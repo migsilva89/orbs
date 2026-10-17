@@ -1,12 +1,10 @@
-import { env } from '@openbots/env/server';
-import { mkdir } from 'node:fs/promises';
-import { join } from 'node:path';
 import { makeDatabaseService } from '@openbots/server/native';
 import { makeAuthService } from '@openbots/server/server';
+import { corePathsNative } from './core-paths.native';
 
 export async function corePairNative(): Promise<void> {
-  await mkdir(env.OPENBOTS_DATA_DIR, { recursive: true });
-  const database = makeDatabaseService({ path: join(env.OPENBOTS_DATA_DIR, 'app.sqlite') });
+  const paths = await corePathsNative();
+  const database = makeDatabaseService({ path: paths.database });
 
   try {
     await database.migrate();

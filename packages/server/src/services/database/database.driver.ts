@@ -48,5 +48,8 @@ export function databaseDriverLoadMigrations() {
     '0001_pairing': readFileSync(new URL('./migrations/0001_pairing.sql', import.meta.url), 'utf8'),
     '0002_pairing_claimed_at': readFileSync(new URL('./migrations/0002_pairing_claimed_at.sql', import.meta.url), 'utf8'),
     '0003_bots': readFileSync(new URL('./migrations/0003_bots.sql', import.meta.url), 'utf8'),
+    '0004_bot_preferences': readFileSync(new URL('./migrations/0004_bot_preferences.sql', import.meta.url), 'utf8'),
+    '0005_credentials': readFileSync(new URL('./migrations/0005_credentials.sql', import.meta.url), 'utf8'),
+    '0006_settings': readFileSync(new URL('./migrations/0006_settings.sql', import.meta.url), 'utf8'),
   };
 }

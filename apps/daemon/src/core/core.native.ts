@@ -2,28 +2,39 @@ import { ModelRuntime } from '@earendil-works/pi-coding-agent';
 import { env } from '@openbots/env/server';
 import { log } from '@openbots/logger/server';
 import { makeStorageService } from '@openbots/runtime/native';
-import { join } from 'node:path';
 import { match } from 'ts-pattern';
 import { makeDatabaseService } from '@openbots/server/native';
 import { makeServices } from '@openbots/server/server';
+import { coreCredentialsNative } from './core-credentials.native';
+import { corePathsNative } from './core-paths.native';
+import { coreResourceNative } from './core-resource.native';
 import { coreServerNative } from './core-server.native';
+import { coreToolsNative } from './core-tools.native';
 
 export async function coreNativeRun(): Promise<void> {
   await using resources = new AsyncDisposableStack();
 
-  const storage = await makeStorageService({ path: join(env.OPENBOTS_DATA_DIR, 'runtime.sqlite') });
+  const paths = await corePathsNative();
+
+  const storage = await makeStorageService({ path: paths.runtime });
   resources.defer(() => storage.close());
 
-  const database = makeDatabaseService({ path: join(env.OPENBOTS_DATA_DIR, 'app.sqlite') });
+  const database = makeDatabaseService({ path: paths.database });
   resources.defer(() => database.close());
   await database.migrate();
 
   const models = await ModelRuntime.create();
+  const credentialsKey = await coreCredentialsNative(paths.data);
 
   const services = await makeServices({
-    storage: storage.storage,
     database,
-    models,
+    credentialsKey,
+    resourceDriver: coreResourceNative(paths.root),
+    runtime: {
+      storage: storage.storage,
+      models,
+      env: coreToolsNative(paths.root),
+    },
   });
 
   resources.defer(() => services.runtime.close());

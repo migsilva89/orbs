@@ -1,53 +1,15 @@
-/** Private route prefixes that share the same URL for all locales. */
-export const PRIVATE_PREFIXES = ['rpc', 'api'] as const;
+import { match, P } from 'ts-pattern';
+import { baseLocale, isLocale } from './paraglide/runtime.js';
+import type { Locale } from './paraglide/runtime.js';
 
-/** Regex for paths that bypass URL-based locale detection — locale comes from cookie instead. */
-export const PRIVATE_PATH_REGEX = new RegExp(`^/(?:${PRIVATE_PREFIXES.join('|')})(?:/|$)`);
+export { baseLocale as BASE_LOCALE, locales as LOCALES } from './paraglide/runtime.js';
+export type { Locale } from './paraglide/runtime.js';
 
-/** Supported locales. */
-export const LOCALES = ['en', 'pt'] as const;
-export type Locale = (typeof LOCALES)[number];
+export function resolveLocale(source: string | null | undefined | object): Locale {
+  const locale = match(source)
+    .with(P.string, (value) => value)
+    .with({ locale: P.string }, (value) => value.locale)
+    .otherwise(() => baseLocale);
 
-/** Default locale. */
-export const BASE_LOCALE = 'en';
-
-type LocaleSource = string | null | undefined | object;
-
-export function resolveLocale(source: LocaleSource): Locale {
-  let locale: unknown;
-
-  if (source instanceof Object) {
-    locale = Object.getOwnPropertyDescriptor(source, 'locale')?.value;
-  } else if (source) {
-    locale = source;
-  }
-
-  return LOCALES.find((supportedLocale) => supportedLocale === locale) ?? BASE_LOCALE;
+  return isLocale(locale) ? locale : baseLocale;
 }
-
-type ParaglideStrategy = 'cookie' | 'baseLocale' | 'globalVariable' | 'url' | 'preferredLanguage' | 'localStorage' | `custom-${string}`;
-
-/** Strategy chain: URL for public paths, then cookie, then browser preference, then base locale fallback. */
-export const STRATEGY: ParaglideStrategy[] = ['custom-privateRoute', 'url', 'cookie', 'preferredLanguage', 'baseLocale'];
-
-interface UrlPattern {
-  pattern: string;
-  localized: [string, string][];
-}
-
-/** URL patterns for locale routing. */
-export const URL_PATTERNS: UrlPattern[] = [
-  // Private routes — no locale prefix, same path for all locales
-  ...PRIVATE_PREFIXES.map((prefix) => ({
-    pattern: `/${prefix}/:path(.*)?`,
-    localized: LOCALES.map((locale): [string, string] => [locale, `/${prefix}/:path(.*)?`]),
-  })),
-  // Public routes — prefix non-default locale only
-  {
-    pattern: '/:path(.*)?',
-    localized: [
-      ['pt', '/pt/:path(.*)?'],
-      ['en', '/:path(.*)?'],
-    ],
-  },
-];

@@ -17,12 +17,15 @@
     "@types/bun": "catalog:"
   },
   "dependencies": {
+    "@openbots/contracts": "workspace:*",
+    "zod": "catalog:",
     "@earendil-works/pi-coding-agent": "catalog:",
     "@openbots/server": "workspace:*",
     "@openbots/runtime": "workspace:*",
     "@openbots/env": "workspace:*",
     "@openbots/logger": "workspace:*",
     "@orpc/server": "catalog:",
-    "ts-pattern": "catalog:"
+    "ts-pattern": "catalog:",
+    "@earendil-works/pi-durable": "catalog:"
   }
 }

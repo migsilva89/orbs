@@ -1,28 +1,36 @@
 import { Errors } from '@openbots/errors/universal';
 import { match, P } from 'ts-pattern';
+import { botActionConfigure } from './bot-action.configure';
+import { botValues } from './bot.utils';
 import type { BotServiceDeps } from '../../types/bot.types';
 import type { BotCreateInput } from '@openbots/contracts/universal';
 
-export async function botActionCreate({ database, runtime }: BotServiceDeps, params: BotCreateInput) {
-  const now = Date.now();
+export async function botActionCreate(deps: BotServiceDeps, params: BotCreateInput) {
+  deps.runtime.queries.validateModel(params);
 
-  const saved = await database.db.insertInto('bot')
-    .values({
-      ...params,
-      id: crypto.randomUUID(),
-      createdAt: now,
-      updatedAt: now,
-    })
-    .onConflict((conflict) => conflict.column('handle').doNothing())
-    .returningAll().executeTakeFirst();
+  const botId = await deps.database.db.transaction().execute(async (tx) => {
+    const now = Date.now();
 
-  const bot = match(saved)
-    .with(P.nonNullable, (value) => value)
-    .otherwise(() => {
-      throw new Errors.CONFLICT();
-    });
+    const saved = await tx.insertInto('bot')
+      .values({
+        ...botValues(params),
+        id: crypto.randomUUID(),
+        createdAt: now,
+        updatedAt: now,
+      })
+      .onConflict((conflict) => conflict.column('handle').doNothing())
+      .returning('id').executeTakeFirst();
 
-  await runtime.actions.configureBot(bot);
+    const id = match(saved)
+      .with(P.nonNullable, (value) => value.id)
+      .otherwise(() => {
+        throw new Errors.CONFLICT();
+      });
 
-  return bot;
+    await deps.resources.actions.prepareDirectory({ botId: id });
+
+    return id;
+  });
+
+  return botActionConfigure(deps, { botId });
 }

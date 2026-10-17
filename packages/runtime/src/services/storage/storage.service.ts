@@ -10,7 +10,10 @@ import type { StorageServiceParams } from '../../types/storage.types';
 export async function makeStorageService({ path }: StorageServiceParams) {
   await mkdir(dirname(resolve(path)), { recursive: true });
 
-  const file = existsSync(path) ? await realpath(path) : join(await realpath(dirname(resolve(path))), basename(path));
+  const file = existsSync(path)
+    ? await realpath(path)
+    : join(await realpath(dirname(resolve(path))), basename(path));
+
   const lock = new DatabaseSync(`${file}.lock`);
 
   try {

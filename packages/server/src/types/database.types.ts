@@ -2,8 +2,25 @@ import { z } from 'zod';
 import type { Bot } from '@openbots/contracts/universal';
 import type { DatabaseSync } from 'node:sqlite';
 
+export interface DatabaseBot extends Omit<Bot, 'avatar' | 'inherit'> {
+  avatar: string | null;
+  inherit: string;
+}
+
 export interface DatabaseSchema {
-  bot: Bot;
+  settings: {
+    key: string;
+    value: string;
+    updatedAt: number;
+  };
+  credentials: {
+    key: string;
+    value: string;
+    iv: string;
+    createdAt: number;
+    updatedAt: number;
+  };
+  bot: DatabaseBot;
   device: {
     id: string;
     name: string;

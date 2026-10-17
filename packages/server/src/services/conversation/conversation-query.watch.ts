@@ -7,8 +7,8 @@ import type { ConversationServiceDeps, ConversationWatchParams } from '../../typ
 import type { ConversationFrame } from '@openbots/contracts/universal';
 
 export async function conversationQueryWatch(
-  { auth, runtime }: ConversationServiceDeps,
-  { deviceId, authorization, signal }: ConversationWatchParams,
+  { auth, runtime, bots }: ConversationServiceDeps,
+  { deviceId, botId, authorization, signal }: ConversationWatchParams,
 ) {
   const revoked = new AbortController();
   const lifetime = AbortSignal.any([revoked.signal, signal ?? revoked.signal]);
@@ -19,7 +19,8 @@ export async function conversationQueryWatch(
 
   try {
     await auth.queries.authenticate({ authorization });
-    const watch = await runtime.watch(withAbortSignal(lifetime, BACKGROUND_CONTEXT));
+    await bots.queries.get({ botId });
+    const watch = await runtime.watch({ botId }, withAbortSignal(lifetime, BACKGROUND_CONTEXT));
     const stream = new TransformStream<ConversationFrame, ConversationFrame>();
     const writer = stream.writable.getWriter();
     const snapshot: ConversationFrame = [['r', copyJson(watch.value, { omitUndefinedProperties: true })]];

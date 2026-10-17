@@ -39,12 +39,18 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
         .otherwise(() => coreHandler(request));
     },
     websocket: {
-      maxPayloadLength: 16 * 1024,
+      maxPayloadLength: 1024 * 1024,
       backpressureLimit: 64 * 1024,
       closeOnBackpressureLimit: true,
       async message(socket, message) {
         await rpc.message(socket, message, {
-          context: { auth: services.auth, conversation: services.conversation },
+          context: {
+            auth: services.auth,
+            bots: services.bots,
+            conversation: services.conversation,
+            tools: services.tools,
+            resources: services.resources,
+          },
         });
       },
       async close(socket) {

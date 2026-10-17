@@ -24,7 +24,6 @@
   "devDependencies": {
     "@openbots/typescript-config": "workspace:*",
     "@types/node": "catalog:",
-    "typescript": "catalog:",
-    "vite": "catalog:"
+    "typescript": "catalog:"
   }
 }

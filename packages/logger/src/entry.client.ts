@@ -1,13 +1,11 @@
 import { initLog, log } from 'evlog/client';
 
-initLog({
-  service: 'openbots',
-  console: Boolean(import.meta.env.DEV),
-  pretty: Boolean(import.meta.env.DEV),
-  transport: {
-    enabled: true,
-    endpoint: '/t/ingest',
-  },
-});
+export function initClientLogger(options: Parameters<typeof initLog>[0] = {}): void {
+  initLog({
+    service: 'openbots',
+    minLevel: 'info',
+    ...options,
+  });
+}
 
 export { log };

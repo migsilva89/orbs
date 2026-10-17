@@ -1,10 +1,17 @@
 import { ConversationBusy } from '@earendil-works/pi-durable';
 import { Errors } from '@openbots/errors/universal';
 import { match, P } from 'ts-pattern';
-import type { RuntimeSubmitDeps, RuntimeSubmitParams } from '../../types/runtime.types';
+import { runtimeQueryConversation } from './runtime-query.conversation';
+import type { RuntimeServiceDeps, RuntimeSubmitParams } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 
-export async function runtimeActionSubmit({ conversation }: RuntimeSubmitDeps, params: RuntimeSubmitParams, context: Context) {
+export async function runtimeActionSubmit(
+  deps: RuntimeServiceDeps,
+  { botId, ...params }: RuntimeSubmitParams,
+  context: Context,
+) {
+  const conversation = await runtimeQueryConversation(deps, { botId }, context);
+
   try {
     return await conversation.submit({ ...params, type: 'input' }, context);
   } catch (error) {

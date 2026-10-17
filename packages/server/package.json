@@ -30,6 +30,7 @@
     "@openbots/contracts": "workspace:*",
     "@orpc/server": "catalog:",
     "@earendil-works/chord": "catalog:",
-    "ts-pattern": "catalog:"
+    "ts-pattern": "catalog:",
+    "@typesafe-ai/sdk": "catalog:"
   }
 }

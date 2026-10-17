@@ -7,5 +7,7 @@
   "validation_already_taken": "This value is already taken.",
   "validation_file_size": "Please upload a smaller file.",
   "validation_file_type": "Please upload a supported file type.",
-  "validation_username": "Use only letters, numbers, dots and underscores."
+  "validation_username": "Use only letters, numbers, dots and underscores.",
+  "validation_model_unknown": "Choose a model available from this provider.",
+  "validation_thinking_level_unsupported": "Choose a thinking level supported by this model."
 }

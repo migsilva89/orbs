@@ -15,6 +15,7 @@
     },
     "check": {
       "dependsOn": [
+        "^check",
         "@openbots/i18n#i18n:compile"
       ]
     },

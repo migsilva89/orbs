@@ -1,7 +1,7 @@
 {
   "extends": "@openbots/typescript-config/base.json",
   "compilerOptions": {
-    "types": ["node", "vite/client"],
+    "types": ["node"],
     "noEmit": true,
     "tsBuildInfoFile": "./node_modules/.cache/typescript/tsbuildinfo.json"
   },

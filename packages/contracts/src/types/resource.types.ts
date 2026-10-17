@@ -22,6 +22,13 @@ export const resourceMcpServer = z.object({
   source: z.string(),
   transport: z.enum(['stdio', 'http']),
   isEnabled: z.boolean(),
+  status: z.enum(['disabled', 'disconnected', 'connecting', 'connected', 'error']),
+  tools: z.array(z.object({
+    name: z.string(),
+    runtimeName: z.string(),
+    title: z.string(),
+    description: z.string(),
+  })),
 });
 
 export const resourceMcpCatalog = z.object({

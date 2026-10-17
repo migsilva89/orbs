@@ -27,8 +27,6 @@ export async function botActionCreate(deps: BotServiceDeps, params: BotCreateInp
         throw new Errors.CONFLICT();
       });
 
-    await deps.resources.actions.prepareDirectory({ botId: id });
-
     return id;
   });
 

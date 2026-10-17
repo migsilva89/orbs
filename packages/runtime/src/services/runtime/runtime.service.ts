@@ -44,6 +44,7 @@ export async function makeRuntimeService({
 
   const deps = {
     harness,
+    registry,
     models,
     readOnlyTools,
     extensions: [...extensions, permissionExtension],

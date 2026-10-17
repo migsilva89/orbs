@@ -7,18 +7,26 @@ import { makeResourceService } from '../services/resource/resource.service';
 import { makeToolService } from '../services/tool/tool.service';
 import type { CoreServicesParams } from '../types/core.types';
 
-export async function makeServices({ database, credentialsKey, resourceDriver, runtime: runtimeOptions }: CoreServicesParams) {
+export async function makeServices({ database, credentialsKey, workspace, skill, mcp, runtime: runtimeOptions }: CoreServicesParams) {
   const credentials = makeCredentialsService({ database, key: credentialsKey });
   const tools = makeToolService({ database, credentials });
   const runtime = await makeRuntimeService({ ...runtimeOptions, permissions: tools });
 
   try {
     const auth = makeAuthService({ database });
-    const resources = makeResourceService({ database, driver: resourceDriver });
+
+    const resources = makeResourceService({
+      database,
+      skill,
+      mcp,
+    });
 
     const bots = makeBotService({
       database,
       runtime,
+      workspace,
+      skill,
+      mcp,
       resources,
     });
 

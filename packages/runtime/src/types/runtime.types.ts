@@ -36,6 +36,7 @@ export interface RuntimeModelsDeps {
 
 export interface RuntimeServiceDeps extends RuntimeModelsDeps {
   harness: PiDurableTypes.Harness;
+  registry: PiDurableTypes.Registry;
   readOnlyTools: PiDurableTypes.ToolRegistration[];
   extensions: PiDurableTypes.Extension[];
 }
@@ -47,6 +48,7 @@ export interface RuntimeBotParams {
   thinkingLevel: ModelThinkingLevel;
   instructions: string;
   skillsPrompt: string;
+  tools: PiDurableTypes.ToolRegistration[];
   permission: 'read-only' | 'ask' | 'auto' | 'full';
 }
 

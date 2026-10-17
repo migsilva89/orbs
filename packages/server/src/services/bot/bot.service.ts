@@ -8,19 +8,21 @@ import { botQueryResources } from './bot-query.resources';
 import type { BotServiceDeps } from '../../types/bot.types';
 import type { BotCreateInput, BotGetInput, BotUpdateInput } from '@openbots/contracts/universal';
 
-export function makeBotService(deps: BotServiceDeps) {
+export function makeBotService(deps: Omit<BotServiceDeps, 'configurations'>) {
+  const serviceDeps: BotServiceDeps = { ...deps, configurations: new Map() };
+
   return {
     actions: {
-      configure: (params: BotGetInput) => botActionConfigure(deps, params),
-      restore: () => botActionRestore(deps),
-      create: (params: BotCreateInput) => botActionCreate(deps, params),
-      update: (params: BotUpdateInput) => botActionUpdate(deps, params),
+      configure: (params: BotGetInput) => botActionConfigure(serviceDeps, params),
+      restore: () => botActionRestore(serviceDeps),
+      create: (params: BotCreateInput) => botActionCreate(serviceDeps, params),
+      update: (params: BotUpdateInput) => botActionUpdate(serviceDeps, params),
     },
     queries: {
-      resources: (params: BotGetInput) => botQueryResources(deps, params),
-      models: () => deps.runtime.queries.models(),
-      list: () => botQueryList(deps),
-      get: (params: BotGetInput) => botQueryGet(deps, params),
+      resources: (params: BotGetInput) => botQueryResources(serviceDeps, params),
+      models: () => serviceDeps.runtime.queries.models(),
+      list: () => botQueryList(serviceDeps),
+      get: (params: BotGetInput) => botQueryGet(serviceDeps, params),
     },
   };
 }

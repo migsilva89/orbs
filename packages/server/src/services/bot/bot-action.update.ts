@@ -25,7 +25,6 @@ export async function botActionUpdate(deps: BotServiceDeps, { botId, ...changes 
       throw new Errors.CONFLICT();
     }).otherwise(() => undefined);
 
-    await deps.resources.actions.prepareDirectory({ botId });
     await tx.updateTable('bot').set({ ...botValues(bot), updatedAt: bot.updatedAt }).where('id', '=', botId).execute();
   });
 

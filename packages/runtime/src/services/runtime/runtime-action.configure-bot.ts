@@ -1,14 +1,17 @@
-import { configure } from '@earendil-works/pi-durable';
+import { configure, defineExtension } from '@earendil-works/pi-durable';
 import { match } from 'ts-pattern';
 import { runtimeBot, runtimeBotConversations } from './runtime.constants';
 import type { RuntimeBotParams, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 
 export function runtimeActionConfigureBot(
-  { harness, extensions, readOnlyTools }: RuntimeServiceDeps,
+  { harness, registry, extensions, readOnlyTools }: RuntimeServiceDeps,
   bot: RuntimeBotParams,
   context: Context,
 ) {
+  const resources = defineExtension({ name: `openbots.resources.${bot.id}`, tools: bot.tools });
+  registry.install(resources);
+
   return harness.commit(async (tx) => {
     const binding = await tx.doc(runtimeBotConversations, bot.id, null);
 
@@ -25,7 +28,7 @@ export function runtimeActionConfigureBot(
       thinkingLevel: bot.thinkingLevel,
       instructions: bot.instructions,
       cwd: `agents/${bot.id}`,
-      extensions,
+      extensions: [resources, ...extensions],
       tools: match(bot.permission)
         .with('read-only', () => readOnlyTools)
         .otherwise(() => null),

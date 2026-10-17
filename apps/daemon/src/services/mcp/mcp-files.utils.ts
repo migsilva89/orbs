@@ -2,7 +2,7 @@ import { readdir, realpath, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { match } from 'ts-pattern';
 
-export async function coreMcpFilesNative(path: string, visited = new Set<string>()): Promise<string[]> {
+export async function mcpFiles(path: string, visited = new Set<string>()): Promise<string[]> {
   const canonical = await realpath(path);
 
   return match(visited.has(canonical))
@@ -27,7 +27,7 @@ export async function coreMcpFilesNative(path: string, visited = new Set<string>
               const shouldScan = isDirectory || child.name === 'mcp.json' || child.name.endsWith('.mcp.json');
 
               return match(shouldScan)
-                .with(true, () => coreMcpFilesNative(childPath, ancestors))
+                .with(true, () => mcpFiles(childPath, ancestors))
                 .with(false, () => [])
                 .exhaustive();
             }));

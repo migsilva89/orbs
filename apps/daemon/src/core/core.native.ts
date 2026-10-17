@@ -5,9 +5,11 @@ import { makeStorageService } from '@openbots/runtime/native';
 import { match } from 'ts-pattern';
 import { makeDatabaseService } from '@openbots/server/native';
 import { makeServices } from '@openbots/server/server';
+import { makeMcpService } from '../services/mcp/mcp.service';
+import { makeSkillService } from '../services/skill/skill.service';
+import { makeWorkspaceService } from '../services/workspace/workspace.service';
 import { coreCredentialsNative } from './core-credentials.native';
 import { corePathsNative } from './core-paths.native';
-import { coreResourceNative } from './core-resource.native';
 import { coreServerNative } from './core-server.native';
 import { coreToolsNative } from './core-tools.native';
 
@@ -25,11 +27,17 @@ export async function coreNativeRun(): Promise<void> {
 
   const models = await ModelRuntime.create();
   const credentialsKey = await coreCredentialsNative(paths.data);
+  const workspace = makeWorkspaceService({ root: paths.root });
+  const skill = makeSkillService({ root: paths.root });
+  const mcp = makeMcpService({ root: paths.root });
+  resources.defer(() => mcp.close());
 
   const services = await makeServices({
     database,
     credentialsKey,
-    resourceDriver: coreResourceNative(paths.root),
+    workspace,
+    skill,
+    mcp,
     runtime: {
       storage: storage.storage,
       models,

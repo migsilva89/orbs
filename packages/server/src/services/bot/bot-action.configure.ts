@@ -1,30 +1,72 @@
-import { Errors } from '@openbots/errors/universal';
-import { match, P } from 'ts-pattern';
-import { botRecord } from './bot.utils';
+import { match } from 'ts-pattern';
+import { botQueryGet } from './bot-query.get';
 import type { BotServiceDeps } from '../../types/bot.types';
-import type { BotGetInput } from '@openbots/contracts/universal';
+import type { Bot, BotGetInput, ResourceSettings } from '@openbots/contracts/universal';
 
-export async function botActionConfigure(
-  { database, runtime, resources }: BotServiceDeps,
-  { botId }: BotGetInput,
-) {
-  const settings = await resources.queries.settings();
+export async function botActionConfigure(deps: BotServiceDeps, { botId }: BotGetInput) {
+  const previous = deps.configurations.get(botId) ?? Promise.resolve();
+  const current = previous.then(botConfigure);
+  const settled = current.then(() => undefined, () => undefined);
+  deps.configurations.set(botId, settled);
 
-  return database.db.transaction().execute(async (tx) => {
-    const row = await tx.selectFrom('bot').selectAll().where('id', '=', botId).executeTakeFirst();
+  try {
+    return await current;
+  } finally {
+    match(deps.configurations.get(botId) === settled)
+      .with(true, () => {
+        deps.configurations.delete(botId);
+      })
+      .with(false, () => undefined)
+      .exhaustive();
+  }
 
-    const bot = match(row)
-      .with(P.nonNullable, botRecord)
-      .otherwise(() => {
-        throw new Errors.NOT_FOUND({ resource: 'bot', resourceId: botId });
-      });
+  async function botConfigure() {
+    const bot = await botQueryGet(deps, { botId });
+    const settings = await deps.resources.queries.settings();
+    return botPublish(bot, settings);
+  }
 
-    await resources.actions.prepareDirectory({ botId: bot.id });
+  async function botPublish(bot: Bot, settings: ResourceSettings): Promise<Bot> {
+    await deps.workspace.actions.prepareDirectory({ botId });
 
-    const { prompt: skillsPrompt } = resources.queries.skills({ bot, settings });
+    const { prompt: skillsPrompt } = deps.skill.queries.load({
+      botId,
+      skillDirs: settings.skillDirs,
+      isInherited: bot.inherit.includes('skills'),
+    });
 
-    await runtime.actions.configureBot({ ...bot, skillsPrompt });
+    const tools = await deps.mcp.actions.prepare({
+      botId,
+      mcpPaths: settings.mcpPaths,
+      isInherited: bot.inherit.includes('mcp'),
+    });
 
-    return bot;
-  });
+    const latestBot = await botQueryGet(deps, { botId });
+    const latestSettings = await deps.resources.queries.settings();
+
+    return match(botConfigureState(bot, settings) === botConfigureState(latestBot, latestSettings))
+      .with(true, async () => {
+        await deps.runtime.actions.configureBot({
+          ...latestBot,
+          skillsPrompt,
+          tools,
+        });
+        return latestBot;
+      })
+      .with(false, () => botPublish(latestBot, latestSettings))
+      .exhaustive();
+  }
+
+  function botConfigureState(bot: Bot, settings: ResourceSettings) {
+    return JSON.stringify({
+      inherit: bot.inherit,
+      modelProvider: bot.modelProvider,
+      modelId: bot.modelId,
+      thinkingLevel: bot.thinkingLevel,
+      instructions: bot.instructions,
+      permission: bot.permission,
+      skillDirs: settings.skillDirs,
+      mcpPaths: settings.mcpPaths,
+    });
+  }
 }

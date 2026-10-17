@@ -7,6 +7,8 @@ export default preset({
     'apps/desktop': 'scripts',
     scripts: 'scripts',
     'packages/server': 'server',
+    'packages/contracts': 'packages',
+    'packages/client': 'packages',
     'packages/runtime': 'packages',
     'packages/avatar-blobs': 'packages',
     'packages/env': 'packages',

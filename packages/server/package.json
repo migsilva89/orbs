@@ -10,8 +10,8 @@
   },
   "devDependencies": {
     "@openbots/typescript-config": "workspace:*",
-    "@types/node": "^26.6.2",
-    "typescript": "^7.0.2"
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
   },
   "exports": {
     "./native": "./src/entry.native.ts",
@@ -21,11 +21,15 @@
     }
   },
   "dependencies": {
-    "uqr": "^0.1.2",
+    "uqr": "catalog:",
     "@openbots/errors": "workspace:*",
     "@openbots/logger": "workspace:*",
     "@openbots/runtime": "workspace:*",
-    "kysely": "^0.29.6",
-    "zod": "^4.6.5"
+    "kysely": "catalog:",
+    "zod": "catalog:",
+    "@openbots/contracts": "workspace:*",
+    "@orpc/server": "catalog:",
+    "@earendil-works/chord": "catalog:",
+    "ts-pattern": "catalog:"
   }
 }

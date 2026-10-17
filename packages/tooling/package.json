@@ -15,12 +15,12 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "oxc-parser": "^0.151.0"
+    "oxc-parser": "catalog:"
   },
   "devDependencies": {
     "@openbots/typescript-config": "workspace:*",
-    "@types/node": "^26.6.2",
-    "oxlint": "1.85.0",
-    "typescript": "^7.0.2"
+    "@types/node": "catalog:",
+    "oxlint": "catalog:",
+    "typescript": "catalog:"
   }
 }

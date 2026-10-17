@@ -1,0 +1,29 @@
+{
+  "name": "@openbots/client",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./client": {
+      "types": "./src/entry.client.ts",
+      "default": "./src/entry.client.ts"
+    }
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "lint": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
+    "lint:fix": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
+  },
+  "devDependencies": {
+    "@openbots/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  },
+  "dependencies": {
+    "@openbots/contracts": "workspace:*",
+    "@orpc/client": "catalog:",
+    "@orpc/contract": "catalog:",
+    "@earendil-works/chord": "catalog:",
+    "ts-pattern": "catalog:"
+  }
+}

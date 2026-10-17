@@ -5,13 +5,13 @@
     "": {
       "name": "openbots",
       "devDependencies": {
-        "@vitest/coverage-v8": "5.0.1",
-        "oxlint": "1.85.0",
-        "oxlint-plugin-arch": "0.6.1",
-        "oxlint-tsgolint": "^7.0.2003",
-        "turbo": "^2.11.4",
-        "typescript": "^7.0.2",
-        "vitest": "5.0.1",
+        "@vitest/coverage-v8": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-plugin-arch": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "turbo": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:",
       },
     },
     "apps/daemon": {
@@ -22,12 +22,14 @@
         "@openbots/logger": "workspace:*",
         "@openbots/runtime": "workspace:*",
         "@openbots/server": "workspace:*",
+        "@orpc/server": "catalog:",
+        "ts-pattern": "catalog:",
       },
       "devDependencies": {
         "@openbots/typescript-config": "workspace:*",
-        "@types/bun": "1.4.2",
-        "@types/node": "^26.6.2",
-        "typescript": "^7.0.2",
+        "@types/bun": "catalog:",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
       },
     },
     "packages/avatar-blobs": {
@@ -35,133 +37,200 @@
       "version": "1.0.0",
       "devDependencies": {
         "@openbots/typescript-config": "workspace:*",
-        "@types/node": "^26.6.2",
-        "typescript": "^7.0.2",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/client": {
+      "name": "@openbots/client",
+      "version": "1.0.0",
+      "dependencies": {
+        "@earendil-works/chord": "catalog:",
+        "@openbots/contracts": "workspace:*",
+        "@orpc/client": "catalog:",
+        "@orpc/contract": "catalog:",
+        "ts-pattern": "catalog:",
+      },
+      "devDependencies": {
+        "@openbots/typescript-config": "workspace:*",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/contracts": {
+      "name": "@openbots/contracts",
+      "version": "1.0.0",
+      "dependencies": {
+        "@earendil-works/chord": "catalog:",
+        "@earendil-works/pi-durable": "catalog:",
+        "@openbots/errors": "workspace:*",
+        "@orpc/contract": "catalog:",
+        "zod": "catalog:",
+      },
+      "devDependencies": {
+        "@openbots/typescript-config": "workspace:*",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
       },
     },
     "packages/env": {
       "name": "@openbots/env",
       "version": "1.0.0",
       "dependencies": {
-        "@t3-oss/env-core": "^0.13.11",
-        "zod": "^4.6.5",
+        "@t3-oss/env-core": "catalog:",
+        "zod": "catalog:",
       },
       "devDependencies": {
         "@openbots/typescript-config": "workspace:*",
-        "@types/node": "^26.6.2",
-        "typescript": "^7.0.2",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
       },
     },
     "packages/errors": {
       "name": "@openbots/errors",
       "version": "1.0.0",
       "dependencies": {
-        "@orpc/client": "2.0.0-beta.39",
-        "zod": "^4.6.5",
+        "@orpc/client": "catalog:",
+        "zod": "catalog:",
       },
       "devDependencies": {
         "@openbots/typescript-config": "workspace:*",
-        "@types/node": "^26.6.2",
-        "typescript": "^7.0.2",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
       },
     },
     "packages/i18n": {
       "name": "@openbots/i18n",
       "version": "1.0.0",
       "dependencies": {
-        "@inlang/paraglide-js": "^2.25.4",
-        "ts-pattern": "^5.6.0",
-        "zod": "^4.6.5",
+        "@inlang/paraglide-js": "catalog:",
+        "ts-pattern": "catalog:",
+        "zod": "catalog:",
       },
       "devDependencies": {
         "@openbots/typescript-config": "workspace:*",
-        "@types/node": "^26.6.2",
-        "typescript": "^7.0.2",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
       },
     },
     "packages/logger": {
       "name": "@openbots/logger",
       "version": "1.0.0",
       "dependencies": {
-        "evlog": "^2.29.0",
+        "evlog": "catalog:",
       },
       "devDependencies": {
         "@openbots/typescript-config": "workspace:*",
-        "@types/node": "^26.6.2",
-        "typescript": "^7.0.2",
-        "vite": "^8.3.1",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
       },
     },
     "packages/runtime": {
       "name": "@openbots/runtime",
       "version": "1.0.0",
       "dependencies": {
-        "@earendil-works/chord": "1.3.0",
-        "@earendil-works/pi-ai": "1.3.0",
-        "@earendil-works/pi-durable": "1.3.0",
+        "@earendil-works/chord": "catalog:",
+        "@earendil-works/pi-ai": "catalog:",
+        "@earendil-works/pi-durable": "catalog:",
         "@openbots/errors": "workspace:*",
       },
       "devDependencies": {
         "@openbots/typescript-config": "workspace:*",
-        "@types/node": "^26.6.2",
-        "typescript": "^7.0.2",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
       },
     },
     "packages/server": {
       "name": "@openbots/server",
       "version": "1.0.0",
       "dependencies": {
+        "@earendil-works/chord": "catalog:",
+        "@openbots/contracts": "workspace:*",
         "@openbots/errors": "workspace:*",
         "@openbots/logger": "workspace:*",
         "@openbots/runtime": "workspace:*",
-        "kysely": "^0.29.6",
-        "uqr": "^0.1.2",
-        "zod": "^4.6.5",
+        "@orpc/server": "catalog:",
+        "kysely": "catalog:",
+        "ts-pattern": "catalog:",
+        "uqr": "catalog:",
+        "zod": "catalog:",
       },
       "devDependencies": {
         "@openbots/typescript-config": "workspace:*",
-        "@types/node": "^26.6.2",
-        "typescript": "^7.0.2",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
       },
     },
     "packages/tanstack-helpers": {
       "name": "@openbots/tanstack-helpers",
       "version": "1.0.0",
       "dependencies": {
-        "@tanstack/router-core": "^1.171.32",
-        "schema-dts": "^2.0.0",
-        "type-fest": "^5.10.0",
+        "@tanstack/router-core": "catalog:",
+        "schema-dts": "catalog:",
+        "type-fest": "catalog:",
       },
       "devDependencies": {
         "@openbots/typescript-config": "workspace:*",
-        "@types/node": "^26.6.2",
-        "@types/react": "^19.3.0",
-        "typescript": "^7.0.2",
+        "@types/node": "catalog:",
+        "@types/react": "catalog:",
+        "typescript": "catalog:",
       },
       "peerDependencies": {
-        "react": "*",
+        "react": "catalog:",
       },
     },
     "packages/tooling": {
       "name": "@openbots/tooling",
       "version": "1.0.0",
       "dependencies": {
-        "oxc-parser": "^0.151.0",
+        "oxc-parser": "catalog:",
       },
       "devDependencies": {
         "@openbots/typescript-config": "workspace:*",
-        "@types/node": "^26.6.2",
-        "oxlint": "1.85.0",
-        "typescript": "^7.0.2",
+        "@types/node": "catalog:",
+        "oxlint": "catalog:",
+        "typescript": "catalog:",
       },
     },
     "packages/typescript-config": {
       "name": "@openbots/typescript-config",
       "version": "1.0.0",
       "devDependencies": {
-        "@types/node": "^26.6.2",
+        "@types/node": "catalog:",
       },
     },
+  },
+  "catalog": {
+    "@earendil-works/chord": "1.3.0",
+    "@earendil-works/pi-ai": "1.3.0",
+    "@earendil-works/pi-durable": "1.3.0",
+    "@inlang/paraglide-js": "^2.25.4",
+    "@orpc/client": "2.0.0-beta.39",
+    "@orpc/contract": "2.0.0-beta.39",
+    "@orpc/server": "2.0.0-beta.39",
+    "@t3-oss/env-core": "^0.13.11",
+    "@tanstack/router-core": "^1.171.32",
+    "@types/bun": "1.4.2",
+    "@types/node": "^26.6.2",
+    "@types/react": "^19.3.0",
+    "@vitest/coverage-v8": "5.0.1",
+    "evlog": "^2.29.0",
+    "kysely": "^0.29.6",
+    "oxc-parser": "^0.151.0",
+    "oxlint": "1.85.0",
+    "oxlint-plugin-arch": "0.6.1",
+    "oxlint-tsgolint": "^7.0.2003",
+    "react": "*",
+    "schema-dts": "^2.0.0",
+    "ts-pattern": "^5.9.0",
+    "turbo": "^2.11.4",
+    "type-fest": "^5.10.0",
+    "typescript": "^7.0.2",
+    "uqr": "^0.1.2",
+    "vite": "^8.3.1",
+    "vitest": "5.0.1",
+    "zod": "^4.6.5",
   },
   "packages": {
     "@anthropic-ai/sdk": ["@anthropic-ai/sdk@0.129.0", "", { "dependencies": { "json-schema-to-ts": "^3.1.1", "standardwebhooks": "^1.0.0" }, "peerDependencies": { "zod": "^3.25.0 || ^4.0.0" }, "optionalPeers": ["zod"], "bin": { "anthropic-ai-sdk": "bin/cli" } }, "sha512-MH7LB20kNpGLUpPTe2OG5XvL/KhX8HUO9XyBaFjgFk6TLS4Xjt0VPIuMKywe7POKKPslX+QxSlVok9e+8kG5Nw=="],
@@ -326,6 +395,10 @@
 
     "@openbots/avatar-blobs": ["@openbots/avatar-blobs@workspace:packages/avatar-blobs"],
 
+    "@openbots/client": ["@openbots/client@workspace:packages/client"],
+
+    "@openbots/contracts": ["@openbots/contracts@workspace:packages/contracts"],
+
     "@openbots/daemon": ["@openbots/daemon@workspace:apps/daemon"],
 
     "@openbots/env": ["@openbots/env@workspace:packages/env"],
@@ -347,6 +420,10 @@
     "@openbots/typescript-config": ["@openbots/typescript-config@workspace:packages/typescript-config"],
 
     "@orpc/client": ["@orpc/client@2.0.0-beta.39", "", { "dependencies": { "@orpc/shared": "2.0.0-beta.39", "@standard-server/core": "~0.9.2", "@standard-server/fetch": "~0.9.2", "@standard-server/peer": "~0.9.2" } }, "sha512-S8F9e3FQK3r0RVvm2x80gQ6vdbWTvc0C4oA20DkYVi/XYd9JUKDfyWRPiAJE9nsYdG0lZOXATnKC/D694AySbw=="],
+
+    "@orpc/contract": ["@orpc/contract@2.0.0-beta.39", "", { "dependencies": { "@orpc/client": "2.0.0-beta.39", "@orpc/shared": "2.0.0-beta.39", "@standard-schema/spec": "^1.1.0" } }, "sha512-ukUvMTLu64jXw5XCsd5nS1FgxNyMLquy2EZwVVSvGLhJ/POSIb1oudw8jJfy0MbTx2JkVrmxrzhvazVQiz3f/Q=="],
+
+    "@orpc/server": ["@orpc/server@2.0.0-beta.39", "", { "dependencies": { "@orpc/client": "2.0.0-beta.39", "@orpc/contract": "2.0.0-beta.39", "@orpc/shared": "2.0.0-beta.39", "@standard-server/aws-lambda": "~0.9.2", "@standard-server/core": "~0.9.2", "@standard-server/fastify": "~0.9.2", "@standard-server/fetch": "~0.9.2", "@standard-server/node": "~0.9.2", "@standard-server/peer": "~0.9.2", "cookie": "^2.0.1" }, "peerDependencies": { "crossws": ">=0.3.4", "fastify": ">=5.6.1" }, "optionalPeers": ["crossws", "fastify"] }, "sha512-8sX8UDvJL49rYjF2a2JhjkDMLn8jv9aWWI1mE5A2a7zT2aDM59aapFNGaJ7lttbq8o1qvufsiw8iIuyA9jdOKQ=="],
 
     "@orpc/shared": ["@orpc/shared@2.0.0-beta.39", "", { "dependencies": { "@standard-server/shared": "~0.9.2", "radash": "^12.1.1", "type-fest": "^5.3.1" } }, "sha512-JiUe95bl/cOp8f1zlL1p/0S7MmFIZCsImciquVZjBFSiHtLqT7vCQGbhlxk9S1nK33R6Gv6MQ2/5dUZjn4c5Fg=="],
 
@@ -556,9 +633,17 @@
 
     "@stablelib/base64": ["@stablelib/base64@1.0.1", "", {}, "sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ=="],
 
+    "@standard-schema/spec": ["@standard-schema/spec@1.1.0", "", {}, "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="],
+
+    "@standard-server/aws-lambda": ["@standard-server/aws-lambda@0.9.2", "", { "dependencies": { "@standard-server/core": "0.9.2", "@standard-server/fetch": "0.9.2", "@standard-server/node": "0.9.2", "@standard-server/shared": "0.9.2" } }, "sha512-29ra5sHSQL1/WZd2Vj1hEAiv45zkcU7yEsRDQ0r/C2u+96zW4Zhpn1XMZ6p9eKy8H74IWMqrK7W43OaLaAX3vg=="],
+
     "@standard-server/core": ["@standard-server/core@0.9.2", "", { "dependencies": { "@standard-server/shared": "0.9.2" } }, "sha512-P1tlRyxyM9n/toFH69/4O5Xn2V33iFszCy2xgZlqpng03nNNmFFH1ua6holdGbQ5CMeRMoJvlb8iezUhfak6Cw=="],
 
+    "@standard-server/fastify": ["@standard-server/fastify@0.9.2", "", { "dependencies": { "@standard-server/core": "0.9.2", "@standard-server/node": "0.9.2" }, "peerDependencies": { "fastify": ">=5.6.1" }, "optionalPeers": ["fastify"] }, "sha512-/3WuZxXIMYS59lVjUnD28ois0OMXRVwRlaGksIesu+DoiQJecc1zc8nkx5Rsh6Znfup+M2MvhVECyIqbzs8TFg=="],
+
     "@standard-server/fetch": ["@standard-server/fetch@0.9.2", "", { "dependencies": { "@standard-server/core": "0.9.2", "@standard-server/shared": "0.9.2" } }, "sha512-tqvbaMra8jUK0glOajYom7rA9udO2xQ0/2Svfj68ba8T/9jADSUVRsrzecsucs3fA2Gqmg8mWniOWCV2r6Aq2A=="],
+
+    "@standard-server/node": ["@standard-server/node@0.9.2", "", { "dependencies": { "@standard-server/core": "0.9.2", "@standard-server/fetch": "0.9.2", "@standard-server/shared": "0.9.2" } }, "sha512-O+drGGJhOwGgUS4lzB1WveXoYs0zEJG8xj5u9Tc7+giho8GnVxE+J2HkFM2pGxuQh0UrCEFoHvzlPsadFqh9AQ=="],
 
     "@standard-server/peer": ["@standard-server/peer@0.9.2", "", { "dependencies": { "@standard-server/core": "0.9.2", "@standard-server/shared": "0.9.2" } }, "sha512-4DtQdtwFeid1jBbdzwfD/UkCwT0FEAE2XxpqGjQhQ41tT551O8IWANX9WHjMrdSUuP5AR8ayL0FMuLlHbQa4MQ=="],
 
@@ -739,6 +824,8 @@
     "concat-map": ["concat-map@0.0.1", "", {}, "sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg=="],
 
     "consola": ["consola@3.4.0", "", {}, "sha512-EiPU8G6dQG0GFHNR8ljnZFki/8a+cQwEQ+7wpxdChl02Q8HXlwEZWD5lqAF8vC2sEC3Tehr8hy7vErz88LHyUA=="],
+
+    "cookie": ["cookie@2.0.1", "", {}, "sha512-yuToqVvRrj6pfDXREyQAAv8SkAEk/8GS3jQRTiUMm66TVtBYmqQeoEjL2Lmq8Rpo6271vH76InTChTitEAm65w=="],
 
     "cookie-es": ["cookie-es@3.1.1", "", {}, "sha512-UaXxwISYJPTr9hwQxMFYZ7kNhSXboMXP+Z3TRX6f1/NyaGPfuNUZOWP1pUEb75B2HjfklIYLVRfWiFZJyC6Npg=="],
 

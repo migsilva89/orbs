@@ -1,10 +1,10 @@
 # Openbots
 
-A Bun/Turbo scaffold with a native daemon, device pairing, and one persistent Pi Durable conversation. Desktop, mobile, bot schemas, and chat endpoints are not implemented yet.
+A Bun/Turbo scaffold with a native daemon, device pairing, and a live view of one persistent Pi Durable conversation. Desktop, mobile, bot schemas, and chat commands are not implemented yet.
 
 ```text
 apps/       daemon, desktop, mobile
-packages/   server, runtime, avatars, env, errors, i18n, logger, TanStack helpers, tooling, TypeScript presets
+packages/   contracts, client, server, runtime, avatars, env, errors, i18n, logger, TanStack helpers, tooling, TypeScript presets
 scripts/    agent-link sync
 .agents/    architecture, quality gate, Pi Durable examples
 ```
@@ -25,7 +25,7 @@ bun run lint
 bun run --cwd apps/daemon start
 ```
 
-The daemon listens on all IPv4 interfaces (`0.0.0.0`), using port 3000 by default, so it can accept LAN and Tailscale connections. Set `OPENBOTS_HOST` to bind a specific interface. `GET /health` returns `{ "status": "ok" }`. Other routes require device authentication except pairing-token redemption. SIGINT/SIGTERM stop the listener gracefully. Health confirms HTTP handling only, not database or agent readiness.
+The daemon listens on all IPv4 interfaces (`0.0.0.0`), using port 3000 by default, so it can accept LAN and Tailscale connections. Set `OPENBOTS_HOST` to bind a specific interface. `GET /health` returns `{ "status": "ok" }`. The `/rpc` WebSocket carries all product operations. Pairing redemption uses a single-use pairing token; other RPC calls authenticate a device credential. Other HTTP paths return 404. SIGINT/SIGTERM close connections and stop the listener. Health confirms HTTP handling only, not database or agent readiness.
 
 Startup opens `runtime.sqlite` in the data directory, acquires a single-process lock, opens and migrates `app.sqlite`, then reopens Pi's root conversation and calls `resume()`. Shutdown closes the listener, Harness, app database, and storage lock. Use a separate data directory per independent daemon.
 
@@ -45,13 +45,13 @@ bun run --cwd apps/daemon pair
 
 It prints a single-use pairing token and its expiry time. The token lasts five minutes. This command works while the daemon is running and also recovers access when all device credentials are lost. It opens only the app database, without starting a listener or Pi runtime.
 
-| Request | Access | Result |
+| RPC call | Access | Result |
 | --- | --- | --- |
-| `POST /pairing/redeem` with `{ "token": "<pairing-token>", "name": "<device-name>" }` | Pairing token | Device metadata and a new device token |
-| `POST /pairing` with `{ "serverUrl": "https://daemon.example" }` | Device bearer token | Five-minute token, expiry, and `qr: { payload, svg }` |
-| `POST /pairing/status` with `{ "token": "<pairing-token>" }` | Device bearer token | Grant expiry, issuer, and `claimedAt` (Unix milliseconds, or `null` while unclaimed) |
-| `GET /devices` | Device bearer token | Paired device IDs, names, and creation times |
-| `DELETE /devices/<id>` | Device bearer token | Revokes that device and its unused pairing grants; may revoke itself |
+| `pairing.redeem({ token, name })` | Pairing token | Device metadata and a new device token |
+| `pairing.create({ serverUrl })` | Device bearer token | Five-minute token, expiry, and `qr: { payload, svg }` |
+| `pairing.status({ token })` | Device bearer token | Grant expiry, issuer, and `claimedAt` (Unix milliseconds, or `null` while unclaimed) |
+| `devices.list()` | Device bearer token | Paired device IDs, names, and creation times |
+| `devices.revoke({ id })` | Device bearer token | Revokes that device and its unused pairing grants; may revoke itself |
 
 Send device credentials as `Authorization: Bearer <device-token>`. They remain valid until revoked. The database stores SHA-256 hashes of random 256-bit tokens; plaintext credentials are returned only when issued. Losing a redemption response requires a new pairing token. All paired devices have the same owner access.
 
@@ -59,7 +59,51 @@ Claimed grants retain their timestamp after expiry. Unclaimed expired grants are
 
 The pairing API renders `qr.svg` for immediate display. `qr.payload` is the exact encoded JSON string: `{ version: 1, serverUrl, token, expiresAt }`. Clients can also render that string themselves. Supply the address the new device can reach; the API normalizes the HTTP(S) origin and rejects credentials, paths, query strings, fragments, and local bind/loopback addresses. Scanning requires the app's future QR reader; this is not an app deep link.
 
-Use HTTPS or the encrypted Tailscale path for remote pairing and requests. The native listener does not terminate TLS. No cookies or query-string tokens are accepted; foreign browser origins are rejected. QR scanning, desktop/mobile credential storage, browser UI integration, throttling, and socket revocation remain pending. See the [pairing plan](.agents/plans/main/05-auth-and-pairing.md).
+Use HTTPS or the encrypted Tailscale path for remote pairing and requests. The native listener does not terminate TLS. No cookies or query-string tokens are accepted; foreign browser origins are rejected. QR scanning, desktop/mobile credential storage, browser UI integration, and throttling remain pending. See the [pairing plan](.agents/plans/main/05-auth-and-pairing.md).
+
+## First RPC example
+
+`devices.list()` uses an [oRPC contract](https://orpc.dev/docs/contract-first) in `packages/contracts`, an implementation in `packages/server`, and the daemon's [WebSocket adapter](https://orpc.dev/docs/adapters/websocket) at `/rpc`. It returns only device IDs, names, and creation times. Pairing and device management use this same transport; the former HTTP endpoints have been removed.
+
+```typescript
+import { makeClient } from '@openbots/client/client';
+
+const client = makeClient({
+  connect: () => new WebSocket('wss://daemon.example/rpc'),
+  token: () => deviceToken,
+});
+const devices = await client.devices.list();
+```
+
+An unpaired client omits the credential getter and redeems the token from the QR or local command:
+
+```typescript
+const client = makeClient({
+  connect: () => new WebSocket('wss://daemon.example/rpc'),
+});
+const paired = await client.pairing.redeem({ token: pairingToken, name: deviceName });
+```
+
+Store `paired.token` securely, then supply it through the credential getter for authenticated calls. Grant creation and redemption are never retried automatically.
+
+The calling app supplies the socket factory and secure credential storage. It must retain and close its sockets when leaving a daemon. The credential getter runs per call; oRPC sends it in that call's headers, not the URL. Server middleware checks the database each time, so revocation rejects subsequent calls on the same socket.
+
+## Live conversation
+
+`conversation.watch()` streams the root conversation using [Pi's watch pattern](.agents/docs/pi-durable.md): an initial replacement snapshot, then committed Chord operations. The client helper applies those operations and yields the current view:
+
+```typescript
+import { watchConversation } from '@openbots/client/client';
+
+const controller = new AbortController();
+for await (const view of watchConversation(client, controller.signal)) {
+  render(view);
+}
+```
+
+Call `controller.abort()` when leaving the view. Disconnecting or cancelling stops observation, not the agent. oRPC reconnects interrupted watch calls and receives a fresh snapshot; it does not retry authentication failures or replay submitted messages. Revoking a device ends its subscriptions even while idle. Pi handles slow watchers with bounded pending frames and replacement snapshots.
+
+This is an owner-only view of the existing root conversation. Multiple rooms, public group views, model setup, and submit/stop endpoints are still pending. Verification used real Pi state and oRPC frames over in-memory sockets, including two clients, reconnect, revocation, cancellation, and a slow reader; live network and app UI verification remain pending.
 
 ## Configuration
 

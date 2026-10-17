@@ -1,35 +1,25 @@
-import { z } from 'zod';
 import type { DatabaseService } from '../services/database/database.service';
+import type { AuthPairInput } from '@openbots/contracts/universal';
 
-export interface AuthServiceDeps {
+export interface AuthServiceParams {
   database: DatabaseService;
 }
 
-export const authToken = z.string().regex(/^[a-f0-9]{64}$/);
+export interface AuthServiceDeps extends AuthServiceParams {
+  revocations: Set<AuthRevocationListener>;
+}
 
-export const authRedeem = z.object({
-  token: authToken,
-  name: z.string().trim().min(1).max(100),
-});
+export type AuthRevocationListener = (deviceId: string) => void;
 
-export const authDeviceId = z.uuid();
-export const authGrantStatus = authRedeem.pick({ token: true });
-
-export const authPair = z.object({
-  serverUrl: z.url({ protocol: /^https?$/ }).max(512).transform((value) => new URL(value)).refine((url) => {
-    return !url.username && !url.password && !url.search && !url.hash && url.pathname === '/'
-      && !['0.0.0.0', '[::]', '[::1]', 'localhost'].includes(url.hostname)
-      && !url.hostname.startsWith('127.') && !url.hostname.endsWith('.localhost');
-  }, 'Use a reachable HTTP or HTTPS server origin').transform((url) => url.origin),
-});
-
-export type AuthRedeemParams = z.infer<typeof authRedeem>;
 export interface AuthGrantParams {
   issuedBy: string | null;
 }
-export type AuthPairParams = AuthGrantParams & z.infer<typeof authPair>;
+export type AuthPairParams = AuthGrantParams & AuthPairInput;
 export interface AuthTokenParams {
   token: string;
+}
+export interface AuthAuthenticateParams {
+  authorization: string | null | undefined;
 }
 export interface AuthRevokeParams {
   id: string;

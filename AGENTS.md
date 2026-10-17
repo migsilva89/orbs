@@ -1,6 +1,6 @@
 # Openbots
 
-Bot app scaffold with a native daemon, device pairing, shared server, and one persistent Pi Durable conversation. Desktop, mobile, bot schemas, and chat endpoints are not implemented.
+Bot app scaffold with a native daemon, device pairing, shared server, and an authenticated live view of one persistent Pi Durable conversation. Desktop, mobile, bot schemas, and chat commands are not implemented.
 
 ## Read first
 

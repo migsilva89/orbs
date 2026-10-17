@@ -1,7 +1,9 @@
 import { z } from 'zod';
+import type { Bot } from '@openbots/contracts/universal';
 import type { DatabaseSync } from 'node:sqlite';
 
 export interface DatabaseSchema {
+  bot: Bot;
   device: {
     id: string;
     name: string;

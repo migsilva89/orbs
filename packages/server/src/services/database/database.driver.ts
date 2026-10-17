@@ -47,5 +47,6 @@ export function databaseDriverLoadMigrations() {
   return {
     '0001_pairing': readFileSync(new URL('./migrations/0001_pairing.sql', import.meta.url), 'utf8'),
     '0002_pairing_claimed_at': readFileSync(new URL('./migrations/0002_pairing_claimed_at.sql', import.meta.url), 'utf8'),
+    '0003_bots': readFileSync(new URL('./migrations/0003_bots.sql', import.meta.url), 'utf8'),
   };
 }

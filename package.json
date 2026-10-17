@@ -1,0 +1,28 @@
+{
+  "name": "openbots",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "bun@1.4.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@vitest/coverage-v8": "5.0.1",
+    "oxlint": "1.85.0",
+    "oxlint-plugin-arch": "0.6.1",
+    "oxlint-tsgolint": "^7.0.2003",
+    "turbo": "^2.11.4",
+    "typescript": "^7.0.2",
+    "vitest": "5.0.1"
+  },
+  "scripts": {
+    "check": "turbo run check",
+    "test": "turbo run test",
+    "test:ci": "turbo run test -- --bail=1",
+    "test:coverage": "vitest run --coverage",
+    "lint": "turbo run lint --continue && oxlint scripts -c ./oxlint.config.ts --disable-nested-config",
+    "lint:fix": "turbo run lint:fix --continue && oxlint scripts -c ./oxlint.config.ts --disable-nested-config --fix"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "extends": "@openbots/typescript-config/base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "tsBuildInfoFile": "./node_modules/.cache/typescript/tsbuildinfo.json",
+    "types": [
+      "bun"
+    ]
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

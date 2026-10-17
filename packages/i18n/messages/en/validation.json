@@ -1,0 +1,11 @@
+{
+  "validation_email": "Please enter a valid email address.",
+  "validation_handle": "Use lowercase letters, numbers and single dashes.",
+  "validation_pick_one": "Pick at least one.",
+  "validation_number": "Please enter a valid number for {field}.",
+  "validation_required": "The {field} field is required.",
+  "validation_already_taken": "This value is already taken.",
+  "validation_file_size": "Please upload a smaller file.",
+  "validation_file_type": "Please upload a supported file type.",
+  "validation_username": "Use only letters, numbers, dots and underscores."
+}

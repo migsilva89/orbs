@@ -1,0 +1,22 @@
+.env*
+!.env.example
+.dev.vars*
+.prod.vars
+dist/
+.wrangler/
+data/
+*.log
+.DS_Store
+.cache/
+node_modules/
+.turbo/
+coverage/
+.fallow/
+packages/i18n/src/paraglide/
+
+# Local agent work, never published
+.agents/plans/
+.agents/research/
+.agents/tasks.md
+
+packages/i18n/project.inlang/cache/

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "tasks": {
+    "i18n:compile": {
+      "outputs": [
+        "src/paraglide/**"
+      ],
+      "inputs": [
+        "messages/**",
+        "project.inlang/settings.json",
+        "scripts/**",
+        "src/config.ts",
+        "src/entry.vite.ts"
+      ]
+    },
+    "check": {
+      "dependsOn": [
+        "@openbots/i18n#i18n:compile"
+      ]
+    },
+    "lint": {
+      "dependsOn": [
+        "@openbots/i18n#i18n:compile"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "../../oxlint.config.ts"
+      ]
+    },
+    "lint:fix": {
+      "cache": false
+    },
+    "test": {
+      "dependsOn": [
+        "@openbots/i18n#i18n:compile"
+      ],
+      "outputs": []
+    }
+  }
+}

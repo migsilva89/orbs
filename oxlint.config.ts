@@ -1,0 +1,22 @@
+import preset from 'oxlint-plugin-arch/presets/tanstack-start-react-modules-preset';
+
+export default preset({
+  root: import.meta.dirname,
+  architecture: {
+    'apps/daemon': 'server',
+    'apps/desktop': 'scripts',
+    scripts: 'scripts',
+    'packages/server': 'server',
+    'packages/runtime': 'packages',
+    'packages/avatar-blobs': 'packages',
+    'packages/env': 'packages',
+    'packages/errors': 'packages',
+    'packages/i18n': 'packages',
+    'packages/logger': 'packages',
+    'packages/tanstack-helpers': 'packages',
+    'packages/tooling': 'packages',
+    'packages/typescript-config': 'packages',
+  },
+  modules: { customFileRoles: ['prompts', 'driver', 'options'] },
+  tests: { additionalAssertionFunctions: ['arch.**.to*'] },
+});

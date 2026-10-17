@@ -1,6 +1,6 @@
 # Openbots
 
-A Bun/Turbo scaffold with a native daemon, device pairing, and a live view of one persistent Pi Durable conversation. Desktop, mobile, bot schemas, and chat commands are not implemented yet.
+A Bun/Turbo scaffold with a native daemon, device pairing, and authenticated submit, stop, and live view of one persistent Pi Durable conversation. Pi supplies provider authentication and model configuration. Desktop, mobile, bot integration, files, and a provider-login UI are not implemented yet.
 
 ```text
 apps/       daemon, desktop, mobile
@@ -27,13 +27,21 @@ bun run --cwd apps/daemon start
 
 The daemon listens on all IPv4 interfaces (`0.0.0.0`), using port 3000 by default, so it can accept LAN and Tailscale connections. Set `OPENBOTS_HOST` to bind a specific interface. `GET /health` returns `{ "status": "ok" }`. The `/rpc` WebSocket carries all product operations. Pairing redemption uses a single-use pairing token; other RPC calls authenticate a device credential. Other HTTP paths return 404. SIGINT/SIGTERM close connections and stop the listener. Health confirms HTTP handling only, not database or agent readiness.
 
-Startup opens `runtime.sqlite` in the data directory, acquires a single-process lock, opens and migrates `app.sqlite`, then reopens Pi's root conversation and calls `resume()`. Shutdown closes the listener, Harness, app database, and storage lock. Use a separate data directory per independent daemon.
+Startup opens `runtime.sqlite` in the data directory, acquires a single-process lock, opens and migrates `app.sqlite`, creates Pi's model runtime, then reopens Pi's root conversation and calls `resume()`. Shutdown closes the listener, Harness, app database, and storage lock. Use a separate data directory per independent daemon.
 
-The app database uses `node:sqlite` through Kysely, adapted from Orbs. WAL and foreign keys are enabled. Kysely tracks the [SQL migrations](packages/server/src/services/database/migrations/0001_pairing.sql); the first migration creates devices and temporary pairing grants. Bot and provider-credential tables will be added with their features. Pi remains the owner of conversation history.
+The app database uses `node:sqlite` through Kysely, adapted from Orbs. WAL and foreign keys are enabled. Kysely tracks the [SQL migrations](packages/server/src/services/database/migrations/0001_pairing.sql); the first migration creates devices and temporary pairing grants. Bot integration and tool-credential storage remain unfinished. Provider credentials use Pi's auth files, not app tables. Pi Durable remains the owner of conversation history.
 
 The daemon initializes native logging at startup. Startup, runtime, and shutdown failures are logged and set a nonzero exit code.
 
-The internal server service supports submit, watch, history, and stop through Pi Durable 1.3.0. Model registries and agent settings are injected by server code; the daemon currently registers no providers or tools. Real model setup and credentials from the app database are still pending. No fake provider is installed in application code.
+The internal server service supports submit, watch, history, and stop through Pi Durable 1.3.0. The daemon injects Pi's `ModelRuntime` for providers and authentication. No tools or fake providers are installed in application code. Per-bot model selection and agent settings remain unfinished.
+
+## Provider authentication
+
+The daemon uses Pi's `ModelRuntime.create()`, which loads saved provider credentials from `auth.json` and custom model configuration from `models.json` in Pi's agent directory (default `~/.pi/agent`). Existing Pi logins are reused; Pi handles file locking and OAuth refresh. Sign in through Pi's `/login` command if needed. Openbots does not currently expose its own login UI.
+
+Set `PI_CODING_AGENT_DIR` for both Pi and the daemon to use a separate auth/config directory, including for development versus production. Run them as the same OS user to share the default directory. Changing `OPENBOTS_DATA_DIR` changes only Openbots data, not Pi authentication. Pi's auth file is sensitive and is not encrypted by this integration.
+
+This loads provider configuration, not CLI sessions, tools, extensions, or `settings.json`. Durable still stores conversations, tasks, and recovery state in `OPENBOTS_DATA_DIR/runtime.sqlite`. Authentication does not select a conversation's model; the host must supply agent settings until bot configuration is wired.
 
 ## Device pairing
 
@@ -103,7 +111,25 @@ for await (const view of watchConversation(client, controller.signal)) {
 
 Call `controller.abort()` when leaving the view. Disconnecting or cancelling stops observation, not the agent. oRPC reconnects interrupted watch calls and receives a fresh snapshot; it does not retry authentication failures or replay submitted messages. Revoking a device ends its subscriptions even while idle. Pi handles slow watchers with bounded pending frames and replacement snapshots.
 
-This is an owner-only view of the existing root conversation. Multiple rooms, public group views, model setup, and submit/stop endpoints are still pending. Verification used real Pi state and oRPC frames over in-memory sockets, including two clients, reconnect, revocation, cancellation, and a slow reader; live network and app UI verification remain pending.
+This is an owner-only view of the existing root conversation. Bot-specific chats, private bot-to-bot DMs, files, and model setup remain pending. Group rooms and their responder-routing logic are excluded from this version. A disposable real WebSocket check passed pairing, two-client updates, reconnect, final-state agreement, idle revocation, cancellation, and continued execution after disconnect. The slow-reader check used in-memory sockets. Remote network and app UI verification remain pending.
+
+## Submit and stop
+
+The authenticated client exposes Pi's existing submission and abort behavior:
+
+```typescript
+const request = { requestId: crypto.randomUUID(), content: 'Hello', whenBusy: 'followUp' as const };
+const { submissionId } = await client.conversation.submit(request);
+// If the response is lost, retry the same request ID; Pi returns the same submission.
+const retried = await client.conversation.submit(request);
+await client.conversation.stop();
+```
+
+Submit accepts nonempty text and a request ID of 1–128 characters. The returned numeric `submissionId` acknowledges durable admission, not a completed answer; observe the conversation for progress. Pi defaults to `followUp` when busy. `steer` queues input for a steering boundary; `reject` returns `CONFLICT` if busy. Pi treats a reused request ID as the same submission even if its content differs, so use a new ID for new input. Files and image blocks are not accepted by this first contract.
+
+Stop withdraws queued inputs, aborts the ordinary running work, and waits until it is idle. It does not cross Pi's background-task boundaries. Cancelling a client request or leaving the watch does not stop accepted work. Neither submit nor stop is automatically retried.
+
+A disposable real WebSocket check with SQLite and Pi's faux provider passed authentication, input validation, concurrent/reconnect/reopen deduplication, busy modes, explicit stop, queued withdrawal, idle stop, client cancellation, and revoked-command rejection. No real provider credentials or production data were used.
 
 ## Configuration
 
@@ -116,7 +142,7 @@ This is an owner-only view of the existing root conversation. Multiple rooms, pu
 | `OPENBOTS_PORT` | `3000` | Integer from 1 to 65535 |
 | `OPENBOTS_LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
 
-Bot settings and credentials will live in the database. The env package does not read or write local config files or generate secrets.
+Bot settings and tool credentials belong in the app database; provider authentication uses Pi's auth files. The env package does not read or write local config files or generate secrets.
 
 ## References
 

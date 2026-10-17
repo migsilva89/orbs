@@ -1,3 +1,4 @@
+import { ModelRuntime } from '@earendil-works/pi-coding-agent';
 import { env } from '@openbots/env/server';
 import { log } from '@openbots/logger/server';
 import { makeStorageService } from '@openbots/runtime/native';
@@ -17,7 +18,14 @@ export async function coreNativeRun(): Promise<void> {
   resources.defer(() => database.close());
   await database.migrate();
 
-  const services = await makeServices({ storage: storage.storage, database });
+  const models = await ModelRuntime.create();
+
+  const services = await makeServices({
+    storage: storage.storage,
+    database,
+    models,
+  });
+
   resources.defer(() => services.runtime.close());
 
   const server = coreServerNative(services);

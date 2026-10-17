@@ -27,6 +27,7 @@
     "@earendil-works/chord": "catalog:",
     "@earendil-works/pi-ai": "catalog:",
     "@earendil-works/pi-durable": "catalog:",
-    "@openbots/errors": "workspace:*"
+    "@openbots/errors": "workspace:*",
+    "ts-pattern": "catalog:"
   }
 }

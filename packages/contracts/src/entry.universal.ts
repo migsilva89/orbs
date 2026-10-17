@@ -1,4 +1,4 @@
 export { contract } from './rpc/rpc.router';
-export type { ConversationFrame, ConversationView } from './types/conversation.types';
+export type { ConversationFrame, ConversationSubmitInput, ConversationView } from './types/conversation.types';
 export { authToken } from './types/auth.types';
 export type { AuthPairInput, AuthRedeemInput } from './types/auth.types';

@@ -1,7 +1,7 @@
 import { errorSchemas } from '@openbots/errors/universal';
 import { asyncIteratorObject, oc } from '@orpc/contract';
 import { authGrant, authGrantStatus, authPair, authPairResult, authRedeem, authRedeemResult } from '../types/auth.types';
-import { conversationFrame } from '../types/conversation.types';
+import { conversationFrame, conversationStopResult, conversationSubmit, conversationSubmitResult } from '../types/conversation.types';
 import { deviceList, deviceRevoke, deviceRevokeResult } from '../types/device.types';
 
 export const contract = {
@@ -14,6 +14,11 @@ export const contract = {
     }).input(authGrantStatus).output(authGrant),
   },
   conversation: {
+    submit: oc.errors({
+      UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+      CONFLICT: errorSchemas.CONFLICT,
+    }).input(conversationSubmit).output(conversationSubmitResult),
+    stop: oc.errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED }).output(conversationStopResult),
     watch: oc.errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED }).output(asyncIteratorObject(conversationFrame)),
   },
   devices: {

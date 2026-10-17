@@ -17,6 +17,7 @@
     "@types/bun": "catalog:"
   },
   "dependencies": {
+    "@earendil-works/pi-coding-agent": "catalog:",
     "@openbots/server": "workspace:*",
     "@openbots/runtime": "workspace:*",
     "@openbots/env": "workspace:*",

@@ -1,9 +1,9 @@
 import { BACKGROUND_CONTEXT } from '@earendil-works/chord/context';
-import { createModels } from '@earendil-works/pi-ai/models';
 import { createRegistry, Harness } from '@earendil-works/pi-durable';
+import { runtimeActionSubmit } from './runtime-action.submit';
 import type { RuntimeHistoryParams, RuntimeServiceParams, RuntimeSubmitParams } from '../../types/runtime.types';
 
-export async function makeRuntimeService({ storage, models = createModels(), agent }: RuntimeServiceParams) {
+export async function makeRuntimeService({ storage, models, agent }: RuntimeServiceParams) {
   const harness = await Harness.open(storage, { models, registry: createRegistry() }, BACKGROUND_CONTEXT);
 
   try {
@@ -14,10 +14,7 @@ export async function makeRuntimeService({ storage, models = createModels(), age
     return {
       id: conversation.id,
       actions: {
-        submit: (params: RuntimeSubmitParams, context = BACKGROUND_CONTEXT) => conversation.submit({
-          ...params,
-          type: 'input',
-        }, context),
+        submit: (params: RuntimeSubmitParams, context = BACKGROUND_CONTEXT) => runtimeActionSubmit({ conversation }, params, context),
         stop: (context = BACKGROUND_CONTEXT) => conversation.abort(context),
       },
       queries: {

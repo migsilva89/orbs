@@ -9,11 +9,12 @@ export async function authActionGrant({ database }: AuthServiceDeps, { issuedBy 
   const expiresAt = now + AUTH.pairingLifetime;
 
   await database.db.transaction().execute(async (tx) => {
-    await tx.deleteFrom('pairingGrant').where('expiresAt', '<=', now).execute();
+    await tx.deleteFrom('pairingGrant').where('expiresAt', '<=', now).where('claimedAt', 'is', null).execute();
     await tx.insertInto('pairingGrant').values({
       tokenHash,
       issuedBy,
       expiresAt,
+      claimedAt: null,
     }).execute();
   });
 

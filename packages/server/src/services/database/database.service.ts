@@ -1,4 +1,4 @@
-import { Kysely } from 'kysely';
+import { CamelCasePlugin, Kysely } from 'kysely';
 import { Migrator } from 'kysely/migration';
 import { DatabaseSync } from 'node:sqlite';
 import { databaseDriverDialect, databaseDriverLoadMigrations, databaseDriverMigrations } from './database.driver';
@@ -12,6 +12,7 @@ export function makeDatabaseService(params: DatabaseServiceParams) {
 
     const db = new Kysely<DatabaseSchema>({
       dialect: databaseDriverDialect({ database: sqlite }),
+      plugins: [new CamelCasePlugin()],
     });
 
     const migrator = new Migrator({

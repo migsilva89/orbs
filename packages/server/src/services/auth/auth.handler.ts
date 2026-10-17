@@ -1,10 +1,11 @@
 import { Errors } from '@openbots/errors/universal';
-import { authDeviceId, authRedeem, authToken } from '../../types/auth.types';
-import { authActionGrant } from './auth-action.grant';
+import { authDeviceId, authGrantStatus, authPair, authRedeem, authToken } from '../../types/auth.types';
+import { authActionPair } from './auth-action.pair';
 import { authActionRedeem } from './auth-action.redeem';
 import { authActionRevoke } from './auth-action.revoke';
 import { authQueryDevice } from './auth-query.device';
 import { authQueryDevices } from './auth-query.devices';
+import { authQueryGrant } from './auth-query.grant';
 import type { AuthServiceDeps } from '../../types/auth.types';
 
 export async function authHandler(deps: AuthServiceDeps, request: Request): Promise<Response> {
@@ -34,8 +35,24 @@ export async function authHandler(deps: AuthServiceDeps, request: Request): Prom
 
   const device = await authQueryDevice(deps, { token: token.data });
 
+  if (request.method === 'POST' && url.pathname === '/pairing/status') {
+    const params = authGrantStatus.safeParse(await request.json());
+
+    if (!params.success) {
+      throw new Errors.VALIDATION_ERROR({ fields: {} });
+    }
+
+    return Response.json(await authQueryGrant(deps, params.data));
+  }
+
   if (request.method === 'POST' && url.pathname === '/pairing') {
-    return Response.json(await authActionGrant(deps, { issuedBy: device.id }), { status: 201 });
+    const params = authPair.safeParse(await request.json());
+
+    if (!params.success) {
+      throw new Errors.VALIDATION_ERROR({ fields: {} });
+    }
+
+    return Response.json(await authActionPair(deps, { ...params.data, issuedBy: device.id }), { status: 201 });
   }
 
   if (request.method === 'GET' && url.pathname === '/devices') {

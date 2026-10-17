@@ -6,12 +6,15 @@ export async function authActionRedeem({ database }: AuthServiceDeps, params: Au
   const grantHash = await authTokenHash(params.token);
   const token = authTokenCreate();
   const tokenHash = await authTokenHash(token);
-  const device = { id: crypto.randomUUID(), name: params.name, createdAt: Date.now() };
 
-  await database.db.transaction().execute(async (tx) => {
-    const grant = await tx.deleteFrom('pairingGrant')
+  const device = await database.db.transaction().execute(async (tx) => {
+    const claimedAt = Date.now();
+
+    const grant = await tx.updateTable('pairingGrant')
+      .set({ claimedAt })
       .where('tokenHash', '=', grantHash)
-      .where('expiresAt', '>', Date.now())
+      .where('expiresAt', '>', claimedAt)
+      .where('claimedAt', 'is', null)
       .returning('tokenHash')
       .executeTakeFirst();
 
@@ -19,7 +22,10 @@ export async function authActionRedeem({ database }: AuthServiceDeps, params: Au
       throw new Errors.UNAUTHORIZED();
     }
 
-    await tx.insertInto('device').values({ ...device, tokenHash }).execute();
+    const paired = { id: crypto.randomUUID(), name: params.name, createdAt: claimedAt };
+    await tx.insertInto('device').values({ ...paired, tokenHash }).execute();
+
+    return paired;
   });
 
   return { device, token };

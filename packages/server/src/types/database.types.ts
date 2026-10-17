@@ -12,6 +12,7 @@ export interface DatabaseSchema {
     tokenHash: string;
     issuedBy: string | null;
     expiresAt: number;
+    claimedAt: number | null;
   };
 }
 

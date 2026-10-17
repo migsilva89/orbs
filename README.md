@@ -48,13 +48,18 @@ It prints a single-use pairing token and its expiry time. The token lasts five m
 | Request | Access | Result |
 | --- | --- | --- |
 | `POST /pairing/redeem` with `{ "token": "<pairing-token>", "name": "<device-name>" }` | Pairing token | Device metadata and a new device token |
-| `POST /pairing` | Device bearer token | A new five-minute pairing token |
+| `POST /pairing` with `{ "serverUrl": "https://daemon.example" }` | Device bearer token | Five-minute token, expiry, and `qr: { payload, svg }` |
+| `POST /pairing/status` with `{ "token": "<pairing-token>" }` | Device bearer token | Grant expiry, issuer, and `claimedAt` (Unix milliseconds, or `null` while unclaimed) |
 | `GET /devices` | Device bearer token | Paired device IDs, names, and creation times |
 | `DELETE /devices/<id>` | Device bearer token | Revokes that device and its unused pairing grants; may revoke itself |
 
 Send device credentials as `Authorization: Bearer <device-token>`. They remain valid until revoked. The database stores SHA-256 hashes of random 256-bit tokens; plaintext credentials are returned only when issued. Losing a redemption response requires a new pairing token. All paired devices have the same owner access.
 
-Use HTTPS or the encrypted Tailscale path for remote pairing and requests. The native listener does not terminate TLS. No cookies or query-string tokens are accepted; foreign browser origins are rejected. Desktop/mobile credential storage, browser UI integration, throttling, and socket revocation remain pending. See the [pairing plan](.agents/plans/main/05-auth-and-pairing.md).
+Claimed grants retain their timestamp after expiry. Unclaimed expired grants are removed when a new grant is issued. Revoking the issuing device removes its grant records, including claim timestamps; this is pairing status, not a permanent audit log.
+
+The pairing API renders `qr.svg` for immediate display. `qr.payload` is the exact encoded JSON string: `{ version: 1, serverUrl, token, expiresAt }`. Clients can also render that string themselves. Supply the address the new device can reach; the API normalizes the HTTP(S) origin and rejects credentials, paths, query strings, fragments, and local bind/loopback addresses. Scanning requires the app's future QR reader; this is not an app deep link.
+
+Use HTTPS or the encrypted Tailscale path for remote pairing and requests. The native listener does not terminate TLS. No cookies or query-string tokens are accepted; foreign browser origins are rejected. QR scanning, desktop/mobile credential storage, browser UI integration, throttling, and socket revocation remain pending. See the [pairing plan](.agents/plans/main/05-auth-and-pairing.md).
 
 ## Configuration
 

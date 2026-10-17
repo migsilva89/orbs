@@ -66,6 +66,7 @@ src/
 - Shared code stays independent of app entry points. Keep platform bindings and lifecycle code at the host boundary.
 - The daemon imports request handling from `@openbots/server/server`. The server package uses standard Request/Response APIs and imports neither apps nor Bun.
 - `@openbots/server/native` exports the app database factory using `node:sqlite` and Kysely. The host owns opening, migrations, and disposal; it injects the database service into `makeServices`. Keep native database construction out of the portable server entry.
+- App SQL tables, columns, and indexes use snake_case. Kysely's `CamelCasePlugin` maps camelCase TypeScript identifiers and results; write raw SQL migrations in snake_case.
 - `apps/daemon/src/entry.native.ts` initializes logging and selects the host or local pairing command. `core/core.native.ts` owns listener setup, signals, and resource cleanup through one disposal stack. `core/core-pair.native.ts` issues a grant through the auth service without starting Pi or a listener.
 - The server composes `@openbots/runtime/server`; runtime never imports server or apps. The daemon uses `@openbots/runtime/native` only for native storage ownership. Keep that export out of portable server imports.
 - Runtime methods currently expose Pi submission/watch/history values to server code. Define authorized wire contracts before exposing these through HTTP or clients.

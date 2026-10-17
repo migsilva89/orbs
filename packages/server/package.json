@@ -21,6 +21,7 @@
     }
   },
   "dependencies": {
+    "uqr": "^0.1.2",
     "@openbots/errors": "workspace:*",
     "@openbots/logger": "workspace:*",
     "@openbots/runtime": "workspace:*",

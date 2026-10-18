@@ -5,11 +5,17 @@
   "ui_show_less": "Show less",
   "ui_command_compact_description": "Summarize older context while keeping conversation history.",
   "ui_command_reset_description": "Start fresh context while keeping conversation history.",
+  "ui_command_cancel_description": "Cancel a queued message. A running turn is not cancelled.",
   "ui_command_compact_argument_hint": "Optional instructions for the summary",
   "ui_command_reset_argument_hint": "Optional handoff for the new context",
+  "ui_command_cancel_argument_hint": "Queued submission ID",
   "ui_tool_bot_list_description": "List local bots you can contact, with their IDs, names and handles.",
   "ui_tool_ask_bot_description": "Ask a named bot for help and wait for its answer. Use bot_list to find its ID. Busy recipients are rejected; use message_bot to queue work instead. Only owner requests may start peer messages; do not forward peer requests or replies. Context defaults to existing, using the recipient’s main conversation. Choose temporary for a separate context scoped to this conversation and recipient; it rotates after 48 hours on the next message.",
   "ui_tool_message_bot_description": "Send a private request to a named bot in the background. Use bot_list for IDs. Its answer arrives here later; finish your current turn. Only owner requests may start peer messages; do not forward peer requests or replies. Context defaults to existing, using the recipient’s main conversation. Choose temporary for a separate context scoped to this conversation and recipient; it rotates after 48 hours on the next message.",
   "ui_tool_subagent_description": "Run a foreground subagent, or spawn, message, and list named background subagents. Foreground run waits for the child answer. Background spawn and send report back as follow-up input.",
-  "ui_tool_subagent_stop_description": "Stop a named background subagent’s current work. It stays available for later messages."
+  "ui_tool_subagent_stop_description": "Stop a named background subagent’s current work. It stays available for later messages.",
+  "ui_command_retry_description": "Retry the latest failed or stopped reply using the saved conversation.",
+  "ui_command_retry_argument_hint": "Failed run task ID",
+  "ui_tool_ask_description": "Ask the owner a question with optional choices and wait for an answer.",
+  "ui_tool_ask_expired": "The owner did not answer in time."
 }

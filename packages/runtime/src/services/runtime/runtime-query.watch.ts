@@ -1,8 +1,10 @@
 import { replicatedState } from '@earendil-works/chord';
-import { InboxDoc, LiveDoc } from '@earendil-works/pi-durable';
+import { GenerationTask, InboxDoc, LiveDoc } from '@earendil-works/pi-durable';
 import { Errors } from '@openbots/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeQueryConversation } from './runtime-query.conversation';
+import { runtimeRun } from './runtime-run.utils';
+import { runtimeWatchChanges } from './runtime-watch.utils';
 import type { RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ConversationState } from '@openbots/contracts/universal';
@@ -26,25 +28,39 @@ export async function runtimeQueryWatch(deps: RuntimeServiceDeps, params: Runtim
     const state = replicatedState<ConversationState>({
       conversationId: conversation.id,
       latestEntryId: 0,
+      lastRun: null,
+      interactionsRevision: 0,
       live: structuredClone(live.value ?? {}),
       inbox: structuredClone(inbox.value ?? { items: [] }),
     });
 
     // Subscribe before reading the tail; entries committed during attachment must not be missed.
     const unsubscribe = deps.harness.subscribeCommits((publication, commitContext) => {
-      const latestEntryId = publication.changes.reduce((latest, change) => match(change)
-        .with({ type: 'entry', value: { conversationId: conversation.id } }, ({ value }) => Math.max(latest, value.id))
-        .otherwise(() => latest), state.value.latestEntryId);
-
-      state.change(commitContext, (draft) => {
-        draft.latestEntryId = latestEntryId;
-      });
+      state.change(commitContext, (draft) => runtimeWatchChanges(draft, publication.changes));
     });
 
     try {
-      const page = await conversation.entries({}, 1, undefined, context);
+      const [page, tasks] = await Promise.all([
+        conversation.entries({}, 1, undefined, context),
+        deps.harness.commit((tx) => tx.scanTasks({
+          conversationId: conversation.id,
+          kind: GenerationTask.definition.name,
+          order: 'descending',
+        }, 1), context),
+      ]);
+
       state.change(context, (draft) => {
         draft.latestEntryId = Math.max(draft.latestEntryId, page.items[0]?.id ?? 0);
+        match(tasks.items[0])
+          .with(P.nonNullable, (task) => {
+            match(task.id > (draft.lastRun?.taskId ?? 0))
+              .with(true, () => {
+                draft.lastRun = runtimeRun(task);
+              })
+              .with(false, () => undefined)
+              .exhaustive();
+          })
+          .otherwise(() => undefined);
       });
       live.start(async (value) => {
         state.change(context, (draft) => {

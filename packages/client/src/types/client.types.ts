@@ -7,4 +7,5 @@ export interface ClientOptions {
   serverId?: string;
   connect: () => WebSocket;
   token?: () => string | undefined | Promise<string | undefined>;
+  url?: string;
 }

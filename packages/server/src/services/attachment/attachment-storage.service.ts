@@ -1,0 +1,20 @@
+import { attachmentStorageActionRemove } from './attachment-storage-action.remove';
+import { attachmentStorageActionWrite } from './attachment-storage-action.write';
+import { attachmentStorageQueryRead } from './attachment-storage-query.read';
+import { attachmentStorageQueryStale } from './attachment-storage-query.stale';
+import type * as AttachmentStorageTypes from '../../types/attachment-storage.types';
+
+export function makeAttachmentStorageService(deps: AttachmentStorageTypes.AttachmentStorageDeps) {
+  return {
+    actions: {
+      write: (params: AttachmentStorageTypes.AttachmentStorageWriteParams) => attachmentStorageActionWrite(deps, params),
+      remove: (params: AttachmentStorageTypes.AttachmentStorageParams) => attachmentStorageActionRemove(deps, params),
+    },
+    queries: {
+      stale: (params: AttachmentStorageTypes.AttachmentStorageTarget) => attachmentStorageQueryStale(deps, params),
+      read: (params: AttachmentStorageTypes.AttachmentStorageParams) => attachmentStorageQueryRead(deps, params),
+    },
+  };
+}
+
+export type AttachmentStorageService = ReturnType<typeof makeAttachmentStorageService>;

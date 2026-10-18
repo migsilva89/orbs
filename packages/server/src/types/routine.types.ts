@@ -1,0 +1,7 @@
+import type { BotService } from '../services/bot/bot.service';
+import type { RuntimeService } from '@openbots/runtime/server';
+
+export interface RoutineServiceDeps {
+  bots: BotService;
+  runtime: RuntimeService;
+}

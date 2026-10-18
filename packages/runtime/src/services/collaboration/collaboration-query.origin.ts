@@ -1,3 +1,4 @@
+import { ATTACHMENT, REPLY } from '@openbots/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { COLLABORATION } from './collaboration.constants';
 import { collaborationBotId } from './collaboration.utils';
@@ -14,11 +15,11 @@ export async function collaborationQueryOrigin(api: ToolExecutionApi, context: C
       const page = await tx.scanEntries({ conversationId: api.conversationId, order: 'descending' }, 50, cursor);
 
       const input = page.items.find((entry) => (
-        entry.kind === 'pi.user' || entry.kind === COLLABORATION.message || entry.kind === COLLABORATION.reply
+        entry.kind === 'pi.user' || entry.kind === REPLY.entryKind || entry.kind === ATTACHMENT.entryKind || entry.kind === COLLABORATION.message || entry.kind === COLLABORATION.reply
       ));
 
       return match(input)
-        .with(P.nonNullable, (entry) => entry.kind !== 'pi.user')
+        .with(P.nonNullable, (entry) => entry.kind === COLLABORATION.message || entry.kind === COLLABORATION.reply)
         .otherwise(() => match(page.next)
           .with(P.nonNullable, readOrigin)
           .otherwise(() => true));

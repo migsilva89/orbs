@@ -1,12 +1,15 @@
+import type { AttachmentService } from '../services/attachment/attachment.service';
 import type { AuthService } from '../services/auth/auth.service';
 import type { BotService } from '../services/bot/bot.service';
 import type { SkillService } from '../services/skill/skill.service';
 import type { AuthAuthenticateParams } from './auth.types';
 import type { ReplicatedState } from '@earendil-works/chord';
+import type { ConversationAnswerQuestionInput } from '@openbots/contracts/universal';
 import type { RuntimeService } from '@openbots/runtime/server';
 
 export interface ConversationServiceDeps {
   auth: AuthService;
+  attachments: AttachmentService;
   bots: BotService;
   runtime: RuntimeService;
   skill: SkillService;
@@ -36,5 +39,9 @@ export interface ConversationApproveParams {
   botId: string;
   id: number;
   approved: boolean;
+  answeredBy: string;
+}
+
+export interface ConversationAnswerQuestionParams extends ConversationAnswerQuestionInput {
   answeredBy: string;
 }

@@ -9,5 +9,8 @@
   "validation_file_type": "Please upload a supported file type.",
   "validation_username": "Use only letters, numbers, dots and underscores.",
   "validation_model_unknown": "Choose a model available from this provider.",
-  "validation_thinking_level_unsupported": "Choose a thinking level supported by this model."
+  "validation_thinking_level_unsupported": "Choose a thinking level supported by this model.",
+  "validation_command_id_arguments": "Enter a positive whole-number ID.",
+  "validation_reaction_limit": "A message can have at most {max} reactions.",
+  "validation_routine_schedule": "Choose a valid five-field cron expression and timezone."
 }

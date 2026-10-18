@@ -1,15 +1,25 @@
 import { assertValidOp } from '@earendil-works/chord/delta';
 import { type } from '@orpc/contract';
 import { z } from 'zod';
+import { attachmentIds } from './attachment.types';
 import { botAvatar } from './bot.types';
+import type { JsonValue } from '@earendil-works/chord';
 import type { Op } from '@earendil-works/chord/delta';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
+
+export interface ConversationRun {
+  taskId: number;
+  status: PiDurableTypes.TaskState<JsonValue, JsonValue>['status'];
+  outcome: PiDurableTypes.TaskOutcome<JsonValue> | null;
+}
 
 export interface ConversationState {
   conversationId: number;
   latestEntryId: number;
   live: PiDurableTypes.LiveState;
   inbox: PiDurableTypes.InboxState;
+  lastRun: ConversationRun | null;
+  interactionsRevision: number;
 }
 
 export interface ConversationContextWatchState {
@@ -41,10 +51,25 @@ export const conversationContent = z.string().min(1).max(64_000);
 
 export const conversationSubmit = conversationTarget.extend({
   requestId: z.string().min(1).max(128),
-  content: conversationContent,
+  replyToEntryId: z.number().int().positive().optional(),
+  content: z.string().max(64_000).default(''),
+  attachmentIds: attachmentIds.default([]),
   skills: z.array(z.string().trim().min(1).max(128)).max(10).optional(),
-  whenBusy: z.enum(['followUp', 'steer', 'reject']).optional(),
-});
+  whenBusy: z.enum(['followUp', 'steer', 'reject', 'interrupt']).optional(),
+}).refine((value) => value.content.length > 0 || value.attachmentIds.length > 0);
+
+export const conversationUpdateSubmission = conversationTarget.extend({
+  submissionId: z.number().int().positive(),
+  replyToEntryId: z.number().int().positive().nullable().optional(),
+  content: z.string().max(64_000).optional(),
+  attachmentIds: attachmentIds.optional(),
+  skills: z.array(z.string().trim().min(1).max(128)).max(10).optional(),
+  whenBusy: z.enum(['followUp', 'steer']).optional(),
+})
+  .refine((value) => value.content !== undefined || value.whenBusy !== undefined || value.attachmentIds !== undefined || value.replyToEntryId !== undefined)
+  .refine((value) => value.skills === undefined || value.content !== undefined);
+
+export const conversationUpdateSubmissionResult = z.void();
 
 export const conversationSubmitResult = z.object({
   submissionId: z.number().int().positive(),
@@ -64,6 +89,7 @@ export const conversationHistoryResult = type<ConversationHistoryPage>();
 export type ConversationHistoryInput = z.infer<typeof conversationHistory>;
 
 export type ConversationSubmitInput = z.infer<typeof conversationSubmit>;
+export type ConversationUpdateSubmissionInput = z.infer<typeof conversationUpdateSubmission>;
 export type ConversationTarget = z.infer<typeof conversationTarget>;
 
 export const conversationContexts = conversationTarget.extend({
@@ -104,6 +130,9 @@ export type ConversationContextPage = z.infer<typeof conversationContextPage>;
 
 export const conversationPreferences = z.object({
   isPinned: z.boolean(),
+  isHidden: z.boolean(),
+  isMuted: z.boolean(),
+  rank: z.number().int().nonnegative().nullable(),
   readThroughEntryId: z.number().int().nonnegative(),
   hasUnread: z.boolean(),
 });

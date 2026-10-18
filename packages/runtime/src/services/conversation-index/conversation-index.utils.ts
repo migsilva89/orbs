@@ -1,4 +1,5 @@
 import { AssistantEntry, UserEntry } from '@earendil-works/pi-durable';
+import { ATTACHMENT, attachmentMessage, REPLY, replyMessage } from '@openbots/contracts/universal';
 import { Errors } from '@openbots/errors/universal';
 import { match, P } from 'ts-pattern';
 import type { ConversationIndexDocument, ConversationIndexItem, ConversationIndexPreview } from '../../types/conversation-index.types';
@@ -25,6 +26,27 @@ export function conversationIndexMessage(entry: PiDurableTypes.EntryRecord): Con
         })
         .otherwise(() => null);
     })
+    .with(REPLY.entryKind, () => match(replyMessage.safeParse(entry.data))
+      .with({ success: true }, ({ data }) => ({
+        entryId: entry.id,
+        role: 'user' as const,
+        preview: data.content.replace(/\s+/g, ' ').trim().slice(0, 160),
+        createdAt: entry.model?.[0]?.timestamp ?? 0,
+      }))
+      .otherwise(() => null))
+    .with(ATTACHMENT.entryKind, () => match(attachmentMessage.safeParse(entry.data))
+      .with({ success: true, data: P.nonNullable }, ({ data }) => {
+        const preview = (data.content.replace(/\s+/g, ' ').trim() || data.attachments[0]?.name || '').slice(0, 160);
+
+        const createdAt = match(entry.model?.[0])
+          .with({ role: 'user', timestamp: P.number }, (value) => value.timestamp)
+          .otherwise(() => 0);
+
+        return match(preview)
+          .with('', () => null)
+          .otherwise((value) => ({ entryId: entry.id, role: 'user' as const, preview: value, createdAt }));
+      })
+      .otherwise(() => null))
     .otherwise(() => null);
 }
 
@@ -70,6 +92,9 @@ export function conversationIndexFind(index: ConversationIndexDocument, botId: s
 export function conversationIndexPreferences(conversation: ConversationIndexItem) {
   return {
     isPinned: conversation.isPinned,
+    isHidden: conversation.isHidden,
+    isMuted: conversation.isMuted,
+    rank: conversation.rank,
     readThroughEntryId: conversation.readThroughEntryId,
     hasUnread: conversation.lastAssistantEntryId > conversation.readThroughEntryId,
   };

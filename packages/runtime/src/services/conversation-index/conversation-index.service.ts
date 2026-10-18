@@ -2,8 +2,11 @@ import { BACKGROUND_CONTEXT, withAbortSignal } from '@earendil-works/chord/conte
 import { Errors } from '@openbots/errors/universal';
 import { log } from '@openbots/logger/server';
 import { match, P } from 'ts-pattern';
+import { conversationIndexActionArrange } from './conversation-index-action.arrange';
 import { conversationIndexActionMarkRead } from './conversation-index-action.mark-read';
 import { conversationIndexActionRestore } from './conversation-index-action.restore';
+import { conversationIndexActionSetHidden } from './conversation-index-action.set-hidden';
+import { conversationIndexActionSetMuted } from './conversation-index-action.set-muted';
 import { conversationIndexActionSetPinned } from './conversation-index-action.set-pinned';
 import { conversationIndexActionUpdate } from './conversation-index-action.update';
 import { conversationIndexQueryList } from './conversation-index-query.list';
@@ -74,6 +77,9 @@ export async function makeConversationIndexService({ harness }: ConversationInde
     actions: {
       markRead: (params: ConversationMarkReadInput, context: Context) => conversationIndexActionMarkRead(deps, params, context),
       setPinned: (params: ConversationSetPinnedInput, context: Context) => conversationIndexActionSetPinned(deps, params, context),
+      setHidden: (params: ConversationIndexTypes.ConversationIndexSetHiddenParams, context: Context) => conversationIndexActionSetHidden(deps, params, context),
+      setMuted: (params: ConversationIndexTypes.ConversationIndexSetMutedParams, context: Context) => conversationIndexActionSetMuted(deps, params, context),
+      arrange: (params: ConversationIndexTypes.ConversationIndexArrangeParams, context: Context) => conversationIndexActionArrange(deps, params, context),
       restore: (params: ConversationIndexTypes.ConversationIndexRestoreParams, context: Context) => conversationIndexActionRestore(deps, params, context),
     },
     queries: {

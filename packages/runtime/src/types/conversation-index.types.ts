@@ -20,6 +20,18 @@ export const conversationIndexV1 = z.object({
   }).nullable()),
 });
 
+export const conversationIndexV2 = z.object({
+  conversations: z.record(z.string(), conversationSummary.pick({
+    botId: true,
+    conversationId: true,
+    lastMessage: true,
+    isPinned: true,
+    readThroughEntryId: true,
+  }).extend({
+    lastAssistantEntryId: z.number().int().nonnegative(),
+  }).nullable()),
+});
+
 export interface ConversationIndexDocument extends JsonObject {
   conversations: Record<string, ConversationIndexItem | null>;
 }
@@ -31,6 +43,20 @@ export interface ConversationIndexServiceDeps {
 export interface ConversationIndexRestoreParams {
   botId: string;
   conversationId: ConversationId;
+}
+
+export interface ConversationIndexSetHiddenParams {
+  botId: string;
+  isHidden: boolean;
+}
+
+export interface ConversationIndexSetMutedParams {
+  botId: string;
+  isMuted: boolean;
+}
+
+export interface ConversationIndexArrangeParams {
+  botIds: string[];
 }
 
 export interface ConversationIndexDeps extends ConversationIndexServiceDeps {

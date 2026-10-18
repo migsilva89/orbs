@@ -1,9 +1,12 @@
 import type { ConversationIndexService } from '../services/conversation-index/conversation-index.service';
+import type { QuestionService } from '../services/question/question.service';
+import type { RoutineService } from '../services/routine/routine.service';
 import type { CollaborationPolicy } from './collaboration.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ModelThinkingLevel, ToolCall } from '@earendil-works/pi-ai';
 import type { Models } from '@earendil-works/pi-ai/models';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
+import type { Attachment } from '@openbots/contracts/universal';
 
 export interface RuntimeServiceParams {
   storage: PiDurableTypes.Storage;
@@ -39,6 +42,8 @@ export interface RuntimeModelsDeps {
 
 export interface RuntimeServiceDeps extends RuntimeModelsDeps {
   harness: PiDurableTypes.Harness;
+  questions: QuestionService;
+  routines: RoutineService;
   index: ConversationIndexService;
   registry: PiDurableTypes.Registry;
   readOnlyTools: PiDurableTypes.ToolRegistration[];
@@ -80,9 +85,26 @@ export interface RuntimeSubmissionParams extends RuntimeConversationParams {
   requestId: string;
 }
 
-export type RuntimeSubmitParams = Omit<PiDurableTypes.InputSubmissionDraft, 'type' | 'requestId'>
+export interface RuntimeUpdateSubmissionParams extends RuntimeConversationParams {
+  submissionId: number;
+  replyToEntryId?: number | null;
+  content?: string;
+  whenBusy?: 'followUp' | 'steer';
+  attachments?: Attachment[];
+}
+
+type RuntimeSubmitBase = Omit<PiDurableTypes.InputSubmissionDraft, 'type' | 'requestId' | 'whenBusy' | 'entry'>
   & RuntimeConversationParams
-  & { requestId: string };
+  & { requestId: string; attachments?: Attachment[]; replyToEntryId?: number };
+
+export type RuntimeSubmitParams =
+  | (RuntimeSubmitBase & { whenBusy: 'interrupt'; entry?: never })
+  | (RuntimeSubmitBase & {
+    whenBusy?: 'followUp' | 'steer' | 'reject';
+    entry?: PiDurableTypes.InputEntry;
+  });
+
+export type RuntimeInterruptDraft = Pick<Extract<RuntimeSubmitParams, { whenBusy: 'interrupt' }>, 'requestId' | 'content'> & { entry?: PiDurableTypes.InputEntry };
 
 export interface RuntimeHistoryParams extends RuntimeConversationParams {
   limit?: number;
@@ -115,4 +137,10 @@ export interface RuntimeApprovalRequest {
   call: RuntimeToolCall;
   taskId: PiDurableTypes.TaskId;
   context: Context;
+}
+
+export interface RuntimeQuestionAnswer extends RuntimeConversationParams {
+  id: number;
+  answer: string;
+  answeredBy: string;
 }

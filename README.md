@@ -1,6 +1,6 @@
 # Openbots
 
-A Bun/Turbo bot backend with a native daemon, device pairing, bot configuration, and authenticated submit, stop, and live views of persistent per-bot Pi Durable conversations. Pi supplies shared provider authentication. Explicit skill invocation, private peer messages, and foreground/background subagents are available. Desktop, mobile, file APIs, and a provider-login UI are not implemented yet.
+A Bun/Turbo bot backend with a native daemon, device pairing, bot configuration, and authenticated submit, stop, and live views of persistent per-bot Pi Durable conversations. Pi supplies shared provider authentication. Explicit skill invocation, private peer messages, and foreground/background subagents are available. Attachment APIs are available. Desktop, mobile, and a provider-login UI are not implemented yet.
 
 ```text
 apps/       daemon, desktop, mobile
@@ -25,7 +25,7 @@ bun run lint
 bun run --cwd apps/daemon start
 ```
 
-The daemon listens on all IPv4 interfaces (`0.0.0.0`), using port 3000 by default, so it can accept LAN and Tailscale connections. Set `OPENBOTS_HOST` to bind a specific interface. `GET /health` returns `{ "status": "ok" }`. The `/rpc` WebSocket carries all product operations. Pairing redemption uses a single-use pairing token; other RPC calls authenticate a device credential. Other HTTP paths return 404. SIGINT/SIGTERM close connections and stop the listener. Health confirms HTTP handling only, not database or agent readiness.
+The daemon listens on all IPv4 interfaces (`0.0.0.0`), using port 3000 by default, so it can accept LAN and Tailscale connections. Set `OPENBOTS_HOST` to bind a specific interface. `GET /health` returns `{ "status": "ok" }`. The `/rpc` WebSocket carries control and live updates. HTTP POST under `/rpc` carries file upload/download through the same authenticated oRPC router. Pairing redemption uses a single-use pairing token; other RPC calls authenticate a device credential. Other HTTP paths return 404. SIGINT/SIGTERM close connections and stop the listener. Health confirms HTTP handling only, not database or agent readiness.
 
 `OPENBOTS_DATA_DIR` is the only configurable storage path and defaults to `~/.config/openbots/`. Bot records keep IDs, not home-directory paths; derive each working folder from the root and bot ID. The native host expands `~` and resolves relative overrides before using this layout:
 
@@ -61,6 +61,78 @@ Platform apps store the ID with the address and device credential, and use it in
 
 The shared client sends `x-openbots-protocol: 1` on every RPC call, including pairing redemption. Raw clients must send it too. A missing or different version returns `PROTOCOL_MISMATCH` with `supportedVersion` and `receivedVersion`; update the incompatible client or daemon before retrying. This is the application protocol version, independent of Pi and package versions. Protocol and identity failures are not retried automatically. Desktop/mobile connection storage and upgrade screens remain pending.
 
+## Attachments
+
+Create the client with an HTTP RPC base for binary transfers. Upload/download use HTTP; metadata, submissions and live updates keep using WebSocket. Both links send the same device credential, protocol version and optional server ID. Transfers are not automatically retried.
+
+```typescript
+const client = makeClient({ connect, token, serverId, url: '/rpc' });
+const attachment = await client.attachments.upload({ botId, file });
+await client.conversation.submit({
+  botId,
+  requestId: crypto.randomUUID(),
+  content: 'Read this file',
+  attachmentIds: [attachment.id],
+});
+const downloadedFile = await client.attachments.download({ botId, attachmentId: attachment.id });
+```
+
+Use an absolute HTTP(S) RPC URL for a remote daemon. Uploads accept PNG, JPEG, WebP, GIF, PDF, plain text, Markdown, CSV and JSON, up to 10 MiB each and four files per message. Invalid size/type inputs return oRPC’s standard `BAD_REQUEST`; MIME charset parameters are ignored for the allowlist. Files bind to the selected `conversationId`, or the bot's main chat when omitted. Empty text is allowed with files. `attachments.list({ botId, conversationId, limit, before })` pages metadata without reading transcripts or file bytes. A removed cursor returns `NOT_FOUND`; restart the list in that case.
+
+Server/native stores bytes under `agents/<botId>/.attachments/<conversationId>/<attachmentId>/<name>`. Pi stores metadata and owner message references, without a SQL message/file table. Saved and queued attachment messages use `openbots.attachment-message` with `{ content, attachments }`; render that data for the owner text and file cards. Model input contains relative file references. Pi's native `read` tool handles text and supported images; PDF contents require an available bot tool. Upload acceptance alone does not imply PDF understanding. Uploads add references rather than bytes to user entries and the inbox. Pi can later persist image/text contents in native tool-result entries when a tool reads the file.
+
+Queued edits accept `attachmentIds`: omit to preserve files, pass `[]` to remove them, or pass IDs to replace them. A file-only input cannot become empty. Queue, steer and interrupt share this representation. Skill expansion still applies before admission. Peer/custom inputs remain protected from owner queue edits.
+
+`attachments.remove` removes an unretained upload. Abandoned uploads expire after 24 hours and are swept on the next upload to that conversation, including old orphan blobs. Before send/edit, Pi marks selected files retained so deletion cannot race accepted references. Retention and submission are separate commits: failed sends, cancelled queue items and removed queue references can leave retained files. They are not swept or manually removable through this API. Whole-chat/bot deletion and its file cleanup remain pending.
+
+File responses use the oRPC binary protocol and return a `File`, not a public download URL. HTTP RPC responses disable caching and MIME sniffing. Composer upload/paste/drop, file cards and gallery UI remain pending.
+
+## Message interactions
+
+Quoted replies use a saved Pi entry ID. Runtime checks that it belongs to the selected conversation and stores a text snapshot of up to 4,000 characters with the new owner message. The snapshot is context for the model, not a new system instruction. Quotes and attachments can be used together.
+
+```ts
+await client.conversation.submit({
+  botId,
+  requestId: crypto.randomUUID(),
+  content: 'Explain this part.',
+  replyToEntryId: selectedEntry.id,
+});
+await client.conversation.updateSubmission({ botId, submissionId, replyToEntryId: null });
+```
+
+On queued edits, omission preserves the quote; `null` clears it. The same snapshot survives promotion, interruption and restart. Foreign-conversation entries are rejected. Reply rendering remains client work.
+
+`conversation.watch` includes `lastRun`: the latest native generation task ID, status and outcome. A failed, faulted or stopped run can be retried through the existing command endpoint:
+
+```ts
+await client.commands.execute({ botId, name: 'retry', arguments: String(lastRun.taskId) });
+```
+
+Retry starts Pi's generation against the current saved context. It adds no duplicate owner message, does not change the original submission's terminal receipt, and leaves queued inputs for Pi's normal boundaries. Only the latest failed/stopped task can be retried; concurrent or stale retries conflict. A queued context reset conflicts. Retry uses the current context, including any reset or compaction already applied; it does not restore earlier context. Retry cannot undo tool side effects and is never automatically resent by the client.
+
+Owner reactions use one emoji grapheme per value, with at most 20 per visible message. Changes are idempotent and do not run a model. Read only the entry IDs displayed by the client:
+
+```ts
+await client.conversation.setReaction({ botId, entryId, emoji: '👍', isPresent: true });
+const reactions = await client.conversation.reactions({ botId, entryIds: visibleEntryIds });
+```
+
+Pass `isPresent: false` to remove a reaction. Pi documents store reactions beside the selected conversation. Bot-authored reactions and reaction-triggered bot replies remain pending.
+
+Bots can call the `ask` tool with a question and optional choices. Clients read pending questions and submit a choice or free text through authenticated RPC:
+
+```ts
+const questions = await client.conversation.questions({ botId, conversationId });
+const result = await client.conversation.answerQuestion({
+  botId, conversationId, id: question.id, answer: 'Use the smaller version.',
+});
+```
+
+The first answer before the five-minute deadline wins; `result.isAccepted` reports whether it was accepted. Question state and its deadline live in a task-scoped Pi document and survive restart. Stopping the task removes it from pending questions. This is separate from permission approval; the trusted `ask` tool also works in read-only mode. Multi-select cards and skip controls are not implemented.
+
+The selected chat watch includes `interactionsRevision`. Refetch visible reactions and pending questions on the initial state and when this value changes. It is a subscription-local invalidation counter, not a replay cursor. Reconnect starts with current state. Reaction buttons, question cards and retry controls remain UI work.
+
 ## Runtime commands
 
 Authenticated clients discover supported slash commands with `commands.list({ botId })`, then send the selected name and optional trailing text to one endpoint:
@@ -71,11 +143,24 @@ await client.commands.execute({ botId, name: 'compact', arguments: 'Keep the fai
 await client.commands.execute({ botId, name: 'reset', arguments: 'Continue with the login fix' });
 ```
 
-Catalog names omit `/`; clients render that prefix. Runtime owns the catalog and calls Pi Durable's native `compact()` or `reset()`. The server checks the bot and authentication; the daemon transports the request. Descriptions use shared i18n messages.
+Catalog names omit `/`; clients render that prefix. Runtime owns the catalog and calls Pi Durable's native operations. The server checks the bot and authentication; the daemon transports the request. Descriptions use shared i18n messages.
 
 Success means Pi accepted the command, not that compaction finished or a queued reset was placed. Follow `conversation.watch` for state and `conversation.history` for persisted entries. Both operations preserve history. Compact summarizes older context; reset starts empty context or uses the optional text as a handoff. Pi owns busy handling and recovery. Commands are not automatically retried after disconnect.
 
-Only compact and reset are exposed here. Ordinary `conversation.submit` text is unchanged, including text that starts with `/`. Skills remain discoverable through `skills.discover` and `bots.catalog`; pass selected names in `conversation.submit.skills`. CLI-only commands are not exposed.
+Use `cancel` to withdraw one pending submission from the selected conversation:
+
+```typescript
+await client.commands.execute({
+  botId,
+  conversationId,
+  name: 'cancel',
+  arguments: String(submissionId),
+});
+```
+
+Take the ID from `view.inbox.items` or the submit acknowledgement. Arguments must be a positive safe-integer decimal string. Pi atomically withdraws the queued input or write; the current run and other queued items continue. An input already placed into a run returns `CONFLICT`. A finished or previously cancelled submission is a no-op, with no rollback of completed work. Missing IDs or IDs from another conversation return `NOT_FOUND`; invalid arguments return `VALIDATION_ERROR`. Omitting `conversationId` selects the bot's main chat. The existing watch reports the changed inbox.
+
+Compact, reset, cancel and retry are exposed here. Ordinary `conversation.submit` text is unchanged, including text that starts with `/`. Skills remain discoverable through `skills.discover` and `bots.catalog`; pass selected names in `conversation.submit.skills`. CLI-only commands are not exposed.
 
 Command and skill catalog items include `argumentsSchema` (JSON Schema) and nullable `argumentHint` for composer controls. Both currently accept text: send command text as `commands.execute.arguments` and skill text as `conversation.submit.content` with the selected `skills`. Schemas are generated once from those input validators. Skills may declare a hint such as `argument-hint: "[file] [focus]"` in frontmatter; hints do not declare typed fields or substitute placeholders. No argument schema is inferred from skill prose.
 
@@ -174,10 +259,10 @@ The earlier root conversation is retained but no longer exposed by these bot-sco
 
 ```ts
 const chats = await client.conversation.list();
-// Each row also includes isPinned, hasUnread, and readThroughEntryId.
+// Each row includes isPinned, isHidden, isMuted, rank, hasUnread, and readThroughEntryId.
 ```
 
-This authenticated query lists pinned main chats first, then newest message first within each group, with a stable bot-ID tie-break. `lastMessage` is null for an empty chat; otherwise it contains `entryId`, `role`, a plain-text `preview` of at most 160 characters, and `createdAt` from Pi's message timestamp. Names and avatars come from current bot settings. Private contexts and subagents remain details of their originating chat.
+This authenticated query lists visible main chats before hidden ones, then pinned chats, manual rank and newest message, with a stable bot-ID tie-break. Hidden rows remain available so a client can show and unhide them. `lastMessage` is null for an empty chat; otherwise it contains `entryId`, `role`, a plain-text `preview` of at most 160 characters, and `createdAt` from Pi's message timestamp. Names and avatars come from current bot settings. Private contexts and subagents remain details of their originating chat.
 
 Runtime maintains a small session-scoped Pi summary document from committed user and assistant text. Tool output, thinking, reset/compaction entries, and private routing inputs do not replace the preview. Native task-graph state supplies `isRunning` for ordinary work in the main conversation; idle background anchors do not keep it busy. List calls read the summary and task graph, never transcripts or full conversation views.
 
@@ -201,6 +286,14 @@ await client.conversation.markRead({ botId, throughEntryId: lastVisibleEntry.id 
 Pass the last saved entry the user actually viewed. An older request cannot move the read position backwards or clear a later reply. Entries from another chat and unknown IDs are rejected. `hasUnread` means a saved assistant text reply exists after `readThroughEntryId`; owner messages, tool output, thinking, and private routing entries do not create unread state. Opening a subscription does not mark anything read. Both actions return `{ isPinned, readThroughEntryId, hasUnread }`. Use `isPinned: false` to unpin; neither action is automatically retried.
 
 These values stay in Pi's summary document. Pi's document migration preserves existing summaries; startup repairs the latest assistant entry alongside the preview and preserves pins/read positions. Existing replies start unread until marked read. The sidebar UI remains separate work.
+
+```ts
+await client.conversation.setHidden({ botId, isHidden: true });
+await client.conversation.setMuted({ botId, isMuted: true });
+await client.conversation.arrange({ botIds: orderedBotIds });
+```
+
+These actions update the existing Pi index and stream to paired devices. `arrange` ranks the supplied chats and clears omitted ranks; pinning still takes precedence. Hide does not stop work or delete history. Mute records the notification preference; notification delivery and UI are not implemented yet.
 
 ## Skills and MCP discovery
 
@@ -359,13 +452,21 @@ for await (const view of watchConversation(client, { botId }, controller.signal)
 }
 ```
 
-`view.inbox.items` contains Pi's pending submissions, in ID order. Input items carry `id`, `mode` (`steer` or `followUp`), and `content`; `id` matches the submit acknowledgement's `submissionId`. Pending writes use `mode: 'write'` and `entry`, for example a queued reset. Keep them separate from saved messages. Pi removes items when they are placed or withdrawn. This exposes queue state; individual cancellation, editing and promotion controls remain pending.
+`view.inbox.items` contains Pi's pending submissions, in ID order. Input items carry `id`, `mode` (`steer` or `followUp`), and `content`; `id` matches the submit acknowledgement's `submissionId`. Pending writes use `mode: 'write'` and `entry`, for example a queued reset. Keep them separate from saved messages. Pi removes items when they are placed or withdrawn. The queue UI remains pending; the backend exposes editing, promotion and cancellation.
+
+```typescript
+await client.conversation.updateSubmission({ botId, submissionId, content: 'Updated request', skills: ['review'] });
+await client.conversation.updateSubmission({ botId, submissionId, whenBusy: 'steer' });
+await client.commands.execute({ botId, name: 'cancel', arguments: String(submissionId) });
+```
+
+An update changes content, placement mode, or both while the input is still queued. Editing replaces the whole content; selected skills are expanded again for that edit. Omitting `skills` on a content edit removes any previous skill expansion. Changing only `whenBusy` preserves the content. The input keeps its submission ID, request ID and queue position. Once Pi places it, an edit is rejected. Peer messages, subagent reports and passive writes cannot be edited through this operation. All connected devices see the committed inbox update through the existing watch.
 
 Call `controller.abort()` when leaving the view. Disconnecting or cancelling stops observation, not the agent. oRPC reconnects interrupted watch calls and receives fresh live/inbox state and the current entry ID. The client catches up from its last loaded entry; interrupted history reads can retry, while commands and submissions are never automatically retried. Revoking a device ends its subscriptions even while idle. Both document watches and the commit listener close together. Pi's document watch and Chord's state subscriptions bound pending updates; skipped intermediate updates still carry the latest entry ID for history catch-up.
 
 To scroll back, call `conversation.history({ botId, conversationId, cursor: view.historyCursor, limit: 50 })` and continue with the returned `next` cursor. These pages are newest-first; reverse each page for chronological display. Private contexts and subagents load only when explicitly selected by conversation ID. They are details within the originating chat, not extra top-level sidebar chats.
 
-All paired devices have owner access to the selected bot's view. Peer messages default to existing bot conversations; the sidebar UI and file APIs remain pending. Group rooms are excluded. Earlier disposable WebSocket checks verified the single-root transport before bot routing was added. Disposable bot integration checks cover tool approvals and SQLite recovery; live providers remain unverified.
+All paired devices have owner access to the selected bot's view. Peer messages default to existing bot conversations; the sidebar and attachment UI remain pending. Group rooms are excluded. Earlier disposable WebSocket checks verified the single-root transport before bot routing was added. Disposable bot integration checks cover tool approvals and SQLite recovery; live providers remain unverified.
 
 ## Submit and stop
 
@@ -379,7 +480,15 @@ const retried = await client.conversation.submit(request);
 await client.conversation.stop({ botId });
 ```
 
-Submit requires a bot UUID, nonempty text, and a request ID of 1–128 characters. Request IDs are scoped to that bot's Pi conversation. The returned numeric `submissionId` acknowledges durable admission, not a completed answer; observe the conversation for progress. Pi defaults to `followUp` when busy. `steer` queues input for a steering boundary; `reject` returns `CONFLICT` if busy. Pi treats a reused request ID as the same submission even if its content differs, so use a new ID for new input. Files and image blocks are not accepted by this first contract.
+Submit requires a bot UUID, text or attachments, and a request ID of 1–128 characters. Request IDs are scoped to that bot's Pi conversation. The returned numeric `submissionId` acknowledges durable admission, not a completed answer; observe the conversation for progress. Pi defaults to `followUp` when busy. `steer` queues input for a steering boundary; `reject` returns `CONFLICT` if busy. Pi treats a reused request ID as the same submission even if its content differs, so use a new ID for new input. Pass uploaded files through `attachmentIds`; raw image blocks are not accepted by this contract.
+
+| Composer mode | `whenBusy` | Behavior |
+| --- | --- | --- |
+| Queue | `followUp` | Start after the current reply finishes. |
+| Steer | `steer` | Join the current work after its tool round. |
+| Interrupt | `interrupt` | Abort the selected run and start this message first, keeping its other queued inputs. |
+
+Interrupt uses Pi task cancellation and generation. It leaves the inbox unchanged while admitting the replacement. Pending steers can join at the replacement's next tool boundary; follow-ups run after its answer. Interrupt does not undo completed tool effects. If another run starts before the replacement can be admitted, the operation returns `CONFLICT` instead of cancelling that newer run. Reusing an admitted request ID returns its submission without another interruption.
 
 Stop affects only the selected bot: it withdraws queued inputs, aborts ordinary running work, and waits until it is idle. It does not cross Pi's background-task boundaries. Cancelling a client request or leaving the watch does not stop accepted work. Neither submit nor stop is automatically retried.
 
@@ -419,3 +528,27 @@ Pages contain Pi entries, newest first, with an optional `next` cursor. Return t
 MCP connections are owned by `@openbots/runtime/native`, separately for each bot. The MCP service in `@openbots/server/native` owns directory settings and config-file discovery. It passes parsed configuration to runtime clients; the daemon only constructs and wires these objects. Startup, bot changes, and submission prepare enabled servers and reuse unchanged connections. A changed or disabled definition closes its previous connection. Tool-list notifications refresh the catalog on the next preparation; disconnected servers reconnect then. Local command configurations are trusted host configuration and run with the daemon’s OS access.
 
 MCP tool calls use Durable tasks and the same Read-only/Ask/Auto/Full policy as other tools. Remote read-only hints do not bypass approvals; MCP tools are excluded in Read-only mode. Calls forward cancellation and progress, preserve MCP error results, and use `replay: 'unsafe'`. An interrupted external call is not automatically sent again after restart. The host closes MCP clients after stopping the runtime. Connection/discovery requests time out after 10 seconds; tool calls use a 60-second timeout renewed by progress.
+
+## Routines
+
+Authenticated `routines.list/create/update/run/remove` manage schedules for a bot's main conversation. `update` accepts partial fields; set `isEnabled: false` to pause and `true` to resume. Schedules are `{ kind: 'once', runAt }` (epoch milliseconds), `{ kind: 'interval', minutes }`, or `{ kind: 'cron', expression, timezone }`. Cron uses five fields at minute resolution and an explicit IANA timezone, including daylight-saving changes. Randomized `H` fields and seconds are not supported.
+
+```ts
+const routine = await client.routines.create({
+  botId,
+  name: 'Morning summary',
+  prompt: 'Summarize the outstanding work.',
+  schedule: { kind: 'cron', expression: '0 9 * * MON-FRI', timezone: 'Europe/Lisbon' },
+  isEnabled: true,
+});
+await client.routines.update({ botId, routineId: routine.id, isEnabled: false });
+await client.routines.run({ botId, routineId: routine.id });
+```
+
+Pi owns the conversation-scoped routine document and one background task per routine. Waiting uses native `sleep` and `watchDoc`, with no model calls. The task saves its deadline and occurrence before delivery, submits the prompt with a stable request ID and `followUp`, then waits for the native submission receipt. The bot uses its configured model, tools and permission hook. Its answer appears directly in that conversation; there is no separate result-copy turn, SQL queue or message mirror.
+
+One routine has at most one claimed occurrence at a time. `lastRun` reports the occurrence, timestamps, native submission ID, status and failure reason. Pause, removal and edits affect future claims; a claimed occurrence keeps its prompt and finishes even if paused or removed. `run` works while paused without enabling the schedule and returns `CONFLICT` while another occurrence is running or already requested. Manual runs preserve a future scheduled deadline.
+
+After downtime, a saved overdue deadline runs once; missed repetitions are not replayed. Cron chooses the next future calendar time after completion. Intervals wait the specified minutes after completion. A scheduled one-shot disables itself after its receipt settles, including an unanswered result. Resuming a past one-shot explicitly requests it again. On restart, the harness resumes the saved phase and reuses the same submission instead of creating another input. External tool effects still follow Pi's replay guarantees.
+
+The native daemon must remain running. No operating-system wake-up or Cloudflare alarm is installed. The routine editor, live routine-list UI and bot-facing schedule tools are not implemented.

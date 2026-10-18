@@ -1,4 +1,5 @@
 import { makeRuntimeService } from '@openbots/runtime/server';
+import { makeAttachmentService } from '../services/attachment/attachment.service';
 import { makeAuthService } from '../services/auth/auth.service';
 import { makeBotService } from '../services/bot/bot.service';
 import { makeCollaborationService } from '../services/collaboration/collaboration.service';
@@ -6,6 +7,7 @@ import { makeConversationService } from '../services/conversation/conversation.s
 import { makeCredentialsService } from '../services/credentials/credentials.service';
 import { makeInstructionService } from '../services/instruction/instruction.service';
 import { makePluginService } from '../services/plugin/plugin.service';
+import { makeRoutineService } from '../services/routine/routine.service';
 import { makeServerService } from '../services/server/server.service';
 import { makeSkillService } from '../services/skill/skill.service';
 import { makeToolService } from '../services/tool/tool.service';
@@ -13,6 +15,7 @@ import type { CoreServicesParams } from '../types/core.types';
 
 export async function makeServices({
   database,
+  attachmentStorage,
   credentialsKey,
   settings,
   workspace,
@@ -56,11 +59,19 @@ export async function makeServices({
       mcp,
     });
 
+    const attachments = makeAttachmentService({
+      bots,
+      runtime,
+      storage: attachmentStorage,
+    });
+
     await bots.actions.restore();
     runtime.resume();
 
     return {
+      routines: makeRoutineService({ bots, runtime }),
       server,
+      attachments,
       database,
       auth,
       bots,
@@ -75,6 +86,7 @@ export async function makeServices({
         auth,
         bots,
         skill,
+        attachments,
       }),
     };
   } catch (error) {

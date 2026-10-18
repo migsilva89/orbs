@@ -3,8 +3,8 @@ import type { ConversationServiceDeps } from '../../types/conversation.types';
 import type { ConversationSubmitInput } from '@openbots/contracts/universal';
 
 export async function conversationActionSubmit(
-  { runtime, bots, skill }: ConversationServiceDeps,
-  { content, skills, ...params }: ConversationSubmitInput,
+  { runtime, bots, skill, attachments }: ConversationServiceDeps,
+  { content, skills, attachmentIds, ...params }: ConversationSubmitInput,
 ) {
   await bots.queries.get({ botId: params.botId });
   const existing = await runtime.queries.submission(params);
@@ -22,9 +22,12 @@ export async function conversationActionSubmit(
           content,
         }));
 
+      const files = await attachments.actions.prepare({ ...params, attachmentIds });
+
       const submission = await runtime.actions.submit({
         ...params,
         content: expanded.content,
+        attachments: files,
       });
 
       return { submissionId: submission.id };

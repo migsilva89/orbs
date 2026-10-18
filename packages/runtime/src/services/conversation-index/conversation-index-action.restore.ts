@@ -28,6 +28,9 @@ export async function conversationIndexActionRestore(
           lastAssistantEntryId: 0,
           readThroughEntryId: 0,
           isPinned: false,
+          isHidden: false,
+          isMuted: false,
+          rank: null,
         };
       }, context);
 

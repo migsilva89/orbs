@@ -64,6 +64,7 @@ function validationMessage(key: string, params: ValidationParams): string {
     .with('validation_already_taken', () => m.validation_already_taken())
     .with('validation_file_size', () => m.validation_file_size())
     .with('validation_file_type', () => m.validation_file_type())
+    .with('validation_routine_schedule', () => m.validation_routine_schedule())
     .otherwise(() => key);
 }
 

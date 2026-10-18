@@ -1,6 +1,6 @@
 # Openbots
 
-Bot backend with a native daemon, device pairing, bot configuration, and authenticated submit, stop, and live views of persistent per-bot Pi Durable conversations. Pi supplies shared provider authentication. Explicit skills, peer messaging and native subagents are implemented. Desktop, mobile, a DM sidebar, file APIs, and a provider-login UI are not implemented.
+Bot backend with a native daemon, device pairing, bot configuration, and authenticated submit, stop, and live views of persistent per-bot Pi Durable conversations. Pi supplies shared provider authentication. Explicit skills, peer messaging, native subagents and attachment APIs are implemented. Desktop, mobile, a DM sidebar and a provider-login UI are not implemented.
 
 ## Read first
 

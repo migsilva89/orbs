@@ -1,9 +1,11 @@
+import type { AttachmentService } from '../services/attachment/attachment.service';
 import type { AuthService } from '../services/auth/auth.service';
 import type { BotService } from '../services/bot/bot.service';
 import type { ConversationService } from '../services/conversation/conversation.service';
 import type { InstructionService } from '../services/instruction/instruction.service';
 import type { McpService } from '../services/mcp/mcp.service';
 import type { PluginService } from '../services/plugin/plugin.service';
+import type { RoutineService } from '../services/routine/routine.service';
 import type { ServerService } from '../services/server/server.service';
 import type { SkillService } from '../services/skill/skill.service';
 import type { ToolService } from '../services/tool/tool.service';
@@ -12,6 +14,8 @@ import type { RequestHeadersPluginContext } from '@orpc/server/plugins';
 
 export interface RpcContext extends RequestHeadersPluginContext {
   server: ServerService;
+  routines: RoutineService;
+  attachments: AttachmentService;
   auth: AuthService;
   runtime: RuntimeService;
   tools: ToolService;

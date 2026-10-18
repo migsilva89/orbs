@@ -10,7 +10,7 @@ import {
   runtimeEnvNative,
 } from '@openbots/runtime/native';
 import { match } from 'ts-pattern';
-import { credentialsKeyNative, makeDatabaseService, makeMcpService, makeWorkspaceService, workspacePathsNative } from '@openbots/server/native';
+import { credentialsKeyNative, makeAttachmentStorageService, makeDatabaseService, makeMcpService, makeWorkspaceService, workspacePathsNative } from '@openbots/server/native';
 import { makeServices, makeSettingsService } from '@openbots/server/server';
 import { coreServerNative } from './core-server.native';
 
@@ -44,6 +44,7 @@ export async function coreNativeRun(): Promise<void> {
 
   const services = await makeServices({
     database,
+    attachmentStorage: makeAttachmentStorageService({ root: paths.root }),
     credentialsKey,
     settings,
     workspace,

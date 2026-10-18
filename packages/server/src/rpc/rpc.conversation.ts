@@ -1,6 +1,17 @@
 import { authedRouter } from './rpc.procedures';
 
 export const conversation = authedRouter.conversation.router({
+  questions: authedRouter.conversation.questions.handler(async ({ context, input }) => context.conversation.queries.questions(input)),
+  answerQuestion: authedRouter.conversation.answerQuestion.handler(async ({ context, input }) => context.conversation.actions.answerQuestion({
+    ...input,
+    answeredBy: context.device.id,
+  })),
+  setReaction: authedRouter.conversation.setReaction.handler(async ({ context, input }) => context.conversation.actions.setReaction(input)),
+  reactions: authedRouter.conversation.reactions.handler(async ({ context, input }) => context.conversation.queries.reactions(input)),
+  setHidden: authedRouter.conversation.setHidden.handler(async ({ context, input }) => context.conversation.actions.setHidden(input)),
+  setMuted: authedRouter.conversation.setMuted.handler(async ({ context, input }) => context.conversation.actions.setMuted(input)),
+  arrange: authedRouter.conversation.arrange.handler(async ({ context, input }) => context.conversation.actions.arrange(input)),
+
   contextUsage: authedRouter.conversation.contextUsage.handler(async ({ context, input }) => context.conversation.queries.contextUsage(input)),
   watchContexts: authedRouter.conversation.watchContexts.handler(async ({ context, input, signal }) => context.conversation.watchContexts({
     ...input,
@@ -20,6 +31,7 @@ export const conversation = authedRouter.conversation.router({
   list: authedRouter.conversation.list.handler(async ({ context }) => context.conversation.queries.list()),
   history: authedRouter.conversation.history.handler(async ({ context, input }) => context.conversation.queries.history(input)),
   submit: authedRouter.conversation.submit.handler(async ({ context, input }) => context.conversation.actions.submit(input)),
+  updateSubmission: authedRouter.conversation.updateSubmission.handler(async ({ context, input }) => context.conversation.actions.updateSubmission(input)),
   stop: authedRouter.conversation.stop.handler(async ({ context, input }) => context.conversation.actions.stop(input)),
   watch: authedRouter.conversation.watch.handler(async ({ context, input, signal }) => {
     return context.conversation.watch({

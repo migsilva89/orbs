@@ -39,6 +39,12 @@ await conversation.abort(context);
 
 Openbots exposes these through authenticated `conversation.submit` and `conversation.stop`, both requiring `botId`. Each bot owns one persistent conversation, so request-ID deduplication and stop scope remain bot-local. The runtime keeps Pi handles internal and maps busy rejection to `CONFLICT`; the wire acknowledgement contains the numeric submission ID. Commands use the runtime's background context instead of the request's cancellation signal. File/image input remains separate work; authenticated history now uses Pi entry pages.
 
+## Native slash commands
+
+Openbots exposes `commands.list({ botId })` and `commands.execute({ botId, name, arguments? })`. Runtime translates `compact` to `conversation.compact(arguments, context)` and `reset` to `conversation.reset(arguments, context)`, following Pi's [reset and handoff](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/durable/README.md#reset-and-handoff) and [compaction](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/durable/README.md#compaction) APIs. Names omit the slash. Success acknowledges admission; Pi owns completion and busy placement. Both preserve stored entries. No CLI session, application task queue or command-specific RPC is added.
+
+Disposable checks on 2026-10-18 used the authenticated in-process oRPC router, native SQLite stores and Pi's faux model. Catalog/dispatch, unknown and malformed requests, access denial, bot isolation, compaction instructions and asynchronous completion, reset handoff/context, busy reset and history preservation across reopen passed. No live provider or network listener was used.
+
 ## Provider authentication and storage
 
 The daemon creates `ModelRuntime` from `@earendil-works/pi-coding-agent` and passes it to Durable as `models`. It implements Pi's `Models` interface. The portable runtime requires that dependency explicitly instead of creating an empty in-memory registry.
@@ -112,3 +118,25 @@ The pinned [coding-agent example](https://github.com/earendil-works/pi/blob/8efd
 Durable 1.3.0 has no filesystem plugin loader. The native loader discovers configured modules without evaluation, imports them during bot preparation, and validates them with Pi's registry. Runtime registers their original Durable extensions and selects them with `configure({ extensions })`, with the permission hook last. A registry preflight rejects reserved or conflicting names before changing the active registry. No CLI extension adapter or second task runner is introduced. Source paths, inheritance, trust and restart behavior are documented in README.
 
 Disposable checks on 2026-10-18 passed for scoped instruction precedence/inheritance, exclusion of parent instructions, metadata-only plugin discovery, symlink deduplication, per-bot selection, plugin prompt sections and tool execution, Ask recovery through SQLite reopen, Read-only denial, invalid-module diagnostics, and partial/empty settings writes. Existing stdio MCP recovery/cancellation checks also passed with the new services. These used temporary files and Pi's faux provider, without real model calls or a daemon listener; all fixtures were removed.
+
+## Explicit skills and collaboration
+
+`conversation.submit({ botId, requestId, content, skills? })` expands selected catalog names before native input admission. The runtime uses Pi Coding Agent's public `stripFrontmatter` and follows its skill-command XML shape, including the source directory for relative references. Durable has no skill-command dispatcher. Manual-only skills remain discoverable and explicitly selectable. The resulting user entry persists in Pi history and context; it is not automatically added again on later turns.
+
+Before preparation, runtime checks the existing request with Pi's `tx.submissionByRequest(conversationId, requestId)` in a read-only commit. The server returns that submission ID without reloading skills. Disposable SQLite checks verified retries after file removal and reopen, with no extra model call; new submissions still prepare and validate normally.
+
+The collaboration extension follows the pinned [foreground subagent example](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/durable/test/examples/22-subagent-foreground.ts) and [background subagent example](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/durable/test/examples/23-subagent-background.ts). Foreground children belong to the calling tool task. Named background children belong to a background anchor; reporter tasks checkpoint delivery and report phases. Answer text is read with `tx.entry` inside the checkpoint commit: `TaskRuntime.entry` only reads the task's own conversation. Report request IDs use the child conversation and answer entry, so multiple submissions sharing one answer do not publish it twice.
+
+Persistent peers use the same delivery/report pattern and default to their existing ownerless bot conversations. Temporary mode is described below. Server policy checks the named recipient and blocks self-delivery or peer-triggered delegation. `ask_bot` rejects a busy recipient rather than waiting on a mutually blocked bot; `message_bot` queues follow-up input. Task-scoped Pi documents record admission in the same transaction that creates delivery work. No SQL transcript, extra scheduler or process per conversation is introduced.
+
+Child creation copies the app bot identity and skill catalog, retaining the parent's selected extensions except peer/subagent delegation. Existing conversation/command RPCs accept optional `conversationId`; runtime checks the selected conversation's bot identity. Approvals use that same bot policy and appear in `tools.pending` with their child conversation ID. Omitting the ID continues to select the main bot conversation.
+
+Disposable checks on 2026-10-18 used actual service composition, native SQLite and Pi's faux provider. Explicit/manual-only skill selection, unknown-skill rejection, request-ID deduplication, busy peer rejection, one-hop limits, foreground cancellation, named background stop, child access/approval isolation, and background recovery passed. Reopening SQLite preserved pending approvals and delivered one peer input/report and one nonempty child report. No live model, Jev request, network listener or frontend was used for this slice.
+
+## Temporary peer contexts
+
+Peer tools default to the recipient's main conversation. Optional `context: 'temporary'` selects a conversation-scoped Pi document-family member keyed by recipient ID. Each sending conversation therefore owns a separate selection even when the sender bot is the same. Server policy supplies the 48-hour lifetime; runtime owns creation and rotation.
+
+Temporary contexts are fresh ownerless conversations, not transcript forks or task-owned subagents. They use the recipient's agent configuration and bot identity. At the first new temporary admission after expiry, one Pi transaction archives the old metadata, selects a fresh context, and creates the delivery task. The task stores the selected ID; recovery and in-flight replies continue using it after rotation. History is retained. There is no timer, SQL conversation table or second queue.
+
+Disposable native SQLite checks on 2026-10-18 verified default reuse, isolation between sending conversations, recipient configuration refresh, 48-hour rotation, retained history, work completing in its original context, and approval identity/recovery after reopen. These used a faux provider, without a listener or live model.

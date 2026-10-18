@@ -7,10 +7,10 @@ import type { Context } from '@earendil-works/chord/context';
 
 export async function runtimeQueryHistory(
   deps: RuntimeServiceDeps,
-  { botId, limit = 50, cursor }: RuntimeHistoryParams,
+  { botId, conversationId, limit = 50, cursor }: RuntimeHistoryParams,
   context: Context,
 ) {
-  const conversation = await runtimeQueryConversation(deps, { botId }, context);
+  const conversation = await runtimeQueryConversation(deps, { botId, conversationId }, context);
 
   try {
     return await conversation.entries({ order: 'descending' }, limit, cursor, context);

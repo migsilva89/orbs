@@ -10,14 +10,13 @@ export async function runtimeActionApprove(
   params: RuntimeApprovalAnswer,
   context: Context,
 ) {
-  const conversation = await runtimeQueryConversation(deps, params, context);
+  await runtimeQueryConversation(deps, { botId: params.botId }, context);
 
   return deps.harness.commit(async (tx) => {
     const task = await tx.task(params.id as TaskId);
 
     return match(task)
       .with({
-        conversationId: conversation.id,
         kind: 'pi.tool',
         abortRequested: false,
         state: { status: 'running' },
@@ -26,7 +25,7 @@ export async function runtimeActionApprove(
         const now = Date.now();
 
         return match(doc.approval)
-          .with({ status: 'pending' }, (approval) => {
+          .with({ botId: params.botId, status: 'pending' }, (approval) => {
             const accepted = approval.expiresAt > now;
 
             const status = match({ accepted, approved: params.approved })

@@ -1,3 +1,4 @@
+import type { CollaborationPolicy } from './collaboration.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ModelThinkingLevel, ToolCall } from '@earendil-works/pi-ai';
 import type { Models } from '@earendil-works/pi-ai/models';
@@ -8,6 +9,7 @@ export interface RuntimeServiceParams {
   models: Models;
   env: NonNullable<PiDurableTypes.HarnessOptions['env']>;
   permissions: RuntimeToolPolicy;
+  collaboration: CollaborationPolicy;
   toolExtensions?: PiDurableTypes.Extension[];
   readOnlyTools?: PiDurableTypes.ToolRegistration[];
 }
@@ -62,6 +64,11 @@ export interface RuntimeBotBinding extends PiDurableTypes.JsonObject {
 
 export interface RuntimeConversationParams {
   botId: string;
+  conversationId?: number;
+}
+
+export interface RuntimeSubmissionParams extends RuntimeConversationParams {
+  requestId: string;
 }
 
 export type RuntimeSubmitParams = Omit<PiDurableTypes.InputSubmissionDraft, 'type' | 'requestId'>

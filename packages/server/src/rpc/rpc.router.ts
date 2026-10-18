@@ -1,4 +1,5 @@
 import { bots } from './rpc.bots';
+import { commands } from './rpc.commands';
 import { conversation } from './rpc.conversation';
 import { devices } from './rpc.devices';
 import { instructions } from './rpc.instructions';
@@ -11,6 +12,7 @@ import { tools } from './rpc.tools';
 
 export const router = baseRouter.router({
   bots,
+  commands,
   devices,
   conversation,
   pairing,

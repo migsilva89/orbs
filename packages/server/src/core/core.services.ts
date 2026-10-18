@@ -1,6 +1,7 @@
 import { makeRuntimeService } from '@openbots/runtime/server';
 import { makeAuthService } from '../services/auth/auth.service';
 import { makeBotService } from '../services/bot/bot.service';
+import { makeCollaborationService } from '../services/collaboration/collaboration.service';
 import { makeConversationService } from '../services/conversation/conversation.service';
 import { makeCredentialsService } from '../services/credentials/credentials.service';
 import { makeInstructionService } from '../services/instruction/instruction.service';
@@ -28,7 +29,13 @@ export async function makeServices({
     settings,
   });
 
-  const runtime = await makeRuntimeService({ ...runtimeOptions, permissions: tools });
+  const collaboration = makeCollaborationService({ database });
+
+  const runtime = await makeRuntimeService({
+    ...runtimeOptions,
+    permissions: tools,
+    collaboration,
+  });
 
   try {
     const auth = makeAuthService({ database });
@@ -63,6 +70,7 @@ export async function makeServices({
         runtime,
         auth,
         bots,
+        skill,
       }),
     };
   } catch (error) {

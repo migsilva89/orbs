@@ -7,10 +7,10 @@ import type { Context } from '@earendil-works/chord/context';
 
 export async function runtimeActionSubmit(
   deps: RuntimeServiceDeps,
-  { botId, ...params }: RuntimeSubmitParams,
+  { botId, conversationId, ...params }: RuntimeSubmitParams,
   context: Context,
 ) {
-  const conversation = await runtimeQueryConversation(deps, { botId }, context);
+  const conversation = await runtimeQueryConversation(deps, { botId, conversationId }, context);
 
   try {
     return await conversation.submit({ ...params, type: 'input' }, context);

@@ -95,6 +95,7 @@ export type SkillService = ReturnType<typeof makeSkillService>;
 - Pi provider authentication stays in Pi's `ModelRuntime` and auth store. Do not duplicate it in application SQL.
 - `env` contains process/build configuration only. Bot settings and secrets belong in persistence. Derive bot directories from the data root and bot ID; never store machine-specific home paths in bot rows. A working directory is not a sandbox.
 - Pi owns transcripts and execution state. No SQL message mirror, approval table, second task queue or custom waiter registry.
+- Runtime owns the command catalog and execution. Expose generic `commands.list`/`commands.execute`; new runtime commands must not require new RPC endpoints. Keep Pi command names and dispatch out of server policy and daemon transport.
 
 ## Pi and domain integration
 

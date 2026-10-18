@@ -1,21 +1,32 @@
 import { Errors } from '@openbots/errors/universal';
 import { match, P } from 'ts-pattern';
-import { runtimeBotConversations } from './runtime.constants';
+import { runtimeBot, runtimeBotConversations } from './runtime.constants';
 import type { RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
+import type { ConversationId } from '@earendil-works/pi-durable';
 
 export async function runtimeQueryConversation(
   { harness }: RuntimeServiceDeps,
-  { botId }: RuntimeConversationParams,
+  { botId, conversationId: selectedId }: RuntimeConversationParams,
   context: Context,
 ) {
   const binding = await harness.snapshot(runtimeBotConversations, botId, context);
 
-  const conversationId = match(binding?.conversationId)
+  const rootId = match(binding?.conversationId)
     .with(P.nonNullable, (id) => id)
     .otherwise(() => {
       throw new Errors.NOT_FOUND({ resource: 'bot', resourceId: botId });
     });
+
+  const conversationId = (selectedId ?? rootId) as ConversationId;
+  const identity = await harness.snapshot(runtimeBot, conversationId, context);
+
+  match(identity?.botId === botId)
+    .with(true, () => undefined)
+    .with(false, () => {
+      throw new Errors.NOT_FOUND({ resource: 'conversation', resourceId: conversationId });
+    })
+    .exhaustive();
 
   const conversation = await harness.conversation(conversationId, context);
 

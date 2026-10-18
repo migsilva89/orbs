@@ -140,6 +140,7 @@
         "@earendil-works/pi-mcp": "catalog:",
         "@openbots/contracts": "workspace:*",
         "@openbots/errors": "workspace:*",
+        "@openbots/i18n": "workspace:*",
         "@openbots/logger": "workspace:*",
         "ts-pattern": "catalog:",
         "zod": "catalog:",

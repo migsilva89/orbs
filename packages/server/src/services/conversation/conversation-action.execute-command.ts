@@ -1,0 +1,7 @@
+import type { ConversationServiceDeps } from '../../types/conversation.types';
+import type { CommandExecuteInput } from '@openbots/contracts/universal';
+
+export async function conversationActionExecuteCommand({ runtime, bots }: ConversationServiceDeps, params: CommandExecuteInput) {
+  await bots.queries.get({ botId: params.botId });
+  await runtime.actions.executeCommand(params);
+}

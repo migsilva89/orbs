@@ -13,11 +13,17 @@ export const conversationFrame = z.array(z.custom<Op>((value) => {
   }
 })).readonly();
 
-export const conversationTarget = z.object({ botId: z.uuid() });
+export const conversationTarget = z.object({
+  botId: z.uuid(),
+  conversationId: z.number().int().positive().optional(),
+});
+
+export const conversationContent = z.string().min(1).max(64_000);
 
 export const conversationSubmit = conversationTarget.extend({
   requestId: z.string().min(1).max(128),
-  content: z.string().min(1).max(64_000),
+  content: conversationContent,
+  skills: z.array(z.string().trim().min(1).max(128)).max(10).optional(),
   whenBusy: z.enum(['followUp', 'steer', 'reject']).optional(),
 });
 

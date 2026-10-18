@@ -9,21 +9,28 @@ export async function runtimeQueryApprovals(
   params: RuntimeConversationParams,
   context: Context,
 ) {
-  const conversation = await runtimeQueryConversation(deps, params, context);
+  await runtimeQueryConversation(deps, { botId: params.botId }, context);
   const graph = await deps.harness.taskGraph(context);
 
   try {
     const tasks = Object.values(graph.value.tasks).filter((task) => (
-      task.conversationId === conversation.id && task.kind === 'pi.tool' && !task.abortRequested
+      task.kind === 'pi.tool' && !task.abortRequested
     ));
 
     const documents = await Promise.all(
-      tasks.map((task) => deps.harness.snapshot(runtimeToolApproval, task.id, context)),
+      tasks.map(async (task) => ({
+        conversationId: task.conversationId,
+        document: await deps.harness.snapshot(runtimeToolApproval, task.id, context),
+      })),
     );
 
-    return documents.flatMap((doc) => (
-      match(doc?.approval)
-        .with({ status: 'pending', expiresAt: P.number.gt(Date.now()) }, (approval) => [approval])
+    return documents.flatMap(({ document, conversationId }) => (
+      match(document?.approval)
+        .with({
+          botId: params.botId,
+          status: 'pending',
+          expiresAt: P.number.gt(Date.now()),
+        }, (approval) => [{ ...approval, conversationId }])
         .otherwise(() => [])
     ));
   } finally {

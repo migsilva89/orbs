@@ -9,6 +9,7 @@ import {
   authRedeemResult,
 } from '../types/auth.types';
 import { bot, botCatalog, botCreate, botGet, botList, botModelList, botUpdate } from '../types/bot.types';
+import { commandCatalog, commandExecute, commandExecuteResult, commandList } from '../types/command.types';
 import {
   conversationFrame,
   conversationHistory,
@@ -33,6 +34,24 @@ import {
 } from '../types/tool.types';
 
 export const contract = {
+  commands: {
+    list: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(commandList)
+      .output(commandCatalog),
+
+    execute: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(commandExecute)
+      .output(commandExecuteResult),
+  },
+
   plugins: {
     discover: oc
       .errors({

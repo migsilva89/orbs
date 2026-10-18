@@ -14,3 +14,8 @@ export interface SkillBotParams {
 export interface SkillLoadParams extends SkillBotParams {
   settings: SkillSettings;
 }
+
+export interface SkillExpandParams extends SkillBotParams {
+  names: string[];
+  content: string;
+}

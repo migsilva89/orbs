@@ -7,6 +7,7 @@ export const conversation = authedRouter.conversation.router({
   watch: authedRouter.conversation.watch.handler(async ({ context, input, signal }) => {
     return context.conversation.watch({
       botId: input.botId,
+      conversationId: input.conversationId,
       deviceId: context.device.id,
       authorization: context.reqHeaders?.get('authorization'),
       signal,

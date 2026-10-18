@@ -13,6 +13,8 @@ export const skill = z.object({
   description: z.string(),
   filePath: z.string(),
   isModelInvocable: z.boolean(),
+  argumentsSchema: z.record(z.string(), z.json()),
+  argumentHint: z.string().nullable(),
 });
 
 export const skillCatalog = z.array(skill);

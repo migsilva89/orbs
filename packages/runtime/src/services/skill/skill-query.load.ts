@@ -1,34 +1,19 @@
-import { formatSkillsForPrompt, getAgentDir, loadSkills } from '@earendil-works/pi-coding-agent';
+import { formatSkillsForPrompt } from '@earendil-works/pi-coding-agent';
+import { conversationContent } from '@openbots/contracts/universal';
 import { log } from '@openbots/logger/server';
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
-import { match } from 'ts-pattern';
+import { z } from 'zod';
+import { skillQueryResolve } from './skill-query.resolve';
 import type { SkillLoaderServiceDeps, SkillLoadParams, SkillLoadResult } from '../../types/skill.types';
 
-export function skillQueryLoad(
-  { root }: SkillLoaderServiceDeps,
-  { botId, directories, isInherited }: SkillLoadParams,
-): SkillLoadResult {
-  const directory = join(root, 'agents', botId);
-  const agentDir = getAgentDir();
-  const localPaths = [join(directory, '.pi/skills'), join(directory, '.agents/skills')];
+const argumentsSchema = z.record(z.string(), z.json()).parse(z.toJSONSchema(conversationContent));
 
-  const sharedPaths = match(isInherited)
-    .with(true, () => [...directories, ...[join(agentDir, 'skills')].filter(existsSync)])
-    .with(false, () => [])
-    .exhaustive();
-
-  const { skills, diagnostics } = loadSkills({
-    cwd: root,
-    agentDir,
-    includeDefaults: false,
-    skillPaths: [...localPaths.filter(existsSync), ...sharedPaths],
-  });
+export function skillQueryLoad(deps: SkillLoaderServiceDeps, params: SkillLoadParams): SkillLoadResult {
+  const { skills, diagnostics } = skillQueryResolve(deps, params);
 
   for (const diagnostic of diagnostics) {
     log.warn({
       tag: 'skills',
-      botId,
+      botId: params.botId,
       ...diagnostic,
     });
   }
@@ -40,6 +25,8 @@ export function skillQueryLoad(
       description: skill.description,
       filePath: skill.filePath,
       isModelInvocable: !skill.disableModelInvocation,
+      argumentsSchema,
+      argumentHint: skill.argumentHint,
     })),
   };
 }

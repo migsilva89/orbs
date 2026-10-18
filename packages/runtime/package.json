@@ -28,6 +28,7 @@
     "@earendil-works/pi-ai": "catalog:",
     "@earendil-works/pi-durable": "catalog:",
     "@openbots/errors": "workspace:*",
+    "@openbots/i18n": "workspace:*",
     "ts-pattern": "catalog:",
     "@earendil-works/pi-mcp": "catalog:",
     "@earendil-works/pi-coding-agent": "catalog:",

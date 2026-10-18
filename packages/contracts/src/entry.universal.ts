@@ -1,4 +1,7 @@
 export { contract } from './rpc/rpc.router';
+export { commandArguments } from './types/command.types';
+export { conversationContent } from './types/conversation.types';
+export type { Command, CommandExecuteInput } from './types/command.types';
 export { skillSettings } from './types/skill.types';
 export type { Skill, SkillConfigureInput, SkillSettings } from './types/skill.types';
 export { mcpSettings } from './types/mcp.types';

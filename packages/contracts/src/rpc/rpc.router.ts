@@ -15,6 +15,9 @@ import {
   conversationHistory,
   conversationHistoryResult,
   conversationList,
+  conversationMarkRead,
+  conversationPreferences,
+  conversationSetPinned,
   conversationStopResult,
   conversationSubmit,
   conversationSubmitResult,
@@ -225,6 +228,22 @@ export const contract = {
   },
 
   conversation: {
+    markRead: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(conversationMarkRead)
+      .output(conversationPreferences),
+
+    setPinned: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(conversationSetPinned)
+      .output(conversationPreferences),
+
     watchList: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
       .output(asyncIteratorObject(conversationFrame)),

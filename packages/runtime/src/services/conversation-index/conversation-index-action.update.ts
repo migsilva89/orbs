@@ -14,6 +14,13 @@ export function conversationIndexActionUpdate(
     for (const { conversationId, lastMessage } of messages) {
       match(index.conversations[conversationId])
         .with(P.nonNullable, (current) => {
+          match(lastMessage.role)
+            .with('assistant', () => {
+              current.lastAssistantEntryId = Math.max(current.lastAssistantEntryId, lastMessage.entryId);
+            })
+            .with('user', () => undefined)
+            .exhaustive();
+
           match(lastMessage.entryId > (current.lastMessage?.entryId ?? 0))
             .with(true, () => {
               current.lastMessage = lastMessage;

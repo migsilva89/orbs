@@ -160,10 +160,10 @@ The earlier root conversation is retained but no longer exposed by these bot-sco
 
 ```ts
 const chats = await client.conversation.list();
-// Each row: botId, conversationId, name, handle, avatar, lastMessage, isRunning.
+// Each row also includes isPinned, hasUnread, and readThroughEntryId.
 ```
 
-This authenticated query lists main bot chats, newest message first, with a stable bot-ID tie-break. `lastMessage` is null for an empty chat; otherwise it contains `entryId`, `role`, a plain-text `preview` of at most 160 characters, and `createdAt` from Pi's message timestamp. Names and avatars come from current bot settings. Private contexts and subagents remain details of their originating chat.
+This authenticated query lists pinned main chats first, then newest message first within each group, with a stable bot-ID tie-break. `lastMessage` is null for an empty chat; otherwise it contains `entryId`, `role`, a plain-text `preview` of at most 160 characters, and `createdAt` from Pi's message timestamp. Names and avatars come from current bot settings. Private contexts and subagents remain details of their originating chat.
 
 Runtime maintains a small session-scoped Pi summary document from committed user and assistant text. Tool output, thinking, reset/compaction entries, and private routing inputs do not replace the preview. Native task-graph state supplies `isRunning` for ordinary work in the main conversation; idle background anchors do not keep it busy. List calls read the summary and task graph, never transcripts or full conversation views.
 
@@ -177,7 +177,16 @@ for await (const chats of watchConversations(client, signal)) {
 }
 ```
 
-`conversation.watchList()` sends an initial list and Chord updates over authenticated oRPC. Runtime watches the summary document and task graph; server joins current bot settings and observes bot changes. Previews, ordering, running status, names, and avatars update without reading histories. Slow clients receive updates relative to their last delivered state; reconnect starts with a fresh list. Cancellation stops observation, and device revocation closes idle streams too. Unread markers, pins, and the sidebar UI remain separate work.
+`conversation.watchList()` sends an initial list and Chord updates over authenticated oRPC. Runtime watches the summary document and task graph; server joins current bot settings and observes bot changes. Previews, ordering, running status, names, and avatars update without reading histories. Slow clients receive updates relative to their last delivered state; reconnect starts with a fresh list. Cancellation stops observation, and device revocation closes idle streams too. Pins and read positions belong to the single owner and sync across paired devices through this same subscription:
+
+```ts
+await client.conversation.setPinned({ botId, isPinned: true });
+await client.conversation.markRead({ botId, throughEntryId: lastVisibleEntry.id });
+```
+
+Pass the last saved entry the user actually viewed. An older request cannot move the read position backwards or clear a later reply. Entries from another chat and unknown IDs are rejected. `hasUnread` means a saved assistant text reply exists after `readThroughEntryId`; owner messages, tool output, thinking, and private routing entries do not create unread state. Opening a subscription does not mark anything read. Both actions return `{ isPinned, readThroughEntryId, hasUnread }`. Use `isPinned: false` to unpin; neither action is automatically retried.
+
+These values stay in Pi's summary document. Pi's document migration preserves existing summaries; startup repairs the latest assistant entry alongside the preview and preserves pins/read positions. Existing replies start unread until marked read. The sidebar UI remains separate work.
 
 ## Skills and MCP discovery
 

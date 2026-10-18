@@ -19,7 +19,7 @@ import { runtimeQueryWatch } from './runtime-query.watch';
 import { runtimeSkills } from './runtime-skills.utils';
 import { runtimeToolsExtension } from './runtime-tools.utils';
 import type * as RuntimeTypes from '../../types/runtime.types';
-import type { CommandExecuteInput } from '@openbots/contracts/universal';
+import type { CommandExecuteInput, ConversationMarkReadInput, ConversationSetPinnedInput } from '@openbots/contracts/universal';
 
 export async function makeRuntimeService({
   storage,
@@ -67,6 +67,8 @@ export async function makeRuntimeService({
 
   return {
     actions: {
+      markRead: (params: ConversationMarkReadInput, context = BACKGROUND_CONTEXT) => deps.index.actions.markRead(params, context),
+      setPinned: (params: ConversationSetPinnedInput, context = BACKGROUND_CONTEXT) => deps.index.actions.setPinned(params, context),
       executeCommand: (params: CommandExecuteInput, context = BACKGROUND_CONTEXT) => (
         runtimeActionExecuteCommand(deps, params, context)
       ),

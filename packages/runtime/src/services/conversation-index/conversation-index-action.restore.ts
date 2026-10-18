@@ -1,7 +1,7 @@
 import { Errors } from '@openbots/errors/universal';
 import { match, P } from 'ts-pattern';
 import { conversationIndex } from './conversation-index.constants';
-import { conversationIndexLatest } from './conversation-index.utils';
+import { conversationIndexFind, conversationIndexLatest } from './conversation-index.utils';
 import type { ConversationIndexDeps, ConversationIndexRestoreParams } from '../../types/conversation-index.types';
 import type { Context } from '@earendil-works/chord/context';
 
@@ -21,24 +21,32 @@ export async function conversationIndexActionRestore(
 
       await harness.commit(async (tx) => {
         const index = await tx.doc(conversationIndex);
-        index.conversations[conversationId] ??= { botId, conversationId, lastMessage: null };
+        index.conversations[conversationId] ??= {
+          botId,
+          conversationId,
+          lastMessage: null,
+          lastAssistantEntryId: 0,
+          readThroughEntryId: 0,
+          isPinned: false,
+        };
       }, context);
 
       // Observe new commits before scanning; restoration must not overwrite a newer preview.
       conversations.add(conversationId);
 
       try {
-        const lastMessage = await conversationIndexLatest(conversation, context);
+        const { lastMessage, lastAssistantEntryId } = await conversationIndexLatest(conversation, context);
         await harness.commit(async (tx) => {
           const index = await tx.doc(conversationIndex);
-          const current = index.conversations[conversationId];
+          const current = conversationIndexFind(index, botId);
 
-          const latest = match((lastMessage?.entryId ?? 0) > (current?.lastMessage?.entryId ?? 0))
+          const latest = match((lastMessage?.entryId ?? 0) > (current.lastMessage?.entryId ?? 0))
             .with(true, () => lastMessage)
-            .with(false, () => current?.lastMessage ?? null)
+            .with(false, () => current.lastMessage ?? null)
             .exhaustive();
 
-          index.conversations[conversationId] = { botId, conversationId, lastMessage: latest };
+          current.lastMessage = latest;
+          current.lastAssistantEntryId = Math.max(current.lastAssistantEntryId, lastAssistantEntryId);
         }, context);
       } catch (error) {
         conversations.delete(conversationId);

@@ -2,7 +2,9 @@ import { BACKGROUND_CONTEXT, withAbortSignal } from '@earendil-works/chord/conte
 import { Errors } from '@openbots/errors/universal';
 import { log } from '@openbots/logger/server';
 import { match, P } from 'ts-pattern';
+import { conversationIndexActionMarkRead } from './conversation-index-action.mark-read';
 import { conversationIndexActionRestore } from './conversation-index-action.restore';
+import { conversationIndexActionSetPinned } from './conversation-index-action.set-pinned';
 import { conversationIndexActionUpdate } from './conversation-index-action.update';
 import { conversationIndexQueryList } from './conversation-index-query.list';
 import { conversationIndexQueryWatch } from './conversation-index-query.watch';
@@ -10,6 +12,7 @@ import { conversationIndex } from './conversation-index.constants';
 import { conversationIndexMessage } from './conversation-index.utils';
 import type * as ConversationIndexTypes from '../../types/conversation-index.types';
 import type { Context } from '@earendil-works/chord/context';
+import type { ConversationMarkReadInput, ConversationSetPinnedInput } from '@openbots/contracts/universal';
 
 export async function makeConversationIndexService({ harness }: ConversationIndexTypes.ConversationIndexServiceDeps) {
   const deps: ConversationIndexTypes.ConversationIndexDeps = { harness, conversations: new Set() };
@@ -69,6 +72,8 @@ export async function makeConversationIndexService({ harness }: ConversationInde
       return { ...watch, closed };
     },
     actions: {
+      markRead: (params: ConversationMarkReadInput, context: Context) => conversationIndexActionMarkRead(deps, params, context),
+      setPinned: (params: ConversationSetPinnedInput, context: Context) => conversationIndexActionSetPinned(deps, params, context),
       restore: (params: ConversationIndexTypes.ConversationIndexRestoreParams, context: Context) => conversationIndexActionRestore(deps, params, context),
     },
     queries: {

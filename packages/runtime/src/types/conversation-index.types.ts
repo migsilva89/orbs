@@ -1,7 +1,24 @@
+import { conversationSummary } from '@openbots/contracts/universal';
+import { z } from 'zod';
 import type { ConversationId, Harness, JsonObject } from '@earendil-works/pi-durable';
 import type { ConversationSummary } from '@openbots/contracts/universal';
 
-export type ConversationIndexItem = Omit<ConversationSummary, 'isRunning'>;
+export type ConversationIndexItem = Omit<ConversationSummary, 'isRunning' | 'hasUnread'> & {
+  lastAssistantEntryId: number;
+};
+
+export interface ConversationIndexPreview {
+  lastMessage: ConversationSummary['lastMessage'];
+  lastAssistantEntryId: number;
+}
+
+export const conversationIndexV1 = z.object({
+  conversations: z.record(z.string(), conversationSummary.pick({
+    botId: true,
+    conversationId: true,
+    lastMessage: true,
+  }).nullable()),
+});
 
 export interface ConversationIndexDocument extends JsonObject {
   conversations: Record<string, ConversationIndexItem | null>;

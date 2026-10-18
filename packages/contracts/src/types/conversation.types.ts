@@ -61,7 +61,23 @@ export type ConversationHistoryInput = z.infer<typeof conversationHistory>;
 export type ConversationSubmitInput = z.infer<typeof conversationSubmit>;
 export type ConversationTarget = z.infer<typeof conversationTarget>;
 
-export const conversationSummary = z.object({
+export const conversationPreferences = z.object({
+  isPinned: z.boolean(),
+  readThroughEntryId: z.number().int().nonnegative(),
+  hasUnread: z.boolean(),
+});
+
+export const conversationMarkRead = z.object({
+  botId: z.uuid(),
+  throughEntryId: z.number().int().positive(),
+});
+
+export const conversationSetPinned = z.object({
+  botId: z.uuid(),
+  isPinned: z.boolean(),
+});
+
+export const conversationSummary = conversationPreferences.extend({
   botId: z.uuid(),
   conversationId: z.number().int().positive(),
   lastMessage: z.object({
@@ -81,3 +97,7 @@ export const conversationList = z.array(conversationSummary.extend({
 
 export type ConversationSummary = z.infer<typeof conversationSummary>;
 export type ConversationListItem = z.infer<typeof conversationList>[number];
+
+export type ConversationPreferences = z.infer<typeof conversationPreferences>;
+export type ConversationMarkReadInput = z.infer<typeof conversationMarkRead>;
+export type ConversationSetPinnedInput = z.infer<typeof conversationSetPinned>;

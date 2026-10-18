@@ -1,6 +1,7 @@
 import { AssistantEntry, UserEntry } from '@earendil-works/pi-durable';
+import { Errors } from '@openbots/errors/universal';
 import { match, P } from 'ts-pattern';
-import type { ConversationIndexDocument } from '../../types/conversation-index.types';
+import type { ConversationIndexDocument, ConversationIndexItem, ConversationIndexPreview } from '../../types/conversation-index.types';
 import type { Context } from '@earendil-works/chord/context';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
 import type { ConversationSummary } from '@openbots/contracts/universal';
@@ -31,14 +32,17 @@ export async function conversationIndexLatest(
   conversation: PiDurableTypes.Conversation,
   context: Context,
   cursor?: PiDurableTypes.Cursor,
-): Promise<ConversationSummary['lastMessage']> {
+  lastMessage: ConversationSummary['lastMessage'] = null,
+): Promise<ConversationIndexPreview> {
   const page = await conversation.entries({}, 100, cursor, context);
-  const latest = page.items.map(conversationIndexMessage).find((message) => message !== null);
+  const messages = page.items.map(conversationIndexMessage);
+  const latest = lastMessage ?? messages.find((message) => message !== null) ?? null;
+  const assistant = messages.find((message) => message?.role === 'assistant');
 
-  return match({ latest, cursor: page.next })
-    .with({ latest: P.nonNullable }, ({ latest: message }) => message)
-    .with({ cursor: P.nonNullable }, ({ cursor: next }) => conversationIndexLatest(conversation, context, next))
-    .otherwise(() => null);
+  return match({ assistant, cursor: page.next })
+    .with({ assistant: P.nonNullable }, ({ assistant: message }) => ({ lastMessage: latest, lastAssistantEntryId: message.entryId }))
+    .with({ cursor: P.nonNullable }, ({ cursor: next }) => conversationIndexLatest(conversation, context, next, latest))
+    .otherwise(() => ({ lastMessage: latest, lastAssistantEntryId: 0 }));
 }
 
 export function conversationIndexSummaries(index: Readonly<ConversationIndexDocument> | null | undefined, graph: PiDurableTypes.TaskGraph) {
@@ -47,6 +51,26 @@ export function conversationIndexSummaries(index: Readonly<ConversationIndexDocu
     .map((task) => task.conversationId));
 
   return Object.values(index?.conversations ?? {}).flatMap((conversation) => match(conversation)
-    .with(P.nonNullable, (summary) => [{ ...summary, isRunning: running.has(summary.conversationId) }])
+    .with(P.nonNullable, ({ lastAssistantEntryId, ...summary }) => [{
+      ...summary,
+      hasUnread: lastAssistantEntryId > summary.readThroughEntryId,
+      isRunning: running.has(summary.conversationId),
+    }])
     .otherwise(() => []));
+}
+
+export function conversationIndexFind(index: ConversationIndexDocument, botId: string) {
+  return match(Object.values(index.conversations).find((conversation) => conversation?.botId === botId))
+    .with(P.nonNullable, (conversation) => conversation)
+    .otherwise(() => {
+      throw new Errors.NOT_FOUND({ resource: 'conversation', resourceId: botId });
+    });
+}
+
+export function conversationIndexPreferences(conversation: ConversationIndexItem) {
+  return {
+    isPinned: conversation.isPinned,
+    readThroughEntryId: conversation.readThroughEntryId,
+    hasUnread: conversation.lastAssistantEntryId > conversation.readThroughEntryId,
+  };
 }

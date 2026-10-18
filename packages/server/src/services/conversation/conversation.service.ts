@@ -1,5 +1,7 @@
 import { conversationActionApprove } from './conversation-action.approve';
 import { conversationActionExecuteCommand } from './conversation-action.execute-command';
+import { conversationActionMarkRead } from './conversation-action.mark-read';
+import { conversationActionSetPinned } from './conversation-action.set-pinned';
 import { conversationActionStop } from './conversation-action.stop';
 import { conversationActionSubmit } from './conversation-action.submit';
 import { conversationQueryApprovals } from './conversation-query.approvals';
@@ -14,6 +16,8 @@ import type * as UniversalTypes from '@openbots/contracts/universal';
 export function makeConversationService(deps: ConversationTypes.ConversationServiceDeps) {
   return {
     actions: {
+      markRead: (params: UniversalTypes.ConversationMarkReadInput) => conversationActionMarkRead(deps, params),
+      setPinned: (params: UniversalTypes.ConversationSetPinnedInput) => conversationActionSetPinned(deps, params),
       executeCommand: (params: UniversalTypes.CommandExecuteInput) => conversationActionExecuteCommand(deps, params),
       approve: (params: ConversationTypes.ConversationApproveParams) => conversationActionApprove(deps, params),
       submit: (params: UniversalTypes.ConversationSubmitInput) => conversationActionSubmit(deps, params),

@@ -21,6 +21,7 @@ Bot backend with a native daemon, device pairing, bot configuration, and authent
 - Preserve architecture, lint, TypeScript, and Fallow rules. Changes to these contracts require the user's explicit request; never weaken them to pass a check.
 - Keep development data and credentials separate from production. Never start, restart, or stop a dev server yourself.
 - Run existing checks. Add tests only when the user asks.
+- After a substantial set of code changes, run the `review` skill in full (simplify, code, blast), fix findings within the authorized task, and rerun affected checks before reporting completion. Do not wait for a separate fix request.
 
 ## Validation
 

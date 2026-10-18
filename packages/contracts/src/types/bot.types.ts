@@ -3,6 +3,7 @@ import { BODIES, COLORS } from '@openbots/avatar-blobs/skins';
 import { z } from 'zod';
 import { instructionCatalog } from './instruction.types';
 import { mcpCatalog } from './mcp.types';
+import { modelThinkingLevel } from './model.types';
 import { pluginCatalog } from './plugin.types';
 import { skill } from './skill.types';
 
@@ -25,8 +26,6 @@ export const botAvatar = z.discriminatedUnion('kind', [
 export const botInherit = z.array(z.enum(['skills', 'agentsFile', 'mcp', 'plugins']))
   .max(4).transform((resources) => [...new Set(resources)]);
 
-export const botThinkingLevel = z.enum(['off', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max']);
-
 export const botFields = z.object({
   avatar: botAvatar.nullable(),
   name: z.string().trim().min(1).max(64),
@@ -34,7 +33,7 @@ export const botFields = z.object({
   instructions: z.string().max(16000),
   modelProvider: z.string().trim().min(1).max(128),
   modelId: z.string().trim().min(1).max(128),
-  thinkingLevel: botThinkingLevel,
+  thinkingLevel: modelThinkingLevel,
   permission: z.enum(['read-only', 'ask', 'auto', 'full']),
   inherit: botInherit,
 });
@@ -51,19 +50,12 @@ export const botGet = z.object({ botId: z.uuid() });
 export const botCreate = botFields.extend({
   avatar: botFields.shape.avatar.default(null),
   instructions: botFields.shape.instructions.default(''),
-  thinkingLevel: botThinkingLevel.default('off'),
+  thinkingLevel: modelThinkingLevel.default('off'),
   permission: botFields.shape.permission.default('ask'),
   inherit: botInherit.default(['skills', 'mcp', 'plugins']),
 });
 
 export const botUpdate = botFields.partial().extend(botGet.shape);
-
-export const botModelList = z.array(z.object({
-  provider: z.string(),
-  id: z.string(),
-  name: z.string(),
-  thinkingLevels: z.array(botThinkingLevel),
-}));
 
 export const botCatalog = z.object({
   skills: z.array(skill),

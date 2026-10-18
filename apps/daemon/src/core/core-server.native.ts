@@ -46,6 +46,7 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
         await rpc.message(socket, message, {
           context: {
             auth: services.auth,
+            runtime: services.runtime,
             bots: services.bots,
             conversation: services.conversation,
             tools: services.tools,

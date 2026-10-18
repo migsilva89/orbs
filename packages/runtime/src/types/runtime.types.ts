@@ -78,6 +78,8 @@ export type RuntimeSubmitParams = Omit<PiDurableTypes.InputSubmissionDraft, 'typ
 export interface RuntimeHistoryParams extends RuntimeConversationParams {
   limit?: number;
   cursor?: PiDurableTypes.Cursor;
+  afterEntryId?: number;
+  throughEntryId?: number;
 }
 
 export type RuntimeToolDecision = 'allow' | 'deny' | 'ask';

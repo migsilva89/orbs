@@ -6,10 +6,12 @@ import type { McpService } from '../services/mcp/mcp.service';
 import type { PluginService } from '../services/plugin/plugin.service';
 import type { SkillService } from '../services/skill/skill.service';
 import type { ToolService } from '../services/tool/tool.service';
+import type { RuntimeService } from '@openbots/runtime/server';
 import type { RequestHeadersPluginContext } from '@orpc/server/plugins';
 
 export interface RpcContext extends RequestHeadersPluginContext {
   auth: AuthService;
+  runtime: RuntimeService;
   tools: ToolService;
   skills: SkillService;
   plugins: PluginService;

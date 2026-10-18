@@ -1,8 +1,10 @@
 import { getSupportedThinkingLevels } from '@earendil-works/pi-ai/models';
 import type { RuntimeModelsDeps } from '../../types/runtime.types';
 
-export function runtimeQueryModels({ models }: RuntimeModelsDeps) {
-  return models.getModels().map((model) => ({
+export async function runtimeQueryModels({ models }: RuntimeModelsDeps) {
+  const availableModels = await models.getAvailable();
+
+  return availableModels.map((model) => ({
     provider: model.provider,
     id: model.id,
     name: model.name,

@@ -134,7 +134,7 @@ The calling app supplies the socket factory and secure credential storage. It mu
 
 ## Bots
 
-Authenticated RPC calls provide `bots.list()`, `bots.get({ botId })`, `bots.create(...)`, `bots.update({ botId, ...changes })`, and `bots.models()`. The model catalog returns only provider/model IDs, names, and supported thinking levels, not credentials. A listed model still needs working provider authentication to answer.
+Authenticated RPC calls provide `bots.list()`, `bots.get({ botId })`, `bots.create(...)`, `bots.update({ botId, ...changes })`, and `models.list()`. Runtime model discovery uses Pi’s `getAvailable()` to list chat models with provider authentication configured. It returns only provider/model IDs, names, and supported thinking levels, not credentials. Availability does not verify live access, billing, or model entitlement.
 
 Choose `selectedModel` from that catalog, then create a bot:
 
@@ -254,7 +254,7 @@ Tool details expose child `conversationId`. Pass it alongside `botId` to the exi
 
 ## Live conversation
 
-`conversation.watch({ botId })` streams that bot's conversation using [Pi's watch pattern](.agents/docs/pi-durable.md): an initial replacement snapshot, then committed Chord operations. The client helper applies those operations and yields the current view:
+`conversation.watch({ botId })` streams only Pi's `LiveDoc`, the conversation ID, and the latest saved entry ID. It never mounts the full transcript. The wire carries an initial snapshot followed by compact Chord operations. `watchConversation` loads the newest 50 stored entries, then fetches new entries in bounded pages as the saved entry ID advances. Its view contains `entries` in chronological order, `live`, and `historyCursor` for loading older pages:
 
 ```typescript
 import { watchConversation } from '@openbots/client/client';
@@ -265,7 +265,9 @@ for await (const view of watchConversation(client, { botId }, controller.signal)
 }
 ```
 
-Call `controller.abort()` when leaving the view. Disconnecting or cancelling stops observation, not the agent. oRPC reconnects interrupted watch calls and receives a fresh snapshot; it does not retry authentication failures or replay submitted messages. Revoking a device ends its subscriptions even while idle. Pi handles slow watchers with bounded pending frames and replacement snapshots.
+Call `controller.abort()` when leaving the view. Disconnecting or cancelling stops observation, not the agent. oRPC reconnects interrupted watch calls and receives fresh live state and the current entry ID. The client catches up from its last loaded entry; interrupted history reads can retry, while commands and submissions are never automatically retried. Revoking a device ends its subscriptions even while idle. Pi's document watch and Chord's state subscriptions bound pending updates; skipped intermediate updates still carry the latest entry ID for history catch-up.
+
+To scroll back, call `conversation.history({ botId, conversationId, cursor: view.historyCursor, limit: 50 })` and continue with the returned `next` cursor. These pages are newest-first; reverse each page for chronological display. Private contexts and subagents load only when explicitly selected by conversation ID. They are details within the originating chat, not extra top-level sidebar chats.
 
 All paired devices have owner access to the selected bot's view. Peer messages default to existing bot conversations; a separate DM sidebar and file APIs remain pending. Group rooms are excluded. Earlier disposable WebSocket checks verified the single-root transport before bot routing was added. Disposable bot integration checks cover tool approvals and SQLite recovery; live providers remain unverified.
 

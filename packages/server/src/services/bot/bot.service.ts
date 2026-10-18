@@ -28,7 +28,6 @@ export function makeBotService(deps: Omit<BotServiceDeps, 'configurations'>) {
       catalog: (params: BotGetInput) => botQueryCatalog(serviceDeps, params),
       skills: (params: BotGetInput) => botQuerySkills(serviceDeps, params),
       mcp: (params: BotGetInput) => botQueryMcp(serviceDeps, params),
-      models: () => serviceDeps.runtime.queries.models(),
       list: () => botQueryList(serviceDeps),
       get: (params: BotGetInput) => botQueryGet(serviceDeps, params),
     },

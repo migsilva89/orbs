@@ -8,7 +8,7 @@ import {
   authRedeem,
   authRedeemResult,
 } from '../types/auth.types';
-import { bot, botCatalog, botCreate, botGet, botList, botModelList, botUpdate } from '../types/bot.types';
+import { bot, botCatalog, botCreate, botGet, botList, botUpdate } from '../types/bot.types';
 import { commandCatalog, commandExecute, commandExecuteResult, commandList } from '../types/command.types';
 import {
   conversationFrame,
@@ -22,6 +22,7 @@ import {
 import { deviceList, deviceRevoke, deviceRevokeResult } from '../types/device.types';
 import { instructionCatalog, instructionConfigure, instructionDiscover, instructionSettings } from '../types/instruction.types';
 import { mcpCatalog, mcpConfigure, mcpDiscover, mcpSettings } from '../types/mcp.types';
+import { modelList } from '../types/model.types';
 import { pluginCatalog, pluginConfigure, pluginDiscover, pluginSettings } from '../types/plugin.types';
 import { skillCatalog, skillConfigure, skillDiscover, skillSettings } from '../types/skill.types';
 import {
@@ -34,6 +35,12 @@ import {
 } from '../types/tool.types';
 
 export const contract = {
+  models: {
+    list: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(modelList),
+  },
+
   commands: {
     list: oc
       .errors({
@@ -159,10 +166,6 @@ export const contract = {
     list: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
       .output(botList),
-
-    models: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(botModelList),
 
     get: oc
       .errors({

@@ -116,7 +116,8 @@ Before adding infrastructure, inspect the installed library API and official exa
 
 - Daemon owns the Bun listener and oRPC WebSocket adapter. Server owns RPC implementation; contracts own validation and public types.
 - Check browser Origin on upgrade. Authenticate each call except token redemption. Revocation closes active watches, including idle ones.
-- Follow Pi `watch()`: current snapshot, then committed Chord operations. Keep backpressure and Pi's bounded watch queue; reconnect from a fresh snapshot without resubmitting input.
+- Page history with Pi `entries()` and watch `LiveDoc` for current activity. Use commit notifications to advance the saved entry ID; never mount full transcripts for sidebar or live subscriptions. Keep Chord updates and bounded delivery; reconnect catches up from the last loaded entry without resubmitting input.
+- Private contexts and subagents are lazy details of the originating chat, not top-level sidebar chats. Read their history and attach live watches only when selected.
 - Disconnect/cancel ends observation, not accepted agent work. Stop is an explicit command. Never automatically retry commands; submit retries reuse the same Pi request ID.
 - Read history through Pi's pagination and opaque cursors. Clients display state; their lifecycle never owns agent execution.
 

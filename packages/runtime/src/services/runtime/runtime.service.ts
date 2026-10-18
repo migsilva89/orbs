@@ -14,6 +14,7 @@ import { runtimeQueryHistory } from './runtime-query.history';
 import { runtimeQueryModels } from './runtime-query.models';
 import { runtimeQuerySubmission } from './runtime-query.submission';
 import { runtimeQueryValidateModel } from './runtime-query.validate-model';
+import { runtimeQueryWatch } from './runtime-query.watch';
 import { runtimeSkills } from './runtime-skills.utils';
 import { runtimeToolsExtension } from './runtime-tools.utils';
 import type * as RuntimeTypes from '../../types/runtime.types';
@@ -92,7 +93,7 @@ export async function makeRuntimeService({
       ),
     },
     watch: (params: RuntimeTypes.RuntimeConversationParams, context = BACKGROUND_CONTEXT) => (
-      runtimeQueryConversation(deps, params, context).then((conversation) => conversation.watch(context))
+      runtimeQueryWatch(deps, params, context)
     ),
     resume: () => harness.resume(),
     closed: harness.closed,

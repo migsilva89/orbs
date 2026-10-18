@@ -10,6 +10,19 @@ Explains how several clients can watch and steer the same conversation. Each sub
 
 The walkthrough shows `viewState()` for observing state and `watch()` for obtaining committed operations that an application can send over a socket.
 
+## Paginated history and live state
+
+The implemented chat watch uses Pi's smaller primitives instead of mounting `conversation.watch()`:
+
+- [09-context.ts](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/durable/test/examples/09-context.ts) reads stored history with `conversation.entries(query, limit, cursor, context)`.
+- [16-real-model.ts](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/durable/test/examples/16-real-model.ts) streams generation through `harness.watchDoc(LiveDoc, conversation.id, context)`.
+
+Runtime subscribes to Pi commits before reading the newest entry, retaining the highest entry ID seen during attachment. It combines that marker with the live document in a bounded Chord state subscription. Server serializes compact operations between delivered states, so skipped intermediate states remain safe for slow clients. No transcript entries travel in the watch.
+
+The client loads the newest 50 entries at the advertised entry ID. Subsequent markers fetch ascending pages after its last loaded ID, bounded by the new marker. Reconnect uses the same catch-up path. Older history uses Pi's returned cursor; private contexts are selected explicitly and never loaded with the main chat.
+
+Disposable checks on 2026-10-18 exercised native SQLite and the authenticated in-process RPC router: initial/older pages, a write during attachment, two clients, catch-up across multiple pages, more than 100 queued changes, lazy private-context loading, Pi generation with a faux provider, reopen, reconnect deduplication, and revocation. Storage instrumentation confirmed bounded entry reads and no private transcript reads before selection. No live provider or network listener was used.
+
 ## Late-join example
 
 [Official runnable source: 21-late-join.ts](https://github.com/earendil-works/pi/blob/main/packages/durable/test/examples/21-late-join.ts)

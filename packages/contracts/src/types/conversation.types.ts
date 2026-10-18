@@ -2,7 +2,18 @@ import { assertValidOp } from '@earendil-works/chord/delta';
 import { type } from '@orpc/contract';
 import { z } from 'zod';
 import type { Op } from '@earendil-works/chord/delta';
-import type { Cursor, EntryRecord, Page } from '@earendil-works/pi-durable';
+import type * as PiDurableTypes from '@earendil-works/pi-durable';
+
+export interface ConversationState {
+  conversationId: number;
+  latestEntryId: number;
+  live: PiDurableTypes.LiveState;
+}
+
+export interface ConversationView extends ConversationState {
+  entries: readonly PiDurableTypes.EntryRecord[];
+  historyCursor?: PiDurableTypes.Cursor;
+}
 
 export const conversationFrame = z.array(z.custom<Op>((value) => {
   try {
@@ -12,6 +23,8 @@ export const conversationFrame = z.array(z.custom<Op>((value) => {
     return false;
   }
 })).readonly();
+
+export type ConversationFrame = z.infer<typeof conversationFrame>;
 
 export const conversationTarget = z.object({
   botId: z.uuid(),
@@ -36,13 +49,13 @@ export const conversationStopResult = z.void();
 export const conversationHistory = conversationTarget.extend({
   limit: z.number().int().min(1).max(100).default(50),
   cursor: z.record(z.string(), z.json()).optional(),
+  afterEntryId: z.number().int().nonnegative().optional(),
+  throughEntryId: z.number().int().positive().optional(),
 });
 
-export type ConversationHistoryPage = Page<EntryRecord, Cursor>;
+export type ConversationHistoryPage = PiDurableTypes.Page<PiDurableTypes.EntryRecord, PiDurableTypes.Cursor>;
 export const conversationHistoryResult = type<ConversationHistoryPage>();
 export type ConversationHistoryInput = z.infer<typeof conversationHistory>;
 
 export type ConversationSubmitInput = z.infer<typeof conversationSubmit>;
 export type ConversationTarget = z.infer<typeof conversationTarget>;
-export type ConversationFrame = z.infer<typeof conversationFrame>;
-export type { ConversationView } from '@earendil-works/pi-durable';

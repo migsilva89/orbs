@@ -1,7 +1,8 @@
 export { coreHandler } from './core/core.handler';
 export { makeServices } from './core/core.services';
 export { makeAuthService } from './services/auth/auth.service';
+export { makeSettingsService } from './services/settings/settings.service';
 export { router } from './rpc/rpc.router';
-export type { McpParams, McpService } from './types/mcp.types';
-export type { SkillLoadParams, SkillLoadResult, SkillService } from './types/skill.types';
-export type { WorkspaceService } from './types/workspace.types';
+export type { McpService } from './services/mcp/mcp.service';
+export type { SkillService } from './services/skill/skill.service';
+export type { WorkspaceService } from './services/workspace/workspace.service';

@@ -10,16 +10,12 @@ export async function toolActionConfigure(deps: ToolServiceDeps, { jevApiKey, ap
     .otherwise(() => undefined);
 
   await match(approvalRules)
-    .with(P.nonNullable, (rules) => {
-      const setting = {
+    .with(P.nonNullable, (rules) => deps.settings.actions.set({
+      records: [{
         key: TOOL.approvalRulesSetting,
         value: JSON.stringify(rules),
-        updatedAt: Date.now(),
-      };
-
-      return deps.database.db.insertInto('settings').values(setting)
-        .onConflict((conflict) => conflict.column('key').doUpdateSet(setting)).execute();
-    })
+      }],
+    }))
     .otherwise(() => undefined);
 
   return toolQuerySettings(deps);

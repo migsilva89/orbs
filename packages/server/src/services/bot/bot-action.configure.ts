@@ -1,9 +1,9 @@
 import { match } from 'ts-pattern';
 import { botQueryGet } from './bot-query.get';
 import type { BotServiceDeps } from '../../types/bot.types';
-import type { Bot, BotGetInput, ResourceSettings } from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@openbots/contracts/universal';
 
-export async function botActionConfigure(deps: BotServiceDeps, { botId }: BotGetInput) {
+export async function botActionConfigure(deps: BotServiceDeps, { botId }: UniversalTypes.BotGetInput) {
   const previous = deps.configurations.get(botId) ?? Promise.resolve();
   const current = previous.then(botConfigure);
   const settled = current.then(() => undefined, () => undefined);
@@ -22,29 +22,34 @@ export async function botActionConfigure(deps: BotServiceDeps, { botId }: BotGet
 
   async function botConfigure() {
     const bot = await botQueryGet(deps, { botId });
-    const settings = await deps.resources.queries.settings();
-    return botPublish(bot, settings);
+    const skillSettings = await deps.skill.queries.settings();
+    const mcpSettings = await deps.mcp.queries.settings();
+    return botPublish(bot, skillSettings, mcpSettings);
   }
 
-  async function botPublish(bot: Bot, settings: ResourceSettings): Promise<Bot> {
+  async function botPublish(
+    bot: UniversalTypes.Bot,
+    skillSettings: UniversalTypes.SkillSettings,
+    mcpSettings: UniversalTypes.McpSettings,
+  ): Promise<UniversalTypes.Bot> {
     await deps.workspace.actions.prepareDirectory({ botId });
 
     const { prompt: skillsPrompt } = deps.skill.queries.load({
-      botId,
-      skillDirs: settings.skillDirs,
-      isInherited: bot.inherit.includes('skills'),
+      bot,
+      settings: skillSettings,
     });
 
     const tools = await deps.mcp.actions.prepare({
-      botId,
-      mcpPaths: settings.mcpPaths,
-      isInherited: bot.inherit.includes('mcp'),
+      bot,
+      settings: mcpSettings,
     });
 
     const latestBot = await botQueryGet(deps, { botId });
-    const latestSettings = await deps.resources.queries.settings();
+    const latestSkillSettings = await deps.skill.queries.settings();
+    const latestMcpSettings = await deps.mcp.queries.settings();
 
-    return match(botConfigureState(bot, settings) === botConfigureState(latestBot, latestSettings))
+    return match(botConfigureState(bot, skillSettings, mcpSettings)
+      === botConfigureState(latestBot, latestSkillSettings, latestMcpSettings))
       .with(true, async () => {
         await deps.runtime.actions.configureBot({
           ...latestBot,
@@ -53,11 +58,11 @@ export async function botActionConfigure(deps: BotServiceDeps, { botId }: BotGet
         });
         return latestBot;
       })
-      .with(false, () => botPublish(latestBot, latestSettings))
+      .with(false, () => botPublish(latestBot, latestSkillSettings, latestMcpSettings))
       .exhaustive();
   }
 
-  function botConfigureState(bot: Bot, settings: ResourceSettings) {
+  function botConfigureState(bot: UniversalTypes.Bot, skillSettings: UniversalTypes.SkillSettings, mcpSettings: UniversalTypes.McpSettings) {
     return JSON.stringify({
       inherit: bot.inherit,
       modelProvider: bot.modelProvider,
@@ -65,8 +70,8 @@ export async function botActionConfigure(deps: BotServiceDeps, { botId }: BotGet
       thinkingLevel: bot.thinkingLevel,
       instructions: bot.instructions,
       permission: bot.permission,
-      skillDirs: settings.skillDirs,
-      mcpPaths: settings.mcpPaths,
+      directories: skillSettings.directories,
+      paths: mcpSettings.paths,
     });
   }
 }

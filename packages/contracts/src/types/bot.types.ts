@@ -1,6 +1,8 @@
 import { EXPRESSIONS } from '@openbots/avatar-blobs/expressions';
 import { BODIES, COLORS } from '@openbots/avatar-blobs/skins';
 import { z } from 'zod';
+import { mcpCatalog } from './mcp.types';
+import { skill } from './skill.types';
 
 export const botAvatar = z.discriminatedUnion('kind', [
   z.object({
@@ -61,7 +63,13 @@ export const botModelList = z.array(z.object({
   thinkingLevels: z.array(botThinkingLevel),
 }));
 
+export const botCatalog = z.object({
+  skills: z.array(skill),
+  mcp: mcpCatalog,
+});
+
 export type Bot = z.infer<typeof bot>;
 export type BotCreateInput = z.infer<typeof botCreate>;
 export type BotUpdateInput = z.infer<typeof botUpdate>;
 export type BotGetInput = z.infer<typeof botGet>;
+export type BotCatalog = z.infer<typeof botCatalog>;

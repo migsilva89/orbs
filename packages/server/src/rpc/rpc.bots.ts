@@ -6,4 +6,5 @@ export const bots = authedRouter.bots.router({
   get: authedRouter.bots.get.handler(async ({ context, input }) => context.bots.queries.get(input)),
   create: authedRouter.bots.create.handler(async ({ context, input }) => context.bots.actions.create(input)),
   update: authedRouter.bots.update.handler(async ({ context, input }) => context.bots.actions.update(input)),
+  catalog: authedRouter.bots.catalog.handler(async ({ context, input }) => context.bots.queries.catalog(input)),
 });

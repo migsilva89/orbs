@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "start": "bun src/entry.native.ts",
-    "pair": "bun src/entry.native.ts pair",
     "check": "tsc --noEmit",
     "lint": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
     "lint:fix": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
@@ -18,16 +17,12 @@
   },
   "dependencies": {
     "@openbots/contracts": "workspace:*",
-    "zod": "catalog:",
     "@earendil-works/pi-coding-agent": "catalog:",
     "@openbots/server": "workspace:*",
     "@openbots/runtime": "workspace:*",
     "@openbots/env": "workspace:*",
     "@openbots/logger": "workspace:*",
     "@orpc/server": "catalog:",
-    "ts-pattern": "catalog:",
-    "@earendil-works/pi-durable": "catalog:",
-    "@earendil-works/pi-mcp": "catalog:",
-    "@earendil-works/pi-ai": "catalog:"
+    "ts-pattern": "catalog:"
   }
 }

@@ -9,8 +9,9 @@ export function runtimeActionConfigureBot(
   bot: RuntimeBotParams,
   context: Context,
 ) {
-  const resources = defineExtension({ name: `openbots.resources.${bot.id}`, tools: bot.tools });
-  registry.install(resources);
+  // Persisted Pi extension id; renaming would drop already admitted tools.
+  const botTools = defineExtension({ name: `openbots.resources.${bot.id}`, tools: bot.tools });
+  registry.install(botTools);
 
   return harness.commit(async (tx) => {
     const binding = await tx.doc(runtimeBotConversations, bot.id, null);
@@ -28,7 +29,7 @@ export function runtimeActionConfigureBot(
       thinkingLevel: bot.thinkingLevel,
       instructions: bot.instructions,
       cwd: `agents/${bot.id}`,
-      extensions: [resources, ...extensions],
+      extensions: [botTools, ...extensions],
       tools: match(bot.permission)
         .with('read-only', () => readOnlyTools)
         .otherwise(() => null),

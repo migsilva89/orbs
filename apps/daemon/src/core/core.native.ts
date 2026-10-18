@@ -1,22 +1,16 @@
 import { ModelRuntime } from '@earendil-works/pi-coding-agent';
 import { env } from '@openbots/env/server';
 import { log } from '@openbots/logger/server';
-import { makeStorageService } from '@openbots/runtime/native';
+import { makeMcpClientService, makeSkillLoaderService, makeStorageService, runtimeEnvNative } from '@openbots/runtime/native';
 import { match } from 'ts-pattern';
-import { makeDatabaseService } from '@openbots/server/native';
-import { makeServices } from '@openbots/server/server';
-import { makeMcpService } from '../services/mcp/mcp.service';
-import { makeSkillService } from '../services/skill/skill.service';
-import { makeWorkspaceService } from '../services/workspace/workspace.service';
-import { coreCredentialsNative } from './core-credentials.native';
-import { corePathsNative } from './core-paths.native';
+import { credentialsKeyNative, makeDatabaseService, makeMcpService, makeWorkspaceService, workspacePathsNative } from '@openbots/server/native';
+import { makeServices, makeSettingsService } from '@openbots/server/server';
 import { coreServerNative } from './core-server.native';
-import { coreToolsNative } from './core-tools.native';
 
 export async function coreNativeRun(): Promise<void> {
   await using resources = new AsyncDisposableStack();
 
-  const paths = await corePathsNative();
+  const paths = await workspacePathsNative(env.OPENBOTS_DATA_DIR);
 
   const storage = await makeStorageService({ path: paths.runtime });
   resources.defer(() => storage.close());
@@ -26,22 +20,30 @@ export async function coreNativeRun(): Promise<void> {
   await database.migrate();
 
   const models = await ModelRuntime.create();
-  const credentialsKey = await coreCredentialsNative(paths.data);
+  const credentialsKey = await credentialsKeyNative(paths.data);
+  const settings = makeSettingsService({ database });
   const workspace = makeWorkspaceService({ root: paths.root });
-  const skill = makeSkillService({ root: paths.root });
-  const mcp = makeMcpService({ root: paths.root });
-  resources.defer(() => mcp.close());
+  const skillLoader = makeSkillLoaderService({ root: paths.root });
+  const mcpClients = makeMcpClientService({ root: paths.root });
+  resources.defer(() => mcpClients.close());
+
+  const mcp = makeMcpService({
+    root: paths.root,
+    settings,
+    clients: mcpClients,
+  });
 
   const services = await makeServices({
     database,
     credentialsKey,
+    settings,
     workspace,
-    skill,
+    skillLoader,
     mcp,
     runtime: {
       storage: storage.storage,
       models,
-      env: coreToolsNative(paths.root),
+      env: runtimeEnvNative(paths.root),
     },
   });
 

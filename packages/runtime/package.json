@@ -28,6 +28,11 @@
     "@earendil-works/pi-ai": "catalog:",
     "@earendil-works/pi-durable": "catalog:",
     "@openbots/errors": "workspace:*",
-    "ts-pattern": "catalog:"
+    "ts-pattern": "catalog:",
+    "@earendil-works/pi-mcp": "catalog:",
+    "@earendil-works/pi-coding-agent": "catalog:",
+    "@openbots/contracts": "workspace:*",
+    "@openbots/logger": "workspace:*",
+    "zod": "catalog:"
   }
 }

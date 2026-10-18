@@ -31,6 +31,7 @@
     "@orpc/server": "catalog:",
     "@earendil-works/chord": "catalog:",
     "ts-pattern": "catalog:",
-    "@typesafe-ai/sdk": "catalog:"
+    "@typesafe-ai/sdk": "catalog:",
+    "@earendil-works/pi-coding-agent": "catalog:"
   }
 }

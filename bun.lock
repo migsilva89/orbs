@@ -19,10 +19,7 @@
       "name": "@openbots/daemon",
       "version": "1.0.0",
       "dependencies": {
-        "@earendil-works/pi-ai": "catalog:",
         "@earendil-works/pi-coding-agent": "catalog:",
-        "@earendil-works/pi-durable": "catalog:",
-        "@earendil-works/pi-mcp": "catalog:",
         "@openbots/contracts": "workspace:*",
         "@openbots/env": "workspace:*",
         "@openbots/logger": "workspace:*",
@@ -30,7 +27,6 @@
         "@openbots/server": "workspace:*",
         "@orpc/server": "catalog:",
         "ts-pattern": "catalog:",
-        "zod": "catalog:",
       },
       "devDependencies": {
         "@openbots/typescript-config": "workspace:*",
@@ -139,9 +135,14 @@
       "dependencies": {
         "@earendil-works/chord": "catalog:",
         "@earendil-works/pi-ai": "catalog:",
+        "@earendil-works/pi-coding-agent": "catalog:",
         "@earendil-works/pi-durable": "catalog:",
+        "@earendil-works/pi-mcp": "catalog:",
+        "@openbots/contracts": "workspace:*",
         "@openbots/errors": "workspace:*",
+        "@openbots/logger": "workspace:*",
         "ts-pattern": "catalog:",
+        "zod": "catalog:",
       },
       "devDependencies": {
         "@openbots/typescript-config": "workspace:*",
@@ -154,6 +155,7 @@
       "version": "1.0.0",
       "dependencies": {
         "@earendil-works/chord": "catalog:",
+        "@earendil-works/pi-coding-agent": "catalog:",
         "@openbots/contracts": "workspace:*",
         "@openbots/errors": "workspace:*",
         "@openbots/logger": "workspace:*",

@@ -1,10 +1,12 @@
 export { contract } from './rpc/rpc.router';
-export { resourceSettings } from './types/resource.types';
-export type { ResourceSettings, ResourceConfigureInput, ResourceSkill, ResourceMcpCatalog } from './types/resource.types';
+export { skillSettings } from './types/skill.types';
+export type { Skill, SkillConfigureInput, SkillSettings } from './types/skill.types';
+export { mcpSettings } from './types/mcp.types';
+export type { McpCatalog, McpConfigureInput, McpSettings } from './types/mcp.types';
 export type { ConversationFrame, ConversationHistoryInput, ConversationHistoryPage, ConversationSubmitInput, ConversationTarget, ConversationView } from './types/conversation.types';
 export { authToken } from './types/auth.types';
 export type { AuthPairInput, AuthRedeemInput } from './types/auth.types';
 export { botAvatar, botInherit } from './types/bot.types';
-export type { Bot, BotCreateInput, BotGetInput, BotUpdateInput } from './types/bot.types';
+export type { Bot, BotCatalog, BotCreateInput, BotGetInput, BotUpdateInput } from './types/bot.types';
 export { toolApprovalRules } from './types/tool.types';
 export type { ToolConfigureInput, ToolSettings, ToolPendingInput, ToolApproval, ToolAnswerInput } from './types/tool.types';

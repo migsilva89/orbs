@@ -3,23 +3,32 @@ import { makeAuthService } from '../services/auth/auth.service';
 import { makeBotService } from '../services/bot/bot.service';
 import { makeConversationService } from '../services/conversation/conversation.service';
 import { makeCredentialsService } from '../services/credentials/credentials.service';
-import { makeResourceService } from '../services/resource/resource.service';
+import { makeSkillService } from '../services/skill/skill.service';
 import { makeToolService } from '../services/tool/tool.service';
 import type { CoreServicesParams } from '../types/core.types';
 
-export async function makeServices({ database, credentialsKey, workspace, skill, mcp, runtime: runtimeOptions }: CoreServicesParams) {
+export async function makeServices({
+  database,
+  credentialsKey,
+  settings,
+  workspace,
+  skillLoader,
+  mcp,
+  runtime: runtimeOptions,
+}: CoreServicesParams) {
   const credentials = makeCredentialsService({ database, key: credentialsKey });
-  const tools = makeToolService({ database, credentials });
+
+  const tools = makeToolService({
+    database,
+    credentials,
+    settings,
+  });
+
   const runtime = await makeRuntimeService({ ...runtimeOptions, permissions: tools });
 
   try {
     const auth = makeAuthService({ database });
-
-    const resources = makeResourceService({
-      database,
-      skill,
-      mcp,
-    });
+    const skill = makeSkillService({ settings, loader: skillLoader });
 
     const bots = makeBotService({
       database,
@@ -27,7 +36,6 @@ export async function makeServices({ database, credentialsKey, workspace, skill,
       workspace,
       skill,
       mcp,
-      resources,
     });
 
     await bots.actions.restore();
@@ -39,7 +47,8 @@ export async function makeServices({ database, credentialsKey, workspace, skill,
       bots,
       runtime,
       tools,
-      resources,
+      skills: skill,
+      mcp,
       conversation: makeConversationService({
         runtime,
         auth,

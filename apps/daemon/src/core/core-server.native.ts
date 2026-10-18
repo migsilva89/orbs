@@ -49,7 +49,8 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
             bots: services.bots,
             conversation: services.conversation,
             tools: services.tools,
-            resources: services.resources,
+            skills: services.skills,
+            mcp: services.mcp,
           },
         });
       },

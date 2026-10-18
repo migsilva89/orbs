@@ -5,3 +5,7 @@ export interface WorkspaceService {
     prepareDirectory(params: BotGetInput): Promise<void>;
   };
 }
+
+export interface WorkspaceServiceDeps {
+  root: string;
+}

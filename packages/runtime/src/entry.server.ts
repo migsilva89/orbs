@@ -3,3 +3,8 @@ export type { RuntimeService } from './services/runtime/runtime.service';
 export type { RuntimeServiceParams } from './types/runtime.types';
 export type { RuntimeToolCall, RuntimeToolDecision } from './types/runtime.types';
 export type { ToolRegistration } from '@earendil-works/pi-durable';
+export { mcpDocument, mcpServer } from './types/mcp.types';
+export type { McpClientParams, McpConfig, McpSource } from './types/mcp.types';
+export type { McpClientService } from './services/mcp/mcp.service';
+export type { SkillLoadParams, SkillLoadResult } from './types/skill.types';
+export type { SkillLoaderService } from './services/skill/skill.service';

@@ -8,7 +8,7 @@ import {
   authRedeem,
   authRedeemResult,
 } from '../types/auth.types';
-import { bot, botCreate, botGet, botList, botModelList, botUpdate } from '../types/bot.types';
+import { bot, botCatalog, botCreate, botGet, botList, botModelList, botUpdate } from '../types/bot.types';
 import {
   conversationFrame,
   conversationHistory,
@@ -19,7 +19,8 @@ import {
   conversationTarget,
 } from '../types/conversation.types';
 import { deviceList, deviceRevoke, deviceRevokeResult } from '../types/device.types';
-import { resourceCatalog, resourceConfigure, resourceDiscover, resourceSettings } from '../types/resource.types';
+import { mcpCatalog, mcpConfigure, mcpDiscover, mcpSettings } from '../types/mcp.types';
+import { skillCatalog, skillConfigure, skillDiscover, skillSettings } from '../types/skill.types';
 import {
   toolAnswer,
   toolAnswerResult,
@@ -30,23 +31,42 @@ import {
 } from '../types/tool.types';
 
 export const contract = {
-  resources: {
+  skills: {
     discover: oc
       .errors({
         UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
         NOT_FOUND: errorSchemas.NOT_FOUND,
       })
-      .input(resourceDiscover)
-      .output(resourceCatalog),
+      .input(skillDiscover)
+      .output(skillCatalog),
 
     settings: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(resourceSettings),
+      .output(skillSettings),
 
     configure: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(resourceConfigure)
-      .output(resourceSettings),
+      .input(skillConfigure)
+      .output(skillSettings),
+  },
+
+  mcp: {
+    discover: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(mcpDiscover)
+      .output(mcpCatalog),
+
+    settings: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(mcpSettings),
+
+    configure: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(mcpConfigure)
+      .output(mcpSettings),
   },
 
   tools: {
@@ -111,6 +131,14 @@ export const contract = {
       })
       .input(botUpdate)
       .output(bot),
+
+    catalog: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(botGet)
+      .output(botCatalog),
   },
 
   pairing: {

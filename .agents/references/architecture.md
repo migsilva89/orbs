@@ -8,8 +8,8 @@ This is the implementation contract. Fix code that conflicts with it; do not rew
 | --- | --- |
 | `apps/daemon` | Entry, startup composition, listener/transport, signals, shutdown. |
 | `apps/desktop`, `apps/mobile` | UI, server connections, device credential storage. |
-| `packages/server` | Product services: bots, pairing, settings, credentials, permissions, skill/MCP selection and discovery; RPC handlers. |
-| `packages/runtime` | Pi integration: Harness, conversations, tools, hooks, approvals, tasks, watches, recovery, skill loading, MCP clients. |
+| `packages/server` | Product services: bots, pairing, settings, credentials, permissions, skill, instruction, plugin and MCP selection/discovery; RPC handlers. |
+| `packages/runtime` | Pi integration: Harness, conversations, tools, hooks, approvals, tasks, watches, recovery, skill/instruction/plugin loading, MCP clients. |
 | `packages/contracts` | Public schemas, input/output types, oRPC contracts and errors. No implementations. |
 | `packages/client` | Typed RPC calls, reconnect, applying Pi view updates. |
 | Shared packages | Env, errors, logging, i18n, avatars and tooling. No application dependencies. |
@@ -17,7 +17,7 @@ This is the implementation contract. Fix code that conflicts with it; do not rew
 Native code stays in its owning package behind `/native`. Using files, SQLite or subprocesses does **not** make code daemon logic.
 
 - Server/native owns app database construction, credential-key loading, workspace directories and MCP configuration-file discovery.
-- Runtime/native owns Pi storage, execution environment, skills loader and MCP connections/tools.
+- Runtime/native owns Pi storage, execution environment, skill, instruction and plugin loaders, and MCP connections/tools.
 - The daemon constructs and injects these services. It does not implement their operations.
 - Startup opens stores, runs migrations once, restores bots, resumes Pi, then starts listening. Pairing and other actions use initialized services; they never boot the app or run migrations.
 - Shutdown closes the listener, runtime, MCP clients, app database and Pi storage in reverse dependency order, including on startup failure.
@@ -105,11 +105,11 @@ Before adding infrastructure, inspect the installed library API and official exa
 - Auto considers owner allow/ask rules in one assessment; ask-first rules win. Recheck policy after Jev and human answers. Load context only when a configured Auto judge needs it.
 - Approval decisions and deadlines live in task-scoped Pi documents. Recovery restores their waits; host timers do not wake an offline host. External tool effects are not guaranteed exactly-once.
 - Bot identity maps to a stable Pi conversation through a session document. Bot SQL commits before filesystem/MCP preparation; no external work inside SQL transactions.
-- Serialize configuration per bot, keeping other bots parallel. After slow preparation, reread bot and skill/MCP settings; retry if relevant values changed before publishing to Pi. `updatedAt` is not a unique version. Restore before resume; reconcile before submission.
+- Serialize configuration per bot, keeping other bots parallel. After slow preparation, reread bot and relevant domain settings; retry if relevant values changed before publishing to Pi. `updatedAt` is not a unique version. Restore before resume; reconcile before submission.
 - Skill service owns settings and inheritance. Runtime uses Pi `loadSkills` and `formatSkillsForPrompt`, including manual-only discovery. Shared inheritance can be disabled without hiding bot-local skills.
 - MCP service owns settings, inheritance, file discovery and merge policy. Runtime clients receive parsed configuration and own connections, tool registration, cancellation and disposal. Runtime does not call server discovery.
 - Catalog discovery reads files and current connection state; it never connects. Preparation reuses unchanged clients and closes replaced/disabled clients. Changes to tool definitions change their approval identity. Preserve persisted Pi identifiers across naming refactors.
-- Use Pi's standalone MCP client and Durable tools, not a CLI extension compatibility layer. Plugins, MCP OAuth and encrypted credential references remain separate work. Exact source precedence and API examples belong in the [README](../../README.md).
+- Use Pi's standalone MCP client and Durable tools, not a CLI extension compatibility layer. Plugin modules default-export Durable extensions; discovery never imports them. MCP OAuth and encrypted credential references remain separate work. Exact source precedence and API examples belong in the [README](../../README.md).
 
 ## Transport and clients
 

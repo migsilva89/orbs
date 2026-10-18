@@ -19,7 +19,9 @@ import {
   conversationTarget,
 } from '../types/conversation.types';
 import { deviceList, deviceRevoke, deviceRevokeResult } from '../types/device.types';
+import { instructionCatalog, instructionConfigure, instructionDiscover, instructionSettings } from '../types/instruction.types';
 import { mcpCatalog, mcpConfigure, mcpDiscover, mcpSettings } from '../types/mcp.types';
+import { pluginCatalog, pluginConfigure, pluginDiscover, pluginSettings } from '../types/plugin.types';
 import { skillCatalog, skillConfigure, skillDiscover, skillSettings } from '../types/skill.types';
 import {
   toolAnswer,
@@ -31,6 +33,44 @@ import {
 } from '../types/tool.types';
 
 export const contract = {
+  plugins: {
+    discover: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(pluginDiscover)
+      .output(pluginCatalog),
+
+    settings: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(pluginSettings),
+
+    configure: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(pluginConfigure)
+      .output(pluginSettings),
+  },
+
+  instructions: {
+    discover: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(instructionDiscover)
+      .output(instructionCatalog),
+
+    settings: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(instructionSettings),
+
+    configure: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(instructionConfigure)
+      .output(instructionSettings),
+  },
+
   skills: {
     discover: oc
       .errors({

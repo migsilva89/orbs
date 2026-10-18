@@ -10,3 +10,8 @@ export { botAvatar, botInherit } from './types/bot.types';
 export type { Bot, BotCatalog, BotCreateInput, BotGetInput, BotUpdateInput } from './types/bot.types';
 export { toolApprovalRules } from './types/tool.types';
 export type { ToolConfigureInput, ToolSettings, ToolPendingInput, ToolApproval, ToolAnswerInput } from './types/tool.types';
+
+export { pluginSettings } from './types/plugin.types';
+export type { PluginCatalog, PluginConfigureInput, PluginSettings } from './types/plugin.types';
+export { instructionSettings } from './types/instruction.types';
+export type { InstructionCatalog, InstructionConfigureInput, InstructionSettings } from './types/instruction.types';

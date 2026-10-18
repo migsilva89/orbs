@@ -4,8 +4,10 @@ import { botActionRestore } from './bot-action.restore';
 import { botActionUpdate } from './bot-action.update';
 import { botQueryCatalog } from './bot-query.catalog';
 import { botQueryGet } from './bot-query.get';
+import { botQueryInstructions } from './bot-query.instructions';
 import { botQueryList } from './bot-query.list';
 import { botQueryMcp } from './bot-query.mcp';
+import { botQueryPlugins } from './bot-query.plugins';
 import { botQuerySkills } from './bot-query.skills';
 import type { BotServiceDeps } from '../../types/bot.types';
 import type { BotCreateInput, BotGetInput, BotUpdateInput } from '@openbots/contracts/universal';
@@ -21,6 +23,8 @@ export function makeBotService(deps: Omit<BotServiceDeps, 'configurations'>) {
       update: (params: BotUpdateInput) => botActionUpdate(serviceDeps, params),
     },
     queries: {
+      plugins: (params: BotGetInput) => botQueryPlugins(serviceDeps, params),
+      instructions: (params: BotGetInput) => botQueryInstructions(serviceDeps, params),
       catalog: (params: BotGetInput) => botQueryCatalog(serviceDeps, params),
       skills: (params: BotGetInput) => botQuerySkills(serviceDeps, params),
       mcp: (params: BotGetInput) => botQueryMcp(serviceDeps, params),

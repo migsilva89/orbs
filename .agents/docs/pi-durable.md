@@ -1,6 +1,6 @@
 # Pi Durable: commands and live client examples
 
-Updated: 2026-10-17
+Updated: 2026-10-18
 
 ## Multiplayer walkthrough
 
@@ -43,7 +43,7 @@ Openbots exposes these through authenticated `conversation.submit` and `conversa
 
 The daemon creates `ModelRuntime` from `@earendil-works/pi-coding-agent` and passes it to Durable as `models`. It implements Pi's `Models` interface. The portable runtime requires that dependency explicitly instead of creating an empty in-memory registry.
 
-Pi's [credentials example](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/sdk/09-api-keys-and-oauth.ts) demonstrates the default runtime and custom auth/model paths. Defaults load `auth.json` and `models.json` from Pi's agent directory; `PI_CODING_AGENT_DIR` selects a separate directory. Existing Pi credentials are reused, with persistence, locking, and OAuth refresh owned by Pi. Skills load from their configured directories without copying or linking them. MCP configuration discovery stays in server/native; Pi clients and tools stay in runtime/native. Plugin loading remains pending. No SQL credential adapter is needed for provider authentication.
+Pi's [credentials example](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/sdk/09-api-keys-and-oauth.ts) demonstrates the default runtime and custom auth/model paths. Defaults load `auth.json` and `models.json` from Pi's agent directory; `PI_CODING_AGENT_DIR` selects a separate directory. Existing Pi credentials are reused, with persistence, locking, and OAuth refresh owned by Pi. Skills load from their configured directories without copying or linking them. MCP configuration discovery stays in server/native; Pi clients and tools stay in runtime/native. Trusted Durable plugin loading lives in runtime/native. No SQL credential adapter is needed for provider authentication.
 
 The native host still owns the locked Durable SQLite store at `OPENBOTS_DATA_DIR/data/runtime.sql`. Loading provider configuration neither changes that path nor creates a coding-agent session. Model selection remains in Durable agent configuration; `ModelRuntime` does not import CLI settings or tools.
 
@@ -51,9 +51,9 @@ The native host still owns the locked Durable SQLite store at `OPENBOTS_DATA_DIR
 
 A session-scoped `openbots.bot-conversation` document family maps each bot UUID to its Pi conversation ID. The runtime creates the mapping and configures an ownerless conversation in one Pi transaction. Reconfiguration preserves the ID and transcript. Bot settings come from app SQL; provider authentication stays shared through `ModelRuntime`.
 
-The server restores all bot configurations before calling `resume()`. Same-bot configuration is serialized in memory. Directory, skill, and MCP preparation run outside SQL. After that work, configuration rereads the bot row and skill and MCP settings and retries if the values that affect Pi config changed, then publishes. SQL and Pi do not share a transaction: a failed Pi synchronization leaves SQL settings for startup or the next submission to reconcile. Pi stores only the relative `agents/<botId>` working directory, not a machine-specific path.
+The server restores all bot configurations before calling `resume()`. Same-bot configuration is serialized in memory. Directory, skill, instruction, plugin, and MCP preparation run outside SQL. After that work, configuration rereads the bot row and relevant domain settings and retries if the values that affect Pi config changed, then publishes. SQL and Pi do not share a transaction: a failed Pi synchronization leaves SQL settings for startup or the next submission to reconcile. Pi stores only the relative `agents/<botId>` working directory, not a machine-specific path.
 
-`conversation.watch({ botId })` and `watchConversation(client, { botId }, signal)` select a bot view. All paired devices act as the owner. The original root is not deleted or automatically adopted as a bot. Tools and permission enforcement now use Pi CodingTools and hooks. Skill loading lives in `@openbots/runtime/native`; MCP config-file discovery lives in `@openbots/server/native`; MCP clients and tools live in `@openbots/runtime/native`. Server policy selects inheritance. Runtime never imports server. OAuth and plugins remain pending.
+`conversation.watch({ botId })` and `watchConversation(client, { botId }, signal)` select a bot view. All paired devices act as the owner. The original root is not deleted or automatically adopted as a bot. Tools and permission enforcement now use Pi CodingTools and hooks. Skill loading lives in `@openbots/runtime/native`; MCP config-file discovery lives in `@openbots/server/native`; MCP clients and tools live in `@openbots/runtime/native`. Server policy selects inheritance. Runtime never imports server. MCP OAuth remains pending.
 
 The initial bot-routing slice had static typecheck/lint validation only. The tool checks below subsequently exercised bot creation/update and recovery. The earlier transport probes predate bot routing; real-provider calls remain unverified.
 
@@ -95,7 +95,7 @@ const services = await makeServices({
 });
 ```
 
-Do not import server code into runtime tool implementations. Inject capabilities through the service composer. A tool that delegates to another tool uses `api.executeTool` so the nested call also crosses the permission hook. Tool extensions are trusted host code; filesystem plugin discovery is not implemented. Preserve Pi's replay policy: approval does not make an external side effect exactly-once.
+Do not import server code into runtime tool implementations. Inject capabilities through the service composer. A tool that delegates to another tool uses `api.executeTool` so the nested call also crosses the permission hook. Tool extensions are trusted host code; filesystem plugin discovery reads metadata without importing modules; configuration loads trusted Durable extensions. Preserve Pi's replay policy: approval does not make an external side effect exactly-once.
 
 Disposable checks with Pi's faux provider verified allow/deny, repeated-answer rejection, Auto falling back to Ask without a key, cancellation, read-only selection, Full mode, and custom/nested calls through the gate. A native SQLite reopen retained the pending task ID and deadline before approval. These checks made no live model or Jev calls and started no dev server. Application secrets were checked for encrypted database values, decryption, and reuse of the native key after reopening it.
 
@@ -104,3 +104,11 @@ Disposable checks with Pi's faux provider verified allow/deny, repeated-answer r
 `@openbots/runtime/native` follows the [Pi MCP client example](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/mcp/README.md): connect with `McpClient`, call `listTools`, forward `callTool` with its abort signal, convert results with `toLlmContent`, then close the client. The daemon constructs MCP clients from `@openbots/runtime/native` and the MCP domain service from `@openbots/server/native`. The server reads settings and configuration files; runtime clients receive parsed configuration and own connections. Tools register as Durable `defineTool` definitions in a bot-specific extension. Pi’s registry supports replacing an installed extension by name; the Openbots permission hook stays last.
 
 Disposable checks exercised an actual stdio subprocess and a faux model through the app services: Ask blocked calls, Read-only rejected a remote read-only hint, approval state survived SQLite reopen, stop sent MCP cancellation, changed/disabled config retired connections, and shutdown removed the child processes. Streamable HTTP was checked with an injected fetch implementation, including pagination, headers, concurrent connection reuse, error results, sanitized failures, and session cleanup. No production server or live model was contacted.
+
+## Instruction files and Durable plugins
+
+The pinned [coding-agent example](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/durable/test/examples/26-coding-agent.ts) supplies context files to Durable. Pi Coding Agent's `loadProjectContextFiles` always reads the agent directory and every ancestor of the working directory. It has no scoped-source option. Openbots therefore reads only selected files with Pi's filename precedence, then passes their content through `configure({ instructions })`. It does not create a CLI session or copy instruction files.
+
+Durable 1.3.0 has no filesystem plugin loader. The native loader discovers configured modules without evaluation, imports them during bot preparation, and validates them with Pi's registry. Runtime registers their original Durable extensions and selects them with `configure({ extensions })`, with the permission hook last. A registry preflight rejects reserved or conflicting names before changing the active registry. No CLI extension adapter or second task runner is introduced. Source paths, inheritance, trust and restart behavior are documented in README.
+
+Disposable checks on 2026-10-18 passed for scoped instruction precedence/inheritance, exclusion of parent instructions, metadata-only plugin discovery, symlink deduplication, per-bot selection, plugin prompt sections and tool execution, Ask recovery through SQLite reopen, Read-only denial, invalid-module diagnostics, and partial/empty settings writes. Existing stdio MCP recovery/cancellation checks also passed with the new services. These used temporary files and Pi's faux provider, without real model calls or a daemon listener; all fixtures were removed.

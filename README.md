@@ -39,7 +39,7 @@ OPENBOTS_DATA_DIR/
 
 Startup creates missing root, data, and agents directories with private permissions and checks read/write/traverse access before opening a database. A path occupied by a file or an inaccessible directory stops startup with a filesystem error. Database opens still report file-level errors; the directory check cannot guarantee a later write succeeds.
 
-Startup opens `data/runtime.sql` with a single-process lock, opens and migrates `data/app.sqlite`, creates Pi's model runtime, constructs workspace, skill, and MCP services from package exports, then restores each bot's Pi conversation and settings before calling `resume()`. Shutdown closes the listener, runtime, MCP clients, app database, and storage lock. Pairing grants live in `app.sqlite`. Use a separate data directory per independent daemon. Existing databases are not moved or renamed automatically.
+Startup opens `data/runtime.sql` with a single-process lock, opens and migrates `data/app.sqlite`, creates Pi's model runtime, constructs workspace, skill, instruction, plugin, and MCP services from package exports, then restores each bot's Pi conversation and settings before calling `resume()`. Shutdown closes the listener, runtime, MCP clients, app database, and storage lock. Pairing grants live in `app.sqlite`. Use a separate data directory per independent daemon. Existing databases are not moved or renamed automatically.
 
 The app database uses `node:sqlite` through Kysely, adapted from Orbs. WAL and foreign keys are enabled. Kysely tracks the [SQL migrations](packages/server/src/services/database/migrations/0001_pairing.sql); the first migration creates devices and temporary pairing grants. Further migrations add bots and their avatar, permission, and inheritance preferences. Migration `0005_credentials` adds the shared encrypted key/value store for application secrets. Provider credentials use Pi's auth files, not app tables. Pi Durable remains the owner of conversation history.
 
@@ -63,7 +63,7 @@ Auto sends the owner rules and tool context in one Jev request. Approval needs a
 
 The daemon uses Pi's `ModelRuntime.create()`, which loads saved provider credentials from `auth.json` and custom model configuration from `models.json` in Pi's agent directory (default `~/.pi/agent`). Existing Pi logins are reused; Pi handles file locking and OAuth refresh. Sign in through Pi's `/login` command if needed. Openbots does not currently expose its own login UI.
 
-Set `PI_CODING_AGENT_DIR` for both Pi and the daemon to use a separate auth/config directory, including for development versus production. Run them as the same OS user to share the default directory. Pi authentication uses its existing location. Skills are loaded directly from their source directories, including existing symlinks; MCP configuration discovery and stdio/Streamable HTTP connections are available; MCP OAuth and plugin loading remain pending. Pi's auth file is sensitive and is not encrypted by this integration.
+Set `PI_CODING_AGENT_DIR` for both Pi and the daemon to use a separate auth/config directory, including for development versus production. Run them as the same OS user to share the default directory. Pi authentication uses its existing location. Skills are loaded directly from their source directories, including existing symlinks; MCP configuration discovery and stdio/Streamable HTTP connections are available; MCP OAuth remains pending. Pi's auth file is sensitive and is not encrypted by this integration.
 
 This loads provider configuration, not CLI sessions, tools, extensions, or `settings.json`. Durable still stores conversations, tasks, and recovery state in `OPENBOTS_DATA_DIR/data/runtime.sql`. Authentication is shared; each bot selects its own model through its database settings.
 
@@ -130,11 +130,11 @@ const bot = await client.bots.create({
 const botId = bot.id;
 ```
 
-Bots store name, unique handle, instructions, provider/model, thinking level, avatar, permission, and skill, MCP, and plugin inheritance preferences. Avatars support blobs, small inline WebP images, colors, and emoji. All RPC inputs remain subject to the listener's 1 MiB payload limit. The default permission is `ask`; inheritance defaults to skills, MCP, and plugins. Permission modes are enforced through Pi tool selection and hooks. Skill and MCP inheritance are implemented; plugins and instruction-file inheritance remain pending. A working folder is not a sandbox.
+Bots store name, unique handle, instructions, provider/model, thinking level, avatar, permission, and skill, MCP, and plugin inheritance preferences. Avatars support blobs, small inline WebP images, colors, and emoji. All RPC inputs remain subject to the listener's 1 MiB payload limit. The default permission is `ask`; inheritance defaults to skills, MCP, and plugins. Permission modes are enforced through Pi tool selection and hooks. Skill, MCP, plugin, and instruction-file inheritance are implemented. Shared instruction files require the `agentsFile` inheritance flag, which is off by default. A working folder is not a sandbox.
 
 Create/update transactions write SQL only. `@openbots/server/native` workspace then creates and validates `agents/<botId>/` during configuration, including restore. Absolute paths are not stored in bot rows. Pi records the relative `agents/<botId>` working directory; the native execution environment resolves it against the data root.
 
-App SQL owns settings. A Pi session document keyed by bot ID owns the stable conversation ID; mapping creation and Pi agent configuration share one commit. Updates do not replace the conversation or history. SQL saves first. Configuration then prepares the directory, skills, and MCP outside that transaction. Same-bot configuration is serialized in memory; after preparation it rereads the bot row and skill and MCP settings and retries if the values that affect Pi config changed. Startup restores every bot before resuming work; submission also reapplies settings. A Pi synchronization failure can leave a saved bot/configuration pending reconciliation. List bots before retrying creation after an error, since handles are unique. Empty working folders from failed operations are not automatically deleted.
+App SQL owns settings. A Pi session document keyed by bot ID owns the stable conversation ID; mapping creation and Pi agent configuration share one commit. Updates do not replace the conversation or history. SQL saves first. Configuration then prepares the directory, skills, instructions, plugins, and MCP outside that transaction. Same-bot configuration is serialized in memory; after preparation it rereads the bot row and all four domain settings and retries if the values that affect Pi config changed. Startup restores every bot before resuming work; submission also reapplies settings. A Pi synchronization failure can leave a saved bot/configuration pending reconciliation. List bots before retrying creation after an error, since handles are unique. Empty working folders from failed operations are not automatically deleted.
 
 The earlier root conversation is retained but no longer exposed by these bot-scoped endpoints. Bot deletion and private DMs remain separate work.
 
@@ -161,7 +161,40 @@ MCP discovery returns `mcp.servers` and `mcp.diagnostics`. Servers include name,
 
 MCP source order is Pi's global `mcp.json`, `~/.agents/mcp.json`, configured MCP paths, bot `.agents/mcp.json`, then bot `.pi/mcp.json`. Shared sources require the bot's `mcp` inheritance flag. Each configured path may be a file or directory. Directories recursively scan `mcp.json` and `*.mcp.json`, skip `.git` and `node_modules`, follow symlinks without cycles, and sort resolved file paths. Later definitions replace the whole same-named entry. A malformed server override removes the earlier same-named entry and adds a diagnostic. Whole-file failures add diagnostics; the returned catalog can be partial.
 
-Use the standard `{ "mcpServers": { "name": { ... } } }` JSON shape. Discovery recognizes stdio commands and HTTP URLs, plus `enabled: false` or `disabled: true` on a complete definition. Stdio accepts `args`, `env`, and `cwd` (relative to the bot directory by default); Streamable HTTP accepts `headers`. Values are literal: shell substitutions and environment interpolation are not supported. `paths: []` clears additional sources, and omitted settings remain unchanged. MCP OAuth, credential-store references, plugin loading, and composer rendering remain pending.
+Use the standard `{ "mcpServers": { "name": { ... } } }` JSON shape. Discovery recognizes stdio commands and HTTP URLs, plus `enabled: false` or `disabled: true` on a complete definition. Stdio accepts `args`, `env`, and `cwd` (relative to the bot directory by default); Streamable HTTP accepts `headers`. Values are literal: shell substitutions and environment interpolation are not supported. `paths: []` clears additional sources, and omitted settings remain unchanged. MCP OAuth, credential-store references, and composer rendering remain pending.
+
+## Instruction files and plugins
+
+These domains use the existing settings table: `instructions.paths` and `plugins.directories`. Settings writes are partial; omitted fields preserve values and `[]` clears configured sources.
+
+```typescript
+await client.instructions.configure({ paths: ['~/.agents/AGENTS.md', '~/bot-instructions'] });
+await client.plugins.configure({ directories: ['~/.agents/plugins', '~/bot-plugins'] });
+const { instructions, plugins } = await client.bots.catalog({ botId });
+// instructions: { files: [{ path, content }], diagnostics }
+// plugins: { plugins: [{ name, path }], diagnostics }
+```
+
+`instructions.settings/discover` and `plugins.settings/discover` also expose each domain separately. Discovery reads files and metadata; it never imports plugin modules or starts execution. Plugin display names come from filenames, not module evaluation.
+
+Instruction order is Pi's agent directory, configured paths, then the bot working folder. The first two require `agentsFile` inheritance. The default configured path is `~/.agents/AGENTS.md`. A directory selects one file in Pi order: `AGENTS.override.md`, `AGENTS.md`, `AGENTS.MD`, `CLAUDE.md`, `CLAUDE.MD`. Paths may also name files directly; symlinks are deduplicated by realpath. Parent directories are not scanned. Bot-local files always apply, followed by the bot's explicit instructions. Missing default locations are skipped; unreadable files and missing explicit paths produce diagnostics and reject configuration. Files refresh on configuration, startup, and submission.
+
+Plugins load from bot `.pi/plugins` and `.agents/plugins`, followed by configured directories when `plugins` inheritance is enabled. Shared directories default to `~/.agents/plugins`. Each directory contains `.ts`, `.js`, or `.mjs` modules, or child folders with `index.ts`, `index.js`, or `index.mjs`. This scan is not recursive. Symlinks are deduplicated by realpath. Relative configured paths resolve against `OPENBOTS_DATA_DIR`; `~` expands to the daemon user's home.
+
+Each module default-exports a Pi Durable extension, as in Pi's `defineExtension` examples:
+
+```typescript
+import { defineExtension, section } from '@earendil-works/pi-durable';
+
+export default defineExtension({
+  name: 'team.guidance',
+  sections: [section('team-guidance', () => 'Use the project conventions.')],
+});
+```
+
+Pi owns extension tools, sections, hooks, and tasks. Openbots selects extensions per bot and keeps its permission hook last. Plugin tools do not gain read-only trust. Plugins are trusted native code running as the daemon user; approval gates tool calls, not module imports or arbitrary JavaScript. Pi CLI ExtensionFactory modules are not supported. Module dependencies must resolve from the plugin's own location.
+
+Imports are cached by canonical path. Restart after editing module code; there is no hot reload. Invalid modules reject bot configuration and appear in catalog diagnostics. Distinct modules cannot share an extension name, and `openbots.*` names are reserved. Removing selection stops new use but does not unload code needed by admitted Pi work. Keep modules available while their tasks remain recoverable; removing required task definitions can prevent recovery.
 
 ## Live conversation
 
@@ -178,7 +211,7 @@ for await (const view of watchConversation(client, { botId }, controller.signal)
 
 Call `controller.abort()` when leaving the view. Disconnecting or cancelling stops observation, not the agent. oRPC reconnects interrupted watch calls and receives a fresh snapshot; it does not retry authentication failures or replay submitted messages. Revoking a device ends its subscriptions even while idle. Pi handles slow watchers with bounded pending frames and replacement snapshots.
 
-All paired devices have owner access to the selected bot's view. Bot-to-bot DMs and files remain pending; group rooms are excluded. Earlier disposable WebSocket checks verified the single-root transport before bot routing was added. The current bot integration has static validation only; no new live-provider or recovery probes were run.
+All paired devices have owner access to the selected bot's view. Bot-to-bot DMs and files remain pending; group rooms are excluded. Earlier disposable WebSocket checks verified the single-root transport before bot routing was added. Disposable bot integration checks cover tool approvals and SQLite recovery; live providers remain unverified.
 
 ## Submit and stop
 

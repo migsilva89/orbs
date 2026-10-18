@@ -1,9 +1,10 @@
+import { Errors } from '@openbots/errors/universal';
 import { match } from 'ts-pattern';
 import { botQueryGet } from './bot-query.get';
-import type { BotServiceDeps } from '../../types/bot.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type { BotConfiguration, BotServiceDeps } from '../../types/bot.types';
+import type { Bot, BotGetInput } from '@openbots/contracts/universal';
 
-export async function botActionConfigure(deps: BotServiceDeps, { botId }: UniversalTypes.BotGetInput) {
+export async function botActionConfigure(deps: BotServiceDeps, { botId }: BotGetInput) {
   const previous = deps.configurations.get(botId) ?? Promise.resolve();
   const current = previous.then(botConfigure);
   const settled = current.then(() => undefined, () => undefined);
@@ -20,49 +21,57 @@ export async function botActionConfigure(deps: BotServiceDeps, { botId }: Univer
       .exhaustive();
   }
 
-  async function botConfigure() {
-    const bot = await botQueryGet(deps, { botId });
-    const skillSettings = await deps.skill.queries.settings();
-    const mcpSettings = await deps.mcp.queries.settings();
-    return botPublish(bot, skillSettings, mcpSettings);
+  async function botConfiguration(): Promise<BotConfiguration> {
+    const [bot, skillSettings, mcpSettings, instructionSettings, pluginSettings] = await Promise.all([
+      botQueryGet(deps, { botId }),
+      deps.skill.queries.settings(),
+      deps.mcp.queries.settings(),
+      deps.instruction.queries.settings(),
+      deps.plugin.queries.settings(),
+    ]);
+
+    return { bot, skillSettings, mcpSettings, instructionSettings, pluginSettings };
   }
 
-  async function botPublish(
-    bot: UniversalTypes.Bot,
-    skillSettings: UniversalTypes.SkillSettings,
-    mcpSettings: UniversalTypes.McpSettings,
-  ): Promise<UniversalTypes.Bot> {
+  async function botConfigure() {
+    return botPublish(await botConfiguration());
+  }
+
+  async function botPublish(configuration: BotConfiguration): Promise<Bot> {
+    const { bot, skillSettings, mcpSettings, instructionSettings, pluginSettings } = configuration;
     await deps.workspace.actions.prepareDirectory({ botId });
 
-    const { prompt: skillsPrompt } = deps.skill.queries.load({
-      bot,
-      settings: skillSettings,
-    });
+    const { prompt: skillsPrompt } = deps.skill.queries.load({ bot, settings: skillSettings });
+    const instructions = await deps.instruction.queries.load({ bot, settings: instructionSettings });
 
-    const tools = await deps.mcp.actions.prepare({
-      bot,
-      settings: mcpSettings,
-    });
+    const instructionFiles = match(instructions.diagnostics.length)
+      .with(0, () => instructions.files)
+      .otherwise(() => {
+        throw new Errors.VALIDATION_ERROR({ fields: {
+          instructions: { message: 'Cannot read configured instructions. Check the instruction catalog diagnostics.' },
+        } });
+      });
 
-    const latestBot = await botQueryGet(deps, { botId });
-    const latestSkillSettings = await deps.skill.queries.settings();
-    const latestMcpSettings = await deps.mcp.queries.settings();
+    const plugins = await deps.plugin.actions.load({ bot, settings: pluginSettings });
+    const tools = await deps.mcp.actions.prepare({ bot, settings: mcpSettings });
+    const latest = await botConfiguration();
 
-    return match(botConfigureState(bot, skillSettings, mcpSettings)
-      === botConfigureState(latestBot, latestSkillSettings, latestMcpSettings))
+    return match(botConfigureState(configuration) === botConfigureState(latest))
       .with(true, async () => {
         await deps.runtime.actions.configureBot({
-          ...latestBot,
+          ...latest.bot,
           skillsPrompt,
+          instructionFiles,
+          plugins,
           tools,
         });
-        return latestBot;
+        return latest.bot;
       })
-      .with(false, () => botPublish(latestBot, latestSkillSettings, latestMcpSettings))
+      .with(false, () => botPublish(latest))
       .exhaustive();
   }
 
-  function botConfigureState(bot: UniversalTypes.Bot, skillSettings: UniversalTypes.SkillSettings, mcpSettings: UniversalTypes.McpSettings) {
+  function botConfigureState({ bot, ...settings }: BotConfiguration) {
     return JSON.stringify({
       inherit: bot.inherit,
       modelProvider: bot.modelProvider,
@@ -70,8 +79,7 @@ export async function botActionConfigure(deps: BotServiceDeps, { botId }: Univer
       thinkingLevel: bot.thinkingLevel,
       instructions: bot.instructions,
       permission: bot.permission,
-      directories: skillSettings.directories,
-      paths: mcpSettings.paths,
+      ...settings,
     });
   }
 }

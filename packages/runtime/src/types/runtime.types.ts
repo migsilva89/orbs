@@ -48,6 +48,8 @@ export interface RuntimeBotParams {
   thinkingLevel: ModelThinkingLevel;
   instructions: string;
   skillsPrompt: string;
+  instructionFiles: { path: string; content: string }[];
+  plugins: PiDurableTypes.Extension[];
   tools: PiDurableTypes.ToolRegistration[];
   permission: 'read-only' | 'ask' | 'auto' | 'full';
 }

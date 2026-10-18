@@ -1,7 +1,14 @@
 import { ModelRuntime } from '@earendil-works/pi-coding-agent';
 import { env } from '@openbots/env/server';
 import { log } from '@openbots/logger/server';
-import { makeMcpClientService, makeSkillLoaderService, makeStorageService, runtimeEnvNative } from '@openbots/runtime/native';
+import {
+  makeInstructionLoaderService,
+  makeMcpClientService,
+  makePluginLoaderService,
+  makeSkillLoaderService,
+  makeStorageService,
+  runtimeEnvNative,
+} from '@openbots/runtime/native';
 import { match } from 'ts-pattern';
 import { credentialsKeyNative, makeDatabaseService, makeMcpService, makeWorkspaceService, workspacePathsNative } from '@openbots/server/native';
 import { makeServices, makeSettingsService } from '@openbots/server/server';
@@ -24,6 +31,8 @@ export async function coreNativeRun(): Promise<void> {
   const settings = makeSettingsService({ database });
   const workspace = makeWorkspaceService({ root: paths.root });
   const skillLoader = makeSkillLoaderService({ root: paths.root });
+  const instructionLoader = makeInstructionLoaderService({ root: paths.root });
+  const pluginLoader = makePluginLoaderService({ root: paths.root });
   const mcpClients = makeMcpClientService({ root: paths.root });
   resources.defer(() => mcpClients.close());
 
@@ -39,6 +48,8 @@ export async function coreNativeRun(): Promise<void> {
     settings,
     workspace,
     skillLoader,
+    instructionLoader,
+    pluginLoader,
     mcp,
     runtime: {
       storage: storage.storage,

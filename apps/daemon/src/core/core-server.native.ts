@@ -50,6 +50,8 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
             conversation: services.conversation,
             tools: services.tools,
             skills: services.skills,
+            instructions: services.instructions,
+            plugins: services.plugins,
             mcp: services.mcp,
           },
         });

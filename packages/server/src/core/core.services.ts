@@ -3,6 +3,8 @@ import { makeAuthService } from '../services/auth/auth.service';
 import { makeBotService } from '../services/bot/bot.service';
 import { makeConversationService } from '../services/conversation/conversation.service';
 import { makeCredentialsService } from '../services/credentials/credentials.service';
+import { makeInstructionService } from '../services/instruction/instruction.service';
+import { makePluginService } from '../services/plugin/plugin.service';
 import { makeSkillService } from '../services/skill/skill.service';
 import { makeToolService } from '../services/tool/tool.service';
 import type { CoreServicesParams } from '../types/core.types';
@@ -13,6 +15,8 @@ export async function makeServices({
   settings,
   workspace,
   skillLoader,
+  instructionLoader,
+  pluginLoader,
   mcp,
   runtime: runtimeOptions,
 }: CoreServicesParams) {
@@ -29,12 +33,16 @@ export async function makeServices({
   try {
     const auth = makeAuthService({ database });
     const skill = makeSkillService({ settings, loader: skillLoader });
+    const instruction = makeInstructionService({ settings, loader: instructionLoader });
+    const plugin = makePluginService({ settings, loader: pluginLoader });
 
     const bots = makeBotService({
       database,
       runtime,
       workspace,
       skill,
+      instruction,
+      plugin,
       mcp,
     });
 
@@ -48,6 +56,8 @@ export async function makeServices({
       runtime,
       tools,
       skills: skill,
+      instructions: instruction,
+      plugins: plugin,
       mcp,
       conversation: makeConversationService({
         runtime,

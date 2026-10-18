@@ -8,3 +8,5 @@ export type { McpClientParams, McpConfig, McpSource } from './types/mcp.types';
 export type { McpClientService } from './services/mcp/mcp.service';
 export type { SkillLoadParams, SkillLoadResult } from './types/skill.types';
 export type { SkillLoaderService } from './services/skill/skill.service';
+export type { PluginLoaderService } from './services/plugin/plugin.service';
+export type { InstructionLoaderService } from './services/instruction/instruction.service';

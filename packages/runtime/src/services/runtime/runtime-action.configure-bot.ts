@@ -1,5 +1,6 @@
 import { configure, defineExtension } from '@earendil-works/pi-durable';
 import { match } from 'ts-pattern';
+import { runtimePluginsInstall } from './runtime-plugins.utils';
 import { runtimeBot, runtimeBotConversations } from './runtime.constants';
 import type { RuntimeBotParams, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
@@ -11,6 +12,7 @@ export function runtimeActionConfigureBot(
 ) {
   // Persisted Pi extension id; renaming would drop already admitted tools.
   const botTools = defineExtension({ name: `openbots.resources.${bot.id}`, tools: bot.tools });
+  runtimePluginsInstall(registry, bot.plugins);
   registry.install(botTools);
 
   return harness.commit(async (tx) => {
@@ -27,9 +29,12 @@ export function runtimeActionConfigureBot(
     await configure(tx, conversationId, {
       model: { provider: bot.modelProvider, modelId: bot.modelId },
       thinkingLevel: bot.thinkingLevel,
-      instructions: bot.instructions,
+      instructions: [
+        ...bot.instructionFiles.map(({ path, content }) => `# ${path}\n\n${content}`),
+        bot.instructions,
+      ].filter(Boolean).join('\n\n'),
       cwd: `agents/${bot.id}`,
-      extensions: [botTools, ...extensions],
+      extensions: [botTools, ...bot.plugins, ...extensions],
       tools: match(bot.permission)
         .with('read-only', () => readOnlyTools)
         .otherwise(() => null),

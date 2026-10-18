@@ -32,7 +32,7 @@ export function subagentExtension() {
     tools: [
       defineTool({
         name: SUBAGENT.tool,
-        description: m.ui_tool_subagent_description(),
+        description: m.ui_tool_bot_subagent_description(),
         parameters: Type.Object({
           operation: Type.Union([
             Type.Literal('run'),
@@ -78,7 +78,7 @@ export function subagentExtension() {
       }),
       defineTool({
         name: SUBAGENT.stop,
-        description: m.ui_tool_subagent_stop_description(),
+        description: m.ui_tool_bot_subagent_stop_description(),
         parameters: Type.Object({ name: subagentName }),
         replay: 'unsafe',
         execute: ({ name }, api, context) => subagentActionStop(api, name, context),

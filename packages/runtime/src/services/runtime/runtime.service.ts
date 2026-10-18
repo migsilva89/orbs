@@ -39,6 +39,7 @@ import { runtimeQueryUsage } from './runtime-query.usage';
 import { runtimeQueryValidateModel } from './runtime-query.validate-model';
 import { runtimeQueryWatch } from './runtime-query.watch';
 import { runtimeQueryWatchContexts } from './runtime-query.watch-contexts';
+import { runtimeRoutineToolsExtension } from './runtime-routine-tools.utils';
 import { runtimeSkills } from './runtime-skills.utils';
 import { runtimeToolsExtension } from './runtime-tools.utils';
 import type * as AttachmentTypes from '../../types/attachment.types';
@@ -70,6 +71,12 @@ export async function makeRuntimeService({
     env,
   }, BACKGROUND_CONTEXT);
 
+  const routines = makeRoutineService({ harness });
+  const routineTools = runtimeRoutineToolsExtension({ harness, routines });
+  registry.install(routineTools.extension);
+  extensions.push(routineTools.extension);
+  trustedReads.push(...routineTools.readOnlyTools);
+
   const permissionExtension = runtimeToolsExtension({
     harness,
     readOnlyTools: trustedReads,
@@ -81,7 +88,7 @@ export async function makeRuntimeService({
   const deps = {
     harness,
     questions: makeQuestionService({ harness }),
-    routines: makeRoutineService({ harness }),
+    routines,
     index: await makeConversationIndexService({ harness }).catch(async (error: unknown) => {
       await harness.close(BACKGROUND_CONTEXT);
       throw error;

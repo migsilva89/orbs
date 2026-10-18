@@ -7,7 +7,7 @@ import { QUESTION } from './question.constants';
 
 const ask = defineTool({
   name: QUESTION.tool,
-  description: m.ui_tool_ask_description(),
+  description: m.ui_tool_bot_question_description(),
   parameters: Type.Object({
     text: Type.String({
       minLength: 1,

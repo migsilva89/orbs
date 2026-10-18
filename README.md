@@ -120,7 +120,7 @@ const reactions = await client.conversation.reactions({ botId, entryIds: visible
 
 Pass `isPresent: false` to remove a reaction. Pi documents store reactions beside the selected conversation. Bot-authored reactions and reaction-triggered bot replies remain pending.
 
-Bots can call the `ask` tool with a question and optional choices. Clients read pending questions and submit a choice or free text through authenticated RPC:
+Bots can call the `bot_question` tool with a question and optional choices. Clients read pending questions and submit a choice or free text through authenticated RPC:
 
 ```ts
 const questions = await client.conversation.questions({ botId, conversationId });
@@ -129,7 +129,7 @@ const result = await client.conversation.answerQuestion({
 });
 ```
 
-The first answer before the five-minute deadline wins; `result.isAccepted` reports whether it was accepted. Question state and its deadline live in a task-scoped Pi document and survive restart. Stopping the task removes it from pending questions. This is separate from permission approval; the trusted `ask` tool also works in read-only mode. Multi-select cards and skip controls are not implemented.
+The first answer before the five-minute deadline wins; `result.isAccepted` reports whether it was accepted. Question state and its deadline live in a task-scoped Pi document and survive restart. Stopping the task removes it from pending questions. This is separate from permission approval; the trusted `bot_question` tool also works in read-only mode. Multi-select cards and skip controls are not implemented.
 
 The selected chat watch includes `interactionsRevision`. Refetch visible reactions and pending questions on the initial state and when this value changes. It is a subscription-local invalidation counter, not a replay cursor. Reconnect starts with current state. Reaction buttons, question cards and retry controls remain UI work.
 
@@ -373,13 +373,15 @@ Peer tools select another bot on the same daemon. By default they reuse its main
 | Tool | Behavior |
 | --- | --- |
 | `bot_list` | List other local bots by ID, name, and handle; a trusted read. |
-| `ask_bot({ botId, message, context? })` | Wait for a peer's answer. A busy recipient is rejected; use `message_bot` to queue work. |
-| `message_bot({ botId, message, context? })` | Accept background delivery; the reply returns as follow-up input in the sender's conversation. |
-| `subagent({ operation: 'run', message })` | Run a task-owned child and return its answer. |
-| `subagent({ operation: 'spawn', name, message })` | Start a named background child and report its answer later. |
-| `subagent({ operation: 'send', name, message, whenBusy? })` | Send to an existing background child; default placement is `steer`. |
-| `subagent({ operation: 'status', name? })` | Read named background child state. |
-| `subagent_stop({ name })` | Stop a background child's current work; keep its context for later messages. |
+| `bot_ask({ botId, message, context? })` | Wait for a peer's answer. A busy recipient is rejected; use `bot_message` to queue work. |
+| `bot_message({ botId, message, context? })` | Accept background delivery; the reply returns as follow-up input in the sender's conversation. |
+| `bot_subagent({ operation: 'run', message })` | Run a task-owned child and return its answer. |
+| `bot_subagent({ operation: 'spawn', name, message })` | Start a named background child and report its answer later. |
+| `bot_subagent({ operation: 'send', name, message, whenBusy? })` | Send to an existing background child; default placement is `steer`. |
+| `bot_subagent({ operation: 'status', name? })` | Read named background child state. |
+| `bot_subagent_stop({ name })` | Stop a background child's current work; keep its context for later messages. |
+
+Openbots-owned tools use the `bot_` namespace. Finish pending calls that use the old unprefixed names before upgrading the daemon. Pi stores tool names with each call; this rename does not migrate those saved calls. Task, document and extension identifiers remain unchanged.
 
 `context` accepts `existing` (the default) or `temporary`. Temporary contexts reuse the recipient’s configuration, skills, permissions, and working directory, without copying its transcript. New admissions refresh that configuration from the main conversation. Context isolation does not isolate files or tools.
 
@@ -551,4 +553,8 @@ One routine has at most one claimed occurrence at a time. `lastRun` reports the 
 
 After downtime, a saved overdue deadline runs once; missed repetitions are not replayed. Cron chooses the next future calendar time after completion. Intervals wait the specified minutes after completion. A scheduled one-shot disables itself after its receipt settles, including an unanswered result. Resuming a past one-shot explicitly requests it again. On restart, the harness resumes the saved phase and reuses the same submission instead of creating another input. External tool effects still follow Pi's replay guarantees.
 
-The native daemon must remain running. No operating-system wake-up or Cloudflare alarm is installed. The routine editor, live routine-list UI and bot-facing schedule tools are not implemented.
+The native daemon must remain running. No operating-system wake-up or Cloudflare alarm is installed. The routine editor and live routine-list UI are not implemented.
+
+Bots have `bot_routine_list`, `bot_routine_create`, `bot_routine_update`, `bot_routine_run` and `bot_routine_remove`. These call the same runtime routine service as RPC. Tool schemas are derived once from the public routine contracts. Tools derive the bot identity from Pi; they accept no bot or conversation ID. Private contexts and subagents manage their bot's main-chat routines, with the same permission hook.
+
+Only `bot_routine_list` is a trusted read. Changes use Ask/Auto/Full approval policy; read-only bots cannot change routines. `bot_routine_update` pauses/resumes via `isEnabled`. `bot_routine_run` queues work and returns immediately, so a bot does not wait for its own next turn. Mutating tools use Pi's `replay: 'unsafe'`: a crash after a write can leave it applied, but Pi will not blindly repeat it. The model must list current routines before deciding whether to retry. Scheduled deliveries keep their existing request-ID deduplication.

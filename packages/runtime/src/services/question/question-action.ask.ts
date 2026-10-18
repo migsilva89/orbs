@@ -97,6 +97,6 @@ function questionReply(answer: string): ToolExecutionResult<QuestionDetails> {
 function questionExpired(): ToolExecutionResult<QuestionDetails> {
   return {
     isError: true,
-    output: [{ type: 'text', text: m.ui_tool_ask_expired() }],
+    output: [{ type: 'text', text: m.ui_tool_bot_question_expired() }],
   };
 }

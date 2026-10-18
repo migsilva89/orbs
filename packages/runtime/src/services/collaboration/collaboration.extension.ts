@@ -29,16 +29,16 @@ export function collaborationExtension({ policy }: CollaborationDeps) {
   });
 
   const askBot = defineTool({
-    name: 'ask_bot',
-    description: m.ui_tool_ask_bot_description(),
+    name: 'bot_ask',
+    description: m.ui_tool_bot_ask_description(),
     parameters,
     replay: 'safe',
     execute: (params, api, context) => collaborationActionSend(deps, { ...params, mode: 'ask' }, api, context),
   });
 
   const messageBot = defineTool({
-    name: 'message_bot',
-    description: m.ui_tool_message_bot_description(),
+    name: 'bot_message',
+    description: m.ui_tool_bot_message_description(),
     parameters,
     replay: 'safe',
     execute: (params, api, context) => collaborationActionSend(deps, { ...params, mode: 'send' }, api, context),

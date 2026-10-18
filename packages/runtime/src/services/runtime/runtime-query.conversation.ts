@@ -6,7 +6,7 @@ import type { Context } from '@earendil-works/chord/context';
 import type { ConversationId } from '@earendil-works/pi-durable';
 
 export async function runtimeQueryConversation(
-  { harness }: RuntimeServiceDeps,
+  { harness }: Pick<RuntimeServiceDeps, 'harness'>,
   { botId, conversationId: selectedId }: RuntimeConversationParams,
   context: Context,
 ) {

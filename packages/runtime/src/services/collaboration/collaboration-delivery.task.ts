@@ -38,7 +38,7 @@ export const collaborationDelivery = defineTask<CollaborationDeliveryInput, Coll
               .otherwise(() => ({ status: 'unanswered' as const, reason: 'No answer was produced.' }));
           } catch (error) {
             return match(error)
-              .with(P.instanceOf(ConversationBusy), () => ({ status: 'unanswered' as const, reason: 'Recipient is busy; use message_bot to queue work.' }))
+              .with(P.instanceOf(ConversationBusy), () => ({ status: 'unanswered' as const, reason: 'Recipient is busy; use bot_message to queue work.' }))
               .otherwise((cause) => {
                 throw cause;
               });

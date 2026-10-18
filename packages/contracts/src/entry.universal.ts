@@ -42,3 +42,4 @@ export { QUESTION } from './types/question.types';
 export type { ConversationQuestion, ConversationAnswerQuestionInput, ConversationAnswerQuestionResult } from './types/question.types';
 
 export type { Routine, RoutineRun, RoutineSchedule, RoutineTarget, RoutineCreateInput, RoutineUpdateInput } from './types/routine.types';
+export { routineCreate, routineTarget, routineUpdate } from './types/routine.types';

@@ -3,8 +3,8 @@ import type { SubagentAgents, SubagentCall } from '../../types/subagent.types';
 
 export const SUBAGENT = {
   extension: 'openbots.subagents',
-  tool: 'subagent',
-  stop: 'subagent_stop',
+  tool: 'bot_subagent',
+  stop: 'bot_subagent_stop',
   anchor: 'openbots.subagent-anchor',
   reporter: 'openbots.subagent-reporter',
   agents: 'openbots.subagent-agents',

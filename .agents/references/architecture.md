@@ -102,6 +102,7 @@ export type SkillService = ReturnType<typeof makeSkillService>;
 Before adding infrastructure, inspect the installed library API and official examples. Use Pi's tools, extensions, documents, tasks, watches and recovery where they fit. State the concrete missing capability before implementing a replacement. See [Pi examples](../docs/pi-durable.md).
 
 - Server owns product policy. Runtime implements it through Pi hooks and tasks. Install the permission hook last, including for custom and MCP tools.
+- Openbots-owned tool names use the `bot_` prefix, for example `bot_message`, `bot_question`, and `bot_routine_create`. Native Pi, MCP and third-party plugin tools keep their provider names.
 - Only explicitly trusted tool registrations bypass approval as reads. Names and MCP `readOnlyHint` annotations do not grant trust. Read-only denies other tools; Ask requests approval; Auto uses Jev only for untrusted calls and falls back to Ask; Full allows calls.
 - Auto considers owner allow/ask rules in one assessment; ask-first rules win. Recheck policy after Jev and human answers. Load context only when a configured Auto judge needs it.
 - Approval decisions and deadlines live in task-scoped Pi documents. Recovery restores their waits; host timers do not wake an offline host. External tool effects are not guaranteed exactly-once.

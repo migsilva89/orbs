@@ -3,7 +3,7 @@ import type { QuestionRecord } from '../../types/question.types';
 
 export const QUESTION = {
   extension: 'openbots.questions',
-  tool: 'ask',
+  tool: 'bot_question',
   document: 'openbots.question',
   timeoutMs: 300_000,
 } as const;

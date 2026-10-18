@@ -1,6 +1,7 @@
 export { coreHandler } from './core/core.handler';
 export { makeServices } from './core/core.services';
 export { makeAuthService } from './services/auth/auth.service';
+export { makeCredentialsService } from './services/credentials/credentials.service';
 export { makeSettingsService } from './services/settings/settings.service';
 export { router } from './rpc/rpc.router';
 export type { McpService } from './services/mcp/mcp.service';

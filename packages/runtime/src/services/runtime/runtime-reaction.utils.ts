@@ -1,9 +1,15 @@
 import { AssistantEntry, UserEntry } from '@earendil-works/pi-durable';
-import { ATTACHMENT, REPLY } from '@openbots/contracts/universal';
+import { ATTACHMENT, REACTION, REPLY } from '@openbots/contracts/universal';
+import { Errors } from '@openbots/errors/universal';
 import { match, P } from 'ts-pattern';
-import type { ConversationId, EntryRecord } from '@earendil-works/pi-durable';
+import { runtimeReactions } from './runtime-reaction.constants';
+import { runtimeBot } from './runtime.constants';
+import type { RuntimeReaction, RuntimeReactToolInput } from '../../types/reaction.types';
+import type { Context } from '@earendil-works/chord/context';
+import type * as PiDurableTypes from '@earendil-works/pi-durable';
+import type { ConversationReaction } from '@openbots/contracts/universal';
 
-export function runtimeReactionTarget(entry: EntryRecord | undefined, conversationId: ConversationId) {
+export function runtimeReactionTarget(entry: PiDurableTypes.EntryRecord | undefined, conversationId: PiDurableTypes.ConversationId) {
   return match(entry)
     .with({
       conversationId,
@@ -15,4 +21,85 @@ export function runtimeReactionTarget(entry: EntryRecord | undefined, conversati
       ))
       .otherwise(() => undefined))
     .otherwise(() => undefined);
+}
+
+export function runtimeReactionView(entryId: number, document: RuntimeReaction): ConversationReaction {
+  return {
+    entryId,
+    emojis: [...document.emojis],
+    botReactions: document.botReactions.flatMap((item) => match(item.emojis.length)
+      .with(0, () => [])
+      .otherwise(() => [{ botId: item.botId, emojis: [...item.emojis] }])),
+  };
+}
+
+export function runtimeReactionToggle(emojis: string[], emoji: string, isPresent: boolean) {
+  const hasEmoji = emojis.includes(emoji);
+
+  match({ isPresent, hasEmoji })
+    .with({ isPresent: true, hasEmoji: true }, { isPresent: false, hasEmoji: false }, () => undefined)
+    .with({ isPresent: true, hasEmoji: false }, () => {
+      match(emojis.length < REACTION.maxPerEntry)
+        .with(false, () => {
+          throw new Errors.VALIDATION_ERROR({
+            fields: { emoji: { message: 'validation_reaction_limit', args: { max: REACTION.maxPerEntry } } },
+          });
+        })
+        .with(true, () => {
+          emojis.push(emoji);
+        })
+        .exhaustive();
+    })
+    .with({ isPresent: false, hasEmoji: true }, () => {
+      emojis.splice(emojis.indexOf(emoji), 1);
+    })
+    .exhaustive();
+}
+
+export function runtimeReactionApplyBot(document: RuntimeReaction, botId: string, params: RuntimeReactToolInput) {
+  const existing = document.botReactions.find((item) => item.botId === botId);
+
+  match(existing)
+    .with(P.nonNullable, (item) => {
+      runtimeReactionToggle(item.emojis, params.emoji, params.isPresent);
+    })
+    .otherwise(() => {
+      match(params.isPresent)
+        .with(true, () => {
+          const emojis: string[] = [];
+          runtimeReactionToggle(emojis, params.emoji, true);
+          document.botReactions.push({ botId, emojis });
+        })
+        .with(false, () => undefined)
+        .exhaustive();
+    });
+
+  document.botReactions = document.botReactions.filter((item) => item.emojis.length > 0);
+}
+
+export async function runtimeReactionSetBot(
+  api: PiDurableTypes.ToolExecutionApi,
+  params: RuntimeReactToolInput,
+  context: Context,
+): Promise<ConversationReaction> {
+  const identity = await api.snapshot(runtimeBot, api.conversationId, context);
+
+  const botId = match(identity?.botId)
+    .with(P.string, (id) => id)
+    .otherwise(() => {
+      throw new Errors.FORBIDDEN();
+    });
+
+  return api.commit(async (tx) => {
+    return match(runtimeReactionTarget(await tx.entry(params.entryId as PiDurableTypes.EntryId), api.conversationId))
+      .with(P.nullish, () => {
+        throw new Errors.NOT_FOUND({ resource: 'entry', resourceId: params.entryId });
+      })
+      .otherwise(async () => {
+        const document = await tx.doc(runtimeReactions, api.conversationId, String(params.entryId), null);
+        runtimeReactionApplyBot(document, botId, params);
+
+        return runtimeReactionView(params.entryId, document);
+      });
+  }, context);
 }

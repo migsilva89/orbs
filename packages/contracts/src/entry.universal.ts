@@ -14,7 +14,7 @@ export type { McpCatalog, McpConfigureInput, McpSettings } from './types/mcp.typ
 export type { ConversationSummary, ConversationListItem, ConversationFrame, ConversationState, ConversationHistoryInput, ConversationHistoryPage, ConversationSubmitInput, ConversationUpdateSubmissionInput, ConversationTarget, ConversationView } from './types/conversation.types';
 export { authToken } from './types/auth.types';
 export type { AuthPairInput, AuthRedeemInput } from './types/auth.types';
-export { botAvatar, botInherit } from './types/bot.types';
+export { botAvatar, botInherit, botCreate, botGet, botUpdate } from './types/bot.types';
 export type { Bot, BotCatalog, BotCreateInput, BotGetInput, BotUpdateInput } from './types/bot.types';
 export { toolApprovalRules } from './types/tool.types';
 export type { ToolConfigureInput, ToolSettings, ToolPendingInput, ToolApproval, ToolAnswerInput } from './types/tool.types';
@@ -35,7 +35,7 @@ export type { MessageQuote } from './types/reply.types';
 export type { ConversationRun } from './types/conversation.types';
 export type { ConversationSetHiddenInput, ConversationSetMutedInput, ConversationArrangeInput } from './types/conversation-preference.types';
 
-export { REACTION } from './types/reaction.types';
+export { REACTION, conversationSetReaction } from './types/reaction.types';
 export type { ConversationSetReactionInput, ConversationReactionsInput, ConversationReaction } from './types/reaction.types';
 
 export { QUESTION } from './types/question.types';
@@ -43,3 +43,34 @@ export type { ConversationQuestion, ConversationAnswerQuestionInput, Conversatio
 
 export type { Routine, RoutineRun, RoutineSchedule, RoutineTarget, RoutineCreateInput, RoutineUpdateInput } from './types/routine.types';
 export { routineCreate, routineTarget, routineUpdate } from './types/routine.types';
+
+export type { ConversationHistoryMessage, ConversationSearchInput, ConversationSearchPage } from './types/history.types';
+
+export {
+  ARTIFACT,
+  artifactBlocks,
+  artifactComponents,
+  artifactSpec,
+  artifactCreate,
+  artifactGet,
+  artifactUpdate,
+  artifactUpdateFields,
+} from './types/artifact.types';
+export type {
+  Artifact,
+  ArtifactSummary,
+  ArtifactSpec,
+  ArtifactVersion,
+  ArtifactListInput,
+  ArtifactGetInput,
+  ArtifactCreateInput,
+  ArtifactUpdateInput,
+  ArtifactSaveStateInput,
+  ArtifactRestoreInput,
+  ArtifactVersionsInput,
+} from './types/artifact.types';
+export { credentialsKey, credentialsSet, credentialsMetadata, credentialsList, credentialsSetResult } from './types/credentials.types';
+export type { CredentialsSetInput } from './types/credentials.types';
+
+export { modelSelection } from './types/model.types';
+export type { ModelSelection } from './types/model.types';

@@ -20,6 +20,7 @@ export interface ConversationState {
   inbox: PiDurableTypes.InboxState;
   lastRun: ConversationRun | null;
   interactionsRevision: number;
+  artifactsRevision: number;
 }
 
 export interface ConversationContextWatchState {

@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@openbots/contracts": "workspace:*",
+    "@openbots/errors": "workspace:*",
     "@earendil-works/pi-coding-agent": "catalog:",
     "@openbots/server": "workspace:*",
     "@openbots/runtime": "workspace:*",

@@ -22,9 +22,15 @@ export const conversationSetReaction = conversationTarget.extend({
   isPresent: z.boolean(),
 });
 
+export const conversationBotReaction = z.object({
+  botId: z.uuid(),
+  emojis: z.array(reactionEmoji).max(REACTION.maxPerEntry),
+});
+
 export const conversationReaction = z.object({
   entryId: z.number().int().positive(),
   emojis: z.array(reactionEmoji).max(REACTION.maxPerEntry),
+  botReactions: z.array(conversationBotReaction),
 });
 
 export const conversationSetReactionResult = conversationReaction;
@@ -37,4 +43,5 @@ export const conversationReactionsResult = z.array(conversationReaction);
 
 export type ConversationSetReactionInput = z.infer<typeof conversationSetReaction>;
 export type ConversationReactionsInput = z.infer<typeof conversationReactions>;
+export type ConversationBotReaction = z.infer<typeof conversationBotReaction>;
 export type ConversationReaction = z.infer<typeof conversationReaction>;

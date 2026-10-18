@@ -1,7 +1,6 @@
-import { match, P } from 'ts-pattern';
 import { runtimeQueryConversation } from './runtime-query.conversation';
 import { runtimeReactions } from './runtime-reaction.constants';
-import { runtimeReactionTarget } from './runtime-reaction.utils';
+import { runtimeReactionTarget, runtimeReactionView } from './runtime-reaction.utils';
 import type { RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { EntryId } from '@earendil-works/pi-durable';
@@ -23,8 +22,6 @@ export async function runtimeQueryReactions(
   return Promise.all(visibleIds.map(async (entryId) => {
     const document = await deps.harness.snapshot(runtimeReactions, conversation.id, String(entryId), context);
 
-    return match(document)
-      .with({ emojis: P.array() }, (value) => ({ entryId, emojis: [...value.emojis] }))
-      .otherwise(() => ({ entryId, emojis: [] }));
+    return runtimeReactionView(entryId, document ?? { emojis: [], botReactions: [] });
   }));
 }

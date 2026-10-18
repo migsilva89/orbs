@@ -172,6 +172,8 @@ Authenticated clients use `tools.pending({ botId })` and `tools.answer({ botId, 
 
 `tools.configure({ jevApiKey })` saves the key; passing `null` removes it, and omitting it leaves it unchanged. `tools.settings()` returns the tool settings object, `{ isJevConfigured, approvalRules }`, and never returns the key. `tools.configure()` returns the updated settings after saving. Application secrets share the encrypted `credentials` table. The native daemon stores the encryption key in `data/credentials.key` with owner-only permissions. Keep that key for recovery; copying the entire data directory also copies the ability to decrypt the database. Pi's provider authentication remains in Pi's own store.
 
+Paired devices manage named secrets through `credentials.set({ key, value })`; `value: null` removes a key. `credentials.list()` returns only names and creation/update timestamps. Secret values are never readable through RPC. The same store serves Jev and MCP; Pi provider credentials remain in Pi's auth store.
+
 Rules use `{ when, behavior: 'allow' | 'ask' }`. `tools.configure({ approvalRules })` replaces the list; `[]` clears it, and omission preserves it. Rules are non-secret owner settings in the shared `settings` table; the Jev key remains encrypted in `credentials`. Up to 50 rules of 300 characters are accepted.
 
 Auto sends the owner rules and tool context in one Jev request. Approval needs a safe score of at least 0.9 and an ask-first score at most 0.1. Matching ask-first rules take priority over allow rules; ambiguity and failures request human approval. Explicit allow rules can cover email or other external actions. Natural-language matching is model-based, not a deterministic security guarantee. Trusted read-only tools skip this evaluation. Ask and Read-only modes cannot be overridden by allow rules. Changes to rules, bot instructions, permission mode, or removal of the Jev key are checked after the answer arrives.
@@ -186,15 +188,30 @@ This loads provider configuration, not CLI sessions, tools, extensions, or `sett
 
 ## Device pairing
 
-Each daemon has one owner. There is no local pair CLI. Existing paired devices issue a pairing payload through authenticated `pairing.create`. A first unpaired client cannot issue a public grant; initial local UI/bootstrap integration is pending.
+Each daemon has one owner. There is no local pair CLI. Existing paired devices issue a pairing payload through authenticated `pairing.create`. The first device gets its grant through `pairing.bootstrap` on the owner-only Unix socket at `data/ipc/rpc.sock`. Public HTTP/WebSocket calls cannot bootstrap, even from loopback. The local endpoint issues grants only when no device records remain. Desktop UI integration remains pending.
 
 | RPC call | Access | Result |
 | --- | --- | --- |
+| `pairing.bootstrap({ serverUrl })` | Local Unix socket, no devices yet | Five-minute token, expiry, and QR payload/SVG |
 | `pairing.redeem({ token, name })` | Pairing token | Device metadata and a new device token |
 | `pairing.create({ serverUrl })` | Device bearer token | Five-minute token, expiry, and `qr: { payload, svg }` |
 | `pairing.status({ token })` | Device bearer token | Grant expiry, issuer, and `claimedAt` (Unix milliseconds, or `null` while unclaimed) |
 | `devices.list()` | Device bearer token | Paired device IDs, names, and creation times |
 | `devices.revoke({ id })` | Device bearer token | Revokes that device and its unused pairing grants; may revoke itself |
+
+The daemon creates a private IPC directory (`0700`) and socket (`0600`). That listener accepts only `POST /rpc/pairing/bootstrap`, rejects browser Origin headers, and requires the normal protocol header. A native client can use the shared HTTP client with Bun's Unix-socket fetch option:
+
+```ts
+import { makeHttpClient } from '@openbots/client/client';
+
+const local = makeHttpClient({
+  url: 'http://localhost/rpc',
+  fetch: (url, init) => fetch(url, { ...init, unix: socketPath }),
+});
+const grant = await local.pairing.bootstrap({ serverUrl });
+```
+
+Display `grant.qr.svg`; the new device redeems its token through the normal network endpoint. Competing bootstrap grants can pair only one first device. The winning claim invalidates the other unused bootstrap grants. Revoking every device allows a fresh local bootstrap. Lost device credentials while device records remain require a separate recovery flow, which is not implemented.
 
 Send device credentials as `Authorization: Bearer <device-token>`. They remain valid until revoked. The database stores SHA-256 hashes of random 256-bit tokens; plaintext credentials are returned only when issued. Losing a redemption response requires a new pairing token. All paired devices have the same owner access.
 
@@ -250,6 +267,12 @@ const botId = bot.id;
 Bots store name, unique handle, instructions, provider/model, thinking level, avatar, permission, and skill, MCP, and plugin inheritance preferences. Avatars support blobs, small inline WebP images, colors, and emoji. All RPC inputs remain subject to the listener's 1 MiB payload limit. The default permission is `ask`; inheritance defaults to skills, MCP, and plugins. Permission modes are enforced through Pi tool selection and hooks. Skill, MCP, plugin, and instruction-file inheritance are implemented. Shared instruction files require the `agentsFile` inheritance flag, which is off by default. A working folder is not a sandbox.
 
 Create/update transactions write SQL only. `@openbots/server/native` workspace then creates and validates `agents/<botId>/` during configuration, including restore. Absolute paths are not stored in bot rows. Pi records the relative `agents/<botId>` working directory; the native execution environment resolves it against the data root.
+
+Bots may set one optional `fallbackModel` with `modelProvider`, `modelId`, and `thinkingLevel`. It defaults to `null`; omitting it during an update preserves the setting, and `null` disables it. Both selections are checked against Pi's model catalog.
+
+When a request fails before producing output with an authentication, quota, or transient provider error, runtime tries the backup once using the same transcript and provider-session identity. Cancellation, context overflow, invalid requests, and failures after output do not trigger fallback. Each new request starts with the primary; the preferred model setting does not change. Pi still owns the generation, submissions, tool execution, and recovery. Completed tools are not replayed by fallback. Deferred provider jobs keep Pi's normal polling behavior; a later polling failure does not switch models.
+
+The two model selections are stored in Pi's agent model reference, so private contexts and subagents inherit them without a separate routing map. Responses and usage name the actual provider/model. Context capacity uses the smaller of the two model windows so compaction prepares a transcript either can accept. Provider caches remain separate; switching providers may require a fresh cache.
 
 App SQL owns settings. A Pi session document keyed by bot ID owns the stable conversation ID; mapping creation and Pi agent configuration share one commit. Updates do not replace the conversation or history. SQL saves first. Configuration then prepares the directory, skills, instructions, plugins, and MCP outside that transaction. Same-bot configuration is serialized in memory; after preparation it rereads the bot row and all four domain settings and retries if the values that affect Pi config changed. Startup restores every bot before resuming work; submission also reapplies settings. A Pi synchronization failure can leave a saved bot/configuration pending reconciliation. List bots before retrying creation after an error, since handles are unique. Empty working folders from failed operations are not automatically deleted.
 
@@ -329,9 +352,26 @@ Removing `skills` from a bot's inheritance disables shared and Pi-global sources
 
 MCP discovery returns `mcp.servers` and `mcp.diagnostics`. Servers include name, description, source file, transport, `isEnabled`, connection `status`, and discovered tool metadata. Commands, arguments, URLs, environment values, and headers are excluded. Discovery reads files and current connection state only; it never opens a connection. Tools appear after bot configuration connects the server.
 
+MCP tool schemas are deferred. Pi's native `tool_search` loads matching definitions when the model needs them; Pi keeps that selection across reconfiguration and restart. Search is a trusted metadata operation; discovered tool calls still require the bot's permission policy. Read-only bots cannot discover untrusted MCP tools. Connections are prepared during bot configuration, not during search. Native coding and Openbots tools remain immediately available; plugins may opt into Pi's `deferred` tools.
+
 MCP source order is Pi's global `mcp.json`, `~/.agents/mcp.json`, configured MCP paths, bot `.agents/mcp.json`, then bot `.pi/mcp.json`. Shared sources require the bot's `mcp` inheritance flag. Each configured path may be a file or directory. Directories recursively scan `mcp.json` and `*.mcp.json`, skip `.git` and `node_modules`, follow symlinks without cycles, and sort resolved file paths. Later definitions replace the whole same-named entry. A malformed server override removes the earlier same-named entry and adds a diagnostic. Whole-file failures add diagnostics; the returned catalog can be partial.
 
-Use the standard `{ "mcpServers": { "name": { ... } } }` JSON shape. Discovery recognizes stdio commands and HTTP URLs, plus `enabled: false` or `disabled: true` on a complete definition. Stdio accepts `args`, `env`, and `cwd` (relative to the bot directory by default); Streamable HTTP accepts `headers`. Values are literal: shell substitutions and environment interpolation are not supported. `paths: []` clears additional sources, and omitted settings remain unchanged. MCP OAuth, credential-store references, and composer rendering remain pending.
+Use the standard `{ "mcpServers": { "name": { ... } } }` JSON shape. Discovery recognizes stdio commands and HTTP URLs, plus `enabled: false` or `disabled: true` on a complete definition. Stdio accepts `args`, `env`, and `cwd` (relative to the bot directory by default); Streamable HTTP accepts `headers`. Values are literal: shell substitutions and environment interpolation are not supported. `paths: []` clears additional sources, and omitted settings remain unchanged. MCP OAuth and composer rendering remain pending.
+
+Reference encrypted credentials by name with `envCredentials` for stdio or `headerCredentials` for HTTP:
+
+```json
+{
+  "mcpServers": {
+    "example": {
+      "url": "https://mcp.example.com/mcp",
+      "headerCredentials": { "Authorization": "mcp.example.authorization" }
+    }
+  }
+}
+```
+
+Set `mcp.example.authorization` through authenticated `credentials.set`; store the complete header value, including any authorization scheme. Referenced values replace literal values for the same environment/header name; HTTP header matching ignores case. Discovery checks key presence without decrypting. Preparation resolves secrets in memory; a missing/unreadable key omits that server and closes its prior client. Rotation reconnects on the next bot preparation (startup, bot configuration or submission), not immediately when the credential is saved. Catalogs contain neither values nor transport configuration.
 
 ## Instruction files and plugins
 
@@ -558,3 +598,40 @@ The native daemon must remain running. No operating-system wake-up or Cloudflare
 Bots have `bot_routine_list`, `bot_routine_create`, `bot_routine_update`, `bot_routine_run` and `bot_routine_remove`. These call the same runtime routine service as RPC. Tool schemas are derived once from the public routine contracts. Tools derive the bot identity from Pi; they accept no bot or conversation ID. Private contexts and subagents manage their bot's main-chat routines, with the same permission hook.
 
 Only `bot_routine_list` is a trusted read. Changes use Ask/Auto/Full approval policy; read-only bots cannot change routines. `bot_routine_update` pauses/resumes via `isEnabled`. `bot_routine_run` queues work and returns immediately, so a bot does not wait for its own next turn. Mutating tools use Pi's `replay: 'unsafe'`: a crash after a write can leave it applied, but Pi will not blindly repeat it. The model must list current routines before deciding whether to retry. Scheduled deliveries keep their existing request-ID deduplication.
+
+## Bot management tools
+
+`bot_get`, `bot_create`, `bot_update`, `bot_catalog`, and `bot_model_list` use the existing bot service and Pi model catalog. `bot_list` remains the peer directory. Create/update use the same input contracts as owner RPC; omitted update fields preserve existing settings. Catalog reads discover skills, instruction files, plugins, and current MCP tool metadata without starting MCP connections or importing plugins.
+
+Reads are trusted by their exact tool registration. Create/update pass through the permission hook and are unavailable in Read-only mode. They use Pi's unsafe replay policy: after an interrupted write, read the bot before deciding whether to retry. Registration happens before bot restore and runtime resume, and the permission hook stays last.
+
+## Search and bot reactions
+
+`bot_history` and `bot_search` read the current conversation. They accept `limit` (default 50, maximum 100) and an opaque `cursor`; search also requires `query`. Owner clients use `conversation.search({ botId, conversationId?, query, limit?, cursor? })`.
+
+Each call reads one native Pi entry page, filters visible message text, and returns `{ messages, cursor?, hasMore }`. Messages within that page are chronological. An empty page can still have a cursor; continue with it to scan older entries. Search is case-insensitive text matching, with no separate index or transcript copy. Thinking, tool results, and artifact bodies are excluded. This is bounded page search, not a full-history search in one call.
+
+`bot_react({ entryId, emoji, isPresent })` adds or removes the executing bot's reaction in its current conversation. It cannot select another bot or conversation. Owner `emojis` and attributed `botReactions` are separate in reaction responses. Removing one author's reaction preserves the other author's reaction. Existing owner reactions migrate in Pi. Reactions do not start a model turn; the selected chat's `interactionsRevision` tells clients to refetch visible reactions. Bot reaction writes use the same approval and replay policy as other writes.
+
+## Artifacts
+
+Artifacts are structured JSON layouts using the 27 Orbs block types, including text, tables, charts, checklists, and state-bound controls. `artifacts.blocks()` returns cached block schemas. Layouts use `root`, `elements`, and `state`; json-render validates the structure and resolves state bindings before each block's schema is checked. Links and images accept HTTP(S) URLs. An artifact spec is limited to 200,000 UTF-8 bytes and a tree depth of 32. Cycles, shared children, and unreachable elements are rejected.
+
+```ts
+const artifact = await client.artifacts.create({
+  botId,
+  title: 'Summary',
+  spec: {
+    root: 'heading',
+    elements: { heading: { type: 'Heading', props: { text: 'Summary' }, children: [] } },
+    state: {},
+  },
+});
+await client.artifacts.update({ botId, artifactId: artifact.id, version: artifact.version, title: 'Updated summary' });
+```
+
+`artifacts.list` returns the 100 most recently updated summaries for the selected conversation. `get` loads one body, optionally at a saved version. `update`, `saveState`, and `restore` require the current `version`; stale edits return `CONFLICT`. Every change creates a version, including title and state changes. `versions` lists the ten most recent versions; restore copies a selected version into a new one. Older data remains in Pi storage but is not offered by this version list.
+
+Pi owns the artifact index and version documents. Chat entries contain artifact references, not duplicated bodies; they do not enter model context. The selected live conversation exposes `artifactsRevision` so clients can refresh summaries and fetch an open artifact. Bodies are loaded through `get`, not sidebar or live subscriptions. Artifact tools return the content they explicitly read or write as ordinary tool results.
+
+Bots have `bot_artifact_list`, `bot_artifact_get`, `bot_artifact_blocks`, `bot_artifact_create`, and `bot_artifact_update`. They use their current Pi conversation and cannot supply another bot or conversation ID. Reads are trusted registrations; mutations require the configured approval policy and are not automatically replayed after interruption. Owner RPC authorizes the selected bot/conversation pair. The artifact renderer and editor are not implemented yet.

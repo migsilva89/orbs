@@ -15,6 +15,7 @@ export function mcpTools(connection: McpConnection, server: string, tools: Tool[
       type: 'object',
       properties: tool.inputSchema.properties ?? {},
     }),
+    deferred: true,
     replay: 'unsafe',
     execute: async (args, api, context) => {
       try {

@@ -1,4 +1,5 @@
 import type { AttachmentStorageService } from '../services/attachment/attachment-storage.service';
+import type { CredentialsService } from '../services/credentials/credentials.service';
 import type { DatabaseService } from '../services/database/database.service';
 import type { McpService } from '../services/mcp/mcp.service';
 import type { SettingsService } from '../services/settings/settings.service';
@@ -8,7 +9,7 @@ import type * as ServerTypes from '@openbots/runtime/server';
 export interface CoreServicesParams {
   database: DatabaseService;
   attachmentStorage: AttachmentStorageService;
-  credentialsKey: CryptoKey;
+  credentials: CredentialsService;
   settings: SettingsService;
   workspace: WorkspaceService;
   skillLoader: ServerTypes.SkillLoaderService;

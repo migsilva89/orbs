@@ -15,6 +15,9 @@ export interface AuthGrantParams {
   issuedBy: string | null;
 }
 export type AuthPairParams = AuthGrantParams & AuthPairInput;
+export type AuthBootstrapParams = AuthPairInput & {
+  isLocal: boolean;
+};
 export interface AuthTokenParams {
   token: string;
 }

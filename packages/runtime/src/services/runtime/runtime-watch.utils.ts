@@ -1,5 +1,5 @@
 import { GenerationTask } from '@earendil-works/pi-durable';
-import { REACTION } from '@openbots/contracts/universal';
+import { ARTIFACT, REACTION } from '@openbots/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeRun } from './runtime-run.utils';
 import type { Draft } from '@earendil-works/chord';
@@ -34,6 +34,13 @@ export function runtimeWatchChanges(state: Draft<ConversationState>, changes: re
         record: { kind: P.union(REACTION.docKind, 'openbots.question') },
       }, () => {
         state.interactionsRevision += 1;
+      })
+      .with({
+        type: 'document',
+        conversationId,
+        record: { kind: ARTIFACT.docKind },
+      }, () => {
+        state.artifactsRevision += 1;
       })
       .otherwise(() => undefined);
   }

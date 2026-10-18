@@ -18,6 +18,7 @@ import { conversationQueryHistory } from './conversation-query.history';
 import { conversationQueryList } from './conversation-query.list';
 import { conversationQueryQuestions } from './conversation-query.questions';
 import { conversationQueryReactions } from './conversation-query.reactions';
+import { conversationQuerySearch } from './conversation-query.search';
 import { conversationQueryUsage } from './conversation-query.usage';
 import { conversationQueryWatch } from './conversation-query.watch';
 import { conversationQueryWatchContexts } from './conversation-query.watch-contexts';
@@ -44,6 +45,7 @@ export function makeConversationService(deps: ConversationTypes.ConversationServ
       stop: (params: UniversalTypes.ConversationTarget) => conversationActionStop(deps, params),
     },
     queries: {
+      search: (params: UniversalTypes.ConversationSearchInput) => conversationQuerySearch(deps, params),
       questions: (params: UniversalTypes.ConversationTarget) => conversationQueryQuestions(deps, params),
       reactions: (params: UniversalTypes.ConversationReactionsInput) => conversationQueryReactions(deps, params),
       contextUsage: (params: UniversalTypes.ConversationTarget) => conversationQueryContextUsage(deps, params),

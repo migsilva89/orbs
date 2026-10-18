@@ -77,6 +77,7 @@ export async function botActionConfigure(deps: BotServiceDeps, { botId }: BotGet
       modelProvider: bot.modelProvider,
       modelId: bot.modelId,
       thinkingLevel: bot.thinkingLevel,
+      fallbackModel: bot.fallbackModel,
       instructions: bot.instructions,
       permission: bot.permission,
       ...settings,

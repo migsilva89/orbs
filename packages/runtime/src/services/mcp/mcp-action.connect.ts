@@ -9,6 +9,7 @@ import type { McpClientServiceDeps, McpConnection, McpConnectParams } from '../.
 export async function mcpActionConnect(deps: McpClientServiceDeps, { botId, entry }: McpConnectParams) {
   const key = `${botId}:${entry.name}`;
   const fingerprint = mcpFingerprint(entry);
+  const sourceFingerprint = entry.sourceFingerprint ?? fingerprint;
   const previous = deps.connections.get(key);
 
   return match(previous)
@@ -36,6 +37,7 @@ export async function mcpActionConnect(deps: McpClientServiceDeps, { botId, entr
 
       const connection: McpConnection = {
         fingerprint,
+        sourceFingerprint,
         client,
         tools: [],
         catalog: [],

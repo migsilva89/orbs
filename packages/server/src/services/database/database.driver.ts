@@ -52,5 +52,6 @@ export function databaseDriverLoadMigrations() {
     '0005_credentials': readFileSync(new URL('./migrations/0005_credentials.sql', import.meta.url), 'utf8'),
     '0006_settings': readFileSync(new URL('./migrations/0006_settings.sql', import.meta.url), 'utf8'),
     '0007_settings_keys': readFileSync(new URL('./migrations/0007_settings_keys.sql', import.meta.url), 'utf8'),
+    '0008_bot_fallback': readFileSync(new URL('./migrations/0008_bot_fallback.sql', import.meta.url), 'utf8'),
   };
 }

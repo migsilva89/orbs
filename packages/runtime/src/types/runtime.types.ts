@@ -1,3 +1,4 @@
+import type { ArtifactService } from '../services/artifact/artifact.service';
 import type { ConversationIndexService } from '../services/conversation-index/conversation-index.service';
 import type { QuestionService } from '../services/question/question.service';
 import type { RoutineService } from '../services/routine/routine.service';
@@ -6,7 +7,7 @@ import type { Context } from '@earendil-works/chord/context';
 import type { ModelThinkingLevel, ToolCall } from '@earendil-works/pi-ai';
 import type { Models } from '@earendil-works/pi-ai/models';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
-import type { Attachment } from '@openbots/contracts/universal';
+import type { Attachment, ModelSelection } from '@openbots/contracts/universal';
 
 export interface RuntimeServiceParams {
   storage: PiDurableTypes.Storage;
@@ -44,6 +45,7 @@ export interface RuntimeServiceDeps extends RuntimeModelsDeps {
   harness: PiDurableTypes.Harness;
   questions: QuestionService;
   routines: RoutineService;
+  artifacts: ArtifactService;
   index: ConversationIndexService;
   registry: PiDurableTypes.Registry;
   readOnlyTools: PiDurableTypes.ToolRegistration[];
@@ -55,6 +57,7 @@ export interface RuntimeBotParams {
   modelProvider: string;
   modelId: string;
   thinkingLevel: ModelThinkingLevel;
+  fallbackModel?: ModelSelection | null;
   instructions: string;
   skillsPrompt: string;
   instructionFiles: { path: string; content: string }[];
@@ -63,7 +66,7 @@ export interface RuntimeBotParams {
   permission: 'read-only' | 'ask' | 'auto' | 'full';
 }
 
-export type RuntimeModelParams = Pick<RuntimeBotParams, 'modelProvider' | 'modelId' | 'thinkingLevel'>;
+export type RuntimeModelParams = Pick<RuntimeBotParams, 'modelProvider' | 'modelId' | 'thinkingLevel' | 'fallbackModel'>;
 
 export interface RuntimeBotBinding extends PiDurableTypes.JsonObject {
   conversationId: PiDurableTypes.ConversationId | null;

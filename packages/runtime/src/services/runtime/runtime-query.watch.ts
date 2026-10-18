@@ -30,6 +30,7 @@ export async function runtimeQueryWatch(deps: RuntimeServiceDeps, params: Runtim
       latestEntryId: 0,
       lastRun: null,
       interactionsRevision: 0,
+      artifactsRevision: 0,
       live: structuredClone(live.value ?? {}),
       inbox: structuredClone(inbox.value ?? { items: [] }),
     });

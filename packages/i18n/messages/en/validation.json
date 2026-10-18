@@ -12,5 +12,6 @@
   "validation_thinking_level_unsupported": "Choose a thinking level supported by this model.",
   "validation_command_id_arguments": "Enter a positive whole-number ID.",
   "validation_reaction_limit": "A message can have at most {max} reactions.",
-  "validation_routine_schedule": "Choose a valid five-field cron expression and timezone."
+  "validation_routine_schedule": "Choose a valid five-field cron expression and timezone.",
+  "validation_artifact_spec": "Use a valid artifact layout and block properties, within the size limit."
 }

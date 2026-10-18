@@ -1,10 +1,10 @@
 import { makeRuntimeService } from '@openbots/runtime/server';
+import { makeArtifactService } from '../services/artifact/artifact.service';
 import { makeAttachmentService } from '../services/attachment/attachment.service';
 import { makeAuthService } from '../services/auth/auth.service';
 import { makeBotService } from '../services/bot/bot.service';
 import { makeCollaborationService } from '../services/collaboration/collaboration.service';
 import { makeConversationService } from '../services/conversation/conversation.service';
-import { makeCredentialsService } from '../services/credentials/credentials.service';
 import { makeInstructionService } from '../services/instruction/instruction.service';
 import { makePluginService } from '../services/plugin/plugin.service';
 import { makeRoutineService } from '../services/routine/routine.service';
@@ -16,7 +16,7 @@ import type { CoreServicesParams } from '../types/core.types';
 export async function makeServices({
   database,
   attachmentStorage,
-  credentialsKey,
+  credentials,
   settings,
   workspace,
   skillLoader,
@@ -25,8 +25,6 @@ export async function makeServices({
   mcp,
   runtime: runtimeOptions,
 }: CoreServicesParams) {
-  const credentials = makeCredentialsService({ database, key: credentialsKey });
-
   const tools = makeToolService({
     database,
     credentials,
@@ -65,15 +63,19 @@ export async function makeServices({
       storage: attachmentStorage,
     });
 
+    runtime.actions.registerBotTools({ bots });
+
     await bots.actions.restore();
     runtime.resume();
 
     return {
       routines: makeRoutineService({ bots, runtime }),
+      artifacts: makeArtifactService({ bots, runtime }),
       server,
       attachments,
       database,
       auth,
+      credentials,
       bots,
       runtime,
       tools,

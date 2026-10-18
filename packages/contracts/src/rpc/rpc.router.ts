@@ -1,5 +1,18 @@
 import { errorSchemas } from '@openbots/errors/universal';
 import { asyncIteratorObject, oc as baseContract } from '@orpc/contract';
+import {
+  artifact,
+  artifactBlocks,
+  artifactCreate,
+  artifactGet,
+  artifactList,
+  artifactListInput,
+  artifactRestore,
+  artifactSaveState,
+  artifactUpdate,
+  artifactVersionList,
+  artifactVersionsInput,
+} from '../types/artifact.types';
 import { attachment, attachmentDownload, attachmentGet, attachmentList, attachmentPage, attachmentRemoveResult, attachmentUpload } from '../types/attachment.types';
 import {
   authGrant,
@@ -30,7 +43,9 @@ import {
   conversationUpdateSubmission,
   conversationUpdateSubmissionResult,
 } from '../types/conversation.types';
+import { credentialsList, credentialsSet, credentialsSetResult } from '../types/credentials.types';
 import { deviceList, deviceRevoke, deviceRevokeResult } from '../types/device.types';
+import { conversationSearch, conversationSearchResult } from '../types/history.types';
 import { instructionCatalog, instructionConfigure, instructionDiscover, instructionSettings } from '../types/instruction.types';
 import { mcpCatalog, mcpConfigure, mcpDiscover, mcpSettings } from '../types/mcp.types';
 import { modelList } from '../types/model.types';
@@ -56,6 +71,68 @@ const oc = baseContract.errors({
 });
 
 export const contract = {
+  credentials: {
+    list: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(credentialsList),
+    set: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(credentialsSet)
+      .output(credentialsSetResult),
+  },
+  artifacts: {
+    blocks: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(artifactBlocks),
+    list: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(artifactListInput)
+      .output(artifactList),
+    get: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(artifactGet)
+      .output(artifact),
+    versions: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(artifactVersionsInput)
+      .output(artifactVersionList),
+    create: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        CONFLICT: errorSchemas.CONFLICT,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(artifactCreate)
+      .output(artifact),
+    update: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        CONFLICT: errorSchemas.CONFLICT,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(artifactUpdate)
+      .output(artifact),
+    saveState: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        CONFLICT: errorSchemas.CONFLICT,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(artifactSaveState)
+      .output(artifact),
+    restore: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        CONFLICT: errorSchemas.CONFLICT,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(artifactRestore)
+      .output(artifact),
+  },
   routines: {
     list: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
@@ -297,6 +374,14 @@ export const contract = {
       .input(authPair)
       .output(authPairResult),
 
+    bootstrap: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        CONFLICT: errorSchemas.CONFLICT,
+      })
+      .input(authPair)
+      .output(authPairResult),
+
     redeem: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
       .input(authRedeem)
@@ -312,6 +397,14 @@ export const contract = {
   },
 
   conversation: {
+    search: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(conversationSearch)
+      .output(conversationSearchResult),
     questions: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
       .input(conversationTarget)

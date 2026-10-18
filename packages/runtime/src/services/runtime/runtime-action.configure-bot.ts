@@ -1,5 +1,6 @@
 import { configure, defineExtension } from '@earendil-works/pi-durable';
 import { match } from 'ts-pattern';
+import { runtimeModelRef } from './runtime-models.utils';
 import { runtimePluginsInstall } from './runtime-plugins.utils';
 import { runtimeBot, runtimeBotConversations } from './runtime.constants';
 import type { RuntimeBotParams, RuntimeServiceDeps } from '../../types/runtime.types';
@@ -27,7 +28,7 @@ export async function runtimeActionConfigureBot(
     identity.skillsPrompt = bot.skillsPrompt;
 
     await configure(tx, conversationId, {
-      model: { provider: bot.modelProvider, modelId: bot.modelId },
+      model: runtimeModelRef(bot),
       thinkingLevel: bot.thinkingLevel,
       instructions: [
         ...bot.instructionFiles.map(({ path, content }) => `# ${path}\n\n${content}`),

@@ -35,6 +35,7 @@
     "@openbots/contracts": "workspace:*",
     "@openbots/logger": "workspace:*",
     "zod": "catalog:",
-    "cron-parser": "catalog:"
+    "cron-parser": "catalog:",
+    "@json-render/core": "catalog:"
   }
 }

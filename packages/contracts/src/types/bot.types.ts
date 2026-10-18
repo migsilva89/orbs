@@ -3,7 +3,7 @@ import { BODIES, COLORS } from '@openbots/avatar-blobs/skins';
 import { z } from 'zod';
 import { instructionCatalog } from './instruction.types';
 import { mcpCatalog } from './mcp.types';
-import { modelThinkingLevel } from './model.types';
+import { modelSelection, modelThinkingLevel } from './model.types';
 import { pluginCatalog } from './plugin.types';
 import { skill } from './skill.types';
 
@@ -31,9 +31,8 @@ export const botFields = z.object({
   name: z.string().trim().min(1).max(64),
   handle: z.string().trim().toLowerCase().min(1).max(48).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   instructions: z.string().max(16000),
-  modelProvider: z.string().trim().min(1).max(128),
-  modelId: z.string().trim().min(1).max(128),
-  thinkingLevel: modelThinkingLevel,
+  ...modelSelection.shape,
+  fallbackModel: modelSelection.nullable(),
   permission: z.enum(['read-only', 'ask', 'auto', 'full']),
   inherit: botInherit,
 });
@@ -50,6 +49,7 @@ export const botGet = z.object({ botId: z.uuid() });
 export const botCreate = botFields.extend({
   avatar: botFields.shape.avatar.default(null),
   instructions: botFields.shape.instructions.default(''),
+  fallbackModel: modelSelection.nullable().default(null),
   thinkingLevel: modelThinkingLevel.default('off'),
   permission: botFields.shape.permission.default('ask'),
   inherit: botInherit.default(['skills', 'mcp', 'plugins']),

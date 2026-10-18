@@ -1,3 +1,4 @@
+import { authActionBootstrap } from './auth-action.bootstrap';
 import { authActionGrant } from './auth-action.grant';
 import { authActionPair } from './auth-action.pair';
 import { authActionRedeem } from './auth-action.redeem';
@@ -23,6 +24,7 @@ export function makeAuthService({ database }: AuthTypes.AuthServiceParams) {
     actions: {
       pair: (params: AuthTypes.AuthPairParams) => authActionPair(deps, params),
       grant: (params: AuthTypes.AuthGrantParams) => authActionGrant(deps, params),
+      bootstrap: (params: AuthTypes.AuthBootstrapParams) => authActionBootstrap(deps, params),
       redeem: (params: AuthRedeemInput) => authActionRedeem(deps, params),
       revoke: (params: AuthTypes.AuthRevokeParams) => authActionRevoke(deps, params),
     },

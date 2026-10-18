@@ -9,9 +9,11 @@ import {
   makeStorageService,
   runtimeEnvNative,
 } from '@openbots/runtime/native';
+import { join } from 'node:path';
 import { match } from 'ts-pattern';
 import { credentialsKeyNative, makeAttachmentStorageService, makeDatabaseService, makeMcpService, makeWorkspaceService, workspacePathsNative } from '@openbots/server/native';
-import { makeServices, makeSettingsService } from '@openbots/server/server';
+import { makeCredentialsService, makeServices, makeSettingsService } from '@openbots/server/server';
+import { coreLocalNative } from './core-local.native';
 import { coreServerNative } from './core-server.native';
 
 export async function coreNativeRun(): Promise<void> {
@@ -28,6 +30,7 @@ export async function coreNativeRun(): Promise<void> {
 
   const models = await ModelRuntime.create();
   const credentialsKey = await credentialsKeyNative(paths.data);
+  const credentials = makeCredentialsService({ database, key: credentialsKey });
   const settings = makeSettingsService({ database });
   const workspace = makeWorkspaceService({ root: paths.root });
   const skillLoader = makeSkillLoaderService({ root: paths.root });
@@ -40,12 +43,13 @@ export async function coreNativeRun(): Promise<void> {
     root: paths.root,
     settings,
     clients: mcpClients,
+    credentials,
   });
 
   const services = await makeServices({
     database,
     attachmentStorage: makeAttachmentStorageService({ root: paths.root }),
-    credentialsKey,
+    credentials,
     settings,
     workspace,
     skillLoader,
@@ -63,6 +67,9 @@ export async function coreNativeRun(): Promise<void> {
 
   const server = coreServerNative(services);
   resources.defer(() => server.stop(true));
+
+  const local = await coreLocalNative(services, { directory: join(paths.data, 'ipc') });
+  resources.defer(() => local.stop(true));
 
   const stopped = Promise.withResolvers<undefined>();
   const stop = (): void => stopped.resolve(undefined);

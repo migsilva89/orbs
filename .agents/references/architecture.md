@@ -87,7 +87,7 @@ export type SkillService = ReturnType<typeof makeSkillService>;
 ## State and security
 
 - One implicit owner per independent daemon. Devices pair with revocable credentials. No users, organizations, roles or password login.
-- Pairing stores token hashes and atomically consumes grants with device creation. Issuing a grant requires an authenticated device or a trusted local bootstrap. No public grant endpoint or pairing CLI. Initial local UI/bootstrap remains pending; see [pairing](../plans/main/05-auth-and-pairing.md).
+- Pairing stores token hashes and atomically consumes grants with device creation. Issuing a grant requires an authenticated device or a trusted local bootstrap. No public grant endpoint or pairing CLI. First-device bootstrap uses an owner-only local socket; local UI integration remains pending; see [pairing](../plans/main/05-auth-and-pairing.md).
 - App persistence uses `node:sqlite` and Kysely. SQL identifiers are snake_case; `CamelCasePlugin` maps TypeScript camelCase. Migrations preserve existing data.
 - Generic non-secret key/value data belongs to the shared `settings` service/table, with domain keys such as `skills.directories`, `mcp.paths` and `tools.approvalRules`.
 - Domain settings RPCs return settings objects, not individual flags. Writes are partial: omission preserves, `[]` clears lists, nullable fields use `null` to clear. Return updated settings.
@@ -111,12 +111,12 @@ Before adding infrastructure, inspect the installed library API and official exa
 - Skill service owns settings and inheritance. Runtime uses Pi `loadSkills` and `formatSkillsForPrompt`, including manual-only discovery. Shared inheritance can be disabled without hiding bot-local skills.
 - MCP service owns settings, inheritance, file discovery and merge policy. Runtime clients receive parsed configuration and own connections, tool registration, cancellation and disposal. Runtime does not call server discovery.
 - Catalog discovery reads files and current connection state; it never connects. Preparation reuses unchanged clients and closes replaced/disabled clients. Changes to tool definitions change their approval identity. Preserve persisted Pi identifiers across naming refactors.
-- Use Pi's standalone MCP client and Durable tools, not a CLI extension compatibility layer. Plugin modules default-export Durable extensions; discovery never imports them. MCP OAuth and encrypted credential references remain separate work. Exact source precedence and API examples belong in the [README](../../README.md).
+- Use Pi's standalone MCP client and Durable tools, not a CLI extension compatibility layer. Plugin modules default-export Durable extensions; discovery never imports them. Server preparation resolves encrypted credential references; catalogs never return secret values. MCP OAuth remains separate work. Exact source precedence and API examples belong in the [README](../../README.md).
 
 ## Transport and clients
 
 - Daemon owns the Bun listener and oRPC WebSocket/HTTP adapters. Server owns RPC implementation; contracts own validation and public types.
-- Check browser Origin on upgrade and HTTP RPC. Authenticate each call except token redemption. Revocation closes active watches, including idle ones.
+- Check browser Origin on upgrade and HTTP RPC. Authenticate each network call except token redemption; bootstrap is restricted to trusted local transport. Revocation closes active watches, including idle ones.
 - Page history with Pi `entries()` and watch `LiveDoc` for current activity. Use commit notifications to advance the saved entry ID; never mount full transcripts for sidebar or live subscriptions. Keep Chord updates and bounded delivery; reconnect catches up from the last loaded entry without resubmitting input.
 - Private contexts and subagents are lazy details of the originating chat, not top-level sidebar chats. Read their history and attach live watches only when selected.
 - Disconnect/cancel ends observation, not accepted agent work. Stop is an explicit command. Never automatically retry commands; submit retries reuse the same Pi request ID.

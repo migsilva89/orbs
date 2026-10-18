@@ -1,3 +1,4 @@
+import { credentialsKey } from '@openbots/contracts/universal';
 import { z } from 'zod';
 import type { ToolRegistration } from '@earendil-works/pi-durable';
 import type { McpClient } from '@earendil-works/pi-mcp';
@@ -12,6 +13,7 @@ export interface McpEntry {
   name: string;
   source: string;
   config: z.infer<typeof mcpServer>;
+  sourceFingerprint?: string;
 }
 
 export interface McpConfig {
@@ -21,6 +23,7 @@ export interface McpConfig {
 
 export interface McpConnection {
   fingerprint: string;
+  sourceFingerprint: string;
   client: McpClient;
   tools: ToolRegistration[];
   catalog: McpCatalog['servers'][number]['tools'];
@@ -61,12 +64,14 @@ export const mcpServer = z.union([
     args: z.array(z.string()).optional(),
     cwd: z.string().min(1).optional(),
     env: z.record(z.string(), z.string()).optional(),
+    envCredentials: z.record(z.string().min(1), credentialsKey).optional(),
     type: z.literal('stdio').optional(),
     url: z.never().optional(),
   }),
   mcpConfig.extend({
     url: z.url({ protocol: /^https?$/ }),
     headers: z.record(z.string(), z.string()).optional(),
+    headerCredentials: z.record(z.string().min(1), credentialsKey).optional(),
     type: z.literal('http').optional(),
     command: z.never().optional(),
   }),

@@ -4,7 +4,11 @@ import { RPCLink as FetchRPCLink } from '@orpc/client/fetch';
 import { RetryLinkPlugin } from '@orpc/client/plugins';
 import { RPCLink } from '@orpc/client/websocket';
 import { match, P } from 'ts-pattern';
-import type { Client, ClientOptions } from './types/client.types';
+import type { Client, ClientOptions, HttpClientOptions } from './types/client.types';
+
+export function makeHttpClient({ url, token, serverId, fetch }: HttpClientOptions): Client {
+  return createORPCClient(clientHttpLink(url, () => clientHeaders({ token, serverId }), fetch));
+}
 
 export function makeClient({ connect, token, serverId, url }: ClientOptions): Client {
   const headers = async () => clientHeaders({ token, serverId });
@@ -50,7 +54,7 @@ async function clientHeaders({ token, serverId }: Pick<ClientOptions, 'token' | 
   };
 }
 
-function clientHttpLink(url: string, headers: () => ReturnType<typeof clientHeaders>) {
+function clientHttpLink(url: string, headers: () => ReturnType<typeof clientHeaders>, fetch?: HttpClientOptions['fetch']) {
   const parsed = new URL(url, 'http://localhost');
   const path = `${parsed.pathname}${parsed.search}` as `/${string}`;
 
@@ -60,5 +64,6 @@ function clientHttpLink(url: string, headers: () => ReturnType<typeof clientHead
       .otherwise(() => undefined),
     url: path,
     headers,
+    fetch,
   });
 }

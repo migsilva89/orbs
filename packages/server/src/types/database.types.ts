@@ -2,9 +2,10 @@ import { z } from 'zod';
 import type { Bot } from '@openbots/contracts/universal';
 import type { DatabaseSync } from 'node:sqlite';
 
-export interface DatabaseBot extends Omit<Bot, 'avatar' | 'inherit'> {
+export interface DatabaseBot extends Omit<Bot, 'avatar' | 'inherit' | 'fallbackModel'> {
   avatar: string | null;
   inherit: string;
+  fallbackModel: string | null;
 }
 
 export interface DatabaseSchema {

@@ -42,7 +42,8 @@
     "@typesafe-ai/sdk": "0.6.0",
     "fallow": "3.34.0",
     "@earendil-works/pi-mcp": "1.3.0",
-    "cron-parser": "5.10.2"
+    "cron-parser": "5.10.2",
+    "@json-render/core": "0.21.1"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "catalog:",

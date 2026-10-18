@@ -8,7 +8,8 @@ export async function mcpQueryCatalog(deps: McpClientServiceDeps, { botId, confi
 
   const servers = config.servers.map((entry) => {
     const saved = deps.connections.get(`${botId}:${entry.name}`);
-    const connection = saved?.fingerprint === mcpFingerprint(entry) ? saved : undefined;
+    const sourceFingerprint = entry.sourceFingerprint ?? mcpFingerprint(entry);
+    const connection = saved?.sourceFingerprint === sourceFingerprint ? saved : undefined;
     const isEnabled = entry.config.enabled !== false && entry.config.disabled !== true;
 
     const status = match({ isEnabled, connection })

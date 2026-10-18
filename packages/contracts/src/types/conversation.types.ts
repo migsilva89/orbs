@@ -1,6 +1,7 @@
 import { assertValidOp } from '@earendil-works/chord/delta';
 import { type } from '@orpc/contract';
 import { z } from 'zod';
+import { botAvatar } from './bot.types';
 import type { Op } from '@earendil-works/chord/delta';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
 
@@ -59,3 +60,24 @@ export type ConversationHistoryInput = z.infer<typeof conversationHistory>;
 
 export type ConversationSubmitInput = z.infer<typeof conversationSubmit>;
 export type ConversationTarget = z.infer<typeof conversationTarget>;
+
+export const conversationSummary = z.object({
+  botId: z.uuid(),
+  conversationId: z.number().int().positive(),
+  lastMessage: z.object({
+    entryId: z.number().int().positive(),
+    role: z.enum(['user', 'assistant']),
+    preview: z.string().max(160),
+    createdAt: z.number(),
+  }).nullable(),
+  isRunning: z.boolean(),
+});
+
+export const conversationList = z.array(conversationSummary.extend({
+  name: z.string(),
+  handle: z.string(),
+  avatar: botAvatar.nullable(),
+}));
+
+export type ConversationSummary = z.infer<typeof conversationSummary>;
+export type ConversationListItem = z.infer<typeof conversationList>[number];

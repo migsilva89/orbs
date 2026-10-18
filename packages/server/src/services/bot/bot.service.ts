@@ -9,13 +9,19 @@ import { botQueryList } from './bot-query.list';
 import { botQueryMcp } from './bot-query.mcp';
 import { botQueryPlugins } from './bot-query.plugins';
 import { botQuerySkills } from './bot-query.skills';
-import type { BotServiceDeps } from '../../types/bot.types';
+import type { BotChangeListener, BotServiceDeps } from '../../types/bot.types';
 import type { BotCreateInput, BotGetInput, BotUpdateInput } from '@openbots/contracts/universal';
 
-export function makeBotService(deps: Omit<BotServiceDeps, 'configurations'>) {
-  const serviceDeps: BotServiceDeps = { ...deps, configurations: new Map() };
+export function makeBotService(deps: Omit<BotServiceDeps, 'configurations' | 'changes'>) {
+  const serviceDeps: BotServiceDeps = { ...deps, configurations: new Map(), changes: new Set() };
 
   return {
+    onChange: (listener: BotChangeListener) => {
+      serviceDeps.changes.add(listener);
+      return () => {
+        serviceDeps.changes.delete(listener);
+      };
+    },
     actions: {
       configure: (params: BotGetInput) => botActionConfigure(serviceDeps, params),
       restore: () => botActionRestore(serviceDeps),

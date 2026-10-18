@@ -6,7 +6,7 @@ export { skillSettings } from './types/skill.types';
 export type { Skill, SkillConfigureInput, SkillSettings } from './types/skill.types';
 export { mcpSettings } from './types/mcp.types';
 export type { McpCatalog, McpConfigureInput, McpSettings } from './types/mcp.types';
-export type { ConversationFrame, ConversationState, ConversationHistoryInput, ConversationHistoryPage, ConversationSubmitInput, ConversationTarget, ConversationView } from './types/conversation.types';
+export type { ConversationSummary, ConversationListItem, ConversationFrame, ConversationState, ConversationHistoryInput, ConversationHistoryPage, ConversationSubmitInput, ConversationTarget, ConversationView } from './types/conversation.types';
 export { authToken } from './types/auth.types';
 export type { AuthPairInput, AuthRedeemInput } from './types/auth.types';
 export { botAvatar, botInherit } from './types/bot.types';

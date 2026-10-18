@@ -5,8 +5,8 @@ import { runtimeBot, runtimeBotConversations } from './runtime.constants';
 import type { RuntimeBotParams, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 
-export function runtimeActionConfigureBot(
-  { harness, registry, extensions, readOnlyTools }: RuntimeServiceDeps,
+export async function runtimeActionConfigureBot(
+  { harness, registry, extensions, readOnlyTools, index }: RuntimeServiceDeps,
   bot: RuntimeBotParams,
   context: Context,
 ) {
@@ -15,7 +15,7 @@ export function runtimeActionConfigureBot(
   runtimePluginsInstall(registry, bot.plugins);
   registry.install(botTools);
 
-  return harness.commit(async (tx) => {
+  const mainConversationId = await harness.commit(async (tx) => {
     const binding = await tx.doc(runtimeBotConversations, bot.id, null);
 
     const conversationId = binding.conversationId
@@ -42,4 +42,8 @@ export function runtimeActionConfigureBot(
 
     return conversationId;
   }, context);
+
+  await index.actions.restore({ botId: bot.id, conversationId: mainConversationId }, context);
+
+  return mainConversationId;
 }

@@ -30,5 +30,9 @@ export async function botActionCreate(deps: BotServiceDeps, params: BotCreateInp
     return id;
   });
 
+  for (const listener of deps.changes) {
+    listener();
+  }
+
   return botActionConfigure(deps, { botId });
 }

@@ -154,7 +154,30 @@ Create/update transactions write SQL only. `@openbots/server/native` workspace t
 
 App SQL owns settings. A Pi session document keyed by bot ID owns the stable conversation ID; mapping creation and Pi agent configuration share one commit. Updates do not replace the conversation or history. SQL saves first. Configuration then prepares the directory, skills, instructions, plugins, and MCP outside that transaction. Same-bot configuration is serialized in memory; after preparation it rereads the bot row and all four domain settings and retries if the values that affect Pi config changed. Startup restores every bot before resuming work; submission also reapplies settings. A Pi synchronization failure can leave a saved bot/configuration pending reconciliation. List bots before retrying creation after an error, since handles are unique. Empty working folders from failed operations are not automatically deleted.
 
-The earlier root conversation is retained but no longer exposed by these bot-scoped endpoints. Bot deletion and a dedicated DM sidebar remain separate work.
+The earlier root conversation is retained but no longer exposed by these bot-scoped endpoints. Bot deletion and the sidebar UI remain separate work. The sidebar list API is described below.
+
+## Sidebar list
+
+```ts
+const chats = await client.conversation.list();
+// Each row: botId, conversationId, name, handle, avatar, lastMessage, isRunning.
+```
+
+This authenticated query lists main bot chats, newest message first, with a stable bot-ID tie-break. `lastMessage` is null for an empty chat; otherwise it contains `entryId`, `role`, a plain-text `preview` of at most 160 characters, and `createdAt` from Pi's message timestamp. Names and avatars come from current bot settings. Private contexts and subagents remain details of their originating chat.
+
+Runtime maintains a small session-scoped Pi summary document from committed user and assistant text. Tool output, thinking, reset/compaction entries, and private routing inputs do not replace the preview. Native task-graph state supplies `isRunning` for ordinary work in the main conversation; idle background anchors do not keep it busy. List calls read the summary and task graph, never transcripts or full conversation views.
+
+Summary updates follow transcript commits. Startup repairs the index from bounded Pi history pages before resuming execution; reconfiguring an already indexed bot does not rescan it. The index is derived state, not another message log. `conversation.list` returns a snapshot. For live updates, use the client helper:
+
+```ts
+import { watchConversations } from '@openbots/client/client';
+
+for await (const chats of watchConversations(client, signal)) {
+  // Render main chats; open history only when a chat is selected.
+}
+```
+
+`conversation.watchList()` sends an initial list and Chord updates over authenticated oRPC. Runtime watches the summary document and task graph; server joins current bot settings and observes bot changes. Previews, ordering, running status, names, and avatars update without reading histories. Slow clients receive updates relative to their last delivered state; reconnect starts with a fresh list. Cancellation stops observation, and device revocation closes idle streams too. Unread markers, pins, and the sidebar UI remain separate work.
 
 ## Skills and MCP discovery
 
@@ -269,7 +292,7 @@ Call `controller.abort()` when leaving the view. Disconnecting or cancelling sto
 
 To scroll back, call `conversation.history({ botId, conversationId, cursor: view.historyCursor, limit: 50 })` and continue with the returned `next` cursor. These pages are newest-first; reverse each page for chronological display. Private contexts and subagents load only when explicitly selected by conversation ID. They are details within the originating chat, not extra top-level sidebar chats.
 
-All paired devices have owner access to the selected bot's view. Peer messages default to existing bot conversations; a separate DM sidebar and file APIs remain pending. Group rooms are excluded. Earlier disposable WebSocket checks verified the single-root transport before bot routing was added. Disposable bot integration checks cover tool approvals and SQLite recovery; live providers remain unverified.
+All paired devices have owner access to the selected bot's view. Peer messages default to existing bot conversations; the sidebar UI and file APIs remain pending. Group rooms are excluded. Earlier disposable WebSocket checks verified the single-root transport before bot routing was added. Disposable bot integration checks cover tool approvals and SQLite recovery; live providers remain unverified.
 
 ## Submit and stop
 

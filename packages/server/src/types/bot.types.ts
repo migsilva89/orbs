@@ -18,6 +18,7 @@ export interface BotServiceDeps extends BotDatabaseDeps {
   plugin: PluginService;
   instruction: InstructionService;
   mcp: McpService;
+  changes: Set<BotChangeListener>;
   configurations: Map<string, Promise<void>>;
 }
 
@@ -28,3 +29,5 @@ export interface BotConfiguration {
   instructionSettings: UniversalTypes.InstructionSettings;
   pluginSettings: UniversalTypes.PluginSettings;
 }
+
+export type BotChangeListener = () => void;

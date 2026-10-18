@@ -14,6 +14,7 @@ import {
   conversationFrame,
   conversationHistory,
   conversationHistoryResult,
+  conversationList,
   conversationStopResult,
   conversationSubmit,
   conversationSubmitResult,
@@ -224,6 +225,14 @@ export const contract = {
   },
 
   conversation: {
+    watchList: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(asyncIteratorObject(conversationFrame)),
+
+    list: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(conversationList),
+
     history: oc
       .errors({
         UNAUTHORIZED: errorSchemas.UNAUTHORIZED,

@@ -28,5 +28,9 @@ export async function botActionUpdate(deps: BotServiceDeps, { botId, ...changes 
     await tx.updateTable('bot').set({ ...botValues(bot), updatedAt: bot.updatedAt }).where('id', '=', botId).execute();
   });
 
+  for (const listener of deps.changes) {
+    listener();
+  }
+
   return botActionConfigure(deps, { botId });
 }

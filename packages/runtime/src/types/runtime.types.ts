@@ -1,3 +1,4 @@
+import type { ConversationIndexService } from '../services/conversation-index/conversation-index.service';
 import type { CollaborationPolicy } from './collaboration.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ModelThinkingLevel, ToolCall } from '@earendil-works/pi-ai';
@@ -38,6 +39,7 @@ export interface RuntimeModelsDeps {
 
 export interface RuntimeServiceDeps extends RuntimeModelsDeps {
   harness: PiDurableTypes.Harness;
+  index: ConversationIndexService;
   registry: PiDurableTypes.Registry;
   readOnlyTools: PiDurableTypes.ToolRegistration[];
   extensions: PiDurableTypes.Extension[];

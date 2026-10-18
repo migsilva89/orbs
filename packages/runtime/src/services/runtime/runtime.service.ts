@@ -2,6 +2,7 @@ import { BACKGROUND_CONTEXT } from '@earendil-works/chord/context';
 import { createRegistry, Harness } from '@earendil-works/pi-durable';
 import { CodingTools } from '@earendil-works/pi-durable/tools';
 import { collaborationExtension } from '../collaboration/collaboration.extension';
+import { makeConversationIndexService } from '../conversation-index/conversation-index.service';
 import { subagentExtension } from '../subagent/subagent.service';
 import { runtimeActionApprove } from './runtime-action.approve';
 import { runtimeActionConfigureBot } from './runtime-action.configure-bot';
@@ -54,6 +55,10 @@ export async function makeRuntimeService({
 
   const deps = {
     harness,
+    index: await makeConversationIndexService({ harness }).catch(async (error: unknown) => {
+      await harness.close(BACKGROUND_CONTEXT);
+      throw error;
+    }),
     registry,
     models,
     readOnlyTools: trustedReads,
@@ -79,6 +84,7 @@ export async function makeRuntimeService({
       ),
     },
     queries: {
+      conversations: (context = BACKGROUND_CONTEXT) => deps.index.queries.list(context),
       submission: (params: RuntimeTypes.RuntimeSubmissionParams, context = BACKGROUND_CONTEXT) => (
         runtimeQuerySubmission(deps, params, context)
       ),
@@ -92,6 +98,7 @@ export async function makeRuntimeService({
         runtimeQueryHistory(deps, params, context)
       ),
     },
+    watchConversations: (context = BACKGROUND_CONTEXT) => deps.index.watch(context),
     watch: (params: RuntimeTypes.RuntimeConversationParams, context = BACKGROUND_CONTEXT) => (
       runtimeQueryWatch(deps, params, context)
     ),

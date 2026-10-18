@@ -1,5 +1,5 @@
 import { errorSchemas } from '@openbots/errors/universal';
-import { asyncIteratorObject, oc } from '@orpc/contract';
+import { asyncIteratorObject, oc as baseContract } from '@orpc/contract';
 import {
   authGrant,
   authGrantStatus,
@@ -10,7 +10,10 @@ import {
 } from '../types/auth.types';
 import { bot, botCatalog, botCreate, botGet, botList, botUpdate } from '../types/bot.types';
 import { commandCatalog, commandExecute, commandExecuteResult, commandList } from '../types/command.types';
+import { conversationContextUsage } from '../types/context-usage.types';
 import {
+  conversationContextPage,
+  conversationContexts,
   conversationFrame,
   conversationHistory,
   conversationHistoryResult,
@@ -28,6 +31,7 @@ import { instructionCatalog, instructionConfigure, instructionDiscover, instruct
 import { mcpCatalog, mcpConfigure, mcpDiscover, mcpSettings } from '../types/mcp.types';
 import { modelList } from '../types/model.types';
 import { pluginCatalog, pluginConfigure, pluginDiscover, pluginSettings } from '../types/plugin.types';
+import { serverInfo } from '../types/server.types';
 import { skillCatalog, skillConfigure, skillDiscover, skillSettings } from '../types/skill.types';
 import {
   toolAnswer,
@@ -37,8 +41,20 @@ import {
   toolPending,
   toolSettings,
 } from '../types/tool.types';
+import { conversationUsage } from '../types/usage.types';
+
+const oc = baseContract.errors({
+  PROTOCOL_MISMATCH: errorSchemas.PROTOCOL_MISMATCH,
+  SERVER_MISMATCH: errorSchemas.SERVER_MISMATCH,
+});
 
 export const contract = {
+  server: {
+    info: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(serverInfo),
+  },
+
   models: {
     list: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
@@ -228,6 +244,39 @@ export const contract = {
   },
 
   conversation: {
+    contextUsage: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(conversationTarget)
+      .output(conversationContextUsage),
+
+    watchContexts: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(conversationTarget)
+      .output(asyncIteratorObject(conversationFrame)),
+
+    usage: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(conversationTarget)
+      .output(conversationUsage),
+
+    contexts: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(conversationContexts)
+      .output(conversationContextPage),
+
     markRead: oc
       .errors({
         UNAUTHORIZED: errorSchemas.UNAUTHORIZED,

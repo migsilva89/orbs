@@ -6,6 +6,13 @@ const errorSchemas = {
   UNAUTHORIZED: { message: 'You must be logged in', status: 401, reportable: false },
   FORBIDDEN: { message: 'Insufficient permissions', status: 403, reportable: false },
   CONFLICT: { message: 'Busy right now, try again shortly', status: 409, reportable: false },
+  PROTOCOL_MISMATCH: {
+    message: 'Client and server protocol versions do not match',
+    status: 400,
+    data: z.object({ supportedVersion: z.number().int().positive(), receivedVersion: z.string().nullable() }),
+    reportable: false,
+  },
+  SERVER_MISMATCH: { message: 'This address belongs to a different server', status: 409, reportable: false },
 
   NOT_FOUND: { message: 'Resource not found', status: 404, data: z.object({ resource: z.string().optional(), resourceId: z.union([z.string(), z.number()]).optional() }), reportable: false },
   VALIDATION_ERROR: {

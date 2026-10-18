@@ -1,6 +1,15 @@
 import { authedRouter } from './rpc.procedures';
 
 export const conversation = authedRouter.conversation.router({
+  contextUsage: authedRouter.conversation.contextUsage.handler(async ({ context, input }) => context.conversation.queries.contextUsage(input)),
+  watchContexts: authedRouter.conversation.watchContexts.handler(async ({ context, input, signal }) => context.conversation.watchContexts({
+    ...input,
+    deviceId: context.device.id,
+    authorization: context.reqHeaders?.get('authorization'),
+    signal,
+  })),
+  usage: authedRouter.conversation.usage.handler(async ({ context, input }) => context.conversation.queries.usage(input)),
+  contexts: authedRouter.conversation.contexts.handler(async ({ context, input }) => context.conversation.queries.contexts(input)),
   markRead: authedRouter.conversation.markRead.handler(async ({ context, input }) => context.conversation.actions.markRead(input)),
   setPinned: authedRouter.conversation.setPinned.handler(async ({ context, input }) => context.conversation.actions.setPinned(input)),
   watchList: authedRouter.conversation.watchList.handler(async ({ context, signal }) => context.conversation.watchList({

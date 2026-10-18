@@ -69,6 +69,13 @@ export interface RuntimeConversationParams {
   conversationId?: number;
 }
 
+export interface RuntimeContextParams {
+  record: PiDurableTypes.ConversationRecord;
+  sourceConversationId: PiDurableTypes.ConversationId;
+  kind: 'subagent' | 'temporary';
+  isRunning: boolean;
+}
+
 export interface RuntimeSubmissionParams extends RuntimeConversationParams {
   requestId: string;
 }

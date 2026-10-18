@@ -47,6 +47,20 @@ The daemon initializes native logging at startup. Startup, runtime, and shutdown
 
 The internal server service supports submit, watch, history, and stop through Pi Durable 1.3.0. The daemon injects Pi's `ModelRuntime` for providers and authentication. Pi’s built-in `read`, `write`, `edit`, and `bash` tools are installed; no fake provider is installed in application code. Bot settings select the model, thinking level, and instructions for each conversation.
 
+## Server identity and protocol
+
+`server.info()` returns the authenticated daemon's stable `id` and `protocolVersion`. Startup creates `server.id` once in the shared settings table. Restarts preserve it; a new data directory gets a new ID. Copying the app database preserves the ID and device credentials, so treat a copy as a restore, not an independent daemon.
+
+```typescript
+const client = makeClient({ connect, token });
+const server = await client.server.info();
+const pinnedClient = makeClient({ connect, token, serverId: server.id });
+```
+
+Platform apps store the ID with the address and device credential, and use it in cache keys. `serverId` pins later requests to that daemon: another daemon at the same address returns `SERVER_MISMATCH` before an action runs. Identity checking does not replace TLS or device authentication.
+
+The shared client sends `x-openbots-protocol: 1` on every RPC call, including pairing redemption. Raw clients must send it too. A missing or different version returns `PROTOCOL_MISMATCH` with `supportedVersion` and `receivedVersion`; update the incompatible client or daemon before retrying. This is the application protocol version, independent of Pi and package versions. Protocol and identity failures are not retried automatically. Desktop/mobile connection storage and upgrade screens remain pending.
+
 ## Runtime commands
 
 Authenticated clients discover supported slash commands with `commands.list({ botId })`, then send the selected name and optional trailing text to one endpoint:
@@ -284,9 +298,57 @@ Subagents follow Pi's foreground and background examples. They copy the parent's
 
 Tool details expose child `conversationId`. Pass it alongside `botId` to the existing conversation watch/history/submit/stop or command calls to select that child. Omitting it selects the bot's main conversation. A mismatched bot/conversation pair is rejected. `tools.pending({ botId })` includes approvals from both main and child conversations; no additional approval table or queue is used.
 
+### Conversation usage
+
+```typescript
+const usage = await client.conversation.usage({ botId, conversationId });
+```
+
+Omit `conversationId` for the bot's main chat. The result reads Pi's `UsageDoc`: `models` is keyed by `provider/modelId`, and `tools` by tool name. Each bucket includes input/output/cache token counts, optional reasoning and one-hour cache-write counts, total tokens, and cost breakdowns. Empty conversations return empty records. These are Pi/provider-reported values, not a billing invoice.
+
+Usage covers the selected conversation's own accumulated spend, including compaction attempts. Child and temporary conversations keep separate ledgers; this endpoint does not sum a conversation tree. Usage queries read no transcripts and do not start work. Refresh when the UI needs a new snapshot.
+
+For the selected conversation's context window:
+
+```typescript
+const context = await client.conversation.contextUsage({ botId, conversationId });
+// context.contextWindow: model capacity in tokens, or null when unknown.
+// context.estimatedTokens: estimated tokens in Pi's committed active context.
+```
+
+This read loads only the selected conversation's active context through Pi. Request it when opening the stats panel and after a completed turn, reset, compaction, or model change; it is not part of sidebar or live-token updates. The estimate uses provider usage after the latest context boundary plus Pi's token estimates for subsequent messages. Older measurements are excluded after reset or compaction, including retained messages with equal timestamps.
+
+The estimate is not lifetime usage or an exact next-request size. Pending input, a live partial answer, and prompt/tool changes not yet committed are excluded. An empty committed context reports zero even when the next request will add instructions and tools. The model's capacity does not subtract Pi's reserved answer budget.
+
+### Discover chat contexts
+
+Fetch details only when the user opens a chat's context panel:
+
+```typescript
+const children = await client.conversation.contexts({ botId, kind: 'subagent', limit: 25 });
+const peers = await client.conversation.contexts({ botId, kind: 'temporary', limit: 25 });
+```
+
+Both queries return `{ items, next? }` in newest-conversation-first order. Pass `next` as `cursor` with the same target and kind to continue. An optional `conversationId` selects a source other than the bot's main chat. Subagents include finished children, their owner task ID, background flag, and name when named. Temporary contexts include their recipient bot ID and creation, expiry, and archive timestamps. Default peer messages reuse main chats and do not appear as temporary contexts. `isRunning` is a snapshot of Pi's ordinary live tasks.
+
+Discovery reads Pi ownership records and documents, never messages or full views, and starts no work. Pi can filter subagents by parent; it cannot filter ownerless temporary contexts by source. Temporary discovery therefore checks at most `limit` conversation metadata records per call (default 50, maximum 100). A page can be empty while `next` exists; only an absent `next` ends the scan. This avoids a second index, but finding a source's contexts can require several metadata pages on a large daemon. On selection, pass the item's `botId` and `conversationId` to the existing history/watch calls; peer contexts belong to the recipient. Archived history remains available.
+
+Keep one invalidation subscription open while the panel is visible:
+
+```typescript
+for await (const _state of watchConversationContexts(client, { botId }, signal)) {
+  const page = await client.conversation.contexts({ botId, kind: 'subagent', limit: 25 }, { signal });
+  renderContexts(page);
+}
+```
+
+`conversation.watchContexts` sends Chord frames for `{ revision }`; the helper applies them. Each value, including the initial value after reconnect, tells the UI to refetch its visible metadata pages. Revisions belong to that subscription, not a persisted replay cursor. New contexts require refreshing the first page; retain lazy pagination rather than fetching every page.
+
+Membership/name/archive changes are scoped to the source conversation. Busy/idle changes use Pi's live task graph across the daemon, so unrelated bots can cause a refresh too; the stream reveals no other conversation data. Token-only and task-checkpoint-only changes do not invalidate pages. Pi/Chord bound pending deliveries and can coalesce updates, which is safe because a refetch reads current state. Cancellation closes observation, not tasks, and device revocation closes the stream.
+
 ## Live conversation
 
-`conversation.watch({ botId })` streams only Pi's `LiveDoc`, the conversation ID, and the latest saved entry ID. It never mounts the full transcript. The wire carries an initial snapshot followed by compact Chord operations. `watchConversation` loads the newest 50 stored entries, then fetches new entries in bounded pages as the saved entry ID advances. Its view contains `entries` in chronological order, `live`, and `historyCursor` for loading older pages:
+`conversation.watch({ botId })` streams Pi's `LiveDoc` and `InboxDoc`, the conversation ID, and the latest saved entry ID. It never mounts the full transcript. The wire carries an initial snapshot followed by compact Chord operations. `watchConversation` loads the newest 50 stored entries, then fetches new entries in bounded pages as the saved entry ID advances. Its view contains `entries` in chronological order, `live`, `inbox`, and `historyCursor` for loading older pages:
 
 ```typescript
 import { watchConversation } from '@openbots/client/client';
@@ -297,7 +359,9 @@ for await (const view of watchConversation(client, { botId }, controller.signal)
 }
 ```
 
-Call `controller.abort()` when leaving the view. Disconnecting or cancelling stops observation, not the agent. oRPC reconnects interrupted watch calls and receives fresh live state and the current entry ID. The client catches up from its last loaded entry; interrupted history reads can retry, while commands and submissions are never automatically retried. Revoking a device ends its subscriptions even while idle. Pi's document watch and Chord's state subscriptions bound pending updates; skipped intermediate updates still carry the latest entry ID for history catch-up.
+`view.inbox.items` contains Pi's pending submissions, in ID order. Input items carry `id`, `mode` (`steer` or `followUp`), and `content`; `id` matches the submit acknowledgement's `submissionId`. Pending writes use `mode: 'write'` and `entry`, for example a queued reset. Keep them separate from saved messages. Pi removes items when they are placed or withdrawn. This exposes queue state; individual cancellation, editing and promotion controls remain pending.
+
+Call `controller.abort()` when leaving the view. Disconnecting or cancelling stops observation, not the agent. oRPC reconnects interrupted watch calls and receives fresh live/inbox state and the current entry ID. The client catches up from its last loaded entry; interrupted history reads can retry, while commands and submissions are never automatically retried. Revoking a device ends its subscriptions even while idle. Both document watches and the commit listener close together. Pi's document watch and Chord's state subscriptions bound pending updates; skipped intermediate updates still carry the latest entry ID for history catch-up.
 
 To scroll back, call `conversation.history({ botId, conversationId, cursor: view.historyCursor, limit: 50 })` and continue with the returned `next` cursor. These pages are newest-first; reverse each page for chronological display. Private contexts and subagents load only when explicitly selected by conversation ID. They are details within the originating chat, not extra top-level sidebar chats.
 

@@ -8,10 +8,12 @@ import { models } from './rpc.models';
 import { pairing } from './rpc.pairing';
 import { plugins } from './rpc.plugins';
 import { baseRouter } from './rpc.procedures';
+import { rpcServer } from './rpc.server';
 import { skills } from './rpc.skills';
 import { tools } from './rpc.tools';
 
 export const router = baseRouter.router({
+  server: rpcServer,
   bots,
   commands,
   devices,

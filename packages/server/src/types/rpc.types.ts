@@ -4,12 +4,14 @@ import type { ConversationService } from '../services/conversation/conversation.
 import type { InstructionService } from '../services/instruction/instruction.service';
 import type { McpService } from '../services/mcp/mcp.service';
 import type { PluginService } from '../services/plugin/plugin.service';
+import type { ServerService } from '../services/server/server.service';
 import type { SkillService } from '../services/skill/skill.service';
 import type { ToolService } from '../services/tool/tool.service';
 import type { RuntimeService } from '@openbots/runtime/server';
 import type { RequestHeadersPluginContext } from '@orpc/server/plugins';
 
 export interface RpcContext extends RequestHeadersPluginContext {
+  server: ServerService;
   auth: AuthService;
   runtime: RuntimeService;
   tools: ToolService;

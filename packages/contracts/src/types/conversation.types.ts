@@ -9,6 +9,11 @@ export interface ConversationState {
   conversationId: number;
   latestEntryId: number;
   live: PiDurableTypes.LiveState;
+  inbox: PiDurableTypes.InboxState;
+}
+
+export interface ConversationContextWatchState {
+  revision: number;
 }
 
 export interface ConversationView extends ConversationState {
@@ -60,6 +65,42 @@ export type ConversationHistoryInput = z.infer<typeof conversationHistory>;
 
 export type ConversationSubmitInput = z.infer<typeof conversationSubmit>;
 export type ConversationTarget = z.infer<typeof conversationTarget>;
+
+export const conversationContexts = conversationTarget.extend({
+  kind: z.enum(['subagent', 'temporary']),
+  limit: z.number().int().min(1).max(100).default(50),
+  cursor: z.record(z.string(), z.json()).optional(),
+});
+
+const conversationContext = z.object({
+  botId: z.uuid(),
+  conversationId: z.number().int().positive(),
+  isRunning: z.boolean(),
+});
+
+export const conversationContextItem = z.discriminatedUnion('kind', [
+  conversationContext.extend({
+    kind: z.literal('subagent'),
+    name: z.string().nullable(),
+    ownerTaskId: z.number().int().positive(),
+    isBackground: z.boolean(),
+  }),
+  conversationContext.extend({
+    kind: z.literal('temporary'),
+    createdAt: z.number(),
+    expiresAt: z.number(),
+    archivedAt: z.number().nullable(),
+  }),
+]);
+
+export const conversationContextPage = z.object({
+  items: z.array(conversationContextItem),
+  next: z.record(z.string(), z.json()).optional(),
+});
+
+export type ConversationContextsInput = z.infer<typeof conversationContexts>;
+export type ConversationContextItem = z.infer<typeof conversationContextItem>;
+export type ConversationContextPage = z.infer<typeof conversationContextPage>;
 
 export const conversationPreferences = z.object({
   isPinned: z.boolean(),

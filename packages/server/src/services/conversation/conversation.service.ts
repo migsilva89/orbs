@@ -6,15 +6,20 @@ import { conversationActionStop } from './conversation-action.stop';
 import { conversationActionSubmit } from './conversation-action.submit';
 import { conversationQueryApprovals } from './conversation-query.approvals';
 import { conversationQueryCommands } from './conversation-query.commands';
+import { conversationQueryContextUsage } from './conversation-query.context-usage';
+import { conversationQueryContexts } from './conversation-query.contexts';
 import { conversationQueryHistory } from './conversation-query.history';
 import { conversationQueryList } from './conversation-query.list';
+import { conversationQueryUsage } from './conversation-query.usage';
 import { conversationQueryWatch } from './conversation-query.watch';
+import { conversationQueryWatchContexts } from './conversation-query.watch-contexts';
 import { conversationQueryWatchList } from './conversation-query.watch-list';
 import type * as ConversationTypes from '../../types/conversation.types';
 import type * as UniversalTypes from '@openbots/contracts/universal';
 
 export function makeConversationService(deps: ConversationTypes.ConversationServiceDeps) {
   return {
+    watchContexts: (params: ConversationTypes.ConversationWatchParams) => conversationQueryWatchContexts(deps, params),
     actions: {
       markRead: (params: UniversalTypes.ConversationMarkReadInput) => conversationActionMarkRead(deps, params),
       setPinned: (params: UniversalTypes.ConversationSetPinnedInput) => conversationActionSetPinned(deps, params),
@@ -24,6 +29,9 @@ export function makeConversationService(deps: ConversationTypes.ConversationServ
       stop: (params: UniversalTypes.ConversationTarget) => conversationActionStop(deps, params),
     },
     queries: {
+      contextUsage: (params: UniversalTypes.ConversationTarget) => conversationQueryContextUsage(deps, params),
+      usage: (params: UniversalTypes.ConversationTarget) => conversationQueryUsage(deps, params),
+      contexts: (params: UniversalTypes.ConversationContextsInput) => conversationQueryContexts(deps, params),
       list: () => conversationQueryList(deps),
       commands: (params: UniversalTypes.ConversationTarget) => conversationQueryCommands(deps, params),
       approvals: (params: UniversalTypes.ConversationTarget) => conversationQueryApprovals(deps, params),

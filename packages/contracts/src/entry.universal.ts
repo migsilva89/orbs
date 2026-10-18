@@ -1,4 +1,9 @@
 export { contract } from './rpc/rpc.router';
+export { SERVER_PROTOCOL, serverInfo } from './types/server.types';
+export type { ServerInfo } from './types/server.types';
+export type { ConversationUsage } from './types/usage.types';
+export type { ConversationContextUsage } from './types/context-usage.types';
+export type { ConversationContextWatchState } from './types/conversation.types';
 export { commandArguments } from './types/command.types';
 export { conversationContent, conversationSummary } from './types/conversation.types';
 export type { Command, CommandExecuteInput } from './types/command.types';
@@ -19,3 +24,4 @@ export type { PluginCatalog, PluginConfigureInput, PluginSettings } from './type
 export { instructionSettings } from './types/instruction.types';
 export type { InstructionCatalog, InstructionConfigureInput, InstructionSettings } from './types/instruction.types';
 export type { ConversationPreferences, ConversationMarkReadInput, ConversationSetPinnedInput } from './types/conversation.types';
+export type { ConversationContextsInput, ConversationContextItem, ConversationContextPage } from './types/conversation.types';

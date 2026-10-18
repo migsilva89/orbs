@@ -6,6 +6,7 @@ import { makeConversationService } from '../services/conversation/conversation.s
 import { makeCredentialsService } from '../services/credentials/credentials.service';
 import { makeInstructionService } from '../services/instruction/instruction.service';
 import { makePluginService } from '../services/plugin/plugin.service';
+import { makeServerService } from '../services/server/server.service';
 import { makeSkillService } from '../services/skill/skill.service';
 import { makeToolService } from '../services/tool/tool.service';
 import type { CoreServicesParams } from '../types/core.types';
@@ -38,6 +39,8 @@ export async function makeServices({
   });
 
   try {
+    const server = makeServerService({ settings });
+    await server.queries.info();
     const auth = makeAuthService({ database });
     const skill = makeSkillService({ settings, loader: skillLoader });
     const instruction = makeInstructionService({ settings, loader: instructionLoader });
@@ -57,6 +60,7 @@ export async function makeServices({
     runtime.resume();
 
     return {
+      server,
       database,
       auth,
       bots,

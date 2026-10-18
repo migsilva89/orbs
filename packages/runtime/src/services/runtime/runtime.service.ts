@@ -10,16 +10,20 @@ import { runtimeActionExecuteCommand } from './runtime-action.execute-command';
 import { runtimeActionSubmit } from './runtime-action.submit';
 import { runtimeQueryApprovals } from './runtime-query.approvals';
 import { runtimeQueryCommands } from './runtime-query.commands';
+import { runtimeQueryContextUsage } from './runtime-query.context-usage';
+import { runtimeQueryContexts } from './runtime-query.contexts';
 import { runtimeQueryConversation } from './runtime-query.conversation';
 import { runtimeQueryHistory } from './runtime-query.history';
 import { runtimeQueryModels } from './runtime-query.models';
 import { runtimeQuerySubmission } from './runtime-query.submission';
+import { runtimeQueryUsage } from './runtime-query.usage';
 import { runtimeQueryValidateModel } from './runtime-query.validate-model';
 import { runtimeQueryWatch } from './runtime-query.watch';
+import { runtimeQueryWatchContexts } from './runtime-query.watch-contexts';
 import { runtimeSkills } from './runtime-skills.utils';
 import { runtimeToolsExtension } from './runtime-tools.utils';
 import type * as RuntimeTypes from '../../types/runtime.types';
-import type { CommandExecuteInput, ConversationMarkReadInput, ConversationSetPinnedInput } from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@openbots/contracts/universal';
 
 export async function makeRuntimeService({
   storage,
@@ -67,9 +71,9 @@ export async function makeRuntimeService({
 
   return {
     actions: {
-      markRead: (params: ConversationMarkReadInput, context = BACKGROUND_CONTEXT) => deps.index.actions.markRead(params, context),
-      setPinned: (params: ConversationSetPinnedInput, context = BACKGROUND_CONTEXT) => deps.index.actions.setPinned(params, context),
-      executeCommand: (params: CommandExecuteInput, context = BACKGROUND_CONTEXT) => (
+      markRead: (params: UniversalTypes.ConversationMarkReadInput, context = BACKGROUND_CONTEXT) => deps.index.actions.markRead(params, context),
+      setPinned: (params: UniversalTypes.ConversationSetPinnedInput, context = BACKGROUND_CONTEXT) => deps.index.actions.setPinned(params, context),
+      executeCommand: (params: UniversalTypes.CommandExecuteInput, context = BACKGROUND_CONTEXT) => (
         runtimeActionExecuteCommand(deps, params, context)
       ),
       approve: (params: RuntimeTypes.RuntimeApprovalAnswer, context = BACKGROUND_CONTEXT) => (
@@ -86,6 +90,11 @@ export async function makeRuntimeService({
       ),
     },
     queries: {
+      contextUsage: (params: RuntimeTypes.RuntimeConversationParams, context = BACKGROUND_CONTEXT) => (
+        runtimeQueryContextUsage(deps, params, context)
+      ),
+      usage: (params: RuntimeTypes.RuntimeConversationParams, context = BACKGROUND_CONTEXT) => runtimeQueryUsage(deps, params, context),
+      contexts: (params: UniversalTypes.ConversationContextsInput, context = BACKGROUND_CONTEXT) => runtimeQueryContexts(deps, params, context),
       conversations: (context = BACKGROUND_CONTEXT) => deps.index.queries.list(context),
       submission: (params: RuntimeTypes.RuntimeSubmissionParams, context = BACKGROUND_CONTEXT) => (
         runtimeQuerySubmission(deps, params, context)
@@ -101,6 +110,9 @@ export async function makeRuntimeService({
       ),
     },
     watchConversations: (context = BACKGROUND_CONTEXT) => deps.index.watch(context),
+    watchContexts: (params: RuntimeTypes.RuntimeConversationParams, context = BACKGROUND_CONTEXT) => (
+      runtimeQueryWatchContexts(deps, params, context)
+    ),
     watch: (params: RuntimeTypes.RuntimeConversationParams, context = BACKGROUND_CONTEXT) => (
       runtimeQueryWatch(deps, params, context)
     ),

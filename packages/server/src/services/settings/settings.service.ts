@@ -1,14 +1,16 @@
+import { settingsActionEnsure } from './settings-action.ensure';
 import { settingsActionSet } from './settings-action.set';
 import { settingsQueryGet } from './settings-query.get';
-import type { SettingsGetParams, SettingsServiceDeps, SettingsSetParams } from '../../types/settings.types';
+import type * as SettingsTypes from '../../types/settings.types';
 
-export function makeSettingsService(deps: SettingsServiceDeps) {
+export function makeSettingsService(deps: SettingsTypes.SettingsServiceDeps) {
   return {
     actions: {
-      set: (params: SettingsSetParams) => settingsActionSet(deps, params),
+      ensure: (params: SettingsTypes.SettingsRecord) => settingsActionEnsure(deps, params),
+      set: (params: SettingsTypes.SettingsSetParams) => settingsActionSet(deps, params),
     },
     queries: {
-      get: (params: SettingsGetParams) => settingsQueryGet(deps, params),
+      get: (params: SettingsTypes.SettingsGetParams) => settingsQueryGet(deps, params),
     },
   };
 }

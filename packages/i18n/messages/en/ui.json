@@ -63,5 +63,7 @@
   "ui_artifact_block_area_chart_description": "An area chart of one to four series over the x axis.",
   "ui_artifact_block_pie_chart_description": "A donut chart of up to six parts of a whole.",
   "ui_artifact_block_select_description": "A dropdown to pick one option. Bind value with $bindState at /path so it is saved.",
-  "ui_artifact_block_notes_description": "A text box people write in. Bind value with $bindState at /path so it is saved."
+  "ui_artifact_block_notes_description": "A text box people write in. Bind value with $bindState at /path so it is saved.",
+  "ui_provider_login_failed": "Login failed. Start a new login to try again.",
+  "ui_tool_bot_swap_models_description": "Replace a matching provider and model on selected bots, optionally including their fallback models. Saves settings before runtime preparation. Does not interrupt an active request. List bots before retrying after an error."
 }

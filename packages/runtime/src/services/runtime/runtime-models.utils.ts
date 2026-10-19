@@ -23,9 +23,7 @@ export function runtimeModelRef(bot: RuntimeBotParams): ModelRef {
 export function runtimeModels(models: Models): Models {
   const getModel: Models['getModel'] = (provider, id) => match(provider)
     .with(ROUTE_PROVIDER, () => {
-      const route = runtimeModelParse(id);
-
-      return match(route).with(P.nonNullable, (route) => {
+      return match(runtimeModelParse(id)).with(P.nonNullable, (route) => {
         const primary = models.getModel(route.primary.modelProvider, route.primary.modelId);
         const fallback = models.getModel(route.fallback.modelProvider, route.fallback.modelId);
 
@@ -49,6 +47,8 @@ export function runtimeModels(models: Models): Models {
     }))
     .otherwise(() => models.streamSimple(model, context, options));
 
+  const completeSimple: Models['completeSimple'] = (model, context, options) => streamSimple(model, context, options).result();
+
   const fetchDeferred: Models['fetchDeferred'] = (model, handle, options) => models.fetchDeferred(
     models.getModel(handle.provider, handle.modelId) ?? model, handle, options,
   );
@@ -61,6 +61,7 @@ export function runtimeModels(models: Models): Models {
     get: (target, property) => match(property)
       .with('getModel', () => getModel)
       .with('streamSimple', () => streamSimple)
+      .with('completeSimple', () => completeSimple)
       .with('fetchDeferred', () => fetchDeferred)
       .with('cancelDeferred', () => cancelDeferred)
       .otherwise(() => {

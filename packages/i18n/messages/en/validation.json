@@ -13,5 +13,9 @@
   "validation_command_id_arguments": "Enter a positive whole-number ID.",
   "validation_reaction_limit": "A message can have at most {max} reactions.",
   "validation_routine_schedule": "Choose a valid five-field cron expression and timezone.",
-  "validation_artifact_spec": "Use a valid artifact layout and block properties, within the size limit."
+  "validation_artifact_spec": "Use a valid artifact layout and block properties, within the size limit.",
+  "validation_oauth": "Could not complete authorization. Check the callback and try again.",
+  "validation_provider_login_unsupported": "This provider does not support the selected login method.",
+  "validation_backup_manifest": "The backup manifest is invalid.",
+  "validation_backup_checksum": "A backup file does not match its recorded checksum."
 }

@@ -22,7 +22,7 @@ import {
   authRedeem,
   authRedeemResult,
 } from '../types/auth.types';
-import { bot, botCatalog, botCreate, botGet, botList, botUpdate } from '../types/bot.types';
+import { bot, botCatalog, botCreate, botGet, botList, botSwapModels, botSwapModelsResult, botUpdate } from '../types/bot.types';
 import { commandCatalog, commandExecute, commandExecuteResult, commandList } from '../types/command.types';
 import { conversationContextUsage } from '../types/context-usage.types';
 import { conversationArrange, conversationArrangeResult, conversationSetHidden, conversationSetMuted } from '../types/conversation-preference.types';
@@ -47,9 +47,21 @@ import { credentialsList, credentialsSet, credentialsSetResult } from '../types/
 import { deviceList, deviceRevoke, deviceRevokeResult } from '../types/device.types';
 import { conversationSearch, conversationSearchResult } from '../types/history.types';
 import { instructionCatalog, instructionConfigure, instructionDiscover, instructionSettings } from '../types/instruction.types';
+import { limitConfigure, limitSettings } from '../types/limit.types';
+import {
+  mcpAuthCancelResult,
+  mcpAuthComplete,
+  mcpAuthCompleteResult,
+  mcpAuthLogoutResult,
+  mcpAuthStart,
+  mcpAuthStartResult,
+  mcpAuthStatusResult,
+  mcpAuthTarget,
+} from '../types/mcp-auth.types';
 import { mcpCatalog, mcpConfigure, mcpDiscover, mcpSettings } from '../types/mcp.types';
 import { modelList } from '../types/model.types';
 import { pluginCatalog, pluginConfigure, pluginDiscover, pluginSettings } from '../types/plugin.types';
+import { providerCancelResult, providerComplete, providerList, providerLogin, providerLogout, providerLogoutResult, providerSession, providerSessionId } from '../types/provider.types';
 import { conversationAnswerQuestion, conversationAnswerQuestionResult, conversationQuestionList } from '../types/question.types';
 import { conversationReactions, conversationReactionsResult, conversationSetReaction, conversationSetReactionResult } from '../types/reaction.types';
 import { routine, routineCreate, routineList, routineRemoveResult, routineTarget, routineUpdate } from '../types/routine.types';
@@ -66,11 +78,101 @@ import {
 import { conversationUsage } from '../types/usage.types';
 
 const oc = baseContract.errors({
+  RATE_LIMITED: errorSchemas.RATE_LIMITED,
   PROTOCOL_MISMATCH: errorSchemas.PROTOCOL_MISMATCH,
   SERVER_MISMATCH: errorSchemas.SERVER_MISMATCH,
 });
 
 export const contract = {
+  providers: {
+    list: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(providerList),
+    login: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        FORBIDDEN: errorSchemas.FORBIDDEN,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        CONFLICT: errorSchemas.CONFLICT,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(providerLogin)
+      .output(providerSession),
+    complete: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        FORBIDDEN: errorSchemas.FORBIDDEN,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        CONFLICT: errorSchemas.CONFLICT,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(providerComplete)
+      .output(providerSession),
+    session: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(providerSessionId)
+      .output(providerSession),
+    cancel: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        FORBIDDEN: errorSchemas.FORBIDDEN,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        CONFLICT: errorSchemas.CONFLICT,
+      })
+      .input(providerSessionId)
+      .output(providerCancelResult),
+    logout: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(providerLogout)
+      .output(providerLogoutResult),
+  },
+  limits: {
+    settings: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(limitSettings),
+    configure: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(limitConfigure)
+      .output(limitSettings),
+  },
+  mcpAuth: {
+    start: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        FORBIDDEN: errorSchemas.FORBIDDEN,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        CONFLICT: errorSchemas.CONFLICT,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(mcpAuthStart)
+      .output(mcpAuthStartResult),
+    complete: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        FORBIDDEN: errorSchemas.FORBIDDEN,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        CONFLICT: errorSchemas.CONFLICT,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(mcpAuthComplete)
+      .output(mcpAuthCompleteResult),
+    cancel: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        FORBIDDEN: errorSchemas.FORBIDDEN,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(mcpAuthTarget)
+      .output(mcpAuthCancelResult),
+    logout: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(mcpAuthTarget)
+      .output(mcpAuthLogoutResult),
+    status: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(mcpAuthTarget)
+      .output(mcpAuthStatusResult),
+  },
   credentials: {
     list: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
@@ -328,6 +430,16 @@ export const contract = {
   },
 
   bots: {
+    swapModels: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        CONFLICT: errorSchemas.CONFLICT,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(botSwapModels)
+      .output(botSwapModelsResult),
+
     list: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
       .output(botList),
@@ -397,6 +509,10 @@ export const contract = {
   },
 
   conversation: {
+    watchNotifications: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(asyncIteratorObject(conversationFrame)),
+
     search: oc
       .errors({
         UNAUTHORIZED: errorSchemas.UNAUTHORIZED,

@@ -16,5 +16,7 @@ export interface CoreServicesParams {
   instructionLoader: ServerTypes.InstructionLoaderService;
   pluginLoader: ServerTypes.PluginLoaderService;
   mcp: McpService;
+  mcpAuth: ServerTypes.McpAuthService;
+  providers: ServerTypes.ProviderService;
   runtime: Omit<ServerTypes.RuntimeServiceParams, 'permissions' | 'collaboration'>;
 }

@@ -1,12 +1,12 @@
-export { makeRuntimeService } from './services/runtime/runtime.service';
-export type { RuntimeService } from './services/runtime/runtime.service';
-export type { RuntimeServiceParams } from './types/runtime.types';
+export { makeRuntimeService, type RuntimeService } from './services/runtime/runtime.service';
+export type { RuntimeServiceParams, RuntimeToolCall, RuntimeToolDecision } from './types/runtime.types';
 export type { CollaborationBotParams, CollaborationPolicy, CollaborationRecipientParams } from './types/collaboration.types';
-export type { RuntimeToolCall, RuntimeToolDecision } from './types/runtime.types';
 export type { ToolRegistration } from '@earendil-works/pi-durable';
 export { mcpDocument, mcpServer } from './types/mcp.types';
 export type { McpClientParams, McpConfig, McpEntry, McpSource } from './types/mcp.types';
 export type { McpClientService } from './services/mcp/mcp.service';
+export type { McpAuthService } from './services/mcp-auth/mcp-auth.service';
+export type { ProviderService } from './services/provider/provider.service';
 export type { SkillExpandParams, SkillExpandResult, SkillLoadParams, SkillLoadResult } from './types/skill.types';
 export type { SkillLoaderService } from './services/skill/skill.service';
 export type { PluginLoaderService } from './services/plugin/plugin.service';

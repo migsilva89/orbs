@@ -84,13 +84,17 @@ Pi's [credentials example](https://github.com/earendil-works/pi/blob/main/packag
 
 The native host still owns the locked Durable SQLite store at `OPENBOTS_DATA_DIR/data/runtime.sql`. Loading provider configuration neither changes that path nor creates a coding-agent session. Model selection remains in Durable agent configuration; `ModelRuntime` does not import CLI settings or tools.
 
+Provider login uses native `ModelRuntime.login` with an `AuthInteraction` adapter for remote prompts and events. Login sessions belong to the initiating paired device; answers carry a prompt ID. Cancellation, expiry, revocation and daemon shutdown end pending interactions. Credentials remain in Pi, and read-only status calls do not refresh them.
+
+MCP OAuth uses `McpOAuthProvider`, `authorizeMcp` and `adaptOAuthProvider` from `@earendil-works/pi-mcp/oauth`. Server resolves the selected bot’s configured HTTP MCP target; runtime manages the flow and stores its native OAuth state through the shared encrypted credentials service. Clients open the authorization URL and return the callback URL; Openbots does not start a callback listener.
+
 ## Bot conversation mapping
 
 A session-scoped `openbots.bot-conversation` document family maps each bot UUID to its Pi conversation ID. The runtime creates the mapping and configures an ownerless conversation in one Pi transaction. Reconfiguration preserves the ID and transcript. Bot settings come from app SQL; provider authentication stays shared through `ModelRuntime`.
 
 The server restores all bot configurations before calling `resume()`. Same-bot configuration is serialized in memory. Directory, skill, instruction, plugin, and MCP preparation run outside SQL. After that work, configuration rereads the bot row and relevant domain settings and retries if the values that affect Pi config changed, then publishes. SQL and Pi do not share a transaction: a failed Pi synchronization leaves SQL settings for startup or the next submission to reconcile. Pi stores only the relative `agents/<botId>` working directory, not a machine-specific path.
 
-`conversation.watch({ botId })` and `watchConversation(client, { botId }, signal)` select a bot view. All paired devices act as the owner. The original root is not deleted or automatically adopted as a bot. Tools and permission enforcement now use Pi CodingTools and hooks. Skill loading lives in `@openbots/runtime/native`; MCP config-file discovery lives in `@openbots/server/native`; MCP clients and tools live in `@openbots/runtime/native`. Server policy selects inheritance. Runtime never imports server. MCP OAuth remains pending.
+`conversation.watch({ botId })` and `watchConversation(client, { botId }, signal)` select a bot view. All paired devices act as the owner. The original root is not deleted or automatically adopted as a bot. Tools and permission enforcement now use Pi CodingTools and hooks. Skill loading lives in `@openbots/runtime/native`; MCP config-file discovery lives in `@openbots/server/native`; MCP clients and tools live in `@openbots/runtime/native`. Server policy selects inheritance. Runtime never imports server. MCP OAuth uses the native `pi-mcp/oauth` helpers through the runtime auth service.
 
 The initial bot-routing slice had static typecheck/lint validation only. The tool checks below subsequently exercised bot creation/update and recovery. The earlier transport probes predate bot routing; real-provider calls remain unverified.
 
@@ -250,7 +254,7 @@ Owner reactions use a conversation-scoped `defineDocFamily`, keyed by visible en
 
 Clarification uses a replay-safe `bot_question` tool and a task-scoped document with question, choices, answer and deadline. `api.watchDoc()` observes answers; `awaitWithContext` ties the wait to native task cancellation. The timer only wakes an open host. Re-execution reads the stored deadline and answer; no process-local waiter registry or SQL question table exists. Answer RPCs use the paired device ID and accept only the first unexpired answer for the selected conversation. Clarification is separate from permission approval.
 
-Sidebar preferences extend the existing session index to version 3 with `isHidden`, `isMuted` and nullable `rank`. Native document migration preserves v1/v2 previews, pins and read cursors. Hide and mute are independent flags. Timed mute, notifications and interaction UI remain client/product work.
+Sidebar preferences extend the existing session index to version 3 with `isHidden`, `isMuted` and nullable `rank`. Native document migration preserves v1/v2 previews, pins and read cursors. Hide and mute are independent flags. Timed mute and interaction UI remain client/product work. The backend notification watch reads the index mute setting and native task/document state.
 
 Disposable native SQLite/faux-provider checks passed for quote isolation, queued quote edits and clearing, quoted attachment interruption with older queued inputs preserved, idempotent reactions, reaction invalidation, concurrent/stale retries, retry after reset followed by a prepare failure with no assistant tail, and reopen persistence. In-process RPC checks covered contracts, service wiring, device attribution and rejection by auth middleware. Separate v1/v2 migration checks preserved existing sidebar values. No live model, listener or permanent test was added.
 

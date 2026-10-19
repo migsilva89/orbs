@@ -1,6 +1,13 @@
 import { authedRouter } from './rpc.procedures';
 
-export const conversation = authedRouter.conversation.router({
+export const conversation = {
+  watchNotifications: authedRouter.conversation.watchNotifications.handler(async ({ context, signal }) => (
+    context.conversation.watchNotifications({
+      deviceId: context.device.id,
+      authorization: context.reqHeaders?.get('authorization'),
+      signal,
+    })
+  )),
   search: authedRouter.conversation.search.handler(async ({ context, input }) => context.conversation.queries.search(input)),
   questions: authedRouter.conversation.questions.handler(async ({ context, input }) => context.conversation.queries.questions(input)),
   answerQuestion: authedRouter.conversation.answerQuestion.handler(async ({ context, input }) => context.conversation.actions.answerQuestion({
@@ -43,4 +50,4 @@ export const conversation = authedRouter.conversation.router({
       signal,
     });
   }),
-});
+};

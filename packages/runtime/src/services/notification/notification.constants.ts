@@ -1,0 +1,1 @@
+export const NOTIFICATION_RECENT_LIMIT = 32;

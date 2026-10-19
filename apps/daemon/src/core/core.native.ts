@@ -3,8 +3,10 @@ import { env } from '@openbots/env/server';
 import { log } from '@openbots/logger/server';
 import {
   makeInstructionLoaderService,
+  makeMcpAuthService,
   makeMcpClientService,
   makePluginLoaderService,
+  makeProviderService,
   makeSkillLoaderService,
   makeStorageService,
   runtimeEnvNative,
@@ -29,14 +31,18 @@ export async function coreNativeRun(): Promise<void> {
   await database.migrate();
 
   const models = await ModelRuntime.create();
+  const providers = makeProviderService({ models });
+  resources.defer(() => providers.close());
   const credentialsKey = await credentialsKeyNative(paths.data);
   const credentials = makeCredentialsService({ database, key: credentialsKey });
+  const mcpAuth = makeMcpAuthService({ credentials });
+  resources.defer(() => mcpAuth.close());
   const settings = makeSettingsService({ database });
   const workspace = makeWorkspaceService({ root: paths.root });
   const skillLoader = makeSkillLoaderService({ root: paths.root });
   const instructionLoader = makeInstructionLoaderService({ root: paths.root });
   const pluginLoader = makePluginLoaderService({ root: paths.root });
-  const mcpClients = makeMcpClientService({ root: paths.root });
+  const mcpClients = makeMcpClientService({ root: paths.root, auth: mcpAuth });
   resources.defer(() => mcpClients.close());
 
   const mcp = makeMcpService({
@@ -56,6 +62,8 @@ export async function coreNativeRun(): Promise<void> {
     instructionLoader,
     pluginLoader,
     mcp,
+    mcpAuth,
+    providers,
     runtime: {
       storage: storage.storage,
       models,

@@ -6,6 +6,8 @@ import { makeBotService } from '../services/bot/bot.service';
 import { makeCollaborationService } from '../services/collaboration/collaboration.service';
 import { makeConversationService } from '../services/conversation/conversation.service';
 import { makeInstructionService } from '../services/instruction/instruction.service';
+import { makeLimitService } from '../services/limit/limit.service';
+import { makeMcpAuthService } from '../services/mcp/mcp-auth.service';
 import { makePluginService } from '../services/plugin/plugin.service';
 import { makeRoutineService } from '../services/routine/routine.service';
 import { makeServerService } from '../services/server/server.service';
@@ -23,6 +25,8 @@ export async function makeServices({
   instructionLoader,
   pluginLoader,
   mcp,
+  mcpAuth,
+  providers,
   runtime: runtimeOptions,
 }: CoreServicesParams) {
   const tools = makeToolService({
@@ -43,6 +47,12 @@ export async function makeServices({
     const server = makeServerService({ settings });
     await server.queries.info();
     const auth = makeAuthService({ database });
+    const limits = makeLimitService({ settings });
+    await limits.ready;
+    auth.onRevoke((deviceId) => {
+      providers.actions.cancelDevice({ deviceId });
+      mcpAuth.actions.cancelDevice({ deviceId });
+    });
     const skill = makeSkillService({ settings, loader: skillLoader });
     const instruction = makeInstructionService({ settings, loader: instructionLoader });
     const plugin = makePluginService({ settings, loader: pluginLoader });
@@ -72,6 +82,14 @@ export async function makeServices({
       routines: makeRoutineService({ bots, runtime }),
       artifacts: makeArtifactService({ bots, runtime }),
       server,
+      limits,
+      providers,
+      mcpAuth: makeMcpAuthService({
+        bots,
+        mcp,
+        oauth: mcpAuth,
+        auth,
+      }),
       attachments,
       database,
       auth,

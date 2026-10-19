@@ -23,6 +23,7 @@ import { conversationQueryUsage } from './conversation-query.usage';
 import { conversationQueryWatch } from './conversation-query.watch';
 import { conversationQueryWatchContexts } from './conversation-query.watch-contexts';
 import { conversationQueryWatchList } from './conversation-query.watch-list';
+import { conversationQueryWatchNotifications } from './conversation-query.watch-notifications';
 import type * as ConversationTypes from '../../types/conversation.types';
 import type * as UniversalTypes from '@openbots/contracts/universal';
 
@@ -56,6 +57,7 @@ export function makeConversationService(deps: ConversationTypes.ConversationServ
       approvals: (params: UniversalTypes.ConversationTarget) => conversationQueryApprovals(deps, params),
       history: (params: UniversalTypes.ConversationHistoryInput) => conversationQueryHistory(deps, params),
     },
+    watchNotifications: (params: ConversationTypes.ConversationListWatchParams) => conversationQueryWatchNotifications(deps, params),
     watchList: (params: ConversationTypes.ConversationListWatchParams) => conversationQueryWatchList(deps, params),
     watch: (params: ConversationTypes.ConversationWatchParams) => conversationQueryWatch(deps, params),
   };

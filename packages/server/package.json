@@ -29,6 +29,8 @@
     "zod": "catalog:",
     "@openbots/contracts": "workspace:*",
     "@orpc/server": "catalog:",
+    "@orpc/shared": "catalog:",
+    "@orpc/ratelimit": "catalog:",
     "@earendil-works/chord": "catalog:",
     "ts-pattern": "catalog:",
     "@typesafe-ai/sdk": "catalog:",

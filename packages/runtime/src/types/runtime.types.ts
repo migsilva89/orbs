@@ -4,7 +4,7 @@ import type { QuestionService } from '../services/question/question.service';
 import type { RoutineService } from '../services/routine/routine.service';
 import type { CollaborationPolicy } from './collaboration.types';
 import type { Context } from '@earendil-works/chord/context';
-import type { ModelThinkingLevel, ToolCall } from '@earendil-works/pi-ai';
+import type { ToolCall } from '@earendil-works/pi-ai';
 import type { Models } from '@earendil-works/pi-ai/models';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
 import type { Attachment, ModelSelection } from '@openbots/contracts/universal';
@@ -52,11 +52,8 @@ export interface RuntimeServiceDeps extends RuntimeModelsDeps {
   extensions: PiDurableTypes.Extension[];
 }
 
-export interface RuntimeBotParams {
+export interface RuntimeBotParams extends ModelSelection {
   id: string;
-  modelProvider: string;
-  modelId: string;
-  thinkingLevel: ModelThinkingLevel;
   fallbackModel?: ModelSelection | null;
   instructions: string;
   skillsPrompt: string;

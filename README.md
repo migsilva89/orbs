@@ -47,6 +47,21 @@ The daemon initializes native logging at startup. Startup, runtime, and shutdown
 
 The internal server service supports submit, watch, history, and stop through Pi Durable 1.3.0. The daemon injects Pi's `ModelRuntime` for providers and authentication. Pi’s built-in `read`, `write`, `edit`, and `bash` tools are installed; no fake provider is installed in application code. Bot settings select the model, thinking level, and instructions for each conversation.
 
+## Offline backup and restore
+
+The native server package exposes backups for a stopped daemon. There is no backup RPC or CLI:
+
+```ts
+import { makeBackupService } from '@openbots/server/native';
+
+await makeBackupService({ root: sourceRoot }).actions.create({ destination: backupDirectory });
+await makeBackupService({ root: newRoot }).actions.restore({ bundle: backupDirectory });
+```
+
+Use absolute paths. Both the backup destination and restore root must be absent, with existing parent directories. Create takes the same storage lock as daemon startup; a running daemon returns `CONFLICT`. It snapshots both SQLite databases with `VACUUM INTO`, copies the credential key and bot workspaces, and records file sizes and SHA-256 checksums. Restore checks the manifest and publishes a complete directory without opening Pi, running migrations, or starting the daemon. Existing directories are never a restore target.
+
+The bundle preserves the server identity, paired devices, encrypted application credentials, transcripts, tasks, bot files and attachments. It also contains the encryption key, so protect the whole bundle as secret data. It excludes runtime locks, local IPC, Pi's external provider-auth store and shared skill/plugin/instruction directories outside the data root. Their configured paths remain in settings. Symlinks and unsupported file types are rejected. Restore replaces the same logical daemon; do not run the source and restored copy as independent servers.
+
 ## Server identity and protocol
 
 `server.info()` returns the authenticated daemon's stable `id` and `protocolVersion`. Startup creates `server.id` once in the shared settings table. Restarts preserve it; a new data directory gets a new ID. Copying the app database preserves the ID and device credentials, so treat a copy as a restore, not an independent daemon.
@@ -118,7 +133,7 @@ await client.conversation.setReaction({ botId, entryId, emoji: '👍', isPresent
 const reactions = await client.conversation.reactions({ botId, entryIds: visibleEntryIds });
 ```
 
-Pass `isPresent: false` to remove a reaction. Pi documents store reactions beside the selected conversation. Bot-authored reactions and reaction-triggered bot replies remain pending.
+Pass `isPresent: false` to remove a reaction. Pi documents store reactions beside the selected conversation. Bot-authored reactions use the separate attribution described below. Reaction-triggered bot replies remain pending.
 
 Bots can call the `bot_question` tool with a question and optional choices. Clients read pending questions and submit a choice or free text through authenticated RPC:
 
@@ -180,11 +195,21 @@ Auto sends the owner rules and tool context in one Jev request. Approval needs a
 
 ## Provider authentication
 
-The daemon uses Pi's `ModelRuntime.create()`, which loads saved provider credentials from `auth.json` and custom model configuration from `models.json` in Pi's agent directory (default `~/.pi/agent`). Existing Pi logins are reused; Pi handles file locking and OAuth refresh. Sign in through Pi's `/login` command if needed. Openbots does not currently expose its own login UI.
+The daemon uses Pi's `ModelRuntime.create()`, which loads saved provider credentials from `auth.json` and custom model configuration from `models.json` in Pi's agent directory (default `~/.pi/agent`). Existing Pi logins are reused; Pi handles file locking and OAuth refresh. Paired devices can use the provider RPC below; Pi's `/login` command remains compatible. Login UI is not implemented.
 
-Set `PI_CODING_AGENT_DIR` for both Pi and the daemon to use a separate auth/config directory, including for development versus production. Run them as the same OS user to share the default directory. Pi authentication uses its existing location. Skills are loaded directly from their source directories, including existing symlinks; MCP configuration discovery and stdio/Streamable HTTP connections are available; MCP OAuth remains pending. Pi's auth file is sensitive and is not encrypted by this integration.
+Set `PI_CODING_AGENT_DIR` for both Pi and the daemon to use a separate auth/config directory, including for development versus production. Run them as the same OS user to share the default directory. Pi authentication uses its existing location. Skills are loaded directly from their source directories, including existing symlinks; MCP configuration discovery, stdio/Streamable HTTP connections and MCP OAuth APIs are available. Pi's auth file is sensitive and is not encrypted by this integration.
 
 This loads provider configuration, not CLI sessions, tools, extensions, or `settings.json`. Durable still stores conversations, tasks, and recovery state in `OPENBOTS_DATA_DIR/data/runtime.sql`. Authentication is shared; each bot selects its own model through its database settings.
+
+Provider auth uses `providers.list()`, `providers.login({ providerId, authType })`, `providers.session({ id })`, `providers.complete({ id, promptId, answer })`, `providers.cancel({ id })` and `providers.logout({ providerId })`. Auth types are `api_key` and `oauth`, filtered by the selected Pi provider's login capabilities. Start returns a bounded, temporary login session. Poll its state, render Pi's notices or authorization link, and answer its current prompt. Each prompt has its own ID so an old answer cannot complete a later step.
+
+Only the paired device that started a login can read or answer that session. Device revocation, cancellation, expiry and shutdown abort unfinished logins. Sessions are not resumed after daemon restart; saved credentials remain in Pi. List/status queries read Pi's current snapshot without starting login or refresh. Secrets entered into prompts are not returned in session state, and RPC logs record error codes rather than request/error payloads.
+
+## Request limits
+
+`limits.settings()` returns the complete policy. `limits.configure(patch)` changes selected fields in the shared settings table; omitted fields, including nested fields, stay unchanged. Defaults per daemon are 6,000 RPC requests/minute, 10 pairing redemptions/minute per connection address, 600 authenticated requests/minute per device, 32 active RPC handlers and 64 active watches.
+
+The public budget is checked before authentication. Peer addresses come from the listener, never forwarded headers; callers behind a reverse proxy share its redemption budget. Excess requests receive `RATE_LIMITED` with `retryAfter` in seconds. Active watches use a separate slot until completion, disconnect or revocation. Changing settings resets rate windows and preserves occupied slots. Rate counters reset on restart. These are RPC limits; Pi still owns accepted agent work, with no second execution queue.
 
 ## Device pairing
 
@@ -219,7 +244,7 @@ Claimed grants retain their timestamp after expiry. Unclaimed expired grants are
 
 The pairing API renders `qr.svg` for immediate display. `qr.payload` is the exact encoded JSON string: `{ version: 1, serverUrl, token, expiresAt }`. Clients can also render that string themselves. Supply the address the new device can reach; the API normalizes the HTTP(S) origin and rejects credentials, paths, query strings, fragments, and local bind/loopback addresses. Scanning requires the app's future QR reader; this is not an app deep link.
 
-Use HTTPS or the encrypted Tailscale path for remote pairing and requests. The native listener does not terminate TLS. No cookies or query-string tokens are accepted; foreign browser origins are rejected. QR scanning, desktop/mobile credential storage, browser UI integration, and throttling remain pending. See the [pairing plan](.agents/plans/main/05-auth-and-pairing.md).
+Use HTTPS or the encrypted Tailscale path for remote pairing and requests. The native listener does not terminate TLS. No cookies or query-string tokens are accepted; foreign browser origins are rejected. QR scanning, desktop/mobile credential storage, and browser UI integration remain pending. Request throttling is implemented through the limits service. See the [pairing plan](.agents/plans/main/05-auth-and-pairing.md).
 
 ## First RPC example
 
@@ -268,9 +293,13 @@ Bots store name, unique handle, instructions, provider/model, thinking level, av
 
 Create/update transactions write SQL only. `@openbots/server/native` workspace then creates and validates `agents/<botId>/` during configuration, including restore. Absolute paths are not stored in bot rows. Pi records the relative `agents/<botId>` working directory; the native execution environment resolves it against the data root.
 
+Bulk replacement uses `bots.swapModels({ botIds, from, to, includeFallbacks })`. `from` matches both `modelProvider` and `modelId`; `to` also supplies `thinkingLevel`. Only selected matching primary models change, and matching fallback models change only when `includeFallbacks` is true. The result counts actual primary and fallback changes. Missing selected bots or invalid model settings reject the entire SQL change.
+
+Settings save in one transaction, then affected bots use the existing configuration path. Preparation failure can leave the saved settings awaiting reconciliation on startup or submission; list bots before retrying. Already prepared model requests finish with their original model. Existing private contexts/subagents keep their configuration snapshots. The permission-gated `bot_swap_models` tool calls the same service and is not automatically replayed.
+
 Bots may set one optional `fallbackModel` with `modelProvider`, `modelId`, and `thinkingLevel`. It defaults to `null`; omitting it during an update preserves the setting, and `null` disables it. Both selections are checked against Pi's model catalog.
 
-When a request fails before producing output with an authentication, quota, or transient provider error, runtime tries the backup once using the same transcript and provider-session identity. Cancellation, context overflow, invalid requests, and failures after output do not trigger fallback. Each new request starts with the primary; the preferred model setting does not change. Pi still owns the generation, submissions, tool execution, and recovery. Completed tools are not replayed by fallback. Deferred provider jobs keep Pi's normal polling behavior; a later polling failure does not switch models.
+When a request fails before producing output or reporting token usage with an authentication, quota, or transient provider error, runtime tries the backup once using the same transcript and provider-session identity. Cancellation, context overflow, invalid requests, and failures after output do not trigger fallback. Each new request starts with the primary; the preferred model setting does not change. Pi still owns the generation, submissions, tool execution, and recovery. Completed tools are not replayed by fallback. Deferred provider jobs keep Pi's normal polling behavior; a later polling failure does not switch models.
 
 The two model selections are stored in Pi's agent model reference, so private contexts and subagents inherit them without a separate routing map. Responses and usage name the actual provider/model. Context capacity uses the smaller of the two model windows so compaction prepares a transcript either can accept. Provider caches remain separate; switching providers may require a fresh cache.
 
@@ -316,7 +345,7 @@ await client.conversation.setMuted({ botId, isMuted: true });
 await client.conversation.arrange({ botIds: orderedBotIds });
 ```
 
-These actions update the existing Pi index and stream to paired devices. `arrange` ranks the supplied chats and clears omitted ranks; pinning still takes precedence. Hide does not stop work or delete history. Mute records the notification preference; notification delivery and UI are not implemented yet.
+These actions update the existing Pi index and stream to paired devices. `arrange` ranks the supplied chats and clears omitted ranks; pinning still takes precedence. Hide does not stop work or delete history. Mute suppresses backend notification events for that bot, including its private contexts and subagents. Notification UI is not implemented.
 
 ## Skills and MCP discovery
 
@@ -356,7 +385,7 @@ MCP tool schemas are deferred. Pi's native `tool_search` loads matching definiti
 
 MCP source order is Pi's global `mcp.json`, `~/.agents/mcp.json`, configured MCP paths, bot `.agents/mcp.json`, then bot `.pi/mcp.json`. Shared sources require the bot's `mcp` inheritance flag. Each configured path may be a file or directory. Directories recursively scan `mcp.json` and `*.mcp.json`, skip `.git` and `node_modules`, follow symlinks without cycles, and sort resolved file paths. Later definitions replace the whole same-named entry. A malformed server override removes the earlier same-named entry and adds a diagnostic. Whole-file failures add diagnostics; the returned catalog can be partial.
 
-Use the standard `{ "mcpServers": { "name": { ... } } }` JSON shape. Discovery recognizes stdio commands and HTTP URLs, plus `enabled: false` or `disabled: true` on a complete definition. Stdio accepts `args`, `env`, and `cwd` (relative to the bot directory by default); Streamable HTTP accepts `headers`. Values are literal: shell substitutions and environment interpolation are not supported. `paths: []` clears additional sources, and omitted settings remain unchanged. MCP OAuth and composer rendering remain pending.
+Use the standard `{ "mcpServers": { "name": { ... } } }` JSON shape. Discovery recognizes stdio commands and HTTP URLs, plus `enabled: false` or `disabled: true` on a complete definition. Stdio accepts `args`, `env`, and `cwd` (relative to the bot directory by default); Streamable HTTP accepts `headers`. Values are literal: shell substitutions and environment interpolation are not supported. `paths: []` clears additional sources, and omitted settings remain unchanged. Composer rendering remains pending.
 
 Reference encrypted credentials by name with `envCredentials` for stdio or `headerCredentials` for HTTP:
 
@@ -372,6 +401,31 @@ Reference encrypted credentials by name with `envCredentials` for stdio or `head
 ```
 
 Set `mcp.example.authorization` through authenticated `credentials.set`; store the complete header value, including any authorization scheme. Referenced values replace literal values for the same environment/header name; HTTP header matching ignores case. Discovery checks key presence without decrypting. Preparation resolves secrets in memory; a missing/unreadable key omits that server and closes its prior client. Rotation reconnects on the next bot preparation (startup, bot configuration or submission), not immediately when the credential is saved. Catalogs contain neither values nor transport configuration.
+
+### MCP OAuth
+
+Paired devices authenticate a configured HTTP MCP server with `mcpAuth.start({ botId, name, redirectUrl })`. Openbots resolves `name` using the bot's inherited/local configuration; callers cannot supply a different MCP server URL. The client opens the returned authorization URL and captures its registered redirect, then sends the full callback URL to `mcpAuth.complete({ botId, name, callbackUrl })`. The server verifies the initiating device, redirect destination and OAuth state before Pi exchanges the code.
+
+`mcpAuth.status`, `mcpAuth.cancel` and `mcpAuth.logout` take `{ botId, name }`. Pi's `McpOAuthProvider`, `authorizeMcp` and `adaptOAuthProvider` own discovery, registration, PKCE, token exchange and refresh. OAuth state is encrypted through the shared credentials service and bound to the exact MCP URL; bots using that URL share the owner's login. Unfinished flows expire and are cancelled when their device is revoked. Restart keeps saved credentials but requires starting unfinished login flows again. No browser or callback listener is started by Openbots.
+
+Successful completion reconfigures the selected bot to reconnect and discover its tools. Other bots reconcile on their next configuration/submission. Ordinary connection setup does not start a new browser authorization flow. The frontend still needs to capture its redirect URL and render the login flow.
+
+## Backend notification events
+
+`conversation.watchNotifications()` provides one authenticated stream for the daemon. The shared client helper applies its Chord frames:
+
+```ts
+import { watchNotifications } from '@openbots/client/client';
+
+for await (const state of watchNotifications(client, controller.signal)) {
+  // state.pending: outstanding approval and question references
+  // state.recent: up to 32 reply and failure events observed by this watch
+}
+```
+
+Events contain identifiers for the bot, conversation, entry or task, plus expiry where relevant. Fetch the selected chat or existing approval/question endpoint for details. The stream carries no tool arguments, question text, provider errors or message bodies. Private contexts retain their own conversation ID and use their bot's main-chat mute preference; hiding a chat does not mute it.
+
+Each connection starts with current pending attention and an empty recent list. Completion events missed while disconnected are not replayed. Clients can compare stable event identifiers across snapshots and decide whether to show an OS notification; foreground suppression, sound and mobile push remain client work. Cancelling the stream or revoking its device ends observation without stopping agent work.
 
 ## Instruction files and plugins
 

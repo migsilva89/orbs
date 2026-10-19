@@ -111,7 +111,7 @@ Before adding infrastructure, inspect the installed library API and official exa
 - Skill service owns settings and inheritance. Runtime uses Pi `loadSkills` and `formatSkillsForPrompt`, including manual-only discovery. Shared inheritance can be disabled without hiding bot-local skills.
 - MCP service owns settings, inheritance, file discovery and merge policy. Runtime clients receive parsed configuration and own connections, tool registration, cancellation and disposal. Runtime does not call server discovery.
 - Catalog discovery reads files and current connection state; it never connects. Preparation reuses unchanged clients and closes replaced/disabled clients. Changes to tool definitions change their approval identity. Preserve persisted Pi identifiers across naming refactors.
-- Use Pi's standalone MCP client and Durable tools, not a CLI extension compatibility layer. Plugin modules default-export Durable extensions; discovery never imports them. Server preparation resolves encrypted credential references; catalogs never return secret values. MCP OAuth remains separate work. Exact source precedence and API examples belong in the [README](../../README.md).
+- Use Pi's standalone MCP client and Durable tools, not a CLI extension compatibility layer. Plugin modules default-export Durable extensions; discovery never imports them. Server preparation resolves encrypted credential references; catalogs never return secret values. MCP OAuth uses Pi’s native OAuth helpers with the same encrypted credential store. Exact source precedence and API examples belong in the [README](../../README.md).
 
 ## Transport and clients
 

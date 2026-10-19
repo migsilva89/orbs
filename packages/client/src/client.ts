@@ -16,7 +16,7 @@ export function makeClient({ connect, token, serverId, url }: ClientOptions): Cl
   const retry = new RetryLinkPlugin({
     default: {
       retry: ({ path }) => match(path)
-        .with(['conversation', P.union('watch', 'watchList', 'watchContexts', 'history')], () => Number.POSITIVE_INFINITY)
+        .with(['conversation', P.union('watch', 'watchList', 'watchContexts', 'watchNotifications', 'history')], () => Number.POSITIVE_INFINITY)
         .otherwise(() => 0),
       shouldRetry: ({ error, signal }) => !signal?.aborted && error instanceof Error && error.name === 'AbortError',
     },

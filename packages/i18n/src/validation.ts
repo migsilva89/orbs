@@ -56,6 +56,10 @@ function validationMessage(key: string, params: ValidationParams): string {
   };
 
   return match(key)
+    .with('validation_backup_manifest', () => m.validation_backup_manifest())
+    .with('validation_backup_checksum', () => m.validation_backup_checksum())
+    .with('validation_oauth', () => m.validation_oauth())
+    .with('validation_provider_login_unsupported', () => m.validation_provider_login_unsupported())
     .with('validation_required', () => m.validation_required(p))
     .with('validation_number', () => m.validation_number(p))
     .with('validation_email', () => m.validation_email())

@@ -6,12 +6,14 @@ import {
   botToolCreateParameters,
   botToolGet,
   botToolGetParameters,
+  botToolSwapModels,
+  botToolSwapModelsParameters,
   botToolUpdate,
   botToolUpdateParameters,
 } from '../../types/runtime-bot-tools.types';
 import { runtimeQueryModels } from './runtime-query.models';
 import type { RuntimeBotToolsDeps } from '../../types/runtime-bot-tools.types';
-import type { Bot, BotCatalog } from '@openbots/contracts/universal';
+import type { Bot, BotCatalog, BotSwapModelsResult } from '@openbots/contracts/universal';
 
 export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
   const get = defineTool({
@@ -47,6 +49,17 @@ export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
     },
   });
 
+  const swapModels = defineTool({
+    name: 'bot_swap_models',
+    description: m.ui_tool_bot_swap_models_description(),
+    parameters: botToolSwapModelsParameters,
+    replay: 'unsafe',
+    execute: async (params) => {
+      const input = botToolSwapModels.parse(params);
+      return runtimeBotToolsOutput(await deps.bots.actions.swapModels(input));
+    },
+  });
+
   const catalog = defineTool({
     name: 'bot_catalog',
     description: m.ui_tool_bot_catalog_description(),
@@ -69,12 +82,12 @@ export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
   return {
     extension: defineExtension({
       name: 'openbots.bot-tools',
-      tools: [get, create, update, catalog, models],
+      tools: [get, create, update, swapModels, catalog, models],
     }),
     readOnlyTools: [get, catalog, models],
   };
 }
 
-function runtimeBotToolsOutput(value: Bot | BotCatalog | Awaited<ReturnType<typeof runtimeQueryModels>>) {
+function runtimeBotToolsOutput(value: Bot | BotCatalog | BotSwapModelsResult | Awaited<ReturnType<typeof runtimeQueryModels>>) {
   return { output: [{ type: 'text' as const, text: JSON.stringify(value) }] };
 }

@@ -1,6 +1,9 @@
 export { makeStorageService } from './services/storage/storage.service';
+export { makeStorageLockService } from './services/storage/storage-lock.service';
 export { makeSkillLoaderService } from './services/skill/skill.service';
 export { makeMcpClientService } from './services/mcp/mcp.service';
+export { makeMcpAuthService } from './services/mcp-auth/mcp-auth.service';
+export { makeProviderService } from './services/provider/provider.service';
 export { runtimeEnvNative } from './services/runtime/runtime-env.utils';
 export { makePluginLoaderService } from './services/plugin/plugin.service';
 export { makeInstructionLoaderService } from './services/instruction/instruction.service';

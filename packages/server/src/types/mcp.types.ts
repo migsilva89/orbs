@@ -18,6 +18,10 @@ export interface McpPrepareParams extends McpBotParams {
   settings: McpSettings;
 }
 
+export interface McpTargetParams extends McpBotParams {
+  name: string;
+}
+
 export interface McpConfigParams {
   botId: string;
   paths: string[];

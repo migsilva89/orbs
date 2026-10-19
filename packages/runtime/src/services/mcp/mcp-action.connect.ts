@@ -12,8 +12,12 @@ export async function mcpActionConnect(deps: McpClientServiceDeps, { botId, entr
   const sourceFingerprint = entry.sourceFingerprint ?? fingerprint;
   const previous = deps.connections.get(key);
 
+  const authProvider = await match(entry.config)
+    .with({ url: P.string }, ({ url }) => deps.auth.provider({ serverUrl: url }))
+    .otherwise(() => undefined);
+
   return match(previous)
-    .when((connection): connection is McpConnection => connection?.fingerprint === fingerprint && !connection.error
+    .when((connection): connection is McpConnection => connection?.fingerprint === fingerprint && connection.authProvider === authProvider && !connection.error
       && ['connecting', 'connected', 'idle'].includes(connection.client.connectionState), async (connection) => {
       await connection.ready;
 
@@ -39,6 +43,7 @@ export async function mcpActionConnect(deps: McpClientServiceDeps, { botId, entr
         fingerprint,
         sourceFingerprint,
         client,
+        authProvider,
         tools: [],
         catalog: [],
         ready: Promise.resolve(),
@@ -55,14 +60,18 @@ export async function mcpActionConnect(deps: McpClientServiceDeps, { botId, entr
           await previous?.client.close();
           await previous?.ready;
 
-          const transport = match(entry.config)
+          const transport = await match(entry.config)
             .with({ command: P.string }, (config) => new StdioTransport({
               command: config.command,
               args: config.args,
               env: config.env,
               cwd: resolve(directory, config.cwd ?? '.'),
             }))
-            .otherwise((config) => new StreamableHttpTransport({ url: config.url, headers: config.headers }));
+            .otherwise(async (config) => new StreamableHttpTransport({
+              url: config.url,
+              headers: config.headers,
+              authProvider,
+            }));
 
           await client.connect(transport);
           await mcpActionConnectTools(connection, entry.name);

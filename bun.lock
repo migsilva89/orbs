@@ -164,7 +164,9 @@
         "@openbots/errors": "workspace:*",
         "@openbots/logger": "workspace:*",
         "@openbots/runtime": "workspace:*",
+        "@orpc/ratelimit": "catalog:",
         "@orpc/server": "catalog:",
+        "@orpc/shared": "catalog:",
         "@typesafe-ai/sdk": "catalog:",
         "kysely": "catalog:",
         "ts-pattern": "catalog:",
@@ -226,7 +228,9 @@
     "@json-render/core": "0.21.1",
     "@orpc/client": "2.0.0-beta.39",
     "@orpc/contract": "2.0.0-beta.39",
+    "@orpc/ratelimit": "2.0.0-beta.39",
     "@orpc/server": "2.0.0-beta.39",
+    "@orpc/shared": "2.0.0-beta.39",
     "@t3-oss/env-core": "^0.13.11",
     "@tanstack/router-core": "^1.171.32",
     "@types/bun": "1.4.2",
@@ -469,6 +473,8 @@
     "@orpc/client": ["@orpc/client@2.0.0-beta.39", "", { "dependencies": { "@orpc/shared": "2.0.0-beta.39", "@standard-server/core": "~0.9.2", "@standard-server/fetch": "~0.9.2", "@standard-server/peer": "~0.9.2" } }, "sha512-S8F9e3FQK3r0RVvm2x80gQ6vdbWTvc0C4oA20DkYVi/XYd9JUKDfyWRPiAJE9nsYdG0lZOXATnKC/D694AySbw=="],
 
     "@orpc/contract": ["@orpc/contract@2.0.0-beta.39", "", { "dependencies": { "@orpc/client": "2.0.0-beta.39", "@orpc/shared": "2.0.0-beta.39", "@standard-schema/spec": "^1.1.0" } }, "sha512-ukUvMTLu64jXw5XCsd5nS1FgxNyMLquy2EZwVVSvGLhJ/POSIb1oudw8jJfy0MbTx2JkVrmxrzhvazVQiz3f/Q=="],
+
+    "@orpc/ratelimit": ["@orpc/ratelimit@2.0.0-beta.39", "", { "dependencies": { "@orpc/server": "2.0.0-beta.39", "@orpc/shared": "2.0.0-beta.39", "@standard-server/core": "~0.9.2" }, "peerDependencies": { "@upstash/ratelimit": ">=2.0.8", "redis": ">=6.0.0" }, "optionalPeers": ["@upstash/ratelimit", "redis"] }, "sha512-xCEw/Rs4GvrWyeUzeFO7WTcjYJMUZ6sEU3tZxd6K621uoYxFt9nO7vKaV9OEjFaq+9rSawhcY3UZsd4vZI+CZw=="],
 
     "@orpc/server": ["@orpc/server@2.0.0-beta.39", "", { "dependencies": { "@orpc/client": "2.0.0-beta.39", "@orpc/contract": "2.0.0-beta.39", "@orpc/shared": "2.0.0-beta.39", "@standard-server/aws-lambda": "~0.9.2", "@standard-server/core": "~0.9.2", "@standard-server/fastify": "~0.9.2", "@standard-server/fetch": "~0.9.2", "@standard-server/node": "~0.9.2", "@standard-server/peer": "~0.9.2", "cookie": "^2.0.1" }, "peerDependencies": { "crossws": ">=0.3.4", "fastify": ">=5.6.1" }, "optionalPeers": ["crossws", "fastify"] }, "sha512-8sX8UDvJL49rYjF2a2JhjkDMLn8jv9aWWI1mE5A2a7zT2aDM59aapFNGaJ7lttbq8o1qvufsiw8iIuyA9jdOKQ=="],
 

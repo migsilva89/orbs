@@ -1,6 +1,6 @@
 import { authedRouter } from './rpc.procedures';
 
-export const artifacts = authedRouter.artifacts.router({
+export const artifacts = {
   list: authedRouter.artifacts.list.handler(async ({ context, input }) => context.artifacts.queries.list(input)),
   get: authedRouter.artifacts.get.handler(async ({ context, input }) => context.artifacts.queries.get(input)),
   versions: authedRouter.artifacts.versions.handler(async ({ context, input }) => context.artifacts.queries.versions(input)),
@@ -9,4 +9,4 @@ export const artifacts = authedRouter.artifacts.router({
   update: authedRouter.artifacts.update.handler(async ({ context, input }) => context.artifacts.actions.update(input)),
   saveState: authedRouter.artifacts.saveState.handler(async ({ context, input }) => context.artifacts.actions.saveState(input)),
   restore: authedRouter.artifacts.restore.handler(async ({ context, input }) => context.artifacts.actions.restore(input)),
-});
+};

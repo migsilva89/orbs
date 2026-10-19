@@ -2,18 +2,20 @@ import { mcpActionConfigure } from './mcp-action.configure';
 import { mcpActionPrepare } from './mcp-action.prepare';
 import { mcpQueryDiscover } from './mcp-query.discover';
 import { mcpQuerySettings } from './mcp-query.settings';
-import type { McpBotParams, McpPrepareParams, McpServiceDeps } from '../../types/mcp.types';
+import { mcpQueryTarget } from './mcp-query.target';
+import type * as McpTypes from '../../types/mcp.types';
 import type { McpConfigureInput } from '@openbots/contracts/universal';
 
-export function makeMcpService(deps: McpServiceDeps) {
+export function makeMcpService(deps: McpTypes.McpServiceDeps) {
   return {
     actions: {
       configure: (params: McpConfigureInput) => mcpActionConfigure(deps, params),
-      prepare: (params: McpPrepareParams) => mcpActionPrepare(deps, params),
+      prepare: (params: McpTypes.McpPrepareParams) => mcpActionPrepare(deps, params),
     },
     queries: {
       settings: () => mcpQuerySettings(deps),
-      discover: (params: McpBotParams) => mcpQueryDiscover(deps, params),
+      discover: (params: McpTypes.McpBotParams) => mcpQueryDiscover(deps, params),
+      target: (params: McpTypes.McpTargetParams) => mcpQueryTarget(deps, params),
     },
   };
 }

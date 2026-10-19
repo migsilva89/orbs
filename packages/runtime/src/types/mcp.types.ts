@@ -1,11 +1,13 @@
 import { credentialsKey } from '@openbots/contracts/universal';
 import { z } from 'zod';
+import type { McpAuthService } from '../services/mcp-auth/mcp-auth.service';
 import type { ToolRegistration } from '@earendil-works/pi-durable';
-import type { McpClient } from '@earendil-works/pi-mcp';
+import type { AuthProvider, McpClient } from '@earendil-works/pi-mcp';
 import type { McpCatalog } from '@openbots/contracts/universal';
 
 export interface McpClientServiceDeps {
   root: string;
+  auth: McpAuthService;
   connections: Map<string, McpConnection>;
 }
 
@@ -25,6 +27,7 @@ export interface McpConnection {
   fingerprint: string;
   sourceFingerprint: string;
   client: McpClient;
+  authProvider?: AuthProvider;
   tools: ToolRegistration[];
   catalog: McpCatalog['servers'][number]['tools'];
   ready: Promise<void>;

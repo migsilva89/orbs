@@ -5,6 +5,7 @@ import { CodingTools } from '@earendil-works/pi-durable/tools';
 import { makeArtifactService } from '../artifact/artifact.service';
 import { collaborationExtension } from '../collaboration/collaboration.extension';
 import { makeConversationIndexService } from '../conversation-index/conversation-index.service';
+import { makeNotificationService } from '../notification/notification.service';
 import { makeQuestionService, questionExtension } from '../question/question.service';
 import { makeRoutineService, routineExtension } from '../routine/routine.service';
 import { subagentExtension } from '../subagent/subagent.service';
@@ -143,6 +144,8 @@ export async function makeRuntimeService({
     extensions: [...extensions, permissionExtension],
   };
 
+  const notifications = makeNotificationService({ harness });
+
   return {
     actions: {
       restoreArtifact: (params: UniversalTypes.ArtifactRestoreInput, context = BACKGROUND_CONTEXT) => runtimeActionRestoreArtifact(deps, params, context),
@@ -230,6 +233,7 @@ export async function makeRuntimeService({
       ),
     },
     watchConversations: (context = BACKGROUND_CONTEXT) => deps.index.watch(context),
+    watchNotifications: (context = BACKGROUND_CONTEXT) => notifications.watch(context),
     watchContexts: (params: RuntimeTypes.RuntimeConversationParams, context = BACKGROUND_CONTEXT) => (
       runtimeQueryWatchContexts(deps, params, context)
     ),

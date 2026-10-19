@@ -64,8 +64,22 @@ export const botCatalog = z.object({
   instructions: instructionCatalog,
 });
 
+export const botSwapModels = z.object({
+  botIds: z.array(z.uuid()).min(1).max(1000).refine((ids) => new Set(ids).size === ids.length),
+  from: modelSelection.pick({ modelProvider: true, modelId: true }),
+  to: modelSelection,
+  includeFallbacks: z.boolean().default(false),
+});
+
+export const botSwapModelsResult = z.object({
+  primary: z.number().int().nonnegative(),
+  fallbacks: z.number().int().nonnegative(),
+});
+
 export type Bot = z.infer<typeof bot>;
 export type BotCreateInput = z.infer<typeof botCreate>;
 export type BotUpdateInput = z.infer<typeof botUpdate>;
 export type BotGetInput = z.infer<typeof botGet>;
 export type BotCatalog = z.infer<typeof botCatalog>;
+export type BotSwapModelsInput = z.infer<typeof botSwapModels>;
+export type BotSwapModelsResult = z.infer<typeof botSwapModelsResult>;

@@ -25,7 +25,7 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
         ))
         .with({ path: P.union('/rpc', P.string.startsWith('/rpc/')), method: 'POST' }, () => rpc.http.handle(request, {
           prefix: '/rpc',
-          context: rpc.context,
+          context: { ...rpc.context, peerAddress: server.requestIP(request)?.address ?? null },
         }).then((result) => match(result)
           .with({ matched: true }, ({ response }) => {
             response.headers.set('Cache-Control', 'no-store');
@@ -46,7 +46,9 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
       backpressureLimit: 64 * 1024,
       closeOnBackpressureLimit: true,
       async message(socket, message) {
-        await rpc.websocket.message(socket, message, { context: rpc.context });
+        await rpc.websocket.message(socket, message, {
+          context: { ...rpc.context, peerAddress: socket.remoteAddress },
+        });
       },
       async close(socket) {
         await rpc.websocket.close(socket);

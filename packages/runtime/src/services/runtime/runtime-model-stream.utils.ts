@@ -25,6 +25,8 @@ export function runtimeModelStream(models: Models, { route, context, options }: 
             && !hasOutput && !options?.signal?.aborted
             && primary !== undefined && fallback !== undefined
             && (primary.provider !== fallback.provider || primary.id !== fallback.id)
+            && !runtimeModelHasOutput(event.error)
+            && event.error.usage.totalTokens === 0 && event.error.usage.cost.total === 0
             && runtimeModelCanFallback(event.error);
 
           await match({ shouldFallback, fallback })
@@ -37,7 +39,7 @@ export function runtimeModelStream(models: Models, { route, context, options }: 
             })
             .otherwise(() => stream.push(event));
 
-          hasOutput ||= event.type !== 'error' && event.type !== 'done' && event.partial.content.length > 0;
+          hasOutput ||= event.type !== 'error' && event.type !== 'done' && runtimeModelHasOutput(event.partial);
         }
       })
       .otherwise(() => {
@@ -81,12 +83,20 @@ function runtimeModelOptions(selection: ModelSelection, model: Model<Api>, optio
   return {
     ...options,
     reasoning: match(selection.thinkingLevel).with('off', () => undefined).otherwise((level) => level),
-    maxTokens: Math.min(options?.maxTokens ?? model.maxTokens, model.maxTokens),
+    maxTokens: match(options?.maxTokens).with(P.number, (tokens) => Math.min(tokens, model.maxTokens)).otherwise(() => undefined),
   };
 }
 
 function runtimeModelCanFallback(message: AssistantMessage) {
   return message.stopReason === 'error' && !isContextOverflow(message)
     && (isRetryableAssistantError(message)
-      || /\b(401|403)\b|not configured|no (?:api key|credentials)|unauthorized|authentication|oauth|token.*(?:expired|invalid)|insufficient_quota|quota exceeded|billing|usage limit/i.test(message.errorMessage ?? ''));
+      || /\b(401|403)\b|not configured|no (?:api key|credentials)|unauthorized|authentication|\bauth\b|oauth|token.*(?:expired|invalid)|insufficient_quota|quota exceeded|billing|usage limit/i.test(message.errorMessage ?? ''));
+}
+
+function runtimeModelHasOutput(message: AssistantMessage) {
+  return message.content.some((block) => match(block)
+    .with({ type: 'text' }, ({ text }) => text.length > 0)
+    .with({ type: 'thinking' }, ({ thinking }) => thinking.length > 0)
+    .with({ type: 'toolCall' }, () => true)
+    .exhaustive());
 }

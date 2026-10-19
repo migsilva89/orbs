@@ -1,4 +1,3 @@
-import { authPair } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { getLocale } from '@openbots/i18n/runtime';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
@@ -8,6 +7,7 @@ import { ButtonLoading } from '@/components/ui/button-loading';
 import { FormErrors } from '@/components/ui/forms/form';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/components/ui/panel';
 import { toasty } from '@/components/ui/sonner';
+import { clipboardCopy } from '@/lib/clipboard';
 import { connectionRead } from '@/services/connection/connection.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCopy from '~icons/lucide/copy';
@@ -20,7 +20,8 @@ export function SettingsDevices() {
   const current = connectionRead();
   const date = new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium' });
   const pair = useMutation(rpc.pairing.create.mutationOptions());
-  const isLoopback = current ? !authPair.safeParse({ serverUrl: current.serverUrl }).success : false;
+  const hostname = current ? new URL(current.serverUrl).hostname : '';
+  const isLoopback = hostname === 'localhost' || hostname === '[::1]' || hostname.startsWith('127.') || hostname.endsWith('.localhost');
   const revoke = useMutation(rpc.devices.revoke.mutationOptions({ onSuccess: () => queryClient.invalidateQueries({ queryKey: rpc.devices.list.key() }) }));
 
   return (
@@ -68,18 +69,20 @@ export function SettingsDevices() {
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => void navigator.clipboard.writeText(pair.data.qr.payload).then(() => toasty(m.settings_devices_pair_copied(), '📋'))}
+                onClick={() => void clipboardCopy(pair.data.qr.payload)
+                  .then(() => toasty(m.settings_devices_pair_copied(), '📋'))
+                  .catch(() => toasty(m.ui_copy_failed(), '🔴'))}
               >
                 <IconCopy />
                 {m.settings_devices_pair_copy()}
               </Button>
             </div>
           ) : null}
-          <FormErrors error={isLoopback ? m.settings_devices_pair_loopback() : null} />
+          {isLoopback ? <PanelDescription>{m.settings_devices_pair_loopback()}</PanelDescription> : null}
           <FormErrors error={pair.isError ? m.settings_devices_pair_error() : null} />
           <ButtonLoading
             className="self-start"
-            disabled={!current || isLoopback}
+            disabled={!current}
             loading={pair.isPending}
             size="sm"
             variant="outline"

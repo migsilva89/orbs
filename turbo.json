@@ -13,6 +13,38 @@
         "src/entry.vite.ts"
       ]
     },
+    "dev": {
+      "dependsOn": [
+        "@openbots/i18n#i18n:compile"
+      ],
+      "persistent": true,
+      "cache": false
+    },
+    "@openbots/web#dev": {
+      "with": [
+        "@openbots/daemon#dev"
+      ]
+    },
+    "dev:macos": {
+      "with": [
+        "@openbots/daemon#dev"
+      ],
+      "persistent": true,
+      "cache": false
+    },
+    "build": {
+      "dependsOn": [
+        "^build",
+        "@openbots/i18n#i18n:compile"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
+    },
+    "start": {
+      "persistent": true,
+      "cache": false
+    },
     "check": {
       "dependsOn": [
         "^check",

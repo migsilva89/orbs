@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev --port 47190",
+    "dev": "OPENBOTS_DAEMON_URL=http://127.0.0.1:47191 vite dev --port 47190 --strictPort",
     "build": "vite build",
     "start": "bun src/application/server.bun.ts",
     "check": "tsc --noEmit",

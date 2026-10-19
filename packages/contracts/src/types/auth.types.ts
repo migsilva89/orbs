@@ -13,8 +13,7 @@ export const authGrantStatus = authRedeem.pick({ token: true });
 export const authPair = z.object({
   serverUrl: z.url({ protocol: /^https?$/ }).max(512).transform((value) => new URL(value)).refine((url) => {
     return !url.username && !url.password && !url.search && !url.hash && url.pathname === '/'
-      && !['0.0.0.0', '[::]', '[::1]', 'localhost'].includes(url.hostname)
-      && !url.hostname.startsWith('127.') && !url.hostname.endsWith('.localhost');
+      && !['0.0.0.0', '[::]'].includes(url.hostname);
   }, 'Use a reachable HTTP or HTTPS server origin').transform((url) => url.origin),
 });
 
@@ -31,10 +30,10 @@ export const authPairPayload = z.object({
   expiresAt: z.number().int(),
 });
 
-/** The pairing QR text: the JSON payload a new device scans or pastes. */
-export const authPairCode = z.string().transform((code, context) => {
+/** The URL-safe Base64 pairing payload a new device scans or pastes. */
+export const authPairCode = z.string().trim().transform((code, context) => {
   try {
-    return JSON.parse(code) as z.input<typeof authPairPayload>;
+    return JSON.parse(atob(code.replaceAll('-', '+').replaceAll('_', '/'))) as z.input<typeof authPairPayload>;
   } catch {
     context.addIssue({ code: 'custom', message: 'connect_code_invalid' });
     return z.NEVER;

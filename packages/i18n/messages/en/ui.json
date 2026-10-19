@@ -1,6 +1,7 @@
 {
   "ui_cancel": "Cancel",
   "ui_close": "Close",
+  "ui_copy_failed": "Copy failed. Check your browser permissions.",
   "ui_show_more": "Show more",
   "ui_show_less": "Show less",
   "ui_command_compact_description": "Summarize older context while keeping conversation history.",

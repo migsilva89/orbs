@@ -1,10 +1,10 @@
 {
-  "name": "@orbs/desktop",
+  "name": "@openbots/desktop",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:macos": "bun ../../scripts/desktop-bundle.ts && ORBS_HOME=$HOME/.config/orbs-dev ORBS_WEB_DEV=$(cd ../web && pwd) electrobun dev",
+    "dev:macos": "bun ../../scripts/desktop-bundle.ts && OPENBOTS_DATA_DIR=$HOME/.config/openbots-dev OPENBOTS_WEB_DEV=$(cd ../web && pwd) electrobun dev",
     "build:macos": "bun ../../scripts/desktop-bundle.ts && electrobun build --env=stable",
     "check": "electrobun prepare && tsc --noEmit",
     "lint": "electrobun prepare && oxlint src/ electrobun.config.ts -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
@@ -12,12 +12,12 @@
     "release:macos": "bun ../../scripts/desktop-release.ts"
   },
   "dependencies": {
-    "@orbs/env": "workspace:*",
-    "@orbs/i18n": "workspace:*",
+    "@openbots/env": "workspace:*",
+    "@openbots/i18n": "workspace:*",
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@orbs/typescript-config": "workspace:*",
+    "@openbots/typescript-config": "workspace:*",
     "@types/bun": "1.4.2",
     "electrobun": "2.0.2",
     "typescript": "^7.0.2"

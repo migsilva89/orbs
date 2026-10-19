@@ -19,7 +19,7 @@ Bot backend with a native daemon, device pairing, bot configuration, and authent
 - Services have concrete domain ownership and receive whole service dependencies. Skill/MCP settings and discovery belong to those domains; a combined response does not justify a catchall service.
 - User-facing copy uses English keys in `packages/i18n/messages/en/`. Remove matching Portuguese keys when deleting or renaming a key.
 - Preserve architecture, lint, TypeScript, and Fallow rules. Changes to these contracts require the user's explicit request; never weaken them to pass a check.
-- Keep development data and credentials separate from production. Never start, restart, or stop a dev server yourself.
+- Keep development data and credentials separate from production. User owns the web server, ask before stopping, restart or starting new ones. Open them in paseo terminal
 - Run existing checks. Add tests only when the user asks.
 - After a substantial set of code changes, run the `review` skill in full (simplify, code, blast), fix findings within the authorized task, and rerun affected checks before reporting completion. Do not wait for a separate fix request.
 

@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Separator } from '@/components/ui/separator';
 import { toasty } from '@/components/ui/sonner';
 import { useIsTouch } from '@/hooks/use-is-touch';
+import { clipboardCopy } from '@/lib/clipboard';
 import { cn } from '@/lib/cn';
 import { roomsMessageText } from '@/services/rooms/rooms.client';
 import { ROOMS } from '@/services/rooms/rooms.constants';
@@ -45,7 +46,7 @@ export function RoomsChatActions({
   const info = <RoomsChatInfo message={message} />;
 
   const copy = async () => {
-    await navigator.clipboard.writeText(roomsMessageText(message));
+    await clipboardCopy(roomsMessageText(message));
     setCopied(true);
     setTimeout(() => setCopied(false), ROOMS.copiedMs);
   };
@@ -75,7 +76,7 @@ export function RoomsChatActions({
           size="icon-xs"
           title={m.rooms_chat_copy()}
           variant="quiet"
-          onClick={() => void copy()}
+          onClick={() => void copy().catch(() => toasty(m.ui_copy_failed(), '🔴'))}
         >
           {copied ? <IconCheck className="size-3.5" /> : <IconCopy className="size-3.5" />}
         </Button>
@@ -134,7 +135,9 @@ export function RoomsChatActions({
                   className="justify-start"
                   size="lg"
                   variant="ghost"
-                  onClick={() => fromSheet(() => void copy().then(() => toasty(m.rooms_chat_copied(), '📋')))}
+                  onClick={() => fromSheet(() => void copy()
+                    .then(() => toasty(m.rooms_chat_copied(), '📋'))
+                    .catch(() => toasty(m.ui_copy_failed(), '🔴')))}
                 >
                   <IconCopy className="size-4 text-muted-foreground" />
                   {m.rooms_chat_copy()}

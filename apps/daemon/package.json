@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "OPENBOTS_DATA_DIR=$HOME/.config/openbots-dev OPENBOTS_HOST=127.0.0.1 OPENBOTS_PORT=47191 OPENBOTS_PUBLIC_URL=http://localhost:47190 bun --watch src/entry.native.ts",
     "start": "bun src/entry.native.ts",
     "backup": "bun src/entry-backup.native.ts",
     "check": "tsc --noEmit",

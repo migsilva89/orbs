@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/components/ui/panel';
 import { toasty } from '@/components/ui/sonner';
 import { StatusDot } from '@/components/ui/status-dot';
+import { clipboardCopy } from '@/lib/clipboard';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCopy from '~icons/lucide/copy';
 import IconMonitor from '~icons/lucide/monitor';
@@ -61,7 +62,9 @@ export function SettingsDesktop() {
                   size="sm"
                   type="button"
                   variant="ghost"
-                  onClick={() => void navigator.clipboard.writeText(address).then(() => toasty(m.desktop_connection_copied(), '📋'))}
+                  onClick={() => void clipboardCopy(address)
+                    .then(() => toasty(m.desktop_connection_copied(), '📋'))
+                    .catch(() => toasty(m.ui_copy_failed(), '🔴'))}
                 >
                   <IconCopy />
                   {m.desktop_copy()}

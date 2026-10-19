@@ -8,6 +8,7 @@ export interface ProviderServiceDeps {
 
 export interface ProviderLoginParams extends UniversalTypes.ProviderLoginInput {
   deviceId: string;
+  serverId: string;
 }
 
 export interface ProviderCompleteParams extends UniversalTypes.ProviderCompleteInput {

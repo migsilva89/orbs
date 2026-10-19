@@ -10,10 +10,11 @@ export function chatViewOptions(target: UniversalTypes.ConversationTarget) {
     queryKey: rpc.conversation.watch.queryKey({ input: target }),
     queryFn: streamedQuery({
       streamFn: ({ signal }) => watchConversation(rpcClient, target, signal),
+      refetchMode: 'append',
       reducer: (_view: UniversalTypes.ConversationView | null, next: UniversalTypes.ConversationView) => next,
       initialValue: null,
     }),
-    staleTime: Number.POSITIVE_INFINITY,
+    staleTime: 0,
   });
 }
 
@@ -22,10 +23,11 @@ export function chatNotificationsOptions() {
     queryKey: rpc.conversation.watchNotifications.queryKey(),
     queryFn: streamedQuery({
       streamFn: ({ signal }) => watchNotifications(rpcClient, signal),
+      refetchMode: 'append',
       reducer: (_state: UniversalTypes.NotificationState | null, next: UniversalTypes.NotificationState) => next,
       initialValue: null,
     }),
-    staleTime: Number.POSITIVE_INFINITY,
+    staleTime: 0,
   });
 }
 
@@ -48,9 +50,10 @@ export function chatContextsWatchOptions(target: UniversalTypes.ConversationTarg
     queryKey: rpc.conversation.watchContexts.queryKey({ input: target }),
     queryFn: streamedQuery({
       streamFn: ({ signal }) => watchConversationContexts(rpcClient, target, signal),
+      refetchMode: 'append',
       reducer: (_state: UniversalTypes.ConversationContextWatchState | null, next: UniversalTypes.ConversationContextWatchState) => next,
       initialValue: null,
     }),
-    staleTime: Number.POSITIVE_INFINITY,
+    staleTime: 0,
   });
 }

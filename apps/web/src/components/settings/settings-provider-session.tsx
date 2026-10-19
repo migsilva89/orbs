@@ -37,7 +37,12 @@ export function SettingsProviderSession({ session: started, onClose }: SettingsP
 
   return (
     <div className="flex flex-col gap-2 rounded-lg border p-3 text-sm">
-      {session.events.map((event, index) => match(event)
+      {match(session.status)
+        .with('completed', () => <output>{m.settings_providers_login_completed()}</output>)
+        .with('cancelled', () => <output>{m.settings_providers_login_cancelled()}</output>)
+        .with('pending', 'failed', () => null)
+        .exhaustive()}
+      {isPending ? session.events.map((event, index) => match(event)
         .with({ type: 'auth_url' }, ({ url, instructions }) => (
           <p key={index}>
             {instructions ?? m.settings_providers_open_link()}
@@ -64,8 +69,8 @@ export function SettingsProviderSession({ session: started, onClose }: SettingsP
         ))
         .with({ type: 'info' }, ({ message }) => <p className="text-muted-foreground" key={index}>{message}</p>)
         .with({ type: 'progress' }, ({ message }) => <p className="text-muted-foreground" key={index}>{message}</p>)
-        .exhaustive())}
-      {prompt?.type === 'select' ? (
+        .exhaustive()) : null}
+      {isPending && prompt?.type === 'select' ? (
         <div className="flex flex-col gap-1">
           <p>{prompt.message}</p>
           {prompt.options.map((option) => (
@@ -86,7 +91,7 @@ export function SettingsProviderSession({ session: started, onClose }: SettingsP
           ))}
         </div>
       ) : null}
-      {prompt && prompt.type !== 'select' ? (
+      {isPending && prompt && prompt.type !== 'select' ? (
         <form
           className="flex flex-col gap-2"
           onSubmit={(event) => {

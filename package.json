@@ -110,6 +110,11 @@
     "fallow": "catalog:"
   },
   "scripts": {
+    "dev:web": "turbo run dev --filter=@openbots/web --log-prefix=none --env-mode=loose",
+    "dev:desktop": "turbo run dev:macos --filter=@openbots/desktop --log-prefix=none --env-mode=loose",
+    "build:web": "turbo run build --filter=@openbots/web",
+    "start:web": "turbo run start --filter=@openbots/web --log-prefix=none --env-mode=loose",
+    "start:daemon": "turbo run start --filter=@openbots/daemon --log-prefix=none --env-mode=loose",
     "check": "turbo run check",
     "test": "turbo run test",
     "test:ci": "turbo run test -- --bail=1",

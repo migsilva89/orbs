@@ -79,6 +79,7 @@ export function providerActionLogin(deps: ProviderTypes.ProviderServiceDeps, par
     notify: (event) => providerPushEvent(session, event),
   }, {
     agentName: PROVIDER.agentName,
+    getDeviceId: () => params.serverId,
   }).then(() => {
     providerFinish(session, 'completed');
   }).catch((error: unknown) => {

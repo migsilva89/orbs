@@ -11,7 +11,8 @@ export interface ArtifactConversationParams {
 }
 
 export type ArtifactListParams = ArtifactConversationParams;
-export type ArtifactCreateParams = ContractTypes.ArtifactCreateInput & ArtifactConversationParams;
+/** `id` is set only when clear-history carries an artifact into a fresh store. */
+export type ArtifactCreateParams = ContractTypes.ArtifactCreateInput & ArtifactConversationParams & { id?: string };
 export type ArtifactGetParams = ContractTypes.ArtifactGetInput & ArtifactConversationParams;
 export type ArtifactUpdateParams = ContractTypes.ArtifactUpdateInput & ArtifactConversationParams;
 export type ArtifactSaveStateParams = ContractTypes.ArtifactSaveStateInput & ArtifactConversationParams;

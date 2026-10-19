@@ -45,7 +45,7 @@ export function artifactAssertCurrent(record: ArtifactRecord, version: number) {
     .exhaustive();
 }
 
-export function artifactAssertSpec(spec: ArtifactSpec) {
+function artifactAssertSpec(spec: ArtifactSpec) {
   match(artifactSpecIssues(spec))
     .with([], () => undefined)
     .otherwise(() => {

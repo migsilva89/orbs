@@ -1,25 +1,12 @@
 import { Errors } from '@openbots/errors/universal';
 import { match } from 'ts-pattern';
 import { botQueryGet } from './bot-query.get';
+import { botQueue } from './bot.utils';
 import type { BotConfiguration, BotServiceDeps } from '../../types/bot.types';
 import type { Bot, BotGetInput } from '@openbots/contracts/universal';
 
-export async function botActionConfigure(deps: BotServiceDeps, { botId }: BotGetInput) {
-  const previous = deps.configurations.get(botId) ?? Promise.resolve();
-  const current = previous.then(botConfigure);
-  const settled = current.then(() => undefined, () => undefined);
-  deps.configurations.set(botId, settled);
-
-  try {
-    return await current;
-  } finally {
-    match(deps.configurations.get(botId) === settled)
-      .with(true, () => {
-        deps.configurations.delete(botId);
-      })
-      .with(false, () => undefined)
-      .exhaustive();
-  }
+export function botActionConfigure(deps: BotServiceDeps, { botId }: BotGetInput) {
+  return botQueue(deps, botId, botConfigure);
 
   async function botConfiguration(): Promise<BotConfiguration> {
     const [bot, skillSettings, mcpSettings, instructionSettings, pluginSettings] = await Promise.all([

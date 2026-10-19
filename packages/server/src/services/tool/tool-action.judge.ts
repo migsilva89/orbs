@@ -1,9 +1,8 @@
-import { log } from '@openbots/logger/server';
+import { log, redactSecrets } from '@openbots/logger/server';
 import { TypeSafeClient } from '@typesafe-ai/sdk';
 import { match, P } from 'ts-pattern';
 import { TOOL } from './tool.constants';
 import { toolPromptsApprovalQuestion, toolPromptsAskFirstQuestion } from './tool.prompts';
-import { toolRedact } from './tool.utils';
 import type { ToolJudgeParams, ToolServiceDeps } from '../../types/tool.types';
 
 export async function toolActionJudge({ credentials }: ToolServiceDeps, params: ToolJudgeParams): Promise<boolean> {
@@ -31,12 +30,12 @@ export async function toolActionJudge({ credentials }: ToolServiceDeps, params: 
 
         const { answers } = await client.systemOne({
           state: {
-            instructions: toolRedact(params.instructions),
-            request: toolRedact(request),
-            call: { tool: params.name, input: toolRedact(input) },
+            instructions: redactSecrets(params.instructions),
+            request: redactSecrets(request),
+            call: { tool: params.name, input: redactSecrets(input) },
             rules: {
-              allow: params.approvalRules.filter((rule) => rule.behavior === 'allow').map((rule) => toolRedact(rule.when)),
-              askFirst: params.approvalRules.filter((rule) => rule.behavior === 'ask').map((rule) => toolRedact(rule.when)),
+              allow: params.approvalRules.filter((rule) => rule.behavior === 'allow').map((rule) => redactSecrets(rule.when)),
+              askFirst: params.approvalRules.filter((rule) => rule.behavior === 'ask').map((rule) => redactSecrets(rule.when)),
             },
           },
           questions: {

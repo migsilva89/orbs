@@ -10,5 +10,3 @@ export function makeBackupService(deps: BackupServiceDeps) {
     },
   };
 }
-
-export type BackupService = ReturnType<typeof makeBackupService>;

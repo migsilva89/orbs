@@ -1,15 +1,18 @@
+import { replicatedState } from '@earendil-works/chord';
 import { BACKGROUND_CONTEXT, withAbortSignal } from '@earendil-works/chord/context';
 import { Errors } from '@openbots/errors/universal';
 import { match } from 'ts-pattern';
 import { conversationWatchStream } from './conversation-watch.utils';
 import type { ConversationListWatchParams, ConversationServiceDeps } from '../../types/conversation.types';
+import type { NotificationItem, NotificationState } from '@openbots/contracts/universal';
 
 export async function conversationQueryWatchNotifications(
-  { auth, runtime }: ConversationServiceDeps,
+  { auth, runtime, bots }: ConversationServiceDeps,
   { deviceId, authorization, signal }: ConversationListWatchParams,
 ) {
   const revoked = new AbortController();
   const lifetime = AbortSignal.any([revoked.signal, signal ?? revoked.signal]);
+  const context = withAbortSignal(lifetime, BACKGROUND_CONTEXT);
 
   const unsubscribe = auth.onRevoke((id) => match(id)
     .with(deviceId, () => revoked.abort(new Errors.UNAUTHORIZED()))
@@ -17,10 +20,42 @@ export async function conversationQueryWatchNotifications(
 
   try {
     await auth.queries.authenticate({ authorization });
-    const watch = await runtime.watchNotifications(withAbortSignal(lifetime, BACKGROUND_CONTEXT));
-    void watch.closed.then(unsubscribe);
+    const watch = await runtime.watchNotifications(context);
+    const state = replicatedState({ notifications: watch.state.value, revision: 0 });
 
-    return conversationWatchStream(watch, lifetime, (value) => value);
+    const unwatch = watch.state.subscribe((value) => {
+      state.change(context, (draft) => {
+        draft.notifications = value;
+      });
+    });
+
+    const unsubscribeBots = bots.onChange(() => {
+      state.change(context, (draft) => {
+        draft.revision += 1;
+      });
+    });
+
+    const closed = watch.closed.then((end) => {
+      unwatch();
+      unsubscribeBots();
+      unsubscribe();
+
+      return end;
+    });
+
+    return conversationWatchStream({
+      state,
+      closed,
+      stop: watch.stop,
+    }, lifetime, async (value): Promise<NotificationState> => {
+      const preferences = await bots.queries.preferences();
+      const conversationIsAudible = (item: NotificationItem) => preferences.get(item.botId)?.isMuted === false;
+
+      return {
+        pending: value.notifications.pending.filter(conversationIsAudible),
+        recent: value.notifications.recent.filter(conversationIsAudible),
+      };
+    });
   } catch (error) {
     revoked.abort(error);
     unsubscribe();

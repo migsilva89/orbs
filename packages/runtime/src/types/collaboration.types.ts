@@ -27,11 +27,18 @@ export interface CollaborationPolicy {
   };
 }
 
+/** Resolves another bot's Pi store; peer delivery crosses stores through stable request IDs. */
+export interface CollaborationDirectory {
+  harness(botId: string): Promise<PiDurableTypes.Harness>;
+}
+
 export interface CollaborationDeps {
   policy: CollaborationPolicy;
+  directory: CollaborationDirectory;
 }
 
 export interface CollaborationDeliveryInput extends PiDurableTypes.JsonObject {
+  requestId: string;
   senderId: string;
   senderName: string;
   recipientId: string;
@@ -42,7 +49,7 @@ export interface CollaborationDeliveryInput extends PiDurableTypes.JsonObject {
 }
 
 export type CollaborationResult =
-  | { status: 'answered'; answerId: PiDurableTypes.EntryId }
+  | { status: 'answered'; answerId: PiDurableTypes.EntryId; text: string }
   | { status: 'unanswered'; reason: string };
 
 export type CollaborationDeliveryState =
@@ -61,9 +68,10 @@ export interface CollaborationSendParams {
 }
 
 export interface CollaborationTargetParams {
+  senderId: string;
+  senderStoreId: string;
   sourceConversationId: PiDurableTypes.ConversationId;
   recipientId: string;
-  mainConversationId: PiDurableTypes.ConversationId;
   context?: 'existing' | 'temporary';
   temporaryTtlMs: number;
 }
@@ -74,11 +82,21 @@ export interface CollaborationTemporaryBinding extends PiDurableTypes.JsonObject
 }
 
 export interface CollaborationTemporaryContext extends PiDurableTypes.JsonObject {
+  senderId: string | null;
   sourceConversationId: PiDurableTypes.ConversationId | null;
   recipientId: string | null;
   createdAt: number | null;
   expiresAt: number | null;
   archivedAt: number | null;
+}
+
+/** Sender-side pointers to temporary contexts that live in recipient stores. */
+export interface CollaborationTemporaryLinks extends PiDurableTypes.JsonObject {
+  links: { recipientId: string; conversationId: PiDurableTypes.ConversationId; createdAt: number }[];
+}
+
+export interface CollaborationStore extends PiDurableTypes.JsonObject {
+  storeId: string | null;
 }
 
 export interface CollaborationCall extends PiDurableTypes.JsonObject {

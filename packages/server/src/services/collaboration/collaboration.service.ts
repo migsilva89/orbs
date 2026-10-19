@@ -11,5 +11,3 @@ export function makeCollaborationService(deps: CollaborationServiceDeps) {
     },
   };
 }
-
-export type CollaborationService = ReturnType<typeof makeCollaborationService>;

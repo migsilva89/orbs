@@ -17,7 +17,7 @@ This is the implementation contract. Fix code that conflicts with it; do not rew
 Native code stays in its owning package behind `/native`. Using files, SQLite or subprocesses does **not** make code daemon logic.
 
 - Server/native owns app database construction, credential-key loading, workspace directories and MCP configuration-file discovery.
-- Runtime/native owns Pi storage, execution environment, skill, instruction and plugin loaders, and MCP connections/tools.
+- Runtime/native owns Pi storage, the host alarm, execution environment, skill, instruction and plugin loaders, and MCP connections/tools.
 - The daemon constructs and injects these services. It does not implement their operations.
 - Startup opens stores, runs migrations once, restores bots, resumes Pi, then starts listening. Pairing and other actions use initialized services; they never boot the app or run migrations.
 - Shutdown closes the listener, runtime, MCP clients, app database and Pi storage in reverse dependency order, including on startup failure.
@@ -95,6 +95,10 @@ export type SkillService = ReturnType<typeof makeSkillService>;
 - Pi provider authentication stays in Pi's `ModelRuntime` and auth store. Do not duplicate it in application SQL.
 - `env` contains process/build configuration only. Bot settings and secrets belong in persistence. Derive bot directories from the data root and bot ID; never store machine-specific home paths in bot rows. A working directory is not a sandbox.
 - Pi owns transcripts and execution state. No SQL message mirror, approval table, second task queue or custom waiter registry.
+- Each bot owns one Pi store, `data/bots/<botId>/runtime.sql`; Pi has no delete API, so the store file is the unit of erasure. Never rename an open or recently closed store file; delete it. One daemon lock guards every store. A failed store closes only its bot; an alarm reopens it. Closing a store holds the bot until the file work ends, so no request reopens a store being cleared or deleted. Configure, clear and delete share one per-bot queue.
+- Cross-bot work crosses stores through Pi tasks with stable request IDs, never a shared store. Store-local IDs restart after a clear, so cross-store keys include a random per-store ID. Shared extensions and the model-request limiter are built once for all stores.
+- Owner chat preferences (pin, hidden, rank, mute, read position) live in app SQL `bot_preference`; Pi supplies only derived summaries.
+- Host wake-up goes through the runtime `AlarmService` port: native timer or Cloudflare Durable Object alarm. Each store arms its earliest saved Pi deadline; there is no job table.
 - Runtime owns the command catalog and execution. Expose generic `commands.list`/`commands.execute`; new runtime commands must not require new RPC endpoints. Keep Pi command names and dispatch out of server policy and daemon transport.
 
 ## Pi and domain integration

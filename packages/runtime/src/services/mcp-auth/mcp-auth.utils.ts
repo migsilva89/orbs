@@ -44,7 +44,7 @@ export function mcpAuthBump(deps: McpAuthTypes.McpAuthServiceState, serverUrl: s
   deps.providers.delete(serverUrl);
 }
 
-export function mcpAuthSaveEpoch(deps: McpAuthTypes.McpAuthServiceState, serverUrl: string): number {
+function mcpAuthSaveEpoch(deps: McpAuthTypes.McpAuthServiceState, serverUrl: string): number {
   return deps.saveEpochs.get(serverUrl) ?? 0;
 }
 
@@ -150,7 +150,7 @@ function mcpAuthStoredUrl(value: string): string | undefined {
   }
 }
 
-export function mcpAuthStateStore(
+function mcpAuthStateStore(
   deps: McpAuthTypes.McpAuthServiceState,
   serverUrl: string,
   bind: McpAuthTypes.McpAuthStoreBind,
@@ -330,7 +330,7 @@ export function mcpAuthAbort(deps: McpAuthTypes.McpAuthServiceState, serverUrl: 
     });
 }
 
-export function mcpAuthSameRedirect(issued: string, callback: string): boolean {
+function mcpAuthSameRedirect(issued: string, callback: string): boolean {
   try {
     const expected = new URL(issued);
     const received = new URL(callback);

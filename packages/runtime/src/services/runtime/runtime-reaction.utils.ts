@@ -56,7 +56,7 @@ export function runtimeReactionToggle(emojis: string[], emoji: string, isPresent
     .exhaustive();
 }
 
-export function runtimeReactionApplyBot(document: RuntimeReaction, botId: string, params: RuntimeReactToolInput) {
+function runtimeReactionApplyBot(document: RuntimeReaction, botId: string, params: RuntimeReactToolInput) {
   const existing = document.botReactions.find((item) => item.botId === botId);
 
   match(existing)

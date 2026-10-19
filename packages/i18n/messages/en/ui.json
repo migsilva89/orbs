@@ -16,7 +16,7 @@
   "ui_tool_bot_subagent_stop_description": "Stop a named background subagent’s current work. It stays available for later messages.",
   "ui_command_retry_description": "Retry the latest failed or stopped reply using the saved conversation.",
   "ui_command_retry_argument_hint": "Failed run task ID",
-  "ui_tool_bot_question_description": "Ask the owner a question with optional choices and wait for an answer.",
+  "ui_tool_bot_question_description": "Ask the owner a question with optional single or multiple choices and wait for an answer. The owner may also reply in text or skip.",
   "ui_tool_bot_question_expired": "The owner did not answer in time.",
   "ui_tool_bot_routine_list_description": "List your routines, schedules, enabled state and latest run. Routines always deliver to your main chat, including when called from a private context or subagent.",
   "ui_tool_bot_routine_create_description": "Create a routine for your main chat. Use once with runAt in epoch milliseconds, interval with minutes, or five-field cron with an explicit IANA timezone. Set isEnabled to enable or pause. The daemon must be running. List routines before retrying an interrupted creation.",
@@ -65,5 +65,7 @@
   "ui_artifact_block_select_description": "A dropdown to pick one option. Bind value with $bindState at /path so it is saved.",
   "ui_artifact_block_notes_description": "A text box people write in. Bind value with $bindState at /path so it is saved.",
   "ui_provider_login_failed": "Login failed. Start a new login to try again.",
-  "ui_tool_bot_swap_models_description": "Replace a matching provider and model on selected bots, optionally including their fallback models. Saves settings before runtime preparation. Does not interrupt an active request. List bots before retrying after an error."
+  "ui_tool_bot_swap_models_description": "Replace a matching provider and model on selected bots, optionally including their fallback models. Saves settings before runtime preparation. Does not interrupt an active request. List bots before retrying after an error.",
+  "ui_tool_bot_question_choices": "The owner chose: {choices}",
+  "ui_tool_bot_question_skipped": "The owner skipped this question."
 }

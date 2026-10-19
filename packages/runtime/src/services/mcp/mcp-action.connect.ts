@@ -12,8 +12,9 @@ export async function mcpActionConnect(deps: McpClientServiceDeps, { botId, entr
   const sourceFingerprint = entry.sourceFingerprint ?? fingerprint;
   const previous = deps.connections.get(key);
 
-  const authProvider = await match(entry.config)
-    .with({ url: P.string }, ({ url }) => deps.auth.provider({ serverUrl: url }))
+  // SAFETY: stored OAuth tokens are keyed by server URL, so a bot-local file naming a shared URL must not get them.
+  const authProvider = await match(entry)
+    .with({ isBotLocal: false, config: { url: P.string } }, ({ config: { url } }) => deps.auth.provider({ serverUrl: url }))
     .otherwise(() => undefined);
 
   return match(previous)

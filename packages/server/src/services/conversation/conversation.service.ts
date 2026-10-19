@@ -1,6 +1,7 @@
 import { conversationActionAnswerQuestion } from './conversation-action.answer-question';
 import { conversationActionApprove } from './conversation-action.approve';
 import { conversationActionArrange } from './conversation-action.arrange';
+import { conversationActionClear } from './conversation-action.clear';
 import { conversationActionExecuteCommand } from './conversation-action.execute-command';
 import { conversationActionMarkRead } from './conversation-action.mark-read';
 import { conversationActionSetHidden } from './conversation-action.set-hidden';
@@ -44,6 +45,7 @@ export function makeConversationService(deps: ConversationTypes.ConversationServ
       submit: (params: UniversalTypes.ConversationSubmitInput) => conversationActionSubmit(deps, params),
       updateSubmission: (params: UniversalTypes.ConversationUpdateSubmissionInput) => conversationActionUpdateSubmission(deps, params),
       stop: (params: UniversalTypes.ConversationTarget) => conversationActionStop(deps, params),
+      clear: (params: UniversalTypes.BotGetInput) => conversationActionClear(deps, params),
     },
     queries: {
       search: (params: UniversalTypes.ConversationSearchInput) => conversationQuerySearch(deps, params),

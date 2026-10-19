@@ -1,93 +1,36 @@
-import { ModelRuntime } from '@earendil-works/pi-coding-agent';
 import { env } from '@openbots/env/server';
 import { log } from '@openbots/logger/server';
 import {
+  makeAlarmService,
   makeInstructionLoaderService,
   makeMcpAuthService,
   makeMcpClientService,
   makePluginLoaderService,
   makeProviderService,
   makeSkillLoaderService,
+  makeStorageLockService,
   makeStorageService,
   runtimeEnvNative,
 } from '@openbots/runtime/native';
 import { join } from 'node:path';
-import { match } from 'ts-pattern';
 import { credentialsKeyNative, makeAttachmentStorageService, makeDatabaseService, makeMcpService, makeWorkspaceService, workspacePathsNative } from '@openbots/server/native';
 import { makeCredentialsService, makeServices, makeSettingsService } from '@openbots/server/server';
 import { coreLocalNative } from './core-local.native';
 import { coreServerNative } from './core-server.native';
 
+const STOP_SIGNALS = ['SIGINT', 'SIGTERM'] as const;
+
 export async function coreNativeRun(): Promise<void> {
   await using resources = new AsyncDisposableStack();
 
-  const paths = await workspacePathsNative(env.OPENBOTS_DATA_DIR);
-
-  const storage = await makeStorageService({ path: paths.runtime });
-  resources.defer(() => storage.close());
-
-  const database = makeDatabaseService({ path: paths.database });
-  resources.defer(() => database.close());
-  await database.migrate();
-
-  const models = await ModelRuntime.create();
-  const providers = makeProviderService({ models });
-  resources.defer(() => providers.close());
-  const credentialsKey = await credentialsKeyNative(paths.data);
-  const credentials = makeCredentialsService({ database, key: credentialsKey });
-  const mcpAuth = makeMcpAuthService({ credentials });
-  resources.defer(() => mcpAuth.close());
-  const settings = makeSettingsService({ database });
-  const workspace = makeWorkspaceService({ root: paths.root });
-  const skillLoader = makeSkillLoaderService({ root: paths.root });
-  const instructionLoader = makeInstructionLoaderService({ root: paths.root });
-  const pluginLoader = makePluginLoaderService({ root: paths.root });
-  const mcpClients = makeMcpClientService({ root: paths.root, auth: mcpAuth });
-  resources.defer(() => mcpClients.close());
-
-  const mcp = makeMcpService({
-    root: paths.root,
-    settings,
-    clients: mcpClients,
-    credentials,
-  });
-
-  const services = await makeServices({
-    database,
-    attachmentStorage: makeAttachmentStorageService({ root: paths.root }),
-    credentials,
-    settings,
-    workspace,
-    skillLoader,
-    instructionLoader,
-    pluginLoader,
-    mcp,
-    mcpAuth,
-    providers,
-    runtime: {
-      storage: storage.storage,
-      models,
-      env: runtimeEnvNative(paths.root),
-    },
-  });
-
-  resources.defer(() => services.runtime.close());
+  const stopped = coreNativeSignals(resources);
+  const { paths, services } = await coreNativeServices(resources);
 
   const server = coreServerNative(services);
   resources.defer(() => server.stop(true));
 
   const local = await coreLocalNative(services, { directory: join(paths.data, 'ipc') });
   resources.defer(() => local.stop(true));
-
-  const stopped = Promise.withResolvers<undefined>();
-  const stop = (): void => stopped.resolve(undefined);
-
-  process.once('SIGINT', stop);
-  process.once('SIGTERM', stop);
-  resources.defer(() => {
-    process.off('SIGINT', stop);
-    process.off('SIGTERM', stop);
-  });
 
   log.info({
     tag: 'daemon',
@@ -96,12 +39,73 @@ export async function coreNativeRun(): Promise<void> {
     port: server.port,
   });
 
-  await Promise.race([
-    stopped.promise,
-    services.runtime.closed.then((result) => match(result)
-      .with({ reason: 'failed' }, ({ error }) => {
-        throw error;
-      })
-      .otherwise(() => undefined)),
-  ]);
+  await stopped;
+}
+
+function coreNativeSignals(resources: AsyncDisposableStack): Promise<void> {
+  return new Promise((resolve) => {
+    const stop = (): void => resolve();
+
+    for (const signal of STOP_SIGNALS) {
+      process.once(signal, stop);
+    }
+
+    resources.defer(() => {
+      for (const signal of STOP_SIGNALS) {
+        process.off(signal, stop);
+      }
+    });
+  });
+}
+
+async function coreNativeServices(resources: AsyncDisposableStack) {
+  const paths = await workspacePathsNative(env.OPENBOTS_DATA_DIR);
+
+  const lock = await makeStorageLockService({ path: paths.lock });
+  resources.defer(() => lock.close());
+  const alarm = makeAlarmService();
+  resources.defer(() => alarm.close());
+
+  const database = makeDatabaseService({ path: paths.database });
+  resources.defer(() => database.close());
+  await database.migrate();
+
+  const providers = await makeProviderService();
+  resources.defer(() => providers.close());
+  const credentialsKey = await credentialsKeyNative(paths.data);
+  const credentials = makeCredentialsService({ database, key: credentialsKey });
+  const mcpAuth = makeMcpAuthService({ credentials });
+  resources.defer(() => mcpAuth.close());
+  const settings = makeSettingsService({ database });
+  const mcpClients = makeMcpClientService({ root: paths.root, auth: mcpAuth });
+  resources.defer(() => mcpClients.close());
+
+  const services = await makeServices({
+    database,
+    attachmentStorage: makeAttachmentStorageService({ root: paths.root }),
+    credentials,
+    settings,
+    workspace: makeWorkspaceService({ root: paths.root }),
+    skillLoader: makeSkillLoaderService({ root: paths.root }),
+    instructionLoader: makeInstructionLoaderService({ root: paths.root }),
+    pluginLoader: makePluginLoaderService({ root: paths.root }),
+    mcp: makeMcpService({
+      root: paths.root,
+      settings,
+      clients: mcpClients,
+      credentials,
+    }),
+    mcpAuth,
+    providers,
+    runtime: {
+      storage: makeStorageService({ root: paths.bots }),
+      alarm,
+      models: providers.models,
+      env: runtimeEnvNative(paths.root),
+    },
+  });
+
+  resources.defer(() => services.runtime.close());
+
+  return { paths, services };
 }

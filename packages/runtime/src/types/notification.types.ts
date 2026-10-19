@@ -6,6 +6,8 @@ export type { NotificationItem, NotificationState };
 
 export interface NotificationServiceDeps {
   harness: Harness;
+  /** Every conversation in a bot store belongs to that bot. */
+  botId: string;
 }
 
 export interface NotificationQueuedCommit {

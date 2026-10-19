@@ -6,6 +6,7 @@ import { questionCopy } from './question.utils';
 import type { QuestionAskParams, QuestionDetails, QuestionRecord } from '../../types/question.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ToolExecutionApi, ToolExecutionResult } from '@earendil-works/pi-durable';
+import type { QuestionAnswer } from '@openbots/contracts/universal';
 
 export async function questionActionAsk(
   params: QuestionAskParams,
@@ -20,6 +21,7 @@ export async function questionActionAsk(
       conversationId: api.conversationId,
       text: params.text,
       choices: [...(params.choices ?? [])],
+      isMultiSelect: params.isMultiSelect ?? false,
       createdAt: Date.now(),
       expiresAt: Date.now() + QUESTION.timeoutMs,
       status: 'pending' as const,
@@ -36,11 +38,12 @@ export async function questionActionAsk(
   await api.details({
     text: question.text,
     choices: [...question.choices],
+    isMultiSelect: question.isMultiSelect,
     expiresAt: question.expiresAt,
   }, context);
 
   return match(question.status)
-    .with('answered', () => questionReply(question.answer ?? ''))
+    .with('answered', () => questionReply(question.answer))
     .with('expired', () => questionExpired())
     .with('pending', () => questionWait(question, api, context))
     .exhaustive();
@@ -81,7 +84,7 @@ async function questionWait(
           });
           return questionExpired();
         })
-        .with({ status: 'answered' }, (answered) => questionReply(answered.answer ?? ''))
+        .with({ status: 'answered' }, (answered) => questionReply(answered.answer))
         .otherwise(() => questionExpired());
     }, context);
   } finally {
@@ -90,8 +93,14 @@ async function questionWait(
   }
 }
 
-function questionReply(answer: string): ToolExecutionResult<QuestionDetails> {
-  return { output: [{ type: 'text', text: answer }] };
+function questionReply(answer: QuestionAnswer | null): ToolExecutionResult<QuestionDetails> {
+  const text = match(answer)
+    .with({ kind: 'text' }, ({ text: value }) => value)
+    .with({ kind: 'choices' }, ({ choices }) => m.ui_tool_bot_question_choices({ choices: choices.join(', ') }))
+    .with(P.union({ kind: 'skip' }, null), () => m.ui_tool_bot_question_skipped())
+    .exhaustive();
+
+  return { output: [{ type: 'text', text }] };
 }
 
 function questionExpired(): ToolExecutionResult<QuestionDetails> {

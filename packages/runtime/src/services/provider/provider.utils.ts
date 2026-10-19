@@ -99,7 +99,7 @@ export function providerOwnedSession(deps: ProviderTypes.ProviderServiceDeps, pa
     .exhaustive();
 }
 
-export function providerSessionRecord({ sessions }: ProviderTypes.ProviderServiceDeps, id: string) {
+function providerSessionRecord({ sessions }: ProviderTypes.ProviderServiceDeps, id: string) {
   return match(sessions.get(id))
     .with(P.nonNullable, (session) => session)
     .otherwise(() => {
@@ -163,7 +163,7 @@ export function providerPromptView(id: string, prompt: AuthPrompt): UniversalTyp
     .exhaustive();
 }
 
-export function providerEventView(event: AuthEvent): UniversalTypes.ProviderEvent {
+function providerEventView(event: AuthEvent): UniversalTypes.ProviderEvent {
   return match(event)
     .with({ type: 'info' }, ({ type, message, links }) => ({
       type,

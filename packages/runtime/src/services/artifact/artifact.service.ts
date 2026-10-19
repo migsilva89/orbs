@@ -2,7 +2,7 @@ import { artifactActionCreate } from './artifact-action.create';
 import { artifactActionRestore } from './artifact-action.restore';
 import { artifactActionSaveState } from './artifact-action.save-state';
 import { artifactActionUpdate } from './artifact-action.update';
-import { artifactQueryBlocks } from './artifact-query.blocks';
+import { artifactBlocksCatalog } from './artifact-blocks.utils';
 import { artifactQueryGet } from './artifact-query.get';
 import { artifactQueryList } from './artifact-query.list';
 import { artifactQueryVersions } from './artifact-query.versions';
@@ -21,7 +21,7 @@ export function makeArtifactService(deps: ArtifactTypes.ArtifactServiceDeps) {
       list: (params: ArtifactTypes.ArtifactListParams, context: Context) => artifactQueryList(deps, params, context),
       get: (params: ArtifactTypes.ArtifactGetParams, context: Context) => artifactQueryGet(deps, params, context),
       versions: (params: ArtifactTypes.ArtifactVersionsParams, context: Context) => artifactQueryVersions(deps, params, context),
-      blocks: () => artifactQueryBlocks(),
+      blocks: () => artifactBlocksCatalog(),
     },
   };
 }

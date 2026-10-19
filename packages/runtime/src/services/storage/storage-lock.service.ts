@@ -4,9 +4,9 @@ import { mkdir, realpath } from 'node:fs/promises';
 import { basename, dirname, join, resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { match, P } from 'ts-pattern';
-import type { StorageServiceParams } from '../../types/storage.types';
+import type { StorageLockParams } from '../../types/storage.types';
 
-export async function makeStorageLockService({ path }: StorageServiceParams) {
+export async function makeStorageLockService({ path }: StorageLockParams) {
   await mkdir(dirname(resolve(path)), { recursive: true });
 
   const file = await match(existsSync(path))
@@ -32,4 +32,5 @@ export async function makeStorageLockService({ path }: StorageServiceParams) {
   };
 }
 
+// fallow-ignore-next-line unused-type
 export type StorageLockService = Awaited<ReturnType<typeof makeStorageLockService>>;

@@ -1,7 +1,18 @@
+import { Errors } from '@openbots/errors/universal';
+import { match } from 'ts-pattern';
+import { conversationQueryPreferences } from './conversation-query.preferences';
 import type { ConversationServiceDeps } from '../../types/conversation.types';
 import type { ConversationMarkReadInput } from '@openbots/contracts/universal';
 
-export async function conversationActionMarkRead({ runtime, bots }: ConversationServiceDeps, params: ConversationMarkReadInput) {
-  await bots.queries.get({ botId: params.botId });
-  return runtime.actions.markRead(params);
+export async function conversationActionMarkRead(deps: ConversationServiceDeps, { botId, throughEntryId }: ConversationMarkReadInput) {
+  await deps.bots.queries.get({ botId });
+
+  match(await deps.runtime.queries.hasEntry({ botId, entryId: throughEntryId }))
+    .with(true, () => undefined)
+    .with(false, () => {
+      throw new Errors.NOT_FOUND({ resource: 'entry', resourceId: throughEntryId });
+    })
+    .exhaustive();
+
+  return conversationQueryPreferences(deps, { botId, preference: await deps.bots.actions.markRead({ botId, throughEntryId }) });
 }

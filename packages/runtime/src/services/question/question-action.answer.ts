@@ -1,6 +1,6 @@
 import { match, P } from 'ts-pattern';
 import { questionDocument } from './question.constants';
-import { questionCopy } from './question.utils';
+import { questionAnswerValidate, questionCopy } from './question.utils';
 import type { QuestionAnswerParams, QuestionServiceDeps } from '../../types/question.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { TaskId } from '@earendil-works/pi-durable';
@@ -27,6 +27,7 @@ export async function questionActionAnswer(
           .with(P.nullish, () => ({ isAccepted: false }))
           .with({ conversationId: params.conversationId, status: 'pending' }, (pending) => {
             const question = questionCopy(pending);
+            questionAnswerValidate(question, params.answer);
             const isAccepted = question.expiresAt > now;
 
             doc.question = match(isAccepted)

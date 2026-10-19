@@ -1,10 +1,8 @@
 import { Errors } from '@openbots/errors/universal';
 import { match, P } from 'ts-pattern';
-import { runtimeBotConversations } from '../runtime/runtime.constants';
 import { collaborationActionTarget } from './collaboration-action.target';
 import { collaborationQueryOrigin } from './collaboration-query.origin';
-import { COLLABORATION, collaborationCall } from './collaboration.constants';
-import { collaborationAnswer } from './collaboration.utils';
+import { COLLABORATION, collaborationCall, collaborationStore, collaborationTemporaryLinks } from './collaboration.constants';
 import type { CollaborationSendParams, CollaborationToolDeps } from '../../types/collaboration.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ToolExecutionApi } from '@earendil-works/pi-durable';
@@ -22,13 +20,22 @@ export async function collaborationActionSend(
     .otherwise(async () => {
       const origin = await collaborationQueryOrigin(api, context);
       const { sender, recipient, maxPending, temporaryTtlMs } = await deps.policy.queries.recipient({ ...origin, recipientId: params.botId });
-      const binding = await api.snapshot(runtimeBotConversations, recipient.id, context);
 
-      const mainConversationId = match(binding?.conversationId)
-        .with(P.nonNullable, (id) => id)
-        .otherwise(() => {
-          throw new Errors.NOT_FOUND({ resource: 'bot', resourceId: recipient.id });
-        });
+      const senderStoreId = await api.commit(async (tx) => {
+        const store = await tx.doc(collaborationStore);
+        store.storeId ??= crypto.randomUUID();
+
+        return store.storeId;
+      }, context);
+
+      const recipientConversationId = await collaborationActionTarget(await deps.directory.harness(recipient.id), {
+        senderId: sender.id,
+        senderStoreId,
+        sourceConversationId: api.conversationId,
+        recipientId: recipient.id,
+        context: params.context,
+        temporaryTtlMs,
+      }, context);
 
       return api.commit(async (tx) => {
         const pages = await Promise.all((['pending', 'running', 'waiting', 'completing'] as const).map((status) => tx.scanTasks({
@@ -54,15 +61,26 @@ export async function collaborationActionSend(
               .with('send', () => ({ ownership: { kind: 'conversation' as const }, background: true }))
               .exhaustive();
 
-            const recipientConversationId = await collaborationActionTarget(tx, {
-              sourceConversationId: api.conversationId,
-              recipientId: recipient.id,
-              mainConversationId,
-              context: params.context,
-              temporaryTtlMs,
-            });
+            await match(params.context ?? 'existing')
+              .with('temporary', async () => {
+                const temporary = await tx.doc(collaborationTemporaryLinks, api.conversationId);
+
+                match(temporary.links.some((link) => link.recipientId === recipient.id && link.conversationId === recipientConversationId))
+                  .with(true, () => undefined)
+                  .with(false, () => {
+                    temporary.links.push({
+                      recipientId: recipient.id,
+                      conversationId: recipientConversationId,
+                      createdAt: Date.now(),
+                    });
+                  })
+                  .exhaustive();
+              })
+              .with('existing', () => undefined)
+              .exhaustive();
 
             call.deliveryId = await tx.createTask(deps.delivery, {
+              requestId: `${senderStoreId}:${api.taskId}`,
               senderId: sender.id,
               senderName: sender.name,
               recipientId: recipient.id,
@@ -94,8 +112,8 @@ export async function collaborationActionSend(
       const { outcome } = (await api.waitForTask(deliveryId, context)).state;
 
       return match(outcome)
-        .with({ status: 'completed', result: { status: 'answered' } }, async ({ result }) => ({
-          output: [{ type: 'text' as const, text: await api.commit((tx) => collaborationAnswer(tx, result.answerId), context) }],
+        .with({ status: 'completed', result: { status: 'answered' } }, ({ result }) => ({
+          output: [{ type: 'text' as const, text: result.text }],
           details: { ...details, answerId: result.answerId },
         }))
         .with({ status: 'completed', result: { status: 'unanswered' } }, ({ result }) => ({

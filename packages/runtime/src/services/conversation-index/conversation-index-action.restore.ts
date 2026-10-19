@@ -26,11 +26,6 @@ export async function conversationIndexActionRestore(
           conversationId,
           lastMessage: null,
           lastAssistantEntryId: 0,
-          readThroughEntryId: 0,
-          isPinned: false,
-          isHidden: false,
-          isMuted: false,
-          rank: null,
         };
       }, context);
 

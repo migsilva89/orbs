@@ -1,11 +1,8 @@
 import type { ModelRuntime } from '@earendil-works/pi-coding-agent';
 import type * as UniversalTypes from '@openbots/contracts/universal';
 
-export interface ProviderServiceParams {
+export interface ProviderServiceDeps {
   models: ModelRuntime;
-}
-
-export interface ProviderServiceDeps extends ProviderServiceParams {
   sessions: Map<string, ProviderLoginRecord>;
 }
 

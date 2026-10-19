@@ -40,6 +40,6 @@ const blocks = artifactBlocks.parse(Object.fromEntries(Object.entries(artifactCo
   },
 ])));
 
-export function artifactQueryBlocks() {
+export function artifactBlocksCatalog() {
   return blocks;
 }

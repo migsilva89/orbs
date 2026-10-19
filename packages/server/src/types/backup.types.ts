@@ -13,7 +13,7 @@ export const backupRestore = z.object({
   bundle: z.string().trim().min(1),
 });
 
-export const backupManifestFile = z.object({
+const backupManifestFile = z.object({
   path: z.string().min(1),
   size: z.number().int().nonnegative(),
   sha256: z.string().regex(/^[a-f0-9]{64}$/),
@@ -24,6 +24,7 @@ export const backupManifest = z.object({
   createdAt: z.number().int(),
   files: z.array(backupManifestFile).min(1),
   directories: z.array(z.string()),
+  skipped: z.array(z.string()).default([]),
   excluded: z.object({
     locks: z.literal(true),
     ipc: z.literal(true),
@@ -36,3 +37,9 @@ export type BackupCreateInput = z.infer<typeof backupCreate>;
 export type BackupRestoreInput = z.infer<typeof backupRestore>;
 export type BackupManifest = z.infer<typeof backupManifest>;
 export type BackupManifestFile = z.infer<typeof backupManifestFile>;
+
+export interface BackupWalkManifest {
+  files: BackupManifestFile[];
+  directories: string[];
+  skipped: string[];
+}

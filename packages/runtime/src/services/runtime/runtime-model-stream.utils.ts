@@ -3,7 +3,7 @@ import { isContextOverflow } from '@earendil-works/pi-ai/utils/overflow';
 import { isRetryableAssistantError } from '@earendil-works/pi-ai/utils/retry';
 import { match, P } from 'ts-pattern';
 import type { RuntimeModelRequest } from '../../types/runtime-model.types';
-import type { Api, AssistantMessage, Model } from '@earendil-works/pi-ai';
+import type * as PiAiTypes from '@earendil-works/pi-ai';
 import type { Models, ModelsSimpleStreamOptions } from '@earendil-works/pi-ai/models';
 import type { ModelSelection } from '@openbots/contracts/universal';
 
@@ -48,14 +48,29 @@ export function runtimeModelStream(models: Models, { route, context, options }: 
   }
 
   void request().catch(() => {
-    const stopReason = options?.signal?.aborted ? 'aborted' as const : 'error' as const;
-
-    const error: AssistantMessage = {
-      role: 'assistant',
-      content: [],
+    stream.push(runtimeModelFailure({
       api: first?.api ?? 'openai-completions',
       provider: first?.provider ?? route.primary.modelProvider,
       model: first?.id ?? route.primary.modelId,
+    }, options));
+  });
+
+  return stream;
+}
+
+export function runtimeModelFailure(
+  model: Pick<PiAiTypes.AssistantMessage, 'api' | 'provider' | 'model'>,
+  options?: ModelsSimpleStreamOptions,
+): PiAiTypes.AssistantMessageEvent {
+  const stopReason = options?.signal?.aborted ? 'aborted' as const : 'error' as const;
+
+  return {
+    type: 'error',
+    reason: stopReason,
+    error: {
+      role: 'assistant',
+      content: [],
+      ...model,
       usage: {
         input: 0,
         output: 0,
@@ -67,19 +82,11 @@ export function runtimeModelStream(models: Models, { route, context, options }: 
       stopReason,
       errorMessage: 'Model request failed.',
       timestamp: Date.now(),
-    };
-
-    stream.push({
-      type: 'error',
-      reason: stopReason,
-      error,
-    });
-  });
-
-  return stream;
+    },
+  };
 }
 
-function runtimeModelOptions(selection: ModelSelection, model: Model<Api>, options?: ModelsSimpleStreamOptions) {
+function runtimeModelOptions(selection: ModelSelection, model: PiAiTypes.Model<PiAiTypes.Api>, options?: ModelsSimpleStreamOptions) {
   return {
     ...options,
     reasoning: match(selection.thinkingLevel).with('off', () => undefined).otherwise((level) => level),
@@ -87,13 +94,13 @@ function runtimeModelOptions(selection: ModelSelection, model: Model<Api>, optio
   };
 }
 
-function runtimeModelCanFallback(message: AssistantMessage) {
+function runtimeModelCanFallback(message: PiAiTypes.AssistantMessage) {
   return message.stopReason === 'error' && !isContextOverflow(message)
     && (isRetryableAssistantError(message)
       || /\b(401|403)\b|not configured|no (?:api key|credentials)|unauthorized|authentication|\bauth\b|oauth|token.*(?:expired|invalid)|insufficient_quota|quota exceeded|billing|usage limit/i.test(message.errorMessage ?? ''));
 }
 
-function runtimeModelHasOutput(message: AssistantMessage) {
+function runtimeModelHasOutput(message: PiAiTypes.AssistantMessage) {
   return message.content.some((block) => match(block)
     .with({ type: 'text' }, ({ text }) => text.length > 0)
     .with({ type: 'thinking' }, ({ thinking }) => thinking.length > 0)

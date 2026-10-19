@@ -1,16 +1,22 @@
+import { artifactSpec, routineCreate } from '@openbots/contracts/universal';
+import { z } from 'zod';
 import type { ArtifactService } from '../services/artifact/artifact.service';
 import type { ConversationIndexService } from '../services/conversation-index/conversation-index.service';
+import type { NotificationService } from '../services/notification/notification.service';
 import type { QuestionService } from '../services/question/question.service';
 import type { RoutineService } from '../services/routine/routine.service';
-import type { CollaborationPolicy } from './collaboration.types';
+import type { AlarmService } from './alarm.types';
+import type { CollaborationDirectory, CollaborationPolicy } from './collaboration.types';
+import type { StorageService } from './storage.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ToolCall } from '@earendil-works/pi-ai';
 import type { Models } from '@earendil-works/pi-ai/models';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
-import type { Attachment, ModelSelection } from '@openbots/contracts/universal';
+import type { Attachment, ModelSelection, QuestionAnswer } from '@openbots/contracts/universal';
 
 export interface RuntimeServiceParams {
-  storage: PiDurableTypes.Storage;
+  storage: StorageService;
+  alarm: AlarmService;
   models: Models;
   env: NonNullable<PiDurableTypes.HarnessOptions['env']>;
   permissions: RuntimeToolPolicy;
@@ -41,7 +47,21 @@ export interface RuntimeModelsDeps {
   models: Models;
 }
 
+/** Built once per daemon and shared by every bot store, including the model-request limiter. */
+export interface RuntimeSharedDeps extends RuntimeModelsDeps {
+  storage: StorageService;
+  alarm: AlarmService;
+  env: RuntimeServiceParams['env'];
+  permissions: RuntimeToolPolicy;
+  extensions: PiDurableTypes.Extension[];
+  readOnlyTools: PiDurableTypes.ToolRegistration[];
+  directory: CollaborationDirectory;
+}
+
+/** One bot's Pi store. */
 export interface RuntimeServiceDeps extends RuntimeModelsDeps {
+  botId: string;
+  directory: CollaborationDirectory;
   harness: PiDurableTypes.Harness;
   questions: QuestionService;
   routines: RoutineService;
@@ -50,6 +70,30 @@ export interface RuntimeServiceDeps extends RuntimeModelsDeps {
   registry: PiDurableTypes.Registry;
   readOnlyTools: PiDurableTypes.ToolRegistration[];
   extensions: PiDurableTypes.Extension[];
+}
+
+export interface RuntimeCarryOverDeps extends RuntimeServiceDeps {
+  storage: StorageService;
+}
+
+export interface RuntimeCarryOverParams {
+  conversationId: PiDurableTypes.ConversationId;
+}
+
+export interface RuntimeBot {
+  deps: RuntimeServiceDeps;
+  notifications: NotificationService;
+  /** Resume pending Pi work after a host alarm and re-arm the next one. */
+  wake(): void;
+  close(): Promise<void>;
+}
+
+export type RuntimeBotChange = { type: 'opened'; bot: RuntimeBot } | { type: 'closed'; botId: string; isFailed: boolean };
+
+export interface RuntimeDirectory extends CollaborationDirectory {
+  bot(botId: string): Promise<RuntimeBot>;
+  opened(): RuntimeBot[];
+  onChange(listener: (change: RuntimeBotChange) => void): () => void;
 }
 
 export interface RuntimeBotParams extends ModelSelection {
@@ -77,8 +121,12 @@ export interface RuntimeConversationParams {
 export interface RuntimeContextParams {
   record: PiDurableTypes.ConversationRecord;
   sourceConversationId: PiDurableTypes.ConversationId;
-  kind: 'subagent' | 'temporary';
   isRunning: boolean;
+}
+
+export interface RuntimeEntryParams {
+  botId: string;
+  entryId: number;
 }
 
 export interface RuntimeSubmissionParams extends RuntimeConversationParams {
@@ -141,6 +189,18 @@ export interface RuntimeApprovalRequest {
 
 export interface RuntimeQuestionAnswer extends RuntimeConversationParams {
   id: number;
-  answer: string;
+  answer: QuestionAnswer;
   answeredBy: string;
 }
+
+/** What a history clear keeps: routines and the latest version of each artifact, with their IDs. */
+export const runtimeCarry = z.object({
+  routines: z.array(routineCreate.omit({ botId: true }).extend({ id: z.uuid() })),
+  artifacts: z.array(z.object({
+    id: z.uuid(),
+    title: z.string(),
+    spec: artifactSpec,
+  })),
+});
+
+export type RuntimeCarry = z.infer<typeof runtimeCarry>;

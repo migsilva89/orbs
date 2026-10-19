@@ -20,7 +20,8 @@ export interface RoutineConversationParams {
   conversationId: PiTypes.ConversationId;
 }
 
-export type RoutineCreateParams = ContractTypes.RoutineCreateInput & RoutineConversationParams;
+/** `id` is set only when clear-history carries a routine into a fresh store. */
+export type RoutineCreateParams = ContractTypes.RoutineCreateInput & RoutineConversationParams & { id?: string };
 export type RoutineUpdateParams = ContractTypes.RoutineUpdateInput & RoutineConversationParams;
 export type RoutineTargetParams = ContractTypes.RoutineTarget & RoutineConversationParams;
 

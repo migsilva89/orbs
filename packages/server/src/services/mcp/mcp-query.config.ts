@@ -23,7 +23,10 @@ export async function mcpQueryConfig(
     .with(false, () => [])
     .exhaustive();
 
-  const sources = await Promise.all([...sharedPaths, ...localPaths.filter(existsSync)].map(async (path) => {
+  const sharedSources = sharedPaths.map((path) => ({ path, isBotLocal: false }));
+  const localSources = localPaths.filter(existsSync).map((path) => ({ path, isBotLocal: true }));
+
+  const sources = await Promise.all([...sharedSources, ...localSources].map(async ({ path, isBotLocal }) => {
     const source = resolve(root, match(path)
       .with('~', () => homedir())
       .when((value) => value.startsWith('~/'), (value) => join(homedir(), value.slice(2)))
@@ -31,16 +34,18 @@ export async function mcpQueryConfig(
 
     try {
       const files = await mcpFiles(source);
-      return await Promise.all(files.map(mcpQueryConfigRead));
+      const documents = await Promise.all(files.map(mcpQueryConfigRead));
+
+      return documents.map((document) => ({ ...document, isBotLocal }));
     } catch {
-      return [{ source, servers: {}, error: 'Cannot read MCP source.' }];
+      return [{ source, servers: {}, error: 'Cannot read MCP source.', isBotLocal }];
     }
   }));
 
   const servers = new Map<string, McpConfig['servers'][number]>();
   const diagnostics: McpCatalog['diagnostics'] = [];
 
-  for (const { source, servers: entries, error } of sources.flat()) {
+  for (const { source, servers: entries, error, isBotLocal } of sources.flat()) {
     match(error)
       .with(P.string, (message) => diagnostics.push({ source, message }))
       .otherwise(() => undefined);
@@ -48,15 +53,27 @@ export async function mcpQueryConfig(
     for (const [name, value] of Object.entries(entries)) {
       servers.delete(name);
 
-      match(mcpServer.safeParse(value))
-        .with({ success: true }, ({ data }) => {
+      match({ result: mcpServer.safeParse(value), isBotLocal })
+        // SAFETY: a bot can write its own folder, so its MCP files must not pull stored secrets.
+        .with({
+          result: { success: true, data: P.union({ envCredentials: P.nonNullable }, { headerCredentials: P.nonNullable }) },
+          isBotLocal: true,
+        }, () => {
+          diagnostics.push({
+            source,
+            server: name,
+            message: 'Bot MCP files cannot use stored credentials. Move this server to a shared MCP file.',
+          });
+        })
+        .with({ result: { success: true } }, ({ result: { data } }) => {
           servers.set(name, {
             name,
             source,
             config: data,
+            isBotLocal,
           });
         })
-        .with({ success: false }, () => {
+        .with({ result: { success: false } }, () => {
           diagnostics.push({
             source,
             server: name,

@@ -12,7 +12,7 @@ export async function backupActionCreate(deps: BackupServiceDeps, params: Backup
   backupOutside(root, destination);
   await backupAssertSource(root);
 
-  const lock = await makeStorageLockService({ path: join(root, BACKUP.files.runtime) });
+  const lock = await makeStorageLockService({ path: join(root, BACKUP.lock) });
 
   try {
     const staging = await backupStage(destination);

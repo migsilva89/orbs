@@ -1,13 +1,7 @@
-import { BACKGROUND_CONTEXT, withAbortSignal } from '@earendil-works/chord/context';
-import { Errors } from '@openbots/errors/universal';
+import { BACKGROUND_CONTEXT } from '@earendil-works/chord/context';
 import { log } from '@openbots/logger/server';
 import { match, P } from 'ts-pattern';
-import { conversationIndexActionArrange } from './conversation-index-action.arrange';
-import { conversationIndexActionMarkRead } from './conversation-index-action.mark-read';
 import { conversationIndexActionRestore } from './conversation-index-action.restore';
-import { conversationIndexActionSetHidden } from './conversation-index-action.set-hidden';
-import { conversationIndexActionSetMuted } from './conversation-index-action.set-muted';
-import { conversationIndexActionSetPinned } from './conversation-index-action.set-pinned';
 import { conversationIndexActionUpdate } from './conversation-index-action.update';
 import { conversationIndexQueryList } from './conversation-index-query.list';
 import { conversationIndexQueryWatch } from './conversation-index-query.watch';
@@ -15,28 +9,27 @@ import { conversationIndex } from './conversation-index.constants';
 import { conversationIndexMessage } from './conversation-index.utils';
 import type * as ConversationIndexTypes from '../../types/conversation-index.types';
 import type { Context } from '@earendil-works/chord/context';
-import type { ConversationMarkReadInput, ConversationSetPinnedInput } from '@openbots/contracts/universal';
 
 export async function makeConversationIndexService({ harness }: ConversationIndexTypes.ConversationIndexServiceDeps) {
   const deps: ConversationIndexTypes.ConversationIndexDeps = { harness, conversations: new Set() };
   await harness.commit(async (tx) => {
     await tx.doc(conversationIndex);
   }, BACKGROUND_CONTEXT);
-  const failed = new AbortController();
   let isClosed = false;
   let pending = Promise.resolve();
-  let failure: Error | null = null;
+  // The update is idempotent, so a failed batch is retried with the next commit instead of breaking the sidebar.
+  let unapplied: ConversationIndexTypes.ConversationIndexUpdate[] = [];
 
   const update = (messages: ConversationIndexTypes.ConversationIndexUpdate[]) => match(isClosed)
     .with(true, () => undefined)
     .with(false, () => {
-      pending = conversationIndexActionUpdate(deps, messages, BACKGROUND_CONTEXT);
-      void pending.catch((error: unknown) => {
-        failure = new Errors.INTERNAL_ERROR({ internal: 'Cannot update conversation index.', cause: error });
-        failed.abort(failure);
+      const batch = [...unapplied, ...messages];
+      unapplied = [];
+      pending = conversationIndexActionUpdate(deps, batch, BACKGROUND_CONTEXT).catch((error: unknown) => {
+        unapplied = [...batch, ...unapplied];
         log.error({
           tag: 'conversation-index',
-          message: 'Cannot update conversation index.',
+          message: 'Cannot update conversation index; retrying with the next commit.',
           error,
         });
       });
@@ -66,31 +59,15 @@ export async function makeConversationIndexService({ harness }: ConversationInde
   return {
     watch: async (context: Context) => {
       await pending;
-      const watch = await conversationIndexQueryWatch(deps, withAbortSignal(failed.signal, context));
-
-      const closed = watch.closed.then((end) => match(failure)
-        .with(P.nonNullable, (error) => ({ reason: 'listener_error' as const, error }))
-        .otherwise(() => end));
-
-      return { ...watch, closed };
+      return conversationIndexQueryWatch(deps, context);
     },
     actions: {
-      markRead: (params: ConversationMarkReadInput, context: Context) => conversationIndexActionMarkRead(deps, params, context),
-      setPinned: (params: ConversationSetPinnedInput, context: Context) => conversationIndexActionSetPinned(deps, params, context),
-      setHidden: (params: ConversationIndexTypes.ConversationIndexSetHiddenParams, context: Context) => conversationIndexActionSetHidden(deps, params, context),
-      setMuted: (params: ConversationIndexTypes.ConversationIndexSetMutedParams, context: Context) => conversationIndexActionSetMuted(deps, params, context),
-      arrange: (params: ConversationIndexTypes.ConversationIndexArrangeParams, context: Context) => conversationIndexActionArrange(deps, params, context),
       restore: (params: ConversationIndexTypes.ConversationIndexRestoreParams, context: Context) => conversationIndexActionRestore(deps, params, context),
     },
     queries: {
       list: async (context: Context) => {
         await pending;
-
-        return match(failure)
-          .with(null, () => conversationIndexQueryList(deps, context))
-          .otherwise((error) => {
-            throw error;
-          });
+        return conversationIndexQueryList(deps, context);
       },
     },
   };

@@ -5,6 +5,9 @@ export const serverEnvSchema = {
   OPENBOTS_DATA_DIR: z.string().trim().min(1).default('~/.config/openbots/'),
   OPENBOTS_HOST: z.string().trim().min(1).default('0.0.0.0'),
   OPENBOTS_PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+  OPENBOTS_ALLOWED_ORIGINS: z.string().trim().default('')
+    .transform((value) => value.split(',').map((origin) => origin.trim()).filter(Boolean)
+      .map((origin) => URL.parse(origin)?.origin ?? origin)),
   OPENBOTS_LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
 };
 

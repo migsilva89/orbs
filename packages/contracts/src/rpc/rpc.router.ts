@@ -22,11 +22,12 @@ import {
   authRedeem,
   authRedeemResult,
 } from '../types/auth.types';
-import { bot, botCatalog, botCreate, botGet, botList, botSwapModels, botSwapModelsResult, botUpdate } from '../types/bot.types';
+import { bot, botCatalog, botCreate, botDeleteResult, botGet, botList, botSwapModels, botSwapModelsResult, botUpdate } from '../types/bot.types';
 import { commandCatalog, commandExecute, commandExecuteResult, commandList } from '../types/command.types';
 import { conversationContextUsage } from '../types/context-usage.types';
 import { conversationArrange, conversationArrangeResult, conversationSetHidden, conversationSetMuted } from '../types/conversation-preference.types';
 import {
+  conversationClearResult,
   conversationContextPage,
   conversationContexts,
   conversationFrame,
@@ -471,6 +472,14 @@ export const contract = {
       .input(botUpdate)
       .output(bot),
 
+    delete: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(botGet)
+      .output(botDeleteResult),
+
     catalog: oc
       .errors({
         UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
@@ -646,6 +655,14 @@ export const contract = {
       })
       .input(conversationTarget)
       .output(conversationStopResult),
+
+    clear: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(botGet)
+      .output(conversationClearResult),
 
     watch: oc
       .errors({

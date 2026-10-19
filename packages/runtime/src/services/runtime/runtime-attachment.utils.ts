@@ -4,7 +4,7 @@ import { RUNTIME_ATTACHMENT_ENTRY } from './runtime-attachment.constants';
 import type { UserInput } from '@earendil-works/pi-durable';
 import type { Attachment } from '@openbots/contracts/universal';
 
-export function runtimeAttachmentPath(conversationId: number, file: Pick<Attachment, 'id' | 'name'>) {
+function runtimeAttachmentPath(conversationId: number, file: Pick<Attachment, 'id' | 'name'>) {
   return `.attachments/${conversationId}/${file.id}/${file.name}`;
 }
 

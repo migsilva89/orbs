@@ -31,15 +31,19 @@ The daemon listens on all IPv4 interfaces (`0.0.0.0`), using port 3000 by defaul
 
 ```text
 OPENBOTS_DATA_DIR/
-  agents/<botId>/       derived bot working folders
+  agents/<botId>/                derived bot working folders (attachments in .attachments/)
   data/
-    runtime.sql        Pi Durable SQLite database
-    app.sqlite         application SQLite database
+    app.sqlite                   application SQLite database
+    credentials.key              encryption key for application secrets
+    daemon.lock                  single-process lock for every store below
+    bots/<botId>/runtime.sql     that bot's Pi Durable store
 ```
+
+Each bot has its own Pi store. Pi has no delete API, so the file is the unit of erasure: deleting a bot deletes its store, and clearing a bot's history replaces it. Peer messages cross stores with stable request IDs; Pi's request-ID deduplication keeps a retried delivery to one message.
 
 Startup creates missing root, data, and agents directories with private permissions and checks read/write/traverse access before opening a database. A path occupied by a file or an inaccessible directory stops startup with a filesystem error. Database opens still report file-level errors; the directory check cannot guarantee a later write succeeds.
 
-Startup opens `data/runtime.sql` with a single-process lock, opens and migrates `data/app.sqlite`, creates Pi's model runtime, constructs workspace, skill, instruction, plugin, and MCP services from package exports, then restores each bot's Pi conversation and settings before calling `resume()`. Shutdown closes the listener, runtime, MCP clients, app database, and storage lock. Pairing grants live in `app.sqlite`. Use a separate data directory per independent daemon. Existing databases are not moved or renamed automatically.
+Startup takes `data/daemon.lock`, opens and migrates `data/app.sqlite`, creates Pi's model runtime, constructs workspace, skill, instruction, plugin, and MCP services from package exports, then opens each bot's store, restores its conversation and settings and calls `resume()`. A failing bot store closes only that bot; the next request reopens it. Shutdown closes the listener, every bot store, MCP clients, app database, and the lock. Pairing grants live in `app.sqlite`. Use a separate data directory per independent daemon. Existing databases are not moved or renamed automatically; a `data/runtime.sql` from the earlier shared-store layout is no longer read.
 
 The app database uses `node:sqlite` through Kysely, adapted from Orbs. WAL and foreign keys are enabled. Kysely tracks the [SQL migrations](packages/server/src/services/database/migrations/0001_pairing.sql); the first migration creates devices and temporary pairing grants. Further migrations add bots and their avatar, permission, and inheritance preferences. Migration `0005_credentials` adds the shared encrypted key/value store for application secrets. Provider credentials use Pi's auth files, not app tables. Pi Durable remains the owner of conversation history.
 
@@ -49,18 +53,16 @@ The internal server service supports submit, watch, history, and stop through Pi
 
 ## Offline backup and restore
 
-The native server package exposes backups for a stopped daemon. There is no backup RPC or CLI:
+Stop the daemon, then run the backup command with the same `OPENBOTS_DATA_DIR`. Restore writes into `OPENBOTS_DATA_DIR`, which must not exist yet. There is no backup RPC.
 
-```ts
-import { makeBackupService } from '@openbots/server/native';
-
-await makeBackupService({ root: sourceRoot }).actions.create({ destination: backupDirectory });
-await makeBackupService({ root: newRoot }).actions.restore({ bundle: backupDirectory });
+```sh
+bun run --cwd apps/daemon backup create ~/openbots-backup-2026-10-19
+OPENBOTS_DATA_DIR=~/.config/openbots-restored bun run --cwd apps/daemon backup restore ~/openbots-backup-2026-10-19
 ```
 
-Use absolute paths. Both the backup destination and restore root must be absent, with existing parent directories. Create takes the same storage lock as daemon startup; a running daemon returns `CONFLICT`. It snapshots both SQLite databases with `VACUUM INTO`, copies the credential key and bot workspaces, and records file sizes and SHA-256 checksums. Restore checks the manifest and publishes a complete directory without opening Pi, running migrations, or starting the daemon. Existing directories are never a restore target.
+The command uses `makeBackupService` from `@openbots/server/native`. Both the backup destination and restore root must be absent, with existing parent directories. Create takes the same storage lock as daemon startup; a running daemon returns `CONFLICT`. It snapshots the app database and every bot's Pi store with `VACUUM INTO`, copies any pending history-clear carry file, the credential key and bot workspaces, and records file sizes and SHA-256 checksums. Restore checks the manifest and publishes a complete directory without opening Pi, running migrations, or starting the daemon. Existing directories are never a restore target.
 
-The bundle preserves the server identity, paired devices, encrypted application credentials, transcripts, tasks, bot files and attachments. It also contains the encryption key, so protect the whole bundle as secret data. It excludes runtime locks, local IPC, Pi's external provider-auth store and shared skill/plugin/instruction directories outside the data root. Their configured paths remain in settings. Symlinks and unsupported file types are rejected. Restore replaces the same logical daemon; do not run the source and restored copy as independent servers.
+The bundle preserves the server identity, paired devices, encrypted application credentials, transcripts, tasks, bot files and attachments. It also contains the encryption key, so protect the whole bundle as secret data. It excludes runtime locks, local IPC, Pi's external provider-auth store and shared skill/plugin/instruction directories outside the data root. Their configured paths remain in settings. Symlinks and special files in bot workspaces, such as `node_modules/.bin` links, are skipped and listed under `skipped` in the manifest; reinstall dependencies after restore. Restore replaces the same logical daemon; do not run the source and restored copy as independent servers.
 
 ## Server identity and protocol
 
@@ -135,16 +137,20 @@ const reactions = await client.conversation.reactions({ botId, entryIds: visible
 
 Pass `isPresent: false` to remove a reaction. Pi documents store reactions beside the selected conversation. Bot-authored reactions use the separate attribution described below. Reaction-triggered bot replies remain pending.
 
-Bots can call the `bot_question` tool with a question and optional choices. Clients read pending questions and submit a choice or free text through authenticated RPC:
+Bots can call the `bot_question` tool with a question, optional choices and `isMultiSelect`. Clients read pending questions and answer with free text, one or more listed choices, or a skip through authenticated RPC:
 
 ```ts
 const questions = await client.conversation.questions({ botId, conversationId });
-const result = await client.conversation.answerQuestion({
-  botId, conversationId, id: question.id, answer: 'Use the smaller version.',
-});
+const target = { botId, conversationId, id: question.id };
+
+await client.conversation.answerQuestion({ ...target, answer: { kind: 'text', text: 'Use the smaller version.' } });
+await client.conversation.answerQuestion({ ...target, answer: { kind: 'choices', choices: ['Staging', 'Production'] } });
+await client.conversation.answerQuestion({ ...target, answer: { kind: 'skip' } });
 ```
 
-The first answer before the five-minute deadline wins; `result.isAccepted` reports whether it was accepted. Question state and its deadline live in a task-scoped Pi document and survive restart. Stopping the task removes it from pending questions. This is separate from permission approval; the trusted `bot_question` tool also works in read-only mode. Multi-select cards and skip controls are not implemented.
+Choices must come from the question's list, without duplicates; more than one requires `isMultiSelect`.
+
+The first answer before the five-minute deadline wins; `result.isAccepted` reports whether it was accepted. Question state and its deadline live in a task-scoped Pi document and survive restart. Stopping the task removes it from pending questions. This is separate from permission approval; the trusted `bot_question` tool also works in read-only mode. Multi-select cards and skip controls in clients are not implemented.
 
 The selected chat watch includes `interactionsRevision`. Refetch visible reactions and pending questions on the initial state and when this value changes. It is a subscription-local invalidation counter, not a replay cursor. Reconnect starts with current state. Reaction buttons, question cards and retry controls remain UI work.
 
@@ -199,7 +205,7 @@ The daemon uses Pi's `ModelRuntime.create()`, which loads saved provider credent
 
 Set `PI_CODING_AGENT_DIR` for both Pi and the daemon to use a separate auth/config directory, including for development versus production. Run them as the same OS user to share the default directory. Pi authentication uses its existing location. Skills are loaded directly from their source directories, including existing symlinks; MCP configuration discovery, stdio/Streamable HTTP connections and MCP OAuth APIs are available. Pi's auth file is sensitive and is not encrypted by this integration.
 
-This loads provider configuration, not CLI sessions, tools, extensions, or `settings.json`. Durable still stores conversations, tasks, and recovery state in `OPENBOTS_DATA_DIR/data/runtime.sql`. Authentication is shared; each bot selects its own model through its database settings.
+This loads provider configuration, not CLI sessions, tools, extensions, or `settings.json`. Durable stores each bot's conversations, tasks, and recovery state in `OPENBOTS_DATA_DIR/data/bots/<botId>/runtime.sql`. Authentication is shared; each bot selects its own model through its database settings.
 
 Provider auth uses `providers.list()`, `providers.login({ providerId, authType })`, `providers.session({ id })`, `providers.complete({ id, promptId, answer })`, `providers.cancel({ id })` and `providers.logout({ providerId })`. Auth types are `api_key` and `oauth`, filtered by the selected Pi provider's login capabilities. Start returns a bounded, temporary login session. Poll its state, render Pi's notices or authorization link, and answer its current prompt. Each prompt has its own ID so an old answer cannot complete a later step.
 
@@ -207,9 +213,9 @@ Only the paired device that started a login can read or answer that session. Dev
 
 ## Request limits
 
-`limits.settings()` returns the complete policy. `limits.configure(patch)` changes selected fields in the shared settings table; omitted fields, including nested fields, stay unchanged. Defaults per daemon are 6,000 RPC requests/minute, 10 pairing redemptions/minute per connection address, 600 authenticated requests/minute per device, 32 active RPC handlers and 64 active watches.
+`limits.settings()` returns the complete policy. `limits.configure(patch)` changes selected fields in the shared settings table; omitted fields, including nested fields, stay unchanged. Defaults are 6,000 RPC requests/minute per connection address, 10 pairing redemptions/minute per connection address, 600 authenticated requests/minute per device, 32 active RPC handlers and 64 active watches.
 
-The public budget is checked before authentication. Peer addresses come from the listener, never forwarded headers; callers behind a reverse proxy share its redemption budget. Excess requests receive `RATE_LIMITED` with `retryAfter` in seconds. Active watches use a separate slot until completion, disconnect or revocation. Changing settings resets rate windows and preserves occupied slots. Rate counters reset on restart. These are RPC limits; Pi still owns accepted agent work, with no second execution queue.
+The public budget is checked before authentication, per connection address, so unpaired peers cannot exhaust paired devices' budget. Peer addresses come from the listener, never forwarded headers; callers behind a reverse proxy share its public and redemption budgets. Excess requests receive `RATE_LIMITED` with `retryAfter` in seconds. Active watches use a separate slot until completion, disconnect or revocation. Changing settings resets rate windows and preserves occupied slots. Rate counters reset on restart. These are RPC limits; Pi still owns accepted agent work, with no second execution queue. Separately, at most four model streams run at once across all bots; later provider requests wait in order and stop waiting when their run is stopped. A slot is held only while a stream runs, never across tool calls.
 
 ## Device pairing
 
@@ -305,18 +311,29 @@ The two model selections are stored in Pi's agent model reference, so private co
 
 App SQL owns settings. A Pi session document keyed by bot ID owns the stable conversation ID; mapping creation and Pi agent configuration share one commit. Updates do not replace the conversation or history. SQL saves first. Configuration then prepares the directory, skills, instructions, plugins, and MCP outside that transaction. Same-bot configuration is serialized in memory; after preparation it rereads the bot row and all four domain settings and retries if the values that affect Pi config changed. Startup restores every bot before resuming work; submission also reapplies settings. A Pi synchronization failure can leave a saved bot/configuration pending reconciliation. List bots before retrying creation after an error, since handles are unique. Empty working folders from failed operations are not automatically deleted.
 
-The earlier root conversation is retained but no longer exposed by these bot-scoped endpoints. Bot deletion and the sidebar UI remain separate work. The sidebar list API is described below.
+### Delete a bot and clear its history
+
+```ts
+await client.conversation.clear({ botId }); // erase history, keep the bot
+await client.bots.delete({ botId });        // erase the bot and everything it owns
+```
+
+`bots.delete` removes the bot row and its preferences, deletes its Pi store file, closes its MCP connections and deletes `agents/<botId>/` with its attachments. It is permanent. Peers that later message the bot receive an unavailable result; what the deleted bot sent to a peer stays in that peer's store.
+
+`conversation.clear` stops the bot's work, saves its routines and the latest version of each artifact, deletes its store, opens a fresh one and recreates them with the same IDs. Attachments are deleted and the read position resets; usage and artifact version history start over. The saved routines live in `data/bots/<botId>/carry.json` until the refill finishes, so a crash in between finishes on the next start.
+
+The sidebar list API is described below.
 
 ## Sidebar list
 
 ```ts
 const chats = await client.conversation.list();
-// Each row includes isPinned, isHidden, isMuted, rank, hasUnread, and readThroughEntryId.
+// Each row includes isPinned, isHidden, isMuted, mutedUntil, rank, hasUnread, and readThroughEntryId.
 ```
 
 This authenticated query lists visible main chats before hidden ones, then pinned chats, manual rank and newest message, with a stable bot-ID tie-break. Hidden rows remain available so a client can show and unhide them. `lastMessage` is null for an empty chat; otherwise it contains `entryId`, `role`, a plain-text `preview` of at most 160 characters, and `createdAt` from Pi's message timestamp. Names and avatars come from current bot settings. Private contexts and subagents remain details of their originating chat.
 
-Runtime maintains a small session-scoped Pi summary document from committed user and assistant text. Tool output, thinking, reset/compaction entries, and private routing inputs do not replace the preview. Native task-graph state supplies `isRunning` for ordinary work in the main conversation; idle background anchors do not keep it busy. List calls read the summary and task graph, never transcripts or full conversation views.
+Each bot store keeps a small session-scoped Pi summary document from committed user and assistant text. Tool output, thinking, reset/compaction entries, and private routing inputs do not replace the preview. Native task-graph state supplies `isRunning` for ordinary work in the main conversation; idle background anchors do not keep it busy. List calls read the summary and task graph, never transcripts or full conversation views.
 
 Summary updates follow transcript commits. Startup repairs the index from bounded Pi history pages before resuming execution; reconfiguring an already indexed bot does not rescan it. The index is derived state, not another message log. `conversation.list` returns a snapshot. For live updates, use the client helper:
 
@@ -328,7 +345,7 @@ for await (const chats of watchConversations(client, signal)) {
 }
 ```
 
-`conversation.watchList()` sends an initial list and Chord updates over authenticated oRPC. Runtime watches the summary document and task graph; server joins current bot settings and observes bot changes. Previews, ordering, running status, names, and avatars update without reading histories. Slow clients receive updates relative to their last delivered state; reconnect starts with a fresh list. Cancellation stops observation, and device revocation closes idle streams too. Pins and read positions belong to the single owner and sync across paired devices through this same subscription:
+`conversation.watchList()` sends an initial list and Chord updates over authenticated oRPC. Runtime watches every bot store's summary document and task graph as one merged view; bots that open, clear or delete later join or leave it. Server joins current bot settings and preferences and observes their changes. Previews, ordering, running status, names, and avatars update without reading histories. Slow clients receive updates relative to their last delivered state; reconnect starts with a fresh list. Cancellation stops observation, and device revocation closes idle streams too. Pins and read positions belong to the single owner and sync across paired devices through this same subscription:
 
 ```ts
 await client.conversation.setPinned({ botId, isPinned: true });
@@ -337,15 +354,16 @@ await client.conversation.markRead({ botId, throughEntryId: lastVisibleEntry.id 
 
 Pass the last saved entry the user actually viewed. An older request cannot move the read position backwards or clear a later reply. Entries from another chat and unknown IDs are rejected. `hasUnread` means a saved assistant text reply exists after `readThroughEntryId`; owner messages, tool output, thinking, and private routing entries do not create unread state. Opening a subscription does not mark anything read. Both actions return `{ isPinned, readThroughEntryId, hasUnread }`. Use `isPinned: false` to unpin; neither action is automatically retried.
 
-These values stay in Pi's summary document. Pi's document migration preserves existing summaries; startup repairs the latest assistant entry alongside the preview and preserves pins/read positions. Existing replies start unread until marked read. The sidebar UI remains separate work.
+Pin, hidden, rank, mute and read position are owner preferences in the app's `bot_preference` table, deleted with the bot. Pi supplies only the preview, latest reply and running state. Startup repairs the latest assistant entry from history. Existing replies start unread until marked read. The sidebar UI remains separate work.
 
 ```ts
 await client.conversation.setHidden({ botId, isHidden: true });
 await client.conversation.setMuted({ botId, isMuted: true });
+await client.conversation.setMuted({ botId, isMuted: true, mutedUntil: Date.now() + 60 * 60 * 1000 });
 await client.conversation.arrange({ botIds: orderedBotIds });
 ```
 
-These actions update the existing Pi index and stream to paired devices. `arrange` ranks the supplied chats and clears omitted ranks; pinning still takes precedence. Hide does not stop work or delete history. Mute suppresses backend notification events for that bot, including its private contexts and subagents. Notification UI is not implemented.
+These actions update the bot preferences and stream to paired devices. `arrange` ranks the supplied chats and clears omitted ranks; pinning still takes precedence. Hide does not stop work or delete history. Mute suppresses backend notification events for that bot, including its private contexts and subagents. `mutedUntil` (milliseconds since epoch) ends a mute at that time; `null` mutes until changed. After expiry, notifications resume and lists report `isMuted: false`; an open sidebar watch refreshes the flag at its next change, so clients should also compare `mutedUntil` with the clock. Notification UI is not implemented.
 
 ## Skills and MCP discovery
 
@@ -402,6 +420,8 @@ Reference encrypted credentials by name with `envCredentials` for stdio or `head
 
 Set `mcp.example.authorization` through authenticated `credentials.set`; store the complete header value, including any authorization scheme. Referenced values replace literal values for the same environment/header name; HTTP header matching ignores case. Discovery checks key presence without decrypting. Preparation resolves secrets in memory; a missing/unreadable key omits that server and closes its prior client. Rotation reconnects on the next bot preparation (startup, bot configuration or submission), not immediately when the credential is saved. Catalogs contain neither values nor transport configuration.
 
+Only shared MCP sources may reference credentials. A bot can write its own folder, so a server in a bot's `.agents/mcp.json` or `.pi/mcp.json` that uses `envCredentials` or `headerCredentials` is skipped with a diagnostic. This blocks the direct path only; a bot with unrestricted shell access under Full mode can still edit files outside its folder.
+
 ### MCP OAuth
 
 Paired devices authenticate a configured HTTP MCP server with `mcpAuth.start({ botId, name, redirectUrl })`. Openbots resolves `name` using the bot's inherited/local configuration; callers cannot supply a different MCP server URL. The client opens the returned authorization URL and captures its registered redirect, then sends the full callback URL to `mcpAuth.complete({ botId, name, callbackUrl })`. The server verifies the initiating device, redirect destination and OAuth state before Pi exchanges the code.
@@ -423,7 +443,7 @@ for await (const state of watchNotifications(client, controller.signal)) {
 }
 ```
 
-Events contain identifiers for the bot, conversation, entry or task, plus expiry where relevant. Fetch the selected chat or existing approval/question endpoint for details. The stream carries no tool arguments, question text, provider errors or message bodies. Private contexts retain their own conversation ID and use their bot's main-chat mute preference; hiding a chat does not mute it.
+Events contain identifiers for the bot, conversation, entry or task, plus expiry where relevant. Fetch the selected chat or existing approval/question endpoint for details. The stream carries no tool arguments, question text, provider errors or message bodies. Each bot store reports its own events and the server merges them; mute is read from the app database, so private contexts and subagents follow their bot's mute. Hiding a chat does not mute it.
 
 Each connection starts with current pending attention and an empty recent list. Completion events missed while disconnected are not replayed. Clients can compare stable event identifiers across snapshots and decide whether to show an OS notification; foreground suppression, sound and mobile push remain client work. Cancelling the stream or revoking its device ends observation without stopping agent work.
 
@@ -479,11 +499,11 @@ Openbots-owned tools use the `bot_` namespace. Finish pending calls that use the
 
 `context` accepts `existing` (the default) or `temporary`. Temporary contexts reuse the recipient’s configuration, skills, permissions, and working directory, without copying its transcript. New admissions refresh that configuration from the main conversation. Context isolation does not isolate files or tools.
 
-A temporary context lasts 48 hours from creation. The next temporary delivery after expiry archives the old context and creates a fresh one in the same Pi transaction as delivery admission. Existing deliveries remain attached to their original context and can finish; history stays readable. This is lazy rotation, with no background cleanup timer or hard deletion. Default-mode messages never create or rotate temporary contexts. Tool details include `recipientConversationId`, which clients can open with the recipient’s `botId`.
+A temporary context lives in the recipient's store and lasts 48 hours from creation. The next temporary delivery after expiry archives the old context and creates a fresh one in the recipient's store; the sender's conversation keeps a pointer to it. Existing deliveries remain attached to their original context and can finish; history stays readable. This is lazy rotation, with no background cleanup timer or hard deletion. Default-mode messages never create or rotate temporary contexts. Tool details include `recipientConversationId`, which clients can open with the recipient’s `botId`.
 
-Peer delivery uses native Pi tasks, checkpoints, and stable submission IDs. Self-delivery and delegation triggered by peer requests/reports are denied. Each source conversation admits at most eight pending deliveries. Recipient conversations serialize their own turns. Stopping the sender does not stop the independent recipient or accepted background delivery. This is a local peer tool surface, not a separate DM UI or cross-daemon bridge.
+Peer delivery uses native Pi tasks, checkpoints, and stable submission IDs. The delivery task lives in the sender's store and submits into the recipient's store with request ID `openbots.delivery:<senderStoreId>:<taskId>`; a rerun after a crash gets the same submission back, so the recipient sees the message once. The sender's store ID is random per store, so task IDs that restart after a history clear never match an old delivery. The answer text is copied back with the result. Self-delivery and delegation triggered by peer requests/reports are denied. Each source conversation admits at most eight pending deliveries. Recipient conversations serialize their own turns. Stopping the sender does not stop the independent recipient or accepted background delivery. This is a local peer tool surface, not a separate DM UI or cross-daemon bridge.
 
-Subagents follow Pi's foreground and background examples. They copy the parent's agent configuration and bot identity at creation, so approvals use the owning bot's current permission policy. Children cannot spawn further children or contact peers. A conversation has at most eight named background children and eight pending background reports. Names persist for reuse; removing them is not implemented. Foreground children stop with their owner task; background children survive parent stop. All tools still pass through the permission hook, including delegation tools.
+Subagents follow Pi's foreground and background examples. They copy the parent's agent configuration and bot identity at creation, so approvals use the owning bot's current permission policy. Children cannot spawn further children or contact peers. A conversation runs at most eight background children at once; finished or stopped children no longer count. Names persist for reuse with send; removing them is not implemented. Foreground children stop with their owner task; background children survive parent stop. All tools still pass through the permission hook, including delegation tools.
 
 Tool details expose child `conversationId`. Pass it alongside `botId` to the existing conversation watch/history/submit/stop or command calls to select that child. Omitting it selects the bot's main conversation. A mismatched bot/conversation pair is rejected. `tools.pending({ botId })` includes approvals from both main and child conversations; no additional approval table or queue is used.
 
@@ -520,7 +540,7 @@ const peers = await client.conversation.contexts({ botId, kind: 'temporary', lim
 
 Both queries return `{ items, next? }` in newest-conversation-first order. Pass `next` as `cursor` with the same target and kind to continue. An optional `conversationId` selects a source other than the bot's main chat. Subagents include finished children, their owner task ID, background flag, and name when named. Temporary contexts include their recipient bot ID and creation, expiry, and archive timestamps. Default peer messages reuse main chats and do not appear as temporary contexts. `isRunning` is a snapshot of Pi's ordinary live tasks.
 
-Discovery reads Pi ownership records and documents, never messages or full views, and starts no work. Pi can filter subagents by parent; it cannot filter ownerless temporary contexts by source. Temporary discovery therefore checks at most `limit` conversation metadata records per call (default 50, maximum 100). A page can be empty while `next` exists; only an absent `next` ends the scan. This avoids a second index, but finding a source's contexts can require several metadata pages on a large daemon. On selection, pass the item's `botId` and `conversationId` to the existing history/watch calls; peer contexts belong to the recipient. Archived history remains available.
+Discovery reads Pi ownership records and documents, never messages or full views, and starts no work. Subagents are scanned by parent in the bot's store. Temporary contexts live in recipient stores; the source conversation keeps pointers to them, and each page reads that list, then the recipients' metadata and running state. On selection, pass the item's `botId` and `conversationId` to the existing history/watch calls; peer contexts belong to the recipient. Archived history remains available.
 
 Keep one invalidation subscription open while the panel is visible:
 
@@ -533,7 +553,7 @@ for await (const _state of watchConversationContexts(client, { botId }, signal))
 
 `conversation.watchContexts` sends Chord frames for `{ revision }`; the helper applies them. Each value, including the initial value after reconnect, tells the UI to refetch its visible metadata pages. Revisions belong to that subscription, not a persisted replay cursor. New contexts require refreshing the first page; retain lazy pagination rather than fetching every page.
 
-Membership/name/archive changes are scoped to the source conversation. Busy/idle changes use Pi's live task graph across the daemon, so unrelated bots can cause a refresh too; the stream reveals no other conversation data. Token-only and task-checkpoint-only changes do not invalidate pages. Pi/Chord bound pending deliveries and can coalesce updates, which is safe because a refetch reads current state. Cancellation closes observation, not tasks, and device revocation closes the stream.
+Membership/name changes are scoped to the source conversation. Busy/idle changes use the bot store's live task graph; a temporary context's running state, which lives in the recipient's store, refreshes on the next page read; the stream reveals no other conversation data. Token-only and task-checkpoint-only changes do not invalidate pages. Pi/Chord bound pending deliveries and can coalesce updates, which is safe because a refetch reads current state. Cancellation closes observation, not tasks, and device revocation closes the stream.
 
 ## Live conversation
 
@@ -600,6 +620,7 @@ Before bot routing was added, a disposable WebSocket check with SQLite and Pi's 
 | `OPENBOTS_HOST` | `0.0.0.0` | Bind address or hostname |
 | `OPENBOTS_PORT` | `3000` | Integer from 1 to 65535 |
 | `OPENBOTS_LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
+| `OPENBOTS_ALLOWED_ORIGINS` | empty | Comma-separated browser or webview origins, such as `tauri://localhost`. Requests without an Origin, or with an Origin on the request host, are always allowed |
 
 Bot settings and tool credentials belong in the app database; provider authentication uses Pi's auth files. The env package does not read or write local config files or generate secrets.
 
@@ -647,7 +668,7 @@ One routine has at most one claimed occurrence at a time. `lastRun` reports the 
 
 After downtime, a saved overdue deadline runs once; missed repetitions are not replayed. Cron chooses the next future calendar time after completion. Intervals wait the specified minutes after completion. A scheduled one-shot disables itself after its receipt settles, including an unanswered result. Resuming a past one-shot explicitly requests it again. On restart, the harness resumes the saved phase and reuses the same submission instead of creating another input. External tool effects still follow Pi's replay guarantees.
 
-The native daemon must remain running. No operating-system wake-up or Cloudflare alarm is installed. The routine editor and live routine-list UI are not implemented.
+Waiting does not depend on a host timer surviving: after each commit, every bot store arms one host alarm at its earliest saved deadline (routine runs, approval and question expiry) plus a one-minute heartbeat while other work is live, and the alarm resumes that store. The native daemon must remain running; its alarm is an in-process timer. A Cloudflare host would back the same port with Durable Object alarms. The routine editor and live routine-list UI are not implemented.
 
 Bots have `bot_routine_list`, `bot_routine_create`, `bot_routine_update`, `bot_routine_run` and `bot_routine_remove`. These call the same runtime routine service as RPC. Tool schemas are derived once from the public routine contracts. Tools derive the bot identity from Pi; they accept no bot or conversation ID. Private contexts and subagents manage their bot's main-chat routines, with the same permission hook.
 

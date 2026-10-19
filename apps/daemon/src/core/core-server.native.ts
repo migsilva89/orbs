@@ -13,14 +13,13 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
     maxRequestBodySize: 12 * 1024 * 1024,
     fetch(request, server) {
       const url = new URL(request.url);
-      const origin = request.headers.get('origin');
 
       return match({
         path: url.pathname,
-        origin,
+        isAllowedOrigin: coreServerAllowedOrigin(request),
         method: request.method,
       })
-        .with({ path: P.union('/rpc', P.string.startsWith('/rpc/')), origin: P.not(P.union(null, url.origin)) }, () => (
+        .with({ path: P.union('/rpc', P.string.startsWith('/rpc/')), isAllowedOrigin: false }, () => (
           new Response(null, { status: 403 })
         ))
         .with({ path: P.union('/rpc', P.string.startsWith('/rpc/')), method: 'POST' }, () => rpc.http.handle(request, {
@@ -43,7 +42,7 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
     },
     websocket: {
       maxPayloadLength: 1024 * 1024,
-      backpressureLimit: 64 * 1024,
+      backpressureLimit: 4 * 1024 * 1024,
       closeOnBackpressureLimit: true,
       async message(socket, message) {
         await rpc.websocket.message(socket, message, {
@@ -55,4 +54,18 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
       },
     },
   });
+}
+
+function coreServerAllowedOrigin(request: Request): boolean {
+  const origin = request.headers.get('origin');
+  const host = request.headers.get('host');
+
+  return match(origin)
+    .with(null, () => true)
+    .otherwise((value) => {
+      const url = URL.parse(value);
+
+      return env.OPENBOTS_ALLOWED_ORIGINS.includes(url?.origin ?? value)
+        || (url !== null && url.host === URL.parse(`http://${host}`)?.host);
+    });
 }

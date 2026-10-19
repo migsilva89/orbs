@@ -1,5 +1,8 @@
 export { makeRuntimeService, type RuntimeService } from './services/runtime/runtime.service';
 export type { RuntimeServiceParams, RuntimeToolCall, RuntimeToolDecision } from './types/runtime.types';
+export type { ConversationIndexSummary } from './types/conversation-index.types';
+export type { AlarmService } from './types/alarm.types';
+export type { StorageService } from './types/storage.types';
 export type { CollaborationBotParams, CollaborationPolicy, CollaborationRecipientParams } from './types/collaboration.types';
 export type { ToolRegistration } from '@earendil-works/pi-durable';
 export { mcpDocument, mcpServer } from './types/mcp.types';

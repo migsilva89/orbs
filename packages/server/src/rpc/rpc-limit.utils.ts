@@ -1,3 +1,4 @@
+import { Errors } from '@openbots/errors/universal';
 import { AsyncIteratorClass, isAsyncIteratorObject } from '@orpc/shared';
 import { match } from 'ts-pattern';
 import type { LimitLease } from '../types/limit.types';
@@ -15,11 +16,23 @@ export async function rpcLimitOutput<T>({ limits, auth, deviceId, authorization,
         throw error;
       }
 
-      const stream = new AsyncIteratorClass(() => iterator.next(), async () => {
+      const revocation = new AbortController();
+
+      const revoked = new Promise<never>((_resolve, reject) => {
+        revocation.signal.addEventListener('abort', () => reject(new Errors.UNAUTHORIZED()), { once: true });
+      });
+
+      revoked.catch(() => undefined);
+
+      const stream = new AsyncIteratorClass(() => Promise.race([iterator.next(), revoked]), async ({ kind }) => {
         signal?.removeEventListener('abort', rpcLimitCancel);
         unsubscribe();
         lease.release();
-        await iterator.return?.();
+        const closing = Promise.resolve(iterator.return?.()).catch(() => undefined);
+
+        await match(kind)
+          .with('error', () => undefined)
+          .otherwise(() => closing);
       });
 
       function rpcLimitCancel() {
@@ -27,7 +40,7 @@ export async function rpcLimitOutput<T>({ limits, auth, deviceId, authorization,
       }
 
       const unsubscribe = auth.onRevoke((id) => match(id)
-        .with(deviceId, rpcLimitCancel)
+        .with(deviceId, () => revocation.abort())
         .otherwise(() => undefined));
 
       signal?.addEventListener('abort', rpcLimitCancel, { once: true });

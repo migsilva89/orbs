@@ -1,4 +1,6 @@
 import { botAvatar, botInherit, modelSelection } from '@openbots/contracts/universal';
+import { match } from 'ts-pattern';
+import type { BotServiceDeps } from '../../types/bot.types';
 import type { DatabaseBot } from '../../types/database.types';
 import type { Bot, BotCreateInput } from '@openbots/contracts/universal';
 
@@ -18,4 +20,22 @@ export function botValues(bot: BotCreateInput) {
     inherit: JSON.stringify(bot.inherit),
     fallbackModel: JSON.stringify(bot.fallbackModel),
   };
+}
+
+export async function botQueue<T>(deps: BotServiceDeps, botId: string, run: () => Promise<T>) {
+  const previous = deps.queues.get(botId) ?? Promise.resolve();
+  const current = previous.then(run);
+  const settled = current.then(() => undefined, () => undefined);
+  deps.queues.set(botId, settled);
+
+  try {
+    return await current;
+  } finally {
+    match(deps.queues.get(botId) === settled)
+      .with(true, () => {
+        deps.queues.delete(botId);
+      })
+      .with(false, () => undefined)
+      .exhaustive();
+  }
 }

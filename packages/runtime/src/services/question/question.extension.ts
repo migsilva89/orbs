@@ -21,6 +21,7 @@ const ask = defineTool({
     }), {
       maxItems: QUESTION_BOUNDS.maxChoices,
     })),
+    isMultiSelect: Type.Optional(Type.Boolean({ description: 'Let the owner pick more than one choice.' })),
   }),
   replay: 'safe',
   execute: (params, api, context) => questionActionAsk(params, api, context),

@@ -1,15 +1,17 @@
 export const BACKUP = {
-  version: 1,
+  version: 2,
   manifest: 'manifest.json',
+  lock: 'data/daemon',
   files: {
-    runtime: 'data/runtime.sql',
     database: 'data/app.sqlite',
     credentials: 'data/credentials.key',
   },
   directories: {
     data: 'data',
+    bots: 'data/bots',
     agents: 'agents',
   },
+  botStore: /^data\/bots\/[0-9a-f-]{36}\/(runtime\.sql|carry\.json)$/,
   excluded: {
     locks: true,
     ipc: true,

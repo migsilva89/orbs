@@ -19,7 +19,8 @@ export interface BotServiceDeps extends BotDatabaseDeps {
   instruction: InstructionService;
   mcp: McpService;
   changes: Set<BotChangeListener>;
-  configurations: Map<string, Promise<void>>;
+  queues: Map<string, Promise<void>>;
+  muteExpiry: { timer: ReturnType<typeof setTimeout> | undefined };
 }
 
 export interface BotConfiguration {
@@ -31,3 +32,31 @@ export interface BotConfiguration {
 }
 
 export type BotChangeListener = () => void;
+
+export interface BotPreferences {
+  isPinned: boolean;
+  isHidden: boolean;
+  rank: number | null;
+  isMuted: boolean;
+  mutedUntil: number | null;
+  readThroughEntryId: number;
+}
+
+export type BotPreferencesUpdate = Partial<BotPreferences> & UniversalTypes.BotGetInput;
+
+export interface BotArrangeParams {
+  botIds: string[];
+}
+
+export interface BotMarkReadParams extends UniversalTypes.BotGetInput {
+  throughEntryId: number;
+}
+
+export interface BotPreferenceRow {
+  isPinned: number | null;
+  isHidden: number | null;
+  rank: number | null;
+  isMuted: number | null;
+  mutedUntil: number | null;
+  readThroughEntryId: number | null;
+}

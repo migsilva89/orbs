@@ -1,5 +1,6 @@
 import { Type } from '@earendil-works/pi-ai';
 import { defineExtension, defineTool } from '@earendil-works/pi-durable';
+import { botCreate } from '@openbots/contracts/universal';
 import * as m from '@openbots/i18n/messages';
 import {
   botToolCreate,
@@ -33,7 +34,7 @@ export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
     parameters: botToolCreateParameters,
     replay: 'unsafe',
     execute: async (params) => {
-      const input = botToolCreate.parse(params);
+      const input = botCreate.parse(botToolCreate.parse(params));
       return runtimeBotToolsOutput(await deps.bots.actions.create(input));
     },
   });

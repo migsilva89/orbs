@@ -7,9 +7,10 @@ Review the changed files and their callers against `.agents/references/architect
 ```sh
 bun run check
 bun run lint
+bun run lint:dead
 ```
 
-Both must finish without warnings or errors. Run existing tests when affected; no application tests exist yet, and an empty test task is not coverage. Add tests only at the user's request.
+`check` and `lint` must finish without warnings or errors. `lint:dead` must exit cleanly; its remaining warnings are exported service types kept by the architecture convention. Run existing tests when affected; no application tests exist yet, and an empty test task is not coverage. Add tests only at the user's request.
 
 ## Review
 

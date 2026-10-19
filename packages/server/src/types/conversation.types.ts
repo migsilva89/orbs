@@ -3,6 +3,7 @@ import type { AuthService } from '../services/auth/auth.service';
 import type { BotService } from '../services/bot/bot.service';
 import type { SkillService } from '../services/skill/skill.service';
 import type { AuthAuthenticateParams } from './auth.types';
+import type { BotPreferences } from './bot.types';
 import type { ReplicatedState } from '@earendil-works/chord';
 import type { ConversationAnswerQuestionInput } from '@openbots/contracts/universal';
 import type { RuntimeService } from '@openbots/runtime/server';
@@ -13,6 +14,11 @@ export interface ConversationServiceDeps {
   bots: BotService;
   runtime: RuntimeService;
   skill: SkillService;
+}
+
+export interface ConversationPreferencesParams {
+  botId: string;
+  preference: BotPreferences;
 }
 
 export interface ConversationListWatchParams extends AuthAuthenticateParams {

@@ -2,7 +2,7 @@ import { AssistantEntry, UserEntry } from '@earendil-works/pi-durable';
 import { ATTACHMENT, attachmentMessage, REPLY, replyMessage } from '@openbots/contracts/universal';
 import { Errors } from '@openbots/errors/universal';
 import { match, P } from 'ts-pattern';
-import type { ConversationIndexDocument, ConversationIndexItem, ConversationIndexPreview } from '../../types/conversation-index.types';
+import type { ConversationIndexDocument, ConversationIndexPreview, ConversationIndexSummary } from '../../types/conversation-index.types';
 import type { Context } from '@earendil-works/chord/context';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
 import type { ConversationSummary } from '@openbots/contracts/universal';
@@ -73,9 +73,8 @@ export function conversationIndexSummaries(index: Readonly<ConversationIndexDocu
     .map((task) => task.conversationId));
 
   return Object.values(index?.conversations ?? {}).flatMap((conversation) => match(conversation)
-    .with(P.nonNullable, ({ lastAssistantEntryId, ...summary }) => [{
+    .with(P.nonNullable, (summary): ConversationIndexSummary[] => [{
       ...summary,
-      hasUnread: lastAssistantEntryId > summary.readThroughEntryId,
       isRunning: running.has(summary.conversationId),
     }])
     .otherwise(() => []));
@@ -87,15 +86,4 @@ export function conversationIndexFind(index: ConversationIndexDocument, botId: s
     .otherwise(() => {
       throw new Errors.NOT_FOUND({ resource: 'conversation', resourceId: botId });
     });
-}
-
-export function conversationIndexPreferences(conversation: ConversationIndexItem) {
-  return {
-    isPinned: conversation.isPinned,
-    isHidden: conversation.isHidden,
-    isMuted: conversation.isMuted,
-    rank: conversation.rank,
-    readThroughEntryId: conversation.readThroughEntryId,
-    hasUnread: conversation.lastAssistantEntryId > conversation.readThroughEntryId,
-  };
 }

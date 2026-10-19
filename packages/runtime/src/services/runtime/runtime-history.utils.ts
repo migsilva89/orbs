@@ -22,7 +22,7 @@ export function runtimeHistoryPage(page: Page<EntryRecord, Cursor>, query?: stri
   };
 }
 
-export function runtimeHistoryMessage(entry: EntryRecord): ConversationHistoryMessage | undefined {
+function runtimeHistoryMessage(entry: EntryRecord): ConversationHistoryMessage | undefined {
   return match(entry)
     .with({ kind: P.union(UserEntry.kind, AssistantEntry.kind, COLLABORATION.message, COLLABORATION.reply) }, (value) => (
       match(value.model?.[0])

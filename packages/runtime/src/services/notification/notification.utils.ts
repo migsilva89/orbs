@@ -1,10 +1,9 @@
 import { AssistantEntry, GenerationTask } from '@earendil-works/pi-durable';
 import { match, P } from 'ts-pattern';
 import { questionDocument } from '../question/question.constants';
-import { runtimeBot, runtimeToolApproval } from '../runtime/runtime.constants';
+import { runtimeToolApproval } from '../runtime/runtime.constants';
 import { NOTIFICATION_RECENT_LIMIT } from './notification.constants';
-import type { ConversationIndexDocument } from '../../types/conversation-index.types';
-import type { NotificationItem } from '../../types/notification.types';
+import type { NotificationItem, NotificationServiceDeps } from '../../types/notification.types';
 import type { Context } from '@earendil-works/chord/context';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
 
@@ -21,22 +20,6 @@ export function notificationRecentAppend(recent: NotificationItem[], item: Notif
     .exhaustive();
 }
 
-export function notificationIsMuted(index: ConversationIndexDocument | null | undefined, botId: string) {
-  return match(Object.values(index?.conversations ?? {}).find((conversation) => conversation?.botId === botId))
-    .with({ isMuted: true }, () => true)
-    .with({ isMuted: false }, () => false)
-    .otherwise(() => true);
-}
-
-export function notificationMuteKey(index: ConversationIndexDocument | null | undefined) {
-  return Object.values(index?.conversations ?? {})
-    .flatMap((conversation) => match(conversation)
-      .with(P.nonNullable, (item) => [`${item.botId}:${item.isMuted}`])
-      .otherwise(() => []))
-    .sort()
-    .join(' ');
-}
-
 export function notificationToolTaskIds(graph: PiDurableTypes.TaskGraph) {
   return Object.values(graph.tasks)
     .filter((task) => task.kind === 'pi.tool' && !task.abortRequested)
@@ -45,7 +28,7 @@ export function notificationToolTaskIds(graph: PiDurableTypes.TaskGraph) {
     .join(' ');
 }
 
-export function notificationIsFinalReply(entry: PiDurableTypes.EntryRecord) {
+function notificationIsFinalReply(entry: PiDurableTypes.EntryRecord) {
   return match(entry)
     .with({ kind: AssistantEntry.kind, model: [{ role: 'assistant', stopReason: P.union('stop', 'length') }] }, ({ model }) => {
       const content = model[0].content;
@@ -95,35 +78,9 @@ export function notificationCommitIsRelevant(changes: readonly PiDurableTypes.Co
   return attention.replies.length > 0 || attention.failures.length > 0 || attention.shouldRebuild;
 }
 
-export async function notificationBotId(
-  harness: PiDurableTypes.Harness,
-  index: ConversationIndexDocument | null | undefined,
-  conversationId: PiDurableTypes.ConversationId,
-  cache: Map<number, string>,
-  context: Context,
-) {
-  return match(cache.get(conversationId) ?? index?.conversations[conversationId]?.botId)
-    .with(P.string, (botId) => {
-      cache.set(conversationId, botId);
-      return botId;
-    })
-    .otherwise(async () => {
-      const identity = await harness.snapshot(runtimeBot, conversationId, context);
-
-      return match(identity?.botId)
-        .with(P.string, (botId) => {
-          cache.set(conversationId, botId);
-          return botId;
-        })
-        .otherwise(() => null);
-    });
-}
-
 export async function notificationPendingItems(
-  harness: PiDurableTypes.Harness,
+  { harness, botId }: NotificationServiceDeps,
   graph: PiDurableTypes.TaskGraph,
-  index: ConversationIndexDocument | null | undefined,
-  cache: Map<number, string>,
   context: Context,
 ) {
   const now = Date.now();
@@ -131,38 +88,34 @@ export async function notificationPendingItems(
 
   const documents = await Promise.all(tasks.map(async (task) => ({
     task,
-    botId: await notificationBotId(harness, index, task.conversationId, cache, context),
     approval: await harness.snapshot(runtimeToolApproval, task.id, context),
     question: await harness.snapshot(questionDocument, task.id, context),
   })));
 
-  const pending = documents.flatMap(({ task, botId, approval, question }) => match(botId)
-    .with(P.nullish, () => [])
-    .with(P.when((id) => notificationIsMuted(index, id)), () => [])
-    .otherwise((id) => [
-      ...match(approval?.approval)
-        .with({
-          status: 'pending',
-          botId: id,
-          expiresAt: P.number.gt(now),
-        }, (value) => [{
-          kind: 'approval' as const,
-          botId: id,
-          conversationId: task.conversationId,
-          taskId: task.id,
-          expiresAt: value.expiresAt,
-        }])
-        .otherwise(() => []),
-      ...match(question?.question)
-        .with({ status: 'pending', expiresAt: P.number.gt(now) }, (value) => [{
-          kind: 'question' as const,
-          botId: id,
-          conversationId: task.conversationId,
-          taskId: value.id,
-          expiresAt: value.expiresAt,
-        }])
-        .otherwise(() => []),
-    ]));
+  const pending = documents.flatMap(({ task, approval, question }) => [
+    ...match(approval?.approval)
+      .with({
+        status: 'pending',
+        botId,
+        expiresAt: P.number.gt(now),
+      }, (value) => [{
+        kind: 'approval' as const,
+        botId,
+        conversationId: task.conversationId,
+        taskId: task.id,
+        expiresAt: value.expiresAt,
+      }])
+      .otherwise(() => []),
+    ...match(question?.question)
+      .with({ status: 'pending', expiresAt: P.number.gt(now) }, (value) => [{
+        kind: 'question' as const,
+        botId,
+        conversationId: task.conversationId,
+        taskId: value.id,
+        expiresAt: value.expiresAt,
+      }])
+      .otherwise(() => []),
+  ]);
 
   return pending.sort((left, right) => match(left.kind.localeCompare(right.kind))
     .with(0, () => match(left.conversationId - right.conversationId)

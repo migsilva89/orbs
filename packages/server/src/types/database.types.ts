@@ -1,11 +1,23 @@
 import { z } from 'zod';
 import type { Bot } from '@openbots/contracts/universal';
+import type { Generated } from 'kysely';
 import type { DatabaseSync } from 'node:sqlite';
 
 export interface DatabaseBot extends Omit<Bot, 'avatar' | 'inherit' | 'fallbackModel'> {
   avatar: string | null;
   inherit: string;
   fallbackModel: string | null;
+}
+
+export interface DatabaseBotPreference {
+  botId: string;
+  isPinned: Generated<number>;
+  isHidden: Generated<number>;
+  rank: number | null;
+  isMuted: Generated<number>;
+  mutedUntil: number | null;
+  readThroughEntryId: Generated<number>;
+  updatedAt: number;
 }
 
 export interface DatabaseSchema {
@@ -22,6 +34,7 @@ export interface DatabaseSchema {
     updatedAt: number;
   };
   bot: DatabaseBot;
+  botPreference: DatabaseBotPreference;
   device: {
     id: string;
     name: string;

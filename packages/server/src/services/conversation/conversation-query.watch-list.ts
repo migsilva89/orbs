@@ -3,7 +3,7 @@ import { BACKGROUND_CONTEXT, withAbortSignal } from '@earendil-works/chord/conte
 import { Errors } from '@openbots/errors/universal';
 import { match } from 'ts-pattern';
 import { conversationWatchStream } from './conversation-watch.utils';
-import { conversationListItems } from './conversation.utils';
+import { conversationListItems, conversationSummaries } from './conversation.utils';
 import type { ConversationListWatchParams, ConversationServiceDeps } from '../../types/conversation.types';
 
 export async function conversationQueryWatchList(
@@ -48,7 +48,12 @@ export async function conversationQueryWatchList(
       closed,
       stop: watch.stop,
     }, lifetime, async (value) => {
-      return conversationListItems(await bots.queries.list(), value.conversations);
+      const [botList, preferences] = await Promise.all([
+        bots.queries.list(),
+        bots.queries.preferences(),
+      ]);
+
+      return conversationListItems(botList, conversationSummaries(value.conversations, preferences));
     });
   } catch (error) {
     revoked.abort(error);

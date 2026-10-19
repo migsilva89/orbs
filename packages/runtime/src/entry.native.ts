@@ -7,3 +7,4 @@ export { makeProviderService } from './services/provider/provider.service';
 export { runtimeEnvNative } from './services/runtime/runtime-env.utils';
 export { makePluginLoaderService } from './services/plugin/plugin.service';
 export { makeInstructionLoaderService } from './services/instruction/instruction.service';
+export { makeAlarmService } from './services/alarm/alarm.service';

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "bun src/entry.native.ts",
+    "backup": "bun src/entry-backup.native.ts",
     "check": "tsc --noEmit",
     "lint": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
     "lint:fix": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
@@ -18,7 +19,6 @@
   "dependencies": {
     "@openbots/contracts": "workspace:*",
     "@openbots/errors": "workspace:*",
-    "@earendil-works/pi-coding-agent": "catalog:",
     "@openbots/server": "workspace:*",
     "@openbots/runtime": "workspace:*",
     "@openbots/env": "workspace:*",

@@ -57,6 +57,8 @@ export const botCreate = botFields.extend({
 
 export const botUpdate = botFields.partial().extend(botGet.shape);
 
+export const botDeleteResult = z.void();
+
 export const botCatalog = z.object({
   skills: z.array(skill),
   mcp: mcpCatalog,

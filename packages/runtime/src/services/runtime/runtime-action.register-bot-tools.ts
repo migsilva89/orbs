@@ -3,6 +3,7 @@ import { match } from 'ts-pattern';
 import { runtimeBotToolsExtension } from './runtime-bot-tools.utils';
 import type { RuntimeRegisterBotToolsDeps, RuntimeRegisterBotToolsParams } from '../../types/runtime-bot-tools.types';
 
+/** Shared bot-management tools; every bot store installs them when it opens, so register before restoring bots. */
 export function runtimeActionRegisterBotTools(deps: RuntimeRegisterBotToolsDeps, { bots }: RuntimeRegisterBotToolsParams) {
   match(deps.extensions.some((extension) => extension.name === 'openbots.bot-tools'))
     .with(true, () => {
@@ -12,7 +13,6 @@ export function runtimeActionRegisterBotTools(deps: RuntimeRegisterBotToolsDeps,
     .exhaustive();
 
   const tools = runtimeBotToolsExtension({ bots, models: deps.models });
-  deps.extensions.splice(deps.extensions.length - 1, 0, tools.extension);
+  deps.extensions.push(tools.extension);
   deps.readOnlyTools.push(...tools.readOnlyTools);
-  deps.registry.install(tools.extension);
 }

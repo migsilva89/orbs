@@ -8,6 +8,7 @@ export const conversationSetHidden = z.object({
 export const conversationSetMuted = z.object({
   botId: z.uuid(),
   isMuted: z.boolean(),
+  mutedUntil: z.number().int().positive().nullable().default(null),
 });
 
 export const conversationArrange = z.object({

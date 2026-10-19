@@ -41,6 +41,7 @@ export const conversation = {
   submit: authedRouter.conversation.submit.handler(async ({ context, input }) => context.conversation.actions.submit(input)),
   updateSubmission: authedRouter.conversation.updateSubmission.handler(async ({ context, input }) => context.conversation.actions.updateSubmission(input)),
   stop: authedRouter.conversation.stop.handler(async ({ context, input }) => context.conversation.actions.stop(input)),
+  clear: authedRouter.conversation.clear.handler(async ({ context, input }) => context.conversation.actions.clear(input)),
   watch: authedRouter.conversation.watch.handler(async ({ context, input, signal }) => {
     return context.conversation.watch({
       botId: input.botId,

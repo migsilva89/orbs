@@ -2,13 +2,14 @@ import { Type } from '@earendil-works/pi-ai';
 import { defineExtension, defineTool } from '@earendil-works/pi-durable';
 import * as m from '@openbots/i18n/messages';
 import { collaborationActionSend } from './collaboration-action.send';
-import { collaborationDelivery } from './collaboration-delivery.task';
+import { collaborationDeliveryTask } from './collaboration-delivery.task';
 import { COLLABORATION } from './collaboration.constants';
 import { collaborationBotId } from './collaboration.utils';
 import type { CollaborationDeps } from '../../types/collaboration.types';
 
-export function collaborationExtension({ policy }: CollaborationDeps) {
-  const deps = { policy, delivery: collaborationDelivery };
+export function collaborationExtension({ policy, directory }: CollaborationDeps) {
+  const delivery = collaborationDeliveryTask({ directory });
+  const deps = { policy, directory, delivery };
 
   const parameters = Type.Object({
     botId: Type.String({ minLength: 1, maxLength: 128 }),
@@ -48,7 +49,7 @@ export function collaborationExtension({ policy }: CollaborationDeps) {
     extension: defineExtension({
       name: COLLABORATION.extension,
       tools: [listBots, askBot, messageBot],
-      tasks: [collaborationDelivery],
+      tasks: [delivery],
     }),
     readOnlyTools: [listBots],
   };

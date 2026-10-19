@@ -8,7 +8,7 @@ import { pipeline } from 'node:stream/promises';
 import { match } from 'ts-pattern';
 import { backupManifest } from '../../types/backup.types';
 import { BACKUP } from './backup.constants';
-import type { BackupManifest, BackupManifestFile } from '../../types/backup.types';
+import type { BackupManifest, BackupManifestFile, BackupWalkManifest } from '../../types/backup.types';
 
 const FILE_MODE = 0o600;
 const EXEC_MODE = 0o700;
@@ -46,7 +46,7 @@ export function backupOutside(source: string, destination: string) {
     .exhaustive();
 }
 
-export async function backupAssertAbsent(path: string) {
+async function backupAssertAbsent(path: string) {
   try {
     await lstat(path);
   } catch (error) {
@@ -64,10 +64,11 @@ export async function backupAssertAbsent(path: string) {
 
 export async function backupAssertSource(root: string) {
   await backupAssertDirectory(root);
-  await backupSerial([BACKUP.files.runtime, BACKUP.files.database, BACKUP.files.credentials], async (path) => {
+  await backupSerial([BACKUP.files.database, BACKUP.files.credentials], async (path) => {
     await backupAssertFile(await backupContained(root, path));
   });
   await backupAssertDirectory(await backupContained(root, BACKUP.directories.agents));
+  await backupAssertDirectory(await backupContained(root, BACKUP.directories.bots));
 }
 
 export async function backupStage(destination: string) {
@@ -102,26 +103,34 @@ export async function backupRemoveStaging(staging: string) {
 export async function backupPopulateCreate(root: string, staging: string) {
   await mkdir(join(staging, BACKUP.directories.data), { mode: DIRECTORY_MODE });
   await mkdir(join(staging, BACKUP.directories.agents), { mode: DIRECTORY_MODE });
-  await backupVacuum(await backupContained(root, BACKUP.files.runtime), join(staging, BACKUP.files.runtime));
-  await backupVacuum(await backupContained(root, BACKUP.files.database), join(staging, BACKUP.files.database));
+  await mkdir(join(staging, BACKUP.directories.bots), { mode: DIRECTORY_MODE });
+  const stores = await backupBotStores(root);
+
+  await backupSerial([BACKUP.files.database, ...stores], async (path) => {
+    await mkdir(dirname(join(staging, path)), { recursive: true, mode: DIRECTORY_MODE });
+    const source = await backupContained(root, path);
+    await match(path.endsWith('.json'))
+      .with(true, () => backupCopyFile(source, join(staging, path)))
+      .with(false, () => backupVacuum(source, join(staging, path)))
+      .exhaustive();
+  });
+
   await backupCopyFile(await backupContained(root, BACKUP.files.credentials), join(staging, BACKUP.files.credentials));
 
-  const files = [
-    await backupManifestEntry(BACKUP.files.runtime, join(staging, BACKUP.files.runtime)),
-    await backupManifestEntry(BACKUP.files.database, join(staging, BACKUP.files.database)),
-    await backupManifestEntry(BACKUP.files.credentials, join(staging, BACKUP.files.credentials)),
-  ];
+  const files = await Promise.all([BACKUP.files.database, BACKUP.files.credentials, ...stores]
+    .map((path) => backupManifestEntry(path, join(staging, path))));
 
-  const directories: string[] = [];
+  const manifest: BackupWalkManifest = { files, directories: [], skipped: [] };
   const agents = await backupContained(root, BACKUP.directories.agents);
-  await backupWalk(root, agents, join(staging, BACKUP.directories.agents), BACKUP.directories.agents, files, directories);
-  await backupWriteManifest(staging, files, directories);
+  await backupWalk(root, agents, join(staging, BACKUP.directories.agents), BACKUP.directories.agents, manifest);
+  await backupWriteManifest(staging, manifest);
 }
 
 export async function backupPopulateRestore(bundle: string, staging: string) {
   const manifest = await backupReadManifest(bundle);
   await mkdir(join(staging, BACKUP.directories.data), { mode: DIRECTORY_MODE });
   await mkdir(join(staging, BACKUP.directories.agents), { mode: DIRECTORY_MODE });
+  await mkdir(join(staging, BACKUP.directories.bots), { mode: DIRECTORY_MODE });
 
   await backupSerial([...manifest.directories].sort((left, right) => left.localeCompare(right)), async (directory) => {
     await mkdir(join(staging, backupAllowedPath(directory)), { recursive: true, mode: DIRECTORY_MODE });
@@ -168,7 +177,7 @@ function backupRelativePath(path: string) {
 function backupAllowedPath(path: string) {
   const relativePath = backupRelativePath(path);
   match(
-    relativePath === BACKUP.files.runtime
+    BACKUP.botStore.test(relativePath)
     || relativePath === BACKUP.files.database
     || relativePath === BACKUP.files.credentials
     || relativePath === BACKUP.directories.agents
@@ -181,6 +190,17 @@ function backupAllowedPath(path: string) {
     .exhaustive();
 
   return relativePath;
+}
+
+async function backupBotStores(root: string) {
+  const bots = await readdir(await backupContained(root, BACKUP.directories.bots), { withFileTypes: true });
+
+  const files = await Promise.all(bots.filter((entry) => entry.isDirectory()).map(async (entry) => {
+    const names = await readdir(join(root, BACKUP.directories.bots, entry.name));
+    return names.map((name) => `${BACKUP.directories.bots}/${entry.name}/${name}`);
+  }));
+
+  return files.flat().filter((path) => BACKUP.botStore.test(path)).sort();
 }
 
 async function backupSerial<Value>(values: readonly Value[], each: (value: Value) => Promise<void>) {
@@ -315,43 +335,35 @@ async function backupWalk(
   source: string,
   destination: string,
   relativePath: string,
-  files: BackupManifestFile[],
-  directories: string[],
+  manifest: BackupWalkManifest,
 ) {
   await backupSerial(await readdir(source, { withFileTypes: true }), async (entry) => {
     const next = backupAllowedPath(`${relativePath}/${entry.name}`);
-    const from = await backupContained(root, next);
     const to = join(destination, entry.name);
 
-    await match({
-      isSymbolicLink: entry.isSymbolicLink(),
-      isDirectory: entry.isDirectory(),
-      isFile: entry.isFile(),
-    })
-      .with({ isSymbolicLink: true }, () => {
-        throw new Errors.FORBIDDEN({ internal: 'Backup refuses symbolic links' });
-      })
+    await match({ isDirectory: entry.isDirectory(), isFile: entry.isFile() })
       .with({ isDirectory: true }, async () => {
         await mkdir(to, { recursive: true, mode: DIRECTORY_MODE });
-        directories.push(next);
-        await backupWalk(root, from, to, next, files, directories);
+        manifest.directories.push(next);
+        await backupWalk(root, await backupContained(root, next), to, next, manifest);
       })
       .with({ isFile: true }, async () => {
-        await backupCopyFile(from, to);
-        files.push(await backupManifestEntry(next, to));
+        await backupCopyFile(await backupContained(root, next), to);
+        manifest.files.push(await backupManifestEntry(next, to));
       })
       .otherwise(() => {
-        throw new Errors.FORBIDDEN({ internal: 'Backup refuses unsupported file types' });
+        manifest.skipped.push(next);
       });
   });
 }
 
-async function backupWriteManifest(directory: string, files: BackupManifestFile[], directories: string[]) {
+async function backupWriteManifest(directory: string, { files, directories, skipped }: BackupWalkManifest) {
   const manifest: BackupManifest = {
     version: BACKUP.version,
     createdAt: Date.now(),
     files: [...files].sort((left, right) => left.path.localeCompare(right.path)),
     directories: [...directories].sort((left, right) => left.localeCompare(right)),
+    skipped: [...skipped].sort((left, right) => left.localeCompare(right)),
     excluded: BACKUP.excluded,
   };
 

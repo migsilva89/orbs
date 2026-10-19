@@ -78,6 +78,8 @@ export const conversationSubmitResult = z.object({
 
 export const conversationStopResult = z.void();
 
+export const conversationClearResult = z.void();
+
 export const conversationHistory = conversationTarget.extend({
   limit: z.number().int().min(1).max(100).default(50),
   cursor: z.record(z.string(), z.json()).optional(),
@@ -133,6 +135,7 @@ export const conversationPreferences = z.object({
   isPinned: z.boolean(),
   isHidden: z.boolean(),
   isMuted: z.boolean(),
+  mutedUntil: z.number().int().positive().nullable(),
   rank: z.number().int().nonnegative().nullable(),
   readThroughEntryId: z.number().int().nonnegative(),
   hasUnread: z.boolean(),

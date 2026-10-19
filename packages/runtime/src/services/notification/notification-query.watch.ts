@@ -1,28 +1,21 @@
 import { replicatedState } from '@earendil-works/chord';
 import { Errors } from '@openbots/errors/universal';
 import { match, P } from 'ts-pattern';
-import { conversationIndex } from '../conversation-index/conversation-index.constants';
 import {
-  notificationBotId,
   notificationCommitAttention,
   notificationCommitIsRelevant,
-  notificationIsMuted,
-  notificationMuteKey,
   notificationPendingItems,
   notificationRecentAppend,
   notificationToolTaskIds,
 } from './notification.utils';
-import type { ConversationIndexDocument } from '../../types/conversation-index.types';
 import type * as NotificationTypes from '../../types/notification.types';
 import type { Context } from '@earendil-works/chord/context';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
 
-export async function notificationQueryWatch({ harness }: NotificationTypes.NotificationServiceDeps, context: Context) {
-  const cache = new Map<number, string>();
+export async function notificationQueryWatch(deps: NotificationTypes.NotificationServiceDeps, context: Context) {
+  const { harness, botId } = deps;
   const queued: NotificationTypes.NotificationQueuedCommit[] = [];
-  let summaries: ConversationIndexDocument | null | undefined;
   let tasks: PiDurableTypes.TaskGraph;
-  let muteKey = '';
   let toolIds = '';
   let isAttached = false;
   let isStopped = false;
@@ -59,7 +52,7 @@ export async function notificationQueryWatch({ harness }: NotificationTypes.Noti
   };
 
   const publishPending = async (commitContext: Context) => {
-    const pending = await notificationPendingItems(harness, tasks, summaries, cache, context);
+    const pending = await notificationPendingItems(deps, tasks, context);
     match(isStopped)
       .with(true, () => undefined)
       .with(false, () => {
@@ -68,20 +61,6 @@ export async function notificationQueryWatch({ harness }: NotificationTypes.Noti
         });
       })
       .exhaustive();
-  };
-
-  const visibleItem = async (
-    conversationId: PiDurableTypes.ConversationId,
-    item: Omit<NotificationTypes.NotificationItem, 'botId' | 'conversationId'> & { kind: 'reply' | 'failure' },
-  ) => {
-    const botId = await notificationBotId(harness, summaries, conversationId, cache, context);
-
-    return match(botId)
-      .with(P.string, (id) => match(notificationIsMuted(summaries, id))
-        .with(true, () => null)
-        .with(false, () => ({ ...item, botId: id, conversationId }))
-        .exhaustive())
-      .otherwise(() => null);
   };
 
   const applyQueued = async () => {
@@ -93,14 +72,10 @@ export async function notificationQueryWatch({ harness }: NotificationTypes.Noti
       .otherwise(async () => {
         const attention = notificationCommitAttention(batch.flatMap(({ publication }) => publication.changes));
 
-        const additions = await Promise.all([
-          ...attention.replies.map((entry) => visibleItem(entry.conversationId, { kind: 'reply', entryId: entry.id })),
-          ...attention.failures.map((task) => visibleItem(task.conversationId, { kind: 'failure', taskId: task.id })),
-        ]);
-
-        const items = additions.flatMap((item) => match(item)
-          .with(P.nonNullable, (value) => [value])
-          .otherwise(() => []));
+        const items: NotificationTypes.NotificationItem[] = [
+          ...attention.replies.map((entry) => ({ kind: 'reply' as const, botId, conversationId: entry.conversationId, entryId: entry.id })),
+          ...attention.failures.map((task) => ({ kind: 'failure' as const, botId, conversationId: task.conversationId, taskId: task.id })),
+        ];
 
         match(items)
           .with([], () => undefined)
@@ -127,73 +102,45 @@ export async function notificationQueryWatch({ harness }: NotificationTypes.Noti
   };
 
   try {
-    const index = match(await harness.watchDoc(conversationIndex, context))
-      .with(P.nonNullable, (watch) => watch)
-      .otherwise(() => {
-        throw new Errors.INTERNAL_ERROR({ internal: 'Conversation index is missing.' });
-      });
+    const graph = await harness.watchTaskGraph(context);
+
+    stop = async () => {
+      isStopped = true;
+      unsubscribe();
+      stopping ??= graph.stop();
+
+      return stopping;
+    };
 
     try {
-      const graph = await harness.watchTaskGraph(context);
+      tasks = graph.value;
+      toolIds = notificationToolTaskIds(tasks);
+      await publishPending(context);
+      isAttached = true;
+      enqueue(() => applyQueued());
 
-      stop = async () => {
-        isStopped = true;
-        unsubscribe();
-        stopping ??= Promise.all([
-          index.stop(),
-          graph.stop(),
-        ]).then(([end]) => end);
+      graph.start(async (value, _ops, commitContext) => {
+        tasks = value;
+        const next = notificationToolTaskIds(tasks);
+        match(next === toolIds)
+          .with(true, () => undefined)
+          .with(false, () => {
+            toolIds = next;
+            enqueue(() => publishPending(commitContext));
+          })
+          .exhaustive();
+      });
 
-        return stopping;
-      };
-
-      try {
-        summaries = index.value;
-        tasks = graph.value;
-        muteKey = notificationMuteKey(summaries);
-        toolIds = notificationToolTaskIds(tasks);
-        await publishPending(context);
-        isAttached = true;
-        enqueue(() => applyQueued());
-
-        index.start(async (value, _ops, commitContext) => {
-          summaries = value;
-          const next = notificationMuteKey(summaries);
-          match(next === muteKey)
-            .with(true, () => undefined)
-            .with(false, () => {
-              muteKey = next;
-              enqueue(() => publishPending(commitContext));
-            })
-            .exhaustive();
-        });
-        graph.start(async (value, _ops, commitContext) => {
-          tasks = value;
-          const next = notificationToolTaskIds(tasks);
-          match(next === toolIds)
-            .with(true, () => undefined)
-            .with(false, () => {
-              toolIds = next;
-              enqueue(() => publishPending(commitContext));
-            })
-            .exhaustive();
-        });
-
-        const closed = Promise.race([index.closed, graph.closed]).then(async (end) => {
-          await stop();
-          return match(failure)
-            .with(P.nonNullable, (error) => ({ reason: 'listener_error' as const, error }))
-            .otherwise(() => end);
-        });
-
-        return { state, closed, stop };
-      } catch (error) {
+      const closed = graph.closed.then(async (end) => {
         await stop();
-        throw error;
-      }
+        return match(failure)
+          .with(P.nonNullable, (error) => ({ reason: 'listener_error' as const, error }))
+          .otherwise(() => end);
+      });
+
+      return { state, closed, stop };
     } catch (error) {
-      unsubscribe();
-      await index.stop();
+      await stop();
       throw error;
     }
   } catch (error) {

@@ -1,3 +1,4 @@
+import { ModelRuntime } from '@earendil-works/pi-coding-agent';
 import { providerActionCancel } from './provider-action.cancel';
 import { providerActionCancelDevice } from './provider-action.cancel-device';
 import { providerActionComplete } from './provider-action.complete';
@@ -8,10 +9,12 @@ import { providerQuerySession } from './provider-query.session';
 import { providerClose } from './provider.utils';
 import type * as ProviderTypes from '../../types/provider.types';
 
-export function makeProviderService({ models }: ProviderTypes.ProviderServiceParams) {
+export async function makeProviderService() {
+  const models = await ModelRuntime.create();
   const deps: ProviderTypes.ProviderServiceDeps = { models, sessions: new Map() };
 
   return {
+    models,
     actions: {
       login: (params: ProviderTypes.ProviderLoginParams) => providerActionLogin(deps, params),
       complete: (params: ProviderTypes.ProviderCompleteParams) => providerActionComplete(deps, params),
@@ -27,4 +30,4 @@ export function makeProviderService({ models }: ProviderTypes.ProviderServicePar
   };
 }
 
-export type ProviderService = ReturnType<typeof makeProviderService>;
+export type ProviderService = Awaited<ReturnType<typeof makeProviderService>>;

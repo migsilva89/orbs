@@ -1,7 +1,7 @@
 import { Type } from '@earendil-works/pi-ai';
 import { botCreate, botGet, botSwapModels, botUpdate } from '@openbots/contracts/universal';
 import { z } from 'zod';
-import type { RuntimeServiceDeps } from './runtime.types';
+import type { RuntimeSharedDeps } from './runtime.types';
 import type { Models } from '@earendil-works/pi-ai/models';
 import type * as UniversalTypes from '@openbots/contracts/universal';
 
@@ -25,10 +25,12 @@ export interface RuntimeBotToolsDeps extends RuntimeRegisterBotToolsParams {
   models: Models;
 }
 
-export type RuntimeRegisterBotToolsDeps = Pick<RuntimeServiceDeps, 'registry' | 'extensions' | 'readOnlyTools' | 'models'>;
+export type RuntimeRegisterBotToolsDeps = Pick<RuntimeSharedDeps, 'extensions' | 'readOnlyTools' | 'models'>;
 
-export const botToolCreate = botCreate.strict();
-export const botToolUpdate = botUpdate.strict();
+// SAFETY: bots never set permission modes, or a bot in Full/Auto could escalate itself or a peer.
+// New bots get the default mode; only the owner changes it through RPC.
+export const botToolCreate = botCreate.omit({ permission: true }).strict();
+export const botToolUpdate = botUpdate.omit({ permission: true }).strict();
 export const botToolGet = botGet.strict();
 export const botToolSwapModels = botSwapModels.strict();
 

@@ -7,7 +7,7 @@ import type { RpcContext } from '../types/rpc.types';
 export const rpcRouter = implement(contract).$context<RpcContext>();
 
 export const baseRouter = rpcRouter.use(async ({ context, next, path }) => {
-  await context.limits.throttle({ kind: 'public' });
+  await context.limits.throttle({ kind: 'public', peer: context.peerAddress });
   await match(path.join('.'))
     .with('pairing.redeem', () => context.limits.throttle({ kind: 'redeem', peer: context.peerAddress }))
     .otherwise(() => undefined);

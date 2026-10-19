@@ -4,20 +4,25 @@ import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { match } from 'ts-pattern';
 
-export async function workspacePathsNative(dataDir: string) {
-  const root = resolve(match(dataDir)
+export function workspacePathsRootNative(dataDir: string) {
+  return resolve(match(dataDir)
     .with('~', () => homedir())
     .when((path) => path.startsWith('~/'), (path) => join(homedir(), path.slice(2)))
     .otherwise((path) => path));
+}
+
+export async function workspacePathsNative(dataDir: string) {
+  const root = workspacePathsRootNative(dataDir);
 
   const paths = {
     agents: join(root, 'agents'),
     data: join(root, 'data'),
-    runtime: join(root, 'data', 'runtime.sql'),
+    bots: join(root, 'data', 'bots'),
+    lock: join(root, 'data', 'daemon'),
     database: join(root, 'data', 'app.sqlite'),
   };
 
-  await Promise.all([root, paths.data, paths.agents].map(workspacePathsNativeDirectory));
+  await Promise.all([root, paths.data, paths.bots, paths.agents].map(workspacePathsNativeDirectory));
 
   return {
     ...paths,

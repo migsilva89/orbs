@@ -34,10 +34,9 @@ export async function subagentActionSpawn(
 
             return { text: call.text, name: call.name, conversationId: call.conversationId };
           })
-          .with(false, () => match(Object.keys(state.agents).length >= maxBackgroundAgents
-            || pending >= maxBackgroundAgents)
+          .with(false, () => match(pending >= maxBackgroundAgents)
             .with(true, () => {
-              call.text = `Cannot start more than ${maxBackgroundAgents} background subagents.`;
+              call.text = `Cannot run more than ${maxBackgroundAgents} background subagents at once.`;
               return { text: call.text, name: null, conversationId: null };
             })
             .with(false, async () => {

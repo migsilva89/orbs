@@ -25,7 +25,7 @@ export interface LimitRuntimeDeps extends LimitServiceDeps {
 }
 
 export type LimitThrottleParams =
-  | { kind: 'public' }
+  | { kind: 'public'; peer: string | null }
   | { kind: 'redeem'; peer: string | null }
   | { kind: 'device'; deviceId: string };
 

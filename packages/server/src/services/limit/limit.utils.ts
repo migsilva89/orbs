@@ -22,7 +22,7 @@ export function limitWindowsCreate(settings: LimitSettings): LimitWindows {
   };
 }
 
-export function limitWindowMerge(current: LimitWindow, patch: Partial<LimitWindow> | undefined): LimitWindow {
+function limitWindowMerge(current: LimitWindow, patch: Partial<LimitWindow> | undefined): LimitWindow {
   return {
     maxRequests: patch?.maxRequests ?? current.maxRequests,
     windowMs: patch?.windowMs ?? current.windowMs,

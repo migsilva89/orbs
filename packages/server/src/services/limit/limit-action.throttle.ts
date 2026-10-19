@@ -5,7 +5,7 @@ import type { LimitRuntimeDeps, LimitThrottleParams } from '../../types/limit.ty
 
 export async function limitActionThrottle({ state }: LimitRuntimeDeps, params: LimitThrottleParams) {
   const result = await match(params)
-    .with({ kind: 'public' }, () => state.windows.public.limit('all'))
+    .with({ kind: 'public' }, ({ peer }) => state.windows.public.limit(limitPeerKey(peer)))
     .with({ kind: 'redeem' }, ({ peer }) => state.windows.redeem.limit(limitPeerKey(peer)))
     .with({ kind: 'device' }, ({ deviceId }) => state.windows.device.limit(deviceId))
     .exhaustive();

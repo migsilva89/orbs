@@ -1,0 +1,19 @@
+{
+  "connect_meta_title": "Connect",
+  "connect_title": "Connect a server",
+  "connect_description": "Pair this browser with your {name} server",
+  "connect_code": "Pairing code",
+  "connect_code_placeholder": "Paste the code from a paired device",
+  "connect_code_hint": "On a paired device, open Settings, then Devices, then Add device.",
+  "connect_device_name": "Device name",
+  "connect_device_name_default": "Web browser",
+  "connect_submit": "Connect",
+  "connect_failed": "Could not pair with this code. Ask for a new code and try again.",
+  "connect_code_invalid": "This is not a valid pairing code.",
+  "connect_privacy_proof": "The device key stays in this browser. {name} talks only to your own server.",
+  "connect_friends_bite": "We don't bite. Mostly.",
+  "connect_friends_human": "Is it the human?",
+  "connect_friends_meeting": "Did I miss the meeting?",
+  "connect_friends_natural": "Act natural.",
+  "connect_friends_typing": "Someone's typing…"
+}

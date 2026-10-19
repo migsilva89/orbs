@@ -24,6 +24,23 @@ export const authPairResult = z.object({
   qr: z.object({ payload: z.string(), svg: z.string() }),
 });
 
+export const authPairPayload = z.object({
+  version: z.literal(1),
+  serverUrl: z.url({ protocol: /^https?$/ }),
+  token: authToken,
+  expiresAt: z.number().int(),
+});
+
+/** The pairing QR text: the JSON payload a new device scans or pastes. */
+export const authPairCode = z.string().transform((code, context) => {
+  try {
+    return JSON.parse(code) as z.input<typeof authPairPayload>;
+  } catch {
+    context.addIssue({ code: 'custom', message: 'connect_code_invalid' });
+    return z.NEVER;
+  }
+}).pipe(authPairPayload);
+
 export const authRedeemResult = z.object({ device, token: authToken });
 
 export const authGrant = z.object({
@@ -34,3 +51,4 @@ export const authGrant = z.object({
 
 export type AuthRedeemInput = z.infer<typeof authRedeem>;
 export type AuthPairInput = z.infer<typeof authPair>;
+export type AuthPairPayload = z.infer<typeof authPairPayload>;

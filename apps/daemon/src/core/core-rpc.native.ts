@@ -1,8 +1,9 @@
+import { env } from '@openbots/env/server';
 import { errorStatusMap } from '@openbots/errors/universal';
 import { log } from '@openbots/logger/server';
 import { onError, ORPCError } from '@orpc/server';
 import { RPCHandler as FetchRPCHandler } from '@orpc/server/fetch';
-import { RequestHeadersPlugin } from '@orpc/server/plugins';
+import { CORSPlugin, RequestHeadersPlugin } from '@orpc/server/plugins';
 import { RPCHandler as WebsocketRPCHandler } from '@orpc/server/websocket';
 import { match, P } from 'ts-pattern';
 import { router } from '@openbots/server/server';
@@ -47,7 +48,7 @@ export function coreRpcNative(
       artifacts: services.artifacts,
     },
     http: new FetchRPCHandler(router, {
-      plugins,
+      plugins: [...plugins, new CORSPlugin({ origin: env.OPENBOTS_ALLOWED_ORIGINS })],
       interceptors,
       errorStatusMap,
     }),

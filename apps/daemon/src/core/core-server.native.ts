@@ -1,4 +1,5 @@
 import { env } from '@openbots/env/server';
+import { isIP } from 'node:net';
 import { match, P } from 'ts-pattern';
 import { coreHandler } from '@openbots/server/server';
 import { coreRpcNative } from './core-rpc.native';
@@ -22,7 +23,7 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
         .with({ path: P.union('/rpc', P.string.startsWith('/rpc/')), isAllowedOrigin: false }, () => (
           new Response(null, { status: 403 })
         ))
-        .with({ path: P.union('/rpc', P.string.startsWith('/rpc/')), method: 'POST' }, () => rpc.http.handle(request, {
+        .with({ path: P.union('/rpc', P.string.startsWith('/rpc/')), method: P.union('POST', 'OPTIONS') }, () => rpc.http.handle(request, {
           prefix: '/rpc',
           context: { ...rpc.context, peerAddress: server.requestIP(request)?.address ?? null },
         }).then((result) => match(result)
@@ -58,14 +59,15 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
 
 function coreServerAllowedOrigin(request: Request): boolean {
   const origin = request.headers.get('origin');
-  const host = request.headers.get('host');
 
   return match(origin)
     .with(null, () => true)
     .otherwise((value) => {
-      const url = URL.parse(value);
+      const hostname = URL.parse(value)?.hostname.replace(/^\[|\]$/gu, '') ?? '';
 
-      return env.OPENBOTS_ALLOWED_ORIGINS.includes(url?.origin ?? value)
-        || (url !== null && url.host === URL.parse(`http://${host}`)?.host);
+      return env.OPENBOTS_ALLOWED_ORIGINS.includes(URL.parse(value)?.origin ?? value)
+        || isIP(hostname) !== 0
+        || hostname === 'localhost'
+        || hostname.endsWith('.localhost');
     });
 }

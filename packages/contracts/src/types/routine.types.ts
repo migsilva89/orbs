@@ -46,9 +46,12 @@ export const routine = routineFields.extend({
 export const routineList = z.array(routine);
 export const routineRemoveResult = z.void();
 
+export const routineEditForm = routineFields.omit({ isEnabled: true });
+
 export type RoutineSchedule = z.infer<typeof routineSchedule>;
 export type Routine = z.infer<typeof routine>;
 export type RoutineRun = z.infer<typeof routineRun>;
 export type RoutineTarget = z.infer<typeof routineTarget>;
 export type RoutineCreateInput = z.infer<typeof routineCreate>;
 export type RoutineUpdateInput = z.infer<typeof routineUpdate>;
+export type RoutineEditForm = z.infer<typeof routineEditForm>;

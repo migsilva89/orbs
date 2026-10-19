@@ -1,4 +1,5 @@
 import { defineDoc, defineDocFamily } from '@earendil-works/pi-durable';
+import { ENTRY } from '@openbots/contracts/universal';
 import type * as CollaborationTypes from '../../types/collaboration.types';
 
 export const collaborationCall = defineDoc({
@@ -53,6 +54,6 @@ export const collaborationTemporaryContext = defineDoc<CollaborationTypes.Collab
 export const COLLABORATION = {
   extension: 'openbots.collaboration',
   delivery: 'openbots.bot-delivery',
-  message: 'openbots.bot-message',
-  reply: 'openbots.bot-reply',
+  message: ENTRY.peerMessage,
+  reply: ENTRY.peerReply,
 } as const;

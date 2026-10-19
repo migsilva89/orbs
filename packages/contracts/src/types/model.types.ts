@@ -16,3 +16,5 @@ export const modelList = z.array(z.object({
   name: z.string(),
   thinkingLevels: z.array(modelThinkingLevel),
 }));
+
+export type ModelList = z.infer<typeof modelList>;

@@ -1,16 +1,35 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   "entry": [
-    "scripts/**/*.ts"
+    "apps/web/src/application/server.tanstack.ts",
+    "apps/web/src/application/server.bun.ts",
+    "apps/web/src/application/start.ts",
+    "apps/web/src/application/routes.ts",
+    "apps/web/src/application/router.tsx",
+    "apps/web/vite/**/*.ts",
+    "scripts/**/*.ts",
+    "apps/desktop/src/desktop.ts",
+    "apps/desktop/src/views/connect/index.ts",
+    "apps/desktop/electrobun.config.ts"
   ],
   "ignorePatterns": [
     "packages/i18n/src/paraglide/**",
-    "**/*.generated.ts"
+    "**/*.generated.ts",
+    "apps/web/src/application/routes.tree.ts"
   ],
   "ignoreDependencies": [
     "oxlint-tsgolint",
     "typescript",
-    "turbo"
+    "turbo",
+    "~icons",
+    "tailwind-scrollbar",
+    "@svgr/core",
+    "@svgr/plugin-jsx",
+    "@iconify-json/logos",
+    "@iconify-json/lucide",
+    "@iconify-json/svg-spinners",
+    "babel-plugin-react-compiler",
+    "tailwindcss"
   ],
   "rules": {
     "unused-files": "error",
@@ -27,7 +46,16 @@
   "workspaces": {
     "patterns": [
       "apps/daemon",
+      "apps/web",
       "packages/*"
     ]
-  }
+  },
+  "ignoreExports": [
+    {
+      "file": "apps/web/src/components/ui/**",
+      "exports": [
+        "*"
+      ]
+    }
+  ]
 }

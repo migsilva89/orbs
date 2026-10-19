@@ -78,6 +78,9 @@ export const botSwapModelsResult = z.object({
   fallbacks: z.number().int().nonnegative(),
 });
 
+/** The bot editor form: an empty handle means "derive it from the name". */
+export const botForm = botCreate.extend({ handle: botFields.shape.handle.or(z.literal('')) });
+
 export type Bot = z.infer<typeof bot>;
 export type BotCreateInput = z.infer<typeof botCreate>;
 export type BotUpdateInput = z.infer<typeof botUpdate>;
@@ -85,3 +88,4 @@ export type BotGetInput = z.infer<typeof botGet>;
 export type BotCatalog = z.infer<typeof botCatalog>;
 export type BotSwapModelsInput = z.infer<typeof botSwapModels>;
 export type BotSwapModelsResult = z.infer<typeof botSwapModelsResult>;
+export type BotForm = z.infer<typeof botForm>;

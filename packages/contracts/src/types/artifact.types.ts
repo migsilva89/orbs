@@ -250,6 +250,7 @@ export const artifactVersion = z.object({
 export const artifactVersionList = z.array(artifactVersion);
 
 export const artifactListInput = conversationTarget;
+export const artifactBotListInput = conversationTarget.pick({ botId: true });
 
 export const artifactGet = conversationTarget.extend({
   artifactId: z.uuid(),
@@ -297,6 +298,7 @@ export type ArtifactSummary = z.infer<typeof artifactSummary>;
 export type Artifact = z.infer<typeof artifact>;
 export type ArtifactVersion = z.infer<typeof artifactVersion>;
 export type ArtifactListInput = z.infer<typeof artifactListInput>;
+export type ArtifactBotListInput = z.infer<typeof artifactBotListInput>;
 export type ArtifactGetInput = z.infer<typeof artifactGet>;
 export type ArtifactCreateInput = z.infer<typeof artifactCreate>;
 export type ArtifactUpdateInput = z.infer<typeof artifactUpdate>;

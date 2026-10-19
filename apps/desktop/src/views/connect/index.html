@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Orbs</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --background: oklch(1 0 0);
+        --foreground: oklch(0.141 0.005 285.823);
+        --muted-foreground: oklch(0.552 0.016 285.938);
+        --primary: oklch(0.205 0 0);
+        --primary-foreground: oklch(0.985 0 0);
+        --accent: oklch(0.967 0.001 286.375);
+        --border: oklch(0.92 0.004 286.32);
+        --input: oklch(0.871 0.006 286.286);
+        --ring: oklch(0.871 0.006 286.286);
+        --destructive: oklch(0.577 0.245 27.325);
+        --radius: 0.625rem;
+        font: 14px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: oklch(0.145 0 0);
+          --foreground: oklch(0.93 0 0);
+          --muted-foreground: oklch(0.708 0 0);
+          --primary: oklch(0.922 0 0);
+          --primary-foreground: oklch(0.205 0 0);
+          --accent: oklch(0.269 0 0);
+          --border: oklch(1 0 0 / 10%);
+          --input: oklch(1 0 0 / 15%);
+          --ring: oklch(0.556 0 0);
+          --destructive: oklch(0.704 0.191 22.216);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        user-select: none;
+        cursor: default;
+      }
+
+      .titlebar {
+        position: fixed;
+        inset: 0 0 auto;
+        height: 40px;
+      }
+
+      main {
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        padding: 48px 40px 40px;
+      }
+
+      .logo {
+        width: 44px;
+        height: 38px;
+      }
+
+      section {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      section[hidden] {
+        display: none;
+      }
+
+      .connection {
+        gap: 8px;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+      }
+
+      .connection h2 {
+        margin: 0 0 4px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .connection dl {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 6px 12px;
+        margin: 0;
+        font-size: 12px;
+      }
+
+      .connection dt {
+        color: var(--muted-foreground);
+      }
+
+      .connection dd {
+        margin: 0;
+        overflow-wrap: anywhere;
+        text-align: right;
+        user-select: text;
+      }
+
+      header {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--muted-foreground);
+        text-wrap: balance;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+
+      .option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        transition: border-color 120ms, background 120ms;
+      }
+
+      .option:has(input:checked) {
+        border-color: var(--foreground);
+      }
+
+      .option:has(input:focus-visible) {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+      }
+
+      .option input {
+        margin: 0;
+        accent-color: var(--foreground);
+      }
+
+      .option span {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .option strong {
+        font-weight: 500;
+      }
+
+      .option small,
+      .field span {
+        color: var(--muted-foreground);
+        font-size: 12px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .field[hidden] {
+        display: none;
+      }
+
+      .found {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .found button {
+        height: 30px;
+        padding: 0 12px;
+        font-size: 13px;
+      }
+
+      input[type='url'] {
+        height: 36px;
+        padding: 0 12px;
+        border: 1px solid var(--input);
+        border-radius: calc(var(--radius) - 2px);
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        user-select: text;
+        outline: none;
+      }
+
+      input[type='url']:focus-visible {
+        border-color: var(--ring);
+        box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+      }
+
+      .error {
+        margin: 0;
+        color: var(--destructive);
+        font-size: 13px;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      button {
+        display: inline-flex;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 16px;
+        border: 1px solid transparent;
+        border-radius: calc(var(--radius) - 2px);
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        font-weight: 500;
+        transition: background 120ms, opacity 120ms;
+      }
+
+      button:focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+      }
+
+      .primary {
+        background: var(--primary);
+        color: var(--primary-foreground);
+      }
+
+      .outline {
+        border-color: var(--border);
+      }
+
+      .outline:hover:not(:disabled),
+      .ghost:hover:not(:disabled) {
+        background: var(--accent);
+      }
+
+      [aria-busy='true']::before {
+        width: 14px;
+        height: 14px;
+        border: 2px solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: spin 700ms linear infinite;
+        content: '';
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(1turn);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        [aria-busy='true']::before {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="titlebar electrobun-webkit-app-region-drag" aria-hidden="true"></div>
+    <main>
+      <svg class="logo" id="logo" aria-hidden="true" viewBox="0 0 729 618">
+        <path fill="currentColor" fill-rule="evenodd" d="M299.5 83.6C271.4 86.4 241.9 95 216.2 107.9C141.6 145.3 58.7 233.8 22.8 314.1C-26.5 424.7 7.6 526.8 111 578.5C168.3 607.1 225.6 617.4 326.5 617.5C406.6 617.5 453.2 612.8 511 598.8C581.7 581.8 633.6 548.2 657.2 504C676.5 468.1 675.9 425.7 655.6 385.2C643 360 627.4 340.9 581.9 294.4C538.3 250 523.6 234 486 190.5C423.6 118.2 402.6 100.8 363.5 89.5C345.9 84.4 317.6 81.8 299.5 83.6ZM135 352.5a28.5 28.5 0 0 1 57 0v72a28.5 28.5 0 0 1 -57 0ZM249.5 352.5a28.5 28.5 0 0 1 57 0v72a28.5 28.5 0 0 1 -57 0ZM509 110.5a110 110 0 1 0 220 0a110 110 0 1 0 -220 0Z" />
+      </svg>
+
+      <section class="connection" id="current" hidden>
+        <h2 id="current-title"></h2>
+        <dl>
+          <dt id="current-mode-label"></dt><dd id="current-mode"></dd>
+          <dt id="current-address-label"></dt><dd id="current-address"></dd>
+          <dt id="current-network-label"></dt><dd id="current-network"></dd>
+          <dt id="current-status-label"></dt><dd id="current-status" role="status"></dd>
+        </dl>
+      </section>
+
+      <section id="choose" hidden>
+        <header>
+          <h1 id="choose-title"></h1>
+          <p id="choose-hint"></p>
+        </header>
+        <form id="form" novalidate>
+          <fieldset class="options">
+            <label class="option">
+              <input type="radio" name="mode" value="local" checked />
+              <span><strong id="local-label"></strong><small id="local-hint"></small></span>
+            </label>
+            <label class="option">
+              <input type="radio" name="mode" value="remote" />
+              <span><strong id="remote-label"></strong><small id="remote-hint"></small></span>
+            </label>
+          </fieldset>
+          <label class="field" id="address-field" hidden>
+            <span id="address-label"></span>
+            <input id="address" name="address" type="url" autocomplete="url" spellcheck="false" autocapitalize="off" />
+          </label>
+          <div class="field" id="found" hidden>
+            <span id="found-label"></span>
+            <div class="found" id="found-list"></div>
+          </div>
+          <p class="error" id="error" role="alert" hidden></p>
+          <button class="primary" id="submit" type="submit"></button>
+        </form>
+      </section>
+
+      <section id="unreachable" role="alert" hidden>
+        <header>
+          <h1 id="unreachable-title"></h1>
+          <p id="unreachable-hint"></p>
+        </header>
+        <div class="actions">
+          <button class="outline" id="retry" type="button"></button>
+          <button class="ghost" id="change" type="button"></button>
+        </div>
+      </section>
+    </main>
+    <script src="index.js" type="module"></script>
+  </body>
+</html>

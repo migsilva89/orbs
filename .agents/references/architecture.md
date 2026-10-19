@@ -7,10 +7,10 @@ This is the implementation contract. Fix code that conflicts with it; do not rew
 | Location | Owns |
 | --- | --- |
 | `apps/daemon` | Entry, startup composition, listener/transport, signals, shutdown. |
-| `apps/desktop`, `apps/mobile` | UI, server connections, device credential storage. |
+| `apps/web`, `apps/desktop`, `apps/mobile` | UI, server connections, device credential storage. The web app is a client-rendered TanStack Start app that talks to the daemon over oRPC; its server proxies `/rpc` to the daemon. |
 | `packages/server` | Product services: bots, pairing, settings, credentials, permissions, skill, instruction, plugin and MCP selection/discovery; RPC handlers. |
 | `packages/runtime` | Pi integration: Harness, conversations, tools, hooks, approvals, tasks, watches, recovery, skill/instruction/plugin loading, MCP clients. |
-| `packages/contracts` | Public schemas, input/output types, oRPC contracts and errors. No implementations. |
+| `packages/contracts` | Public schemas, input/output types, oRPC contracts and errors, including the schemas clients validate forms, search params, pairing codes and stored preferences with. No implementations. |
 | `packages/client` | Typed RPC calls, reconnect, applying Pi view updates. |
 | Shared packages | Env, errors, logging, i18n, avatars and tooling. No application dependencies. |
 
@@ -25,7 +25,7 @@ Native code stays in its owning package behind `/native`. Using files, SQLite or
 ## Dependencies
 
 ```text
-desktop/mobile -> client -> contracts
+web/desktop/mobile -> client -> contracts
 daemon -> server -> runtime
 server/runtime -> contracts
 ```
@@ -87,7 +87,7 @@ export type SkillService = ReturnType<typeof makeSkillService>;
 ## State and security
 
 - One implicit owner per independent daemon. Devices pair with revocable credentials. No users, organizations, roles or password login.
-- Pairing stores token hashes and atomically consumes grants with device creation. Issuing a grant requires an authenticated device or a trusted local bootstrap. No public grant endpoint or pairing CLI. First-device bootstrap uses an owner-only local socket; local UI integration remains pending; see [pairing](../plans/main/05-auth-and-pairing.md).
+- Pairing stores token hashes and atomically consumes grants with device creation. Issuing a grant requires an authenticated device or a trusted local bootstrap. No public grant endpoint or pairing CLI. First-device bootstrap uses an owner-only local socket, and the daemon prints a startup pairing link while no device exists; see [pairing](../plans/main/05-auth-and-pairing.md).
 - App persistence uses `node:sqlite` and Kysely. SQL identifiers are snake_case; `CamelCasePlugin` maps TypeScript camelCase. Migrations preserve existing data.
 - Generic non-secret key/value data belongs to the shared `settings` service/table, with domain keys such as `skills.directories`, `mcp.paths` and `tools.approvalRules`.
 - Domain settings RPCs return settings objects, not individual flags. Writes are partial: omission preserves, `[]` clears lists, nullable fields use `null` to clear. Return updated settings.

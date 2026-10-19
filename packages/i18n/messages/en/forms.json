@@ -1,4 +1,4 @@
 {
-  "forms_name": "Name",
-  "forms_name_placeholder": "John Doe"
+  "forms_hide_password": "Hide password",
+  "forms_show_password": "Show password"
 }

@@ -16,6 +16,7 @@ import { join } from 'node:path';
 import { credentialsKeyNative, makeAttachmentStorageService, makeDatabaseService, makeMcpService, makeWorkspaceService, workspacePathsNative } from '@openbots/server/native';
 import { makeCredentialsService, makeServices, makeSettingsService } from '@openbots/server/server';
 import { coreLocalNative } from './core-local.native';
+import { corePairingNative } from './core-pairing.native';
 import { coreServerNative } from './core-server.native';
 
 const STOP_SIGNALS = ['SIGINT', 'SIGTERM'] as const;
@@ -38,6 +39,8 @@ export async function coreNativeRun(): Promise<void> {
     host: env.OPENBOTS_HOST,
     port: server.port,
   });
+
+  resources.defer(corePairingNative(services));
 
   await stopped;
 }

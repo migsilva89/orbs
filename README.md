@@ -219,7 +219,7 @@ The public budget is checked before authentication, per connection address, so u
 
 ## Device pairing
 
-Each daemon has one owner. There is no local pair CLI. Existing paired devices issue a pairing payload through authenticated `pairing.create`. The first device gets its grant through `pairing.bootstrap` on the owner-only Unix socket at `data/ipc/rpc.sock`. Public HTTP/WebSocket calls cannot bootstrap, even from loopback. The local endpoint issues grants only when no device records remain. Desktop UI integration remains pending.
+Each daemon has one owner. There is no local pair CLI. Existing paired devices issue a pairing payload through authenticated `pairing.create`. At startup, while no device is paired, the daemon prints a pairing link (`OPENBOTS_PUBLIC_URL/connect#code=…`) and a terminal QR code. It prints a new one when the grant expires. Open the link to prefill the web connect form. Other first-device clients can get a grant through `pairing.bootstrap` on the owner-only Unix socket at `data/ipc/rpc.sock`. Public HTTP/WebSocket calls cannot bootstrap, even from loopback. The local endpoint issues grants only when no device records remain. Desktop UI integration remains pending.
 
 | RPC call | Access | Result |
 | --- | --- | --- |
@@ -620,7 +620,11 @@ Before bot routing was added, a disposable WebSocket check with SQLite and Pi's 
 | `OPENBOTS_HOST` | `0.0.0.0` | Bind address or hostname |
 | `OPENBOTS_PORT` | `3000` | Integer from 1 to 65535 |
 | `OPENBOTS_LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
-| `OPENBOTS_ALLOWED_ORIGINS` | empty | Comma-separated browser or webview origins, such as `tauri://localhost`. Requests without an Origin, or with an Origin on the request host, are always allowed |
+| `OPENBOTS_ALLOWED_ORIGINS` | empty | Comma-separated browser or webview origins, such as `https://bots.example.com`. Requests without an Origin, or with an IP-literal or `localhost` Origin, are always allowed. Add every hostname origin that serves the web app |
+| `OPENBOTS_PUBLIC_URL` | `http://127.0.0.1:47190` | Web app URL used in the startup pairing link |
+| `OPENBOTS_DAEMON_URL` | `http://127.0.0.1:3000` | Daemon URL the web server proxies `/rpc` to |
+| `OPENBOTS_WEB_HOST` | `127.0.0.1` | Web app bind address |
+| `OPENBOTS_WEB_PORT` | `47190` | Web app port |
 
 Bot settings and tool credentials belong in the app database; provider authentication uses Pi's auth files. The env package does not read or write local config files or generate secrets.
 

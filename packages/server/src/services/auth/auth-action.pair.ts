@@ -1,6 +1,7 @@
 import { renderSVG } from 'uqr';
 import { authActionGrant } from './auth-action.grant';
 import type { AuthPairParams, AuthServiceDeps } from '../../types/auth.types';
+import type { AuthPairPayload } from '@openbots/contracts/universal';
 
 export async function authActionPair(deps: AuthServiceDeps, params: AuthPairParams) {
   const grant = await authActionGrant(deps, { issuedBy: params.issuedBy });
@@ -10,7 +11,7 @@ export async function authActionPair(deps: AuthServiceDeps, params: AuthPairPara
     serverUrl: params.serverUrl,
     token: grant.token,
     expiresAt: grant.expiresAt,
-  });
+  } satisfies AuthPairPayload);
 
   const svg = renderSVG(payload, { ecc: 'M', border: 4 });
 

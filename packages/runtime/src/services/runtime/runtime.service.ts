@@ -48,6 +48,7 @@ import { runtimeQueryConversation } from './runtime-query.conversation';
 import { runtimeQueryHasEntry } from './runtime-query.has-entry';
 import { runtimeQueryHistory } from './runtime-query.history';
 import { runtimeQueryListArtifacts } from './runtime-query.list-artifacts';
+import { runtimeQueryListBotArtifacts } from './runtime-query.list-bot-artifacts';
 import { runtimeQueryListRoutines } from './runtime-query.list-routines';
 import { runtimeQueryModels } from './runtime-query.models';
 import { runtimeQueryQuestions } from './runtime-query.questions';
@@ -184,6 +185,7 @@ export async function makeRuntimeService({
       artifactVersions: inBot(runtimeQueryArtifactVersions),
       artifact: inBot(runtimeQueryArtifact),
       artifacts: inBot(runtimeQueryListArtifacts),
+      botArtifacts: inBot(runtimeQueryListBotArtifacts),
       search: inBot((deps, params: RuntimeSearchParams, context) => runtimeQuerySearch(deps, params, context)),
       routines: inBot(runtimeQueryListRoutines),
       questions: inBot(runtimeQueryQuestions),

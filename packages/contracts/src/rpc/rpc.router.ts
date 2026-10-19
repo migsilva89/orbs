@@ -3,6 +3,7 @@ import { asyncIteratorObject, oc as baseContract } from '@orpc/contract';
 import {
   artifact,
   artifactBlocks,
+  artifactBotListInput,
   artifactCreate,
   artifactGet,
   artifactList,
@@ -190,6 +191,10 @@ export const contract = {
     list: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
       .input(artifactListInput)
+      .output(artifactList),
+    listBot: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(artifactBotListInput)
       .output(artifactList),
     get: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })

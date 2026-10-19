@@ -1,4 +1,5 @@
 import { defineDoc } from '@earendil-works/pi-durable';
+import { ENTRY } from '@openbots/contracts/universal';
 import type { SubagentAgents, SubagentCall } from '../../types/subagent.types';
 
 export const SUBAGENT = {
@@ -9,7 +10,7 @@ export const SUBAGENT = {
   reporter: 'openbots.subagent-reporter',
   agents: 'openbots.subagent-agents',
   call: 'openbots.subagent-call',
-  report: 'openbots.subagent-report',
+  report: ENTRY.subagentReport,
   request: 'openbots.subagent',
   reportRequest: 'openbots.subagent-report',
   maxBackgroundAgents: 8,

@@ -30,8 +30,15 @@ export const toolApprovalList = z.array(toolApproval);
 export const toolAnswer = toolPending.extend({ id: z.number().int().positive(), approved: z.boolean() });
 export const toolAnswerResult = z.object({ accepted: z.boolean() });
 
+export const toolSettingsForm = z.object({
+  approvalRules: toolApprovalRules,
+  jevApiKey: z.string().trim().max(8192),
+});
+
 export type ToolConfigureInput = z.infer<typeof toolConfigure>;
 export type ToolSettings = z.infer<typeof toolSettings>;
 export type ToolPendingInput = z.infer<typeof toolPending>;
 export type ToolApproval = z.infer<typeof toolApproval>;
 export type ToolAnswerInput = z.infer<typeof toolAnswer>;
+export type ToolSettingsForm = z.infer<typeof toolSettingsForm>;
+export type ToolApprovalRule = z.infer<typeof toolApprovalRules>[number];

@@ -11,7 +11,13 @@
   ],
   "plugin.inlang.messageFormat": {
     "pathPattern": [
+      "./messages/{locale}/avatars.json",
+      "./messages/{locale}/connect.json",
+      "./messages/{locale}/desktop.json",
       "./messages/{locale}/forms.json",
+      "./messages/{locale}/layout.json",
+      "./messages/{locale}/rooms.json",
+      "./messages/{locale}/settings.json",
       "./messages/{locale}/ui.json",
       "./messages/{locale}/validation.json"
     ]

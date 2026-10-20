@@ -85,8 +85,8 @@ export function avatarSvg(frame: BotFrame, ink: string, uid: string): AvatarSvgN
     });
   }));
 
+  // No paper under the body: the eye holes stay transparent and show whatever surface is behind.
   const body = svgNode('g', { opacity: frame.bodyAlpha }, [
-    svgNode('path', { fill: PAPER, d: frame.bodyPath }),
     svgNode('g', { mask: `url(#${maskId})` }, [svgNode('rect', { ...FRAME_BOX, fill: ink })]),
   ]);
 

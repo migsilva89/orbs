@@ -10,6 +10,7 @@ const VARIANTS: Record<z.infer<typeof appVariantSchema>, { name: string; scheme:
 };
 
 const INTER_WEIGHTS = [
+  { file: '300Light/Inter_300Light.ttf', weight: 300 },
   { file: '400Regular/Inter_400Regular.ttf', weight: 400 },
   { file: '500Medium/Inter_500Medium.ttf', weight: 500 },
   { file: '600SemiBold/Inter_600SemiBold.ttf', weight: 600 },
@@ -35,6 +36,7 @@ export default (): ExpoConfig => ({
     package: variant.bundleIdentifier,
   },
   plugins: [
+    'expo-secure-store',
     [
       'expo-font',
       {

@@ -18,7 +18,8 @@
       --color-secondary: oklch(0.967 0.001 286.375);
       --color-secondary-foreground: oklch(0.21 0.006 285.885);
       --color-muted: oklch(0.967 0.001 286.375);
-      --color-muted-foreground: oklch(0.552 0.016 285.938);
+      --color-muted-foreground: oklch(0.631 0.004 286.3);
+      --color-glass-muted: oklch(0.631 0.004 286.3);
       --color-accent: oklch(0.967 0.001 286.375);
       --color-accent-foreground: oklch(0.21 0.006 285.885);
       --color-destructive: oklch(0.637 0.237 25.331);
@@ -35,8 +36,8 @@
     }
 
     @variant dark {
-      --color-background: oklch(0.145 0 0);
-      --color-foreground: oklch(0.82 0 0);
+      --color-background: oklch(0.191 0 0);
+      --color-foreground: oklch(1 0 0);
       --color-card: oklch(0.205 0 0);
       --color-card-foreground: oklch(0.93 0 0);
       --color-popover: oklch(0.205 0 0);
@@ -46,7 +47,8 @@
       --color-secondary: oklch(0.269 0 0);
       --color-secondary-foreground: oklch(0.985 0 0);
       --color-muted: oklch(0.269 0 0);
-      --color-muted-foreground: oklch(0.708 0 0);
+      --color-muted-foreground: oklch(0.672 0.009 286.2);
+      --color-glass-muted: oklch(0.76 0.008 286);
       --color-accent: oklch(0.269 0 0);
       --color-accent-foreground: oklch(0.985 0 0);
       --color-destructive: oklch(0.637 0.237 25.331);
@@ -67,6 +69,7 @@
 @theme {
   /* Native family name registered by the expo-font plugin in app.config.ts. */
   --font-sans: 'Inter';
+  --tracking-body: -0.16px;
 
   --radius-sm: 6px;
   --radius-md: 8px;

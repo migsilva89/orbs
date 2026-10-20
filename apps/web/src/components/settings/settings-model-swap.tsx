@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormErrors, FormErrorsAndHint, FormField, FormItem, FormLabel } from '@/components/ui/forms/form';
 import { Item, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { BotModelUsage } from '@/types/bot.types';
+import type { BotModelUsage } from '@openbots/client/client';
 
 interface SettingsModelSwapProps {
   usage: BotModelUsage

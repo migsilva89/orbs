@@ -1,11 +1,10 @@
+import { roomsMessageText } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { match } from 'ts-pattern';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { roomsMessageText } from '@/services/rooms/rooms.client';
-import type { ChatMessage, ChatPart } from '@/types/chat.types';
-import type { ToolBot } from '@/types/tool.types';
+import type { ChatMessage, ChatPart, ToolBot } from '@openbots/client/client';
 
 interface RoomsChatNoticeProps {
   message: ChatMessage

@@ -1,6 +1,7 @@
 import { m } from '@openbots/i18n/client';
 import { getLocale } from '@openbots/i18n/runtime';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useHydrated } from '@tanstack/react-router';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { Button } from '@/components/ui/button';
 import { ButtonLoading } from '@/components/ui/button-loading';
@@ -8,19 +9,23 @@ import { FormErrors } from '@/components/ui/forms/form';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/components/ui/panel';
 import { toasty } from '@/components/ui/sonner';
 import { clipboardCopy } from '@/lib/clipboard';
-import { connectionRead } from '@/services/connection/connection.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCopy from '~icons/lucide/copy';
 import IconLaptop from '~icons/lucide/laptop';
 import IconQrCode from '~icons/lucide/qr-code';
+import type { ConnectionInfo } from '@/types/connection.types';
 
-export function SettingsDevices() {
+interface SettingsDevicesProps {
+  connection: ConnectionInfo
+}
+
+export function SettingsDevices({ connection }: SettingsDevicesProps) {
   const queryClient = useQueryClient();
   const { data: devices } = useSuspenseQuery(rpc.devices.list.queryOptions());
-  const current = connectionRead();
+  const hydrated = useHydrated();
   const date = new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium' });
   const pair = useMutation(rpc.pairing.create.mutationOptions());
-  const hostname = current ? new URL(current.serverUrl).hostname : '';
+  const hostname = new URL(connection.serverUrl).hostname;
   const isLoopback = hostname === 'localhost' || hostname === '[::1]' || hostname.startsWith('127.') || hostname.endsWith('.localhost');
   const revoke = useMutation(rpc.devices.revoke.mutationOptions({ onSuccess: () => queryClient.invalidateQueries({ queryKey: rpc.devices.list.key() }) }));
 
@@ -37,10 +42,10 @@ export function SettingsDevices() {
           <PanelContent>
             <PanelTitle className="truncate">{device.name}</PanelTitle>
             <PanelDescription>
-              {device.id === current?.deviceId ? m.settings_devices_current() : m.settings_devices_added({ date: date.format(new Date(device.createdAt)) })}
+              {device.id === connection.deviceId ? m.settings_devices_current() : m.settings_devices_added({ date: hydrated ? date.format(new Date(device.createdAt)) : '' })}
             </PanelDescription>
           </PanelContent>
-          {device.id === current?.deviceId ? null : (
+          {device.id === connection.deviceId ? null : (
             <Button
               disabled={revoke.isPending}
               size="sm"
@@ -82,11 +87,10 @@ export function SettingsDevices() {
           <FormErrors error={pair.isError ? m.settings_devices_pair_error() : null} />
           <ButtonLoading
             className="self-start"
-            disabled={!current}
             loading={pair.isPending}
             size="sm"
             variant="outline"
-            onClick={() => current && pair.mutate({ serverUrl: current.serverUrl })}
+            onClick={() => pair.mutate({ serverUrl: connection.serverUrl })}
           >
             {pair.data ? m.settings_devices_pair_again() : m.settings_devices_pair_create()}
           </ButtonLoading>

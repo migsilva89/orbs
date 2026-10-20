@@ -1,0 +1,121 @@
+import { createContext, use } from 'react';
+import { Linking } from 'react-native';
+import { EnrichedMarkdownText } from 'react-native-enriched-markdown';
+import { match } from 'ts-pattern';
+import { useCSSVariable, useUniwind } from 'uniwind';
+import type { MarkdownStyle } from 'react-native-enriched-markdown';
+
+/** Text colour for markdown inside a coloured surface, such as the owner's bubble. */
+export const markdownColorContext = createContext<string | undefined>(undefined);
+
+// Code colours from T3 Code's GitHub-like palettes.
+const MARKDOWN_SYNTAX = {
+  dark: {
+    keyword: '#ff7b72',
+    string: '#a5d6ff',
+    number: '#79c0ff',
+    constant: '#79c0ff',
+    comment: '#8b949e',
+    function: '#d2a8ff',
+    type: '#ffa657',
+    property: '#79c0ff',
+    tag: '#7ee787',
+    attribute: '#79c0ff',
+  },
+  light: {
+    keyword: '#cf222e',
+    string: '#0a3069',
+    number: '#0550ae',
+    constant: '#0550ae',
+    comment: '#6e7781',
+    function: '#8250df',
+    type: '#953800',
+    property: '#0550ae',
+    tag: '#116329',
+    attribute: '#0550ae',
+  },
+} as const;
+
+const MARKDOWN_TEXT = { fontFamily: 'Inter', fontSize: 16, lineHeight: 23, marginTop: 0, marginBottom: 8 };
+
+interface MarkdownProps {
+  children: string;
+  isStreaming?: boolean;
+  /** Muted and smaller, for secondary text such as a bot's reasoning. */
+  tone?: 'default' | 'muted';
+  /** Native text selection; off in bubbles so a long press opens the message actions. */
+  selectable?: boolean;
+}
+
+export function Markdown({ children, isStreaming = false, tone = 'default', selectable = false }: MarkdownProps) {
+  const color = use(markdownColorContext);
+  const { theme } = useUniwind();
+
+  const [foreground, muted, border, codeBackground, link, background] = useCSSVariable([
+    '--color-foreground',
+    '--color-muted-foreground',
+    '--color-border',
+    '--color-muted',
+    '--color-primary',
+    '--color-background',
+  ]).map(String);
+
+  const text = match(tone)
+    .with('muted', () => ({ ...MARKDOWN_TEXT, fontSize: 14, lineHeight: 20, color: muted }))
+    .with('default', () => ({ ...MARKDOWN_TEXT, color: color ?? foreground }))
+    .exhaustive();
+
+  const heading = (fontSize: number) => ({ ...text, fontSize, lineHeight: Math.round(fontSize * 1.3), fontWeight: '600', marginTop: 8 });
+  const block = { marginTop: 4, marginBottom: 12, borderRadius: 12, borderWidth: 1, borderColor: border };
+
+  const markdownStyle: MarkdownStyle = {
+    paragraph: text,
+    h1: heading(24),
+    h2: heading(21),
+    h3: heading(19),
+    h4: heading(17),
+    h5: heading(16),
+    h6: heading(16),
+    strong: { fontWeight: 'bold' },
+    em: { fontStyle: 'italic' },
+    strikethrough: { color: text.color },
+    link: { color: color ?? link, underline: true },
+    code: { fontFamily: 'Menlo', fontSize: 14, color: text.color, backgroundColor: codeBackground, borderColor: 'transparent' },
+    blockquote: { ...text, color: muted, borderColor: border, borderWidth: 3, gapWidth: 12, backgroundColor: 'transparent' },
+    list: { ...text, bulletColor: muted, markerColor: muted, gapWidth: 8 },
+    thematicBreak: { color: border, height: 1, marginTop: 8, marginBottom: 8 },
+    codeBlock: {
+      ...text,
+      ...block,
+      fontFamily: 'Menlo',
+      fontSize: 14,
+      lineHeight: 20,
+      backgroundColor: codeBackground,
+      padding: 12,
+      syntaxColors: theme === 'dark' ? MARKDOWN_SYNTAX.dark : MARKDOWN_SYNTAX.light,
+    },
+    taskList: { checkedColor: link, borderColor: muted, checkmarkColor: background, checkedTextColor: muted, checkedStrikethrough: true },
+    table: {
+      ...text,
+      ...block,
+      fontSize: 14,
+      headerBackgroundColor: codeBackground,
+      headerTextColor: text.color,
+      rowEvenBackgroundColor: 'transparent',
+      rowOddBackgroundColor: 'transparent',
+      cellPaddingHorizontal: 10,
+      cellPaddingVertical: 7,
+    },
+  };
+
+  return (
+    <EnrichedMarkdownText
+      flavor="github"
+      selectable={selectable}
+      markdown={children}
+      markdownStyle={markdownStyle}
+      streamingAnimation={isStreaming}
+      onLinkPress={({ url }) => void Linking.openURL(url)}
+    />
+  );
+}

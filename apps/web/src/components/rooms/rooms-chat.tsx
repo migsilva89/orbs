@@ -1,3 +1,4 @@
+import { CHAT, chatActivity, chatFailure, chatLive, chatMessages, chatOutgoingMessages, chatQueued } from '@openbots/client/client';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
@@ -10,13 +11,10 @@ import { RoomsChatTranscript } from '@/components/rooms/rooms-chat-transcript';
 import { useRoomReactions } from '@/hooks/use-room-reactions';
 import { useRoomRead } from '@/hooks/use-room-read';
 import { chatHistoryOptions, chatViewOptions } from '@/services/chat/chat.client';
-import { CHAT } from '@/services/chat/chat.constants';
-import { chatActivity, chatFailure, chatLive, chatMessages, chatOutgoingMessages, chatQueued } from '@/services/chat/chat.utils';
 import { LAYOUT_SHORTCUT_OPTIONS, LAYOUT_SHORTCUT_OVERLAYS, LAYOUT_SHORTCUTS } from '@/services/layout/layout.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
-import type { ChatMessage, ChatOutgoing } from '@/types/chat.types';
-import type { RoomsChat as RoomsChatItem } from '@/types/rooms.types';
+import type { ChatMessage, ChatOutgoing, RoomsChat as RoomsChatItem } from '@openbots/client/client';
 import type { Bot, ConversationView } from '@openbots/contracts/universal';
 
 interface RoomsChatViewProps {

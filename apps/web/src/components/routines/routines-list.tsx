@@ -1,3 +1,4 @@
+import { ROOMS } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { RoutinesItem } from '@/components/routines/routines-item';
@@ -5,7 +6,6 @@ import { EmptyCompact } from '@/components/ui/empty';
 import { FormErrors } from '@/components/ui/forms/form';
 import { ItemGroup } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ROOMS } from '@/services/rooms/rooms.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCalendarClock from '~icons/lucide/calendar-clock';
 import type { Bot } from '@openbots/contracts/universal';

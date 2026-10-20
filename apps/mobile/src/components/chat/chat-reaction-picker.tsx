@@ -1,0 +1,80 @@
+import { m } from '@openbots/i18n/client';
+import { useNavigation } from '@react-navigation/native';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { FlatList, View } from 'react-native';
+import { match, P } from 'ts-pattern';
+import { ActionSheetChoice } from '@/components/ui/action-sheet';
+import { SearchField } from '@/components/ui/search-field';
+import { Text } from '@/components/ui/text';
+import { useConnection } from '@/hooks/use-connection';
+import { useMessageReaction } from '@/hooks/use-message-reaction';
+import { emojiListOptions, emojiSearch } from '@/services/emoji/emoji.client';
+import { EMOJI } from '@/services/emoji/emoji.constants';
+import type { ChatReactionParams } from '@/types/chat.types';
+import type { NavigationRoot } from '@/types/navigation.types';
+import type { RpcSession } from '@/types/rpc.types';
+
+interface ChatReactionPickerProps {
+  route: { params: ChatReactionParams };
+}
+
+export function ChatReactionPicker({ route }: ChatReactionPickerProps) {
+  const { session } = useConnection();
+
+  return match(session)
+    .with(P.nonNullable, (current) => <ChatReactionPickerContent params={route.params} session={current} />)
+    .otherwise(() => null);
+}
+
+interface ChatReactionPickerContentProps {
+  session: RpcSession;
+  params: ChatReactionParams;
+}
+
+function ChatReactionPickerContent({ session, params }: ChatReactionPickerContentProps) {
+  const navigation = useNavigation<NavigationRoot>();
+  const [search, setSearch] = useState('');
+  const emoji = useQuery(emojiListOptions());
+  const reaction = useMessageReaction(session, params);
+  const items = emojiSearch({ items: emoji.data ?? [], query: search });
+
+  const empty = match(emoji.status)
+    .with('pending', () => m.rooms_mention_skills_loading())
+    .with('error', () => m.rooms_mention_skills_offline())
+    .otherwise(() => m.rooms_reaction_empty());
+
+  return (
+    <View className="flex-1 gap-3 px-4 pt-6">
+      <SearchField
+        accessibilityLabel={m.rooms_reaction_search()}
+        placeholder={m.rooms_reaction_search()}
+        value={search}
+        onChangeText={setSearch}
+      />
+      <FlatList
+        columnWrapperClassName="justify-between"
+        contentContainerClassName="gap-3 pb-10"
+        data={items}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
+        keyExtractor={(item) => item.unicode}
+        ListEmptyComponent={<Text className="mt-8 text-center" tone="muted">{empty}</Text>}
+        numColumns={EMOJI.columns}
+        renderItem={({ item }) => (
+          <ActionSheetChoice
+            accessibilityLabel={m.rooms_reaction_quick({ emoji: item.unicode })}
+            disabled={reaction.isPending}
+            selected={reaction.mine.includes(item.unicode)}
+            onPress={() => {
+              reaction.react(item.unicode);
+              navigation.goBack();
+            }}
+          >
+            {item.unicode}
+          </ActionSheetChoice>
+        )}
+      />
+    </View>
+  );
+}

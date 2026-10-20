@@ -9,7 +9,7 @@ import IconFileText from '~icons/lucide/file-text';
 import IconPlug from '~icons/lucide/plug';
 import IconShield from '~icons/lucide/shield';
 import IconSparkles from '~icons/lucide/sparkles';
-import type { BotInherit } from '@/types/bot.types';
+import type { BotInherit } from '@openbots/client/client';
 import type { BotForm } from '@openbots/contracts/universal';
 
 const BOT_FORM_INHERIT = [

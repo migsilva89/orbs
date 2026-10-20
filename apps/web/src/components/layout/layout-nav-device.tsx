@@ -5,17 +5,22 @@ import { match } from 'ts-pattern';
 import * as DropdownMenu from '@/components/ui/dropdown-menu';
 import * as Sidebar from '@/components/ui/sidebar';
 import { StatusDot } from '@/components/ui/status-dot';
-import { connectionForget, connectionRead } from '@/services/connection/connection.client';
+import { connectionForget } from '@/services/connection/connection.client';
 import { LAYOUT_MENU } from '@/services/layout/layout.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import BrandsOpenbots from '~icons/brands/openbots';
 import LucideChevronsUpDown from '~icons/lucide/chevrons-up-down';
 import IconLogOut from '~icons/lucide/log-out';
+import type { ConnectionInfo } from '@/types/connection.types';
 
-export function LayoutNavDevice() {
+interface LayoutNavDeviceProps {
+  connection: ConnectionInfo
+}
+
+export function LayoutNavDevice({ connection }: LayoutNavDeviceProps) {
   const { isMobile } = Sidebar.useSidebar();
   const server = useQuery(rpc.server.info.queryOptions());
-  const host = new URL(connectionRead()?.serverUrl ?? location.origin).host;
+  const host = new URL(connection.serverUrl).host;
 
   const status = match(server)
     .with({ isError: true }, () => 'destructive' as const)
@@ -23,10 +28,8 @@ export function LayoutNavDevice() {
     .otherwise(() => 'default' as const);
 
   async function disconnect() {
-    const deviceId = connectionRead()?.deviceId;
-
-    await (deviceId ? rpc.devices.revoke.call({ id: deviceId }).catch(() => undefined) : undefined);
-    connectionForget();
+    await rpc.devices.revoke.call({ id: connection.deviceId }).catch(() => undefined);
+    await connectionForget();
     location.assign('/connect');
   }
 

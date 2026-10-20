@@ -219,7 +219,7 @@ export type ArtifactBlockName = keyof typeof artifactComponents;
 const artifactTitle = z.string().trim().min(1).max(ARTIFACT.titleMax);
 const artifactState = z.record(z.string(), z.json());
 
-export const artifactSpec = z.object({
+const artifactStructuredSpec = z.object({
   root: z.string().min(1),
   elements: z.record(z.string().min(1), z.object({
     type: z.string().min(1),
@@ -227,7 +227,15 @@ export const artifactSpec = z.object({
     children: z.array(z.string()).default([]),
   })),
   state: artifactState.default({}),
-});
+}).strict();
+
+export const artifactSpec = z.union([
+  artifactStructuredSpec,
+  z.object({
+    html: z.string().trim().min(1).max(ARTIFACT.specBytesMax),
+    state: artifactState.default({}),
+  }).strict(),
+]);
 
 export const artifactSummary = z.object({
   id: z.uuid(),

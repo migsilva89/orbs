@@ -9,7 +9,7 @@ const LinearGradient = withUniwind(NativeLinearGradient);
 
 const edgeFadeVariants = cva({
   base: 'absolute inset-x-0',
-  variants: { edge: { top: 'top-0 h-24', bottom: 'bottom-0 h-32' } },
+  variants: { edge: { top: 'top-0 h-24', bottom: 'bottom-0 h-24' } },
 });
 
 interface EdgeFadeProps extends Required<VariantProps<typeof edgeFadeVariants>> {

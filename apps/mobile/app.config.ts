@@ -15,6 +15,8 @@ const INTER_WEIGHTS = [
   { file: '500Medium/Inter_500Medium.ttf', weight: 500 },
   { file: '600SemiBold/Inter_600SemiBold.ttf', weight: 600 },
   { file: '700Bold/Inter_700Bold.ttf', weight: 700 },
+  { file: '400Regular_Italic/Inter_400Regular_Italic.ttf', weight: 400, style: 'italic' },
+  { file: '700Bold_Italic/Inter_700Bold_Italic.ttf', weight: 700, style: 'italic' },
 ];
 
 const interPath = (file: string) => `./node_modules/@expo-google-fonts/inter/${file}`;
@@ -45,7 +47,7 @@ export default (): ExpoConfig => ({
           fonts: [
             {
               fontFamily: 'Inter',
-              fontDefinitions: INTER_WEIGHTS.map(({ file, weight }) => ({ path: interPath(file), weight })),
+              fontDefinitions: INTER_WEIGHTS.map(({ file, weight, style }) => ({ path: interPath(file), weight, style })),
             },
           ],
         },

@@ -2,7 +2,7 @@ import { m } from '@openbots/i18n/client';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/components/ui/sidebar';
-import type { ChatActivity } from '@/types/chat.types';
+import type { ChatActivity } from '@openbots/client/client';
 import type { Bot } from '@openbots/contracts/universal';
 
 interface RoomsChatPillProps {

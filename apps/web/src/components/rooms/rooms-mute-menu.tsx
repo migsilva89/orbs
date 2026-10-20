@@ -1,11 +1,11 @@
+import { ROOMS_MUTE_DURATIONS } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useMutation } from '@tanstack/react-query';
 import { DropdownMenuItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { ROOMS_MUTE_DURATIONS } from '@/services/rooms/rooms.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconBell from '~icons/lucide/bell';
 import IconBellOff from '~icons/lucide/bell-off';
-import type { RoomsChat } from '@/types/rooms.types';
+import type { RoomsChat } from '@openbots/client/client';
 
 interface RoomsMuteMenuProps {
   chat: RoomsChat

@@ -1,8 +1,8 @@
+import { botDefaultSettings } from '@openbots/client/client';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { BotCreateDialog } from '@/components/bots/bot-create-dialog';
 import { BotList } from '@/components/bots/bot-list';
 import { useDialogNavigation } from '@/hooks/use-dialog-navigation';
-import { botDefaultSettings } from '@/services/bot/bot.client';
 import { rpc } from '@/services/rpc/rpc.client';
 
 export const Route = createFileRoute('/_chat/bots/create')({

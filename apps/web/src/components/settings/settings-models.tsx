@@ -1,3 +1,4 @@
+import { botModelBrand, botModelUsage } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -9,10 +10,9 @@ import { Empty, EmptyDescription } from '@/components/ui/empty';
 import { FormErrors } from '@/components/ui/forms/form';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/components/ui/panel';
 import { Skeleton } from '@/components/ui/skeleton';
-import { botModelBrand, botModelUsage } from '@/services/bot/bot.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCpu from '~icons/lucide/cpu';
-import type { BotModelUsage } from '@/types/bot.types';
+import type { BotModelUsage } from '@openbots/client/client';
 
 export function SettingsModels() {
   const bots = useQuery(rpc.bots.list.queryOptions());

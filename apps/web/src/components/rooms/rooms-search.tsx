@@ -1,3 +1,4 @@
+import { ROOMS, roomsSearchResults, roomsSearchSnippet } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { getLocale } from '@openbots/i18n/runtime';
 import { keepPreviousData, useQueries, useSuspenseQuery } from '@tanstack/react-query';
@@ -7,10 +8,9 @@ import { BotAvatar } from '@/components/bots/bot-avatar';
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Kbd } from '@/components/ui/kbd';
 import { Skeleton } from '@/components/ui/skeleton';
-import { roomsLink, roomsSearchResults, roomsSearchSnippet } from '@/services/rooms/rooms.client';
-import { ROOMS } from '@/services/rooms/rooms.constants';
+import { roomsLink } from '@/services/rooms/rooms.client';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { RoomsSearchEntry } from '@/types/rooms.types';
+import type { RoomsSearchEntry } from '@openbots/client/client';
 
 export function RoomsSearch() {
   const navigate = useNavigate();

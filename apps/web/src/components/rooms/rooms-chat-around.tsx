@@ -1,11 +1,10 @@
+import { CHAT, chatMessages } from '@openbots/client/client';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { RoomsChatTranscript } from '@/components/rooms/rooms-chat-transcript';
 import { useRoomReactions } from '@/hooks/use-room-reactions';
-import { CHAT } from '@/services/chat/chat.constants';
-import { chatMessages } from '@/services/chat/chat.utils';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { ChatMessage } from '@/types/chat.types';
+import type { ChatMessage } from '@openbots/client/client';
 import type { Bot, ConversationView } from '@openbots/contracts/universal';
 
 interface RoomsChatAroundProps {

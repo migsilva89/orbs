@@ -1,12 +1,10 @@
+import { BOT_ACTIVITY_LABELS, botBlobPresentation } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { match } from 'ts-pattern';
 import { AvatarBlob } from '@/components/avatars/avatar-blob';
 import { useBotCheer } from '@/hooks/use-bot-cheer';
 import { cn } from '@/lib/cn';
-import { botBlobPresentation } from '@/services/bot/bot.client';
-import { BOT_ACTIVITY_LABELS } from '@/services/bot/bot.constants';
-import type { BotAvatar as BotAvatarValue } from '@/types/bot.types';
-import type { ChatActivity } from '@/types/chat.types';
+import type { BotAvatar as BotAvatarValue, ChatActivity } from '@openbots/client/client';
 
 interface BotAvatarProps {
   bot: { name: string; avatar?: BotAvatarValue }

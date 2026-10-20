@@ -1,7 +1,7 @@
 import { m } from '@openbots/i18n/client';
 import { getLocale } from '@openbots/i18n/runtime';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useMatch } from '@tanstack/react-router';
+import { useHydrated, useMatch } from '@tanstack/react-router';
 import { useState } from 'react';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { RoomsDetailsBot } from '@/components/rooms/rooms-details-bot';
@@ -15,7 +15,7 @@ import * as Sidebar from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconPanelRight from '~icons/lucide/panel-right';
-import type { RoomsChat } from '@/types/rooms.types';
+import type { RoomsChat } from '@openbots/client/client';
 import type { Bot } from '@openbots/contracts/universal';
 
 export function RoomsDetails() {
@@ -115,11 +115,13 @@ interface RoomsDetailsFactsProps {
 }
 
 function RoomsDetailsFacts({ bot, chat }: RoomsDetailsFactsProps) {
+  const hydrated = useHydrated();
   const date = new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium', timeStyle: 'short' });
+  const lastActivity = chat.lastMessage && hydrated ? date.format(new Date(chat.lastMessage.createdAt)) : '';
 
   const facts = [
-    { label: m.rooms_last_activity(), value: chat.lastMessage ? date.format(new Date(chat.lastMessage.createdAt)) : m.rooms_last_activity_none() },
-    { label: m.rooms_details_created(), value: date.format(new Date(bot.createdAt)) },
+    { label: m.rooms_last_activity(), value: chat.lastMessage ? lastActivity : m.rooms_last_activity_none() },
+    { label: m.rooms_details_created(), value: hydrated ? date.format(new Date(bot.createdAt)) : '' },
   ];
 
   return (

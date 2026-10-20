@@ -1,3 +1,4 @@
+import { ROOMS, roomsMessageText } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useState } from 'react';
 import { RoomsChatEmojiChoices } from '@/components/rooms/rooms-chat-emoji-choices';
@@ -11,15 +12,13 @@ import { toasty } from '@/components/ui/sonner';
 import { useIsTouch } from '@/hooks/use-is-touch';
 import { clipboardCopy } from '@/lib/clipboard';
 import { cn } from '@/lib/cn';
-import { roomsMessageText } from '@/services/rooms/rooms.client';
-import { ROOMS } from '@/services/rooms/rooms.constants';
 import IconCheck from '~icons/lucide/check';
 import IconCopy from '~icons/lucide/copy';
 import IconEllipsisVertical from '~icons/lucide/ellipsis-vertical';
 import IconInfo from '~icons/lucide/info';
 import IconReply from '~icons/lucide/reply';
 import IconTextSelect from '~icons/lucide/text-select';
-import type { ChatMessage } from '@/types/chat.types';
+import type { ChatMessage } from '@openbots/client/client';
 
 interface RoomsChatActionsProps {
   message: ChatMessage

@@ -1,37 +1,61 @@
 import { makeHttpClient } from '@openbots/client/client';
 import { connectionStored } from '@openbots/contracts/universal';
-import { match, P } from 'ts-pattern';
+import { createIsomorphicFn } from '@tanstack/react-start';
 import { CONNECTION } from './connection.constants';
+import { connectionCookie, connectionParse } from './connection.utils';
 import type * as ConnectionTypes from '@/types/connection.types';
 import type { ConnectionSaved } from '@openbots/contracts/universal';
 
-export function connectionRead(): ConnectionSaved | null {
-  const saved = match(globalThis.localStorage)
-    .with(P.nullish, () => null)
-    .otherwise((storage) => storage.getItem(CONNECTION.storageKey));
+export const connectionRead = createIsomorphicFn()
+  .server(async () => {
+    const { getRequestHeader } = await import('@tanstack/react-start/server');
 
-  return connectionStored.safeParse(saved).data ?? null;
-}
+    return connectionParse(getRequestHeader('cookie') ?? '');
+  })
+  .client(async () => connectionParse(document.cookie));
 
-export function connectionForget(): void {
-  localStorage.removeItem(CONNECTION.storageKey);
+export const connectionForget = createIsomorphicFn()
+  .server(async () => {
+    const { deleteCookie } = await import('@tanstack/react-start/server');
+    deleteCookie(CONNECTION.storageKey, { path: '/' });
+  })
+  .client(async () => {
+    document.cookie = connectionCookie(null, location.protocol === 'https:');
+    localStorage.removeItem(CONNECTION.storageKey);
+  });
+
+export function connectionMigrate(): void {
+  const saved = connectionStored.safeParse(localStorage.getItem(CONNECTION.storageKey)).data;
+
+  if (!saved || new URL(saved.serverUrl).origin !== location.origin) {
+    return;
+  }
+
+  if (!connectionParse(document.cookie)) {
+    document.cookie = connectionCookie(saved, location.protocol === 'https:');
+  }
+
+  if (connectionParse(document.cookie)) {
+    localStorage.removeItem(CONNECTION.storageKey);
+  }
 }
 
 export async function connectionPair({ payload, name }: ConnectionTypes.ConnectionPairParams) {
-  const url = connectionRpcUrl({ serverUrl: payload.serverUrl });
+  const url = CONNECTION.rpcPath;
   const redeemed = await makeHttpClient({ url }).pairing.redeem({ token: payload.token, name });
 
   const connection: ConnectionSaved = {
-    serverUrl: payload.serverUrl,
+    serverUrl: location.origin,
     deviceId: redeemed.device.id,
     token: redeemed.token,
   };
 
-  localStorage.setItem(CONNECTION.storageKey, JSON.stringify(connection));
+  document.cookie = connectionCookie(connection, location.protocol === 'https:');
 
   const server = await makeHttpClient({ url, token: () => redeemed.token }).server.info();
 
-  localStorage.setItem(CONNECTION.storageKey, JSON.stringify({ ...connection, serverId: server.id }));
+  document.cookie = connectionCookie({ ...connection, serverId: server.id }, location.protocol === 'https:');
+  localStorage.removeItem(CONNECTION.storageKey);
 }
 
 export function connectionRpcUrl({ serverUrl }: ConnectionTypes.ConnectionUrlParams): string {

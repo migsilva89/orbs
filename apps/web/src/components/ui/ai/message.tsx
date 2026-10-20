@@ -23,7 +23,7 @@ export function Message({ className, from, ...props }: MessageProps) {
 }
 
 export function MessageStack({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex max-w-full min-w-0 flex-col gap-1 group-data-[role=assistant]:items-start group-data-[role=user]:items-end md:max-w-[80%]', className)} {...props} />;
+  return <div className={cn('flex w-4/5 min-w-0 flex-col gap-1 group-data-[role=assistant]:items-start group-data-[role=user]:items-end', className)} {...props} />;
 }
 
 const messageContentVariants = cva({
@@ -49,7 +49,7 @@ export type MessageContentProps = HTMLAttributes<HTMLDivElement> & VariantProps<
 // iOS-style bubble tail: a small filled wedge tucked under the bottom corner nearest the sender.
 export function MessageContent({ children, className, tail = true, ...props }: MessageContentProps) {
   return (
-    <div className="relative w-fit max-w-full">
+    <div className="relative w-fit max-w-full min-w-0 has-[[data-message-wide]]:w-full">
       <div className={cn(messageContentVariants({ tail }), className)} {...props}>
         {children}
       </div>

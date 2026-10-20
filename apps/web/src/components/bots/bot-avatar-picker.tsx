@@ -1,14 +1,14 @@
 import { EXPRESSIONS } from '@openbots/avatar-blobs/expressions';
 import { BODIES, COLORS } from '@openbots/avatar-blobs/skins';
+import { BOT } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { Button } from '@/components/ui/button';
 import { useBotAvatarFlash } from '@/hooks/use-bot-avatar-flash';
 import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS } from '@/services/avatar/avatar.constants';
-import { BOT } from '@/services/bot/bot.constants';
 import IconChevronLeft from '~icons/lucide/chevron-left';
 import IconChevronRight from '~icons/lucide/chevron-right';
-import type { BotAvatar as BotAvatarValue } from '@/types/bot.types';
+import type { BotAvatar as BotAvatarValue } from '@openbots/client/client';
 import type { MouseEvent } from 'react';
 
 const revealOnHover = 'opacity-0 group-focus-within/avatar:opacity-100 group-hover/avatar:opacity-100 pointer-coarse:opacity-100';

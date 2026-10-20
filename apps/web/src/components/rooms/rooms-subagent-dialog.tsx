@@ -1,3 +1,4 @@
+import { chatLive, chatMessages, roomsMessageText } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { BotAvatar } from '@/components/bots/bot-avatar';
@@ -8,10 +9,8 @@ import { Response } from '@/components/ui/ai/response';
 import { Clamp } from '@/components/ui/clamp';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { chatViewOptions } from '@/services/chat/chat.client';
-import { chatLive, chatMessages } from '@/services/chat/chat.utils';
-import { roomsMessageText } from '@/services/rooms/rooms.client';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { ToolBot } from '@/types/tool.types';
+import type { ToolBot } from '@openbots/client/client';
 
 interface RoomsSubagentDialogProps {
   botId: string
@@ -58,7 +57,7 @@ export function RoomsSubagentDialog({ botId, bot, conversationId, name, task, on
             <Message from="assistant" key={message.id}>
               <MessageStack>
                 <MessageContent>
-                  <Response>{roomsMessageText(message)}</Response>
+                  <Response renderHtml isAnimating={message.parts.some((part) => part.type === 'text' && part.state === 'streaming')}>{roomsMessageText(message)}</Response>
                 </MessageContent>
               </MessageStack>
               <BotAvatar

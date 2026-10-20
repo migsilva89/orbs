@@ -2,7 +2,7 @@ import { m } from '@openbots/i18n/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toasty } from '@/components/ui/sonner';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { RoomsArrangeParams } from '@/types/rooms.types';
+import type { RoomsArrangeParams } from '@openbots/client/client';
 
 export function useRoomsArrange() {
   const queryClient = useQueryClient();

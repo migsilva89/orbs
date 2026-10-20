@@ -1,3 +1,4 @@
+import { toolRunning } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -7,13 +8,12 @@ import { Question, QuestionDescription, QuestionHeader, QuestionHeading, Questio
 import { Button } from '@/components/ui/button';
 import { chatContextsWatchOptions } from '@/services/chat/chat.client';
 import { rpc } from '@/services/rpc/rpc.client';
-import { toolRunning } from '@/services/tool/tool.client';
 import IconLucideCheck from '~icons/lucide/check';
 import IconLucideLoaderCircle from '~icons/lucide/loader-circle';
 import IconLucideSquare from '~icons/lucide/square';
 import IconLucideWorkflow from '~icons/lucide/workflow';
 import IconLucideX from '~icons/lucide/x';
-import type { ToolBot, ToolSubagent } from '@/types/tool.types';
+import type { ToolBot, ToolSubagent } from '@openbots/client/client';
 import type { DynamicToolUIPart } from 'ai';
 
 interface RoomsChatSubagentProps {

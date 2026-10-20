@@ -20,7 +20,7 @@ const BLOB_HALF = HALF_VIEWBOX * BLOB_ZOOM;
 
 const avatarVariants = cva({
   base: 'shrink-0 items-center justify-center overflow-hidden rounded-full',
-  variants: { size: { default: 'size-12', featured: 'size-24' } },
+  variants: { size: { xs: 'size-4', sm: 'size-8', default: 'size-12', featured: 'size-24' } },
   defaultVariants: { size: 'default' },
 });
 
@@ -61,7 +61,7 @@ export function Avatar({ avatar, name, size = 'default', className }: AvatarProp
         .with({ kind: 'color' }, ({ color }) => <View className="size-full" style={{ backgroundColor: color }} />)
         .with({ kind: 'emoji' }, ({ emoji, color }) => (
           <View className="size-full items-center justify-center" style={{ backgroundColor: color }}>
-            <Text variant={match(size).with('featured', () => 'avatar-featured' as const).otherwise(() => 'avatar' as const)}>{emoji}</Text>
+            <Text variant={match(size).with('featured', () => 'avatar-featured' as const).with('sm', 'xs', () => 'avatar-small' as const).otherwise(() => 'avatar' as const)}>{emoji}</Text>
           </View>
         ))
         .otherwise(() => <SvgXml height="100%" width="100%" xml={xml} />)}

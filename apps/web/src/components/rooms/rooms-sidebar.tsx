@@ -1,6 +1,7 @@
 import { DndContext, DragOverlay, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { ROOMS_DRAG_PRESS, roomsSidebarOrder } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
@@ -14,8 +15,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader } from '@/components/ui/empty';
 import * as Sidebar from '@/components/ui/sidebar';
 import { useRoomsArrange } from '@/hooks/use-rooms-arrange';
-import { roomsSidebarOrder } from '@/services/rooms/rooms.client';
-import { ROOMS_DRAG_PRESS } from '@/services/rooms/rooms.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconPlus from '~icons/lucide/plus';
 import IconSearch from '~icons/lucide/search';

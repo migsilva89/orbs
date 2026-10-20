@@ -1,6 +1,6 @@
+import { ROOMS } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useEffect, useEffectEvent, useRef } from 'react';
-import { ROOMS } from '@/services/rooms/rooms.constants';
 
 interface RoomsChatUnreadProps {
   seen: boolean

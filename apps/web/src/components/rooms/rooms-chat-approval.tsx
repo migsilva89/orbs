@@ -1,13 +1,11 @@
+import { ROOMS_APPROVAL_CHOICES, roomsApprovalText, toolPresentation } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { ORPCError } from '@orpc/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ToolInput } from '@/components/tools/tool-input';
 import { Question, QuestionDescription, QuestionHeader, QuestionHeading, QuestionOption, QuestionOptions, QuestionTitle } from '@/components/ui/ai/question';
 import { ToolCode } from '@/components/ui/ai/tool';
-import { roomsApprovalText } from '@/services/rooms/rooms.client';
-import { ROOMS_APPROVAL_CHOICES } from '@/services/rooms/rooms.constants';
 import { rpc } from '@/services/rpc/rpc.client';
-import { toolPresentation } from '@/services/tool/tool.client';
 import type { ToolApproval } from '@openbots/contracts/universal';
 
 interface RoomsChatApprovalProps {

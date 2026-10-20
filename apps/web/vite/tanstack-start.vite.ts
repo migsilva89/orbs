@@ -4,7 +4,6 @@ import { routes } from '../src/application/routes.ts';
 
 export function createTanstackStartPlugin() {
   return tanstackStart({
-    start: { entry: join('application', 'start.ts') },
     server: { entry: join('application', 'server.tanstack.ts') },
     router: {
       entry: join('application', 'router.tsx'),

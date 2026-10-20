@@ -19,12 +19,12 @@ interface TextFieldProps extends TextInputProps, VariantProps<typeof textFieldVa
 
 export function TextField({ className, size, tone, placeholderTone = 'muted-foreground', style, ...props }: TextFieldProps) {
   const inherited = use(textContext);
-  // Resolved directly: Uniwind's placeholder class does not reach the native placeholder in dark mode.
-  const placeholderColor = String(useCSSVariable(`--color-${placeholderTone}`));
+  // Resolved directly: Uniwind's placeholder and selection classes do not reach the native input.
+  const [placeholderColor, selectionColor] = useCSSVariable([`--color-${placeholderTone}`, '--color-primary']).map(String);
   return (
     <TextInput
       placeholderTextColor={placeholderColor}
-      selectionColorClassName="accent-primary"
+      selectionColor={selectionColor}
       {...props}
       className={cn(textFieldVariants({ size, tone: tone ?? inherited.tone }), className)}
       style={[style, { paddingVertical: 0, textAlignVertical: 'center' }]}

@@ -4,23 +4,30 @@ import { View } from 'react-native';
 import { match } from 'ts-pattern';
 import { useUniwind, withUniwind } from 'uniwind';
 import { cn } from '@/lib/cn';
+import type { VariantProps } from 'cva';
 import type { ViewProps } from 'react-native';
 
 const NativeGlass = withUniwind(GlassView, { style: { fromClassName: 'className' } });
 const hasGlass = isGlassEffectAPIAvailable() && isLiquidGlassAvailable();
 
+const glassShapeVariants = cva({
+  variants: { shape: { pill: 'rounded-full', field: 'rounded-3xl' } },
+  defaultVariants: { shape: 'pill' },
+});
+
 const glassVariants = cva({
-  base: 'rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-none',
+  composes: glassShapeVariants,
+  base: 'shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-none',
   variants: { native: { false: 'bg-card', true: 'bg-transparent' } },
 });
 
-interface GlassSurfaceProps extends ViewProps {
+interface GlassSurfaceProps extends ViewProps, VariantProps<typeof glassShapeVariants> {
   interactive?: boolean;
 }
 
-export function GlassSurface({ className, interactive = false, children, ...props }: GlassSurfaceProps) {
+export function GlassSurface({ className, shape, interactive = false, children, ...props }: GlassSurfaceProps) {
   const { theme } = useUniwind();
-  const classes = cn(glassVariants({ native: hasGlass }), className);
+  const classes = cn(glassVariants({ native: hasGlass, shape }), className);
   // Dark glass over a near-black page reads as a hole; a faint white tint lifts it like iOS controls.
   const tint = match(theme).with('dark', () => 'rgba(255,255,255,0.12)').otherwise(() => undefined);
 
@@ -28,7 +35,7 @@ export function GlassSurface({ className, interactive = false, children, ...prop
   const content = (
     <>
       {children}
-      <View className="absolute inset-0 rounded-full border border-black/10 dark:border-white/15" pointerEvents="none" style={{ borderCurve: 'continuous' }} />
+      <View className={cn('absolute inset-0 border border-black/10 dark:border-white/15', glassShapeVariants({ shape }))} pointerEvents="none" style={{ borderCurve: 'continuous' }} />
     </>
   );
 

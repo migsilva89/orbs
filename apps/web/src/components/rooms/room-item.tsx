@@ -1,5 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { MENTION } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { Link, useMatch } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -7,11 +8,10 @@ import { BotAvatar } from '@/components/bots/bot-avatar';
 import { RoomsSettingsMenu } from '@/components/rooms/rooms-settings-menu';
 import * as Sidebar from '@/components/ui/sidebar';
 import { useRoomDraft } from '@/hooks/use-room-draft';
-import { MENTION } from '@/services/mention/mention.constants';
 import IconBellOff from '~icons/lucide/bell-off';
 import IconEllipsisVertical from '~icons/lucide/ellipsis-vertical';
 import IconPin from '~icons/lucide/pin';
-import type { RoomsChat } from '@/types/rooms.types';
+import type { RoomsChat } from '@openbots/client/client';
 
 interface RoomItemProps {
   chat: RoomsChat

@@ -264,7 +264,9 @@ Claimed grants retain their timestamp after expiry. Unclaimed expired grants are
 
 The pairing API renders `qr.svg` for immediate display. `qr.payload` is an unpadded URL-safe Base64 code containing `{ version: 1, serverUrl, token, expiresAt }`. Clients decode it with `authPairCode` and can render the code themselves. Base64 is an encoding, not encryption; treat the code as a temporary credential. Supply the address the new device can reach; the API normalizes the HTTP(S) origin and rejects credentials, paths, query strings, fragments, and wildcard bind addresses. Loopback addresses are allowed for pairing another browser on the same computer; the UI warns that these codes cannot connect another computer or phone. Scanning requires the app's future QR reader; this is not an app deep link.
 
-Use HTTPS or the encrypted Tailscale path for remote pairing and requests. The native listener does not terminate TLS. No cookies or query-string tokens are accepted; foreign browser origins are rejected. QR scanning, desktop/mobile credential storage, and browser UI integration remain pending. Request throttling is implemented through the limits service. See the [pairing plan](.agents/plans/main/05-auth-and-pairing.md).
+Use HTTPS or the encrypted Tailscale path for remote pairing and requests. The native listener does not terminate TLS. The daemon accepts Bearer credentials, not cookies or query-string tokens; foreign browser origins are rejected. Request throttling is implemented through the limits service. See the [pairing plan](.agents/plans/main/05-auth-and-pairing.md).
+
+Each web deployment connects to its configured `OPENBOTS_DAEMON_URL`, including pairing. TanStack Start renders initial data on the server and hydrates the browser query cache; chat loads one complete view before switching to live WebSocket updates. The web stores its device credential in a browser-readable, same-site cookie so SSR and WebSocket calls use the same token. HTTPS connections set the Secure flag. Existing same-origin local-storage credentials migrate once; the credential is never included in hydrated page data, and SSR responses are private and not cached.
 
 ## First RPC example
 
@@ -636,7 +638,7 @@ Before bot routing was added, a disposable WebSocket check with SQLite and Pi's 
 | `OPENBOTS_LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
 | `OPENBOTS_ALLOWED_ORIGINS` | empty | Comma-separated browser or webview origins, such as `https://bots.example.com`. Requests without an Origin, or with an IP-literal or `localhost` Origin, are always allowed. Add every hostname origin that serves the web app |
 | `OPENBOTS_PUBLIC_URL` | `http://127.0.0.1:47190` | Web app URL used in the startup pairing link |
-| `OPENBOTS_DAEMON_URL` | `http://127.0.0.1:3000` | Daemon URL the web server proxies `/rpc` to |
+| `OPENBOTS_DAEMON_URL` | `http://127.0.0.1:3000` | Daemon URL used by web SSR and the `/rpc` proxy |
 | `OPENBOTS_WEB_HOST` | `127.0.0.1` | Web app bind address |
 | `OPENBOTS_WEB_PORT` | `47190` | Web app port |
 
@@ -708,7 +710,7 @@ Each call reads one native Pi entry page, filters visible message text, and retu
 
 ## Artifacts
 
-Artifacts are structured JSON layouts using the 27 Orbs block types, including text, tables, charts, checklists, and state-bound controls. `artifacts.blocks()` returns cached block schemas. Layouts use `root`, `elements`, and `state`; json-render validates the structure and resolves state bindings before each block's schema is checked. Links and images accept HTTP(S) URLs. An artifact spec is limited to 200,000 UTF-8 bytes and a tree depth of 32. Cycles, shared children, and unreachable elements are rejected.
+Artifacts support structured JSON layouts and self-contained HTML pages. Structured layouts use the 27 Orbs block types, including text, tables, charts, checklists, and state-bound controls. `artifacts.blocks()` returns cached block schemas. Layouts use `root`, `elements`, and `state`; json-render validates the structure and resolves state bindings before each block's schema is checked. Links and images accept HTTP(S) URLs. An artifact spec is limited to 200,000 UTF-8 bytes and a tree depth of 32. Cycles, shared children, and unreachable elements are rejected.
 
 ```ts
 const artifact = await client.artifacts.create({
@@ -722,6 +724,8 @@ const artifact = await client.artifacts.create({
 });
 await client.artifacts.update({ botId, artifactId: artifact.id, version: artifact.version, title: 'Updated summary' });
 ```
+
+For an HTML artifact, pass `spec: { html: '<h1>Hello</h1>' }` to the same create or update operation. HTML uses the same storage, version history, chat references, and fullscreen views as structured artifacts. The web client runs inline scripts in an opaque-origin sandbox with automatic height (up to 1,600 pixels before scrolling) and live theme CSS variables such as `--background`, `--foreground`, and `--primary`. Remote resources, network requests, form submissions, and access to app storage are blocked; embed images with data URLs. HTTP(S) links open outside the frame after user interaction. Script state is local to each mounted frame and is not saved through `saveState`. Assistant replies can also show HTML without creating an artifact: a complete `html`/`htm` code fence or a standalone raw HTML block renders in the same sandbox, with Source and fullscreen controls. Execution waits until the text has finished streaming. User messages and other Markdown views do not enable these previews. For example, ask: “Reply with an interactive counter in one HTML code block, using inline CSS and JavaScript. Do not create an artifact.”
 
 `artifacts.list` returns the 100 most recently updated summaries for the selected conversation. `get` loads one body, optionally at a saved version. `update`, `saveState`, and `restore` require the current `version`; stale edits return `CONFLICT`. Every change creates a version, including title and state changes. `versions` lists the ten most recent versions; restore copies a selected version into a new one. Older data remains in Pi storage but is not offered by this version list.
 

@@ -11,8 +11,13 @@ import { SettingsProviders } from '@/components/settings/settings-providers';
 import { SettingsSources } from '@/components/settings/settings-sources';
 import { SettingsTools } from '@/components/settings/settings-tools';
 import { Button } from '@/components/ui/button';
+import type { ConnectionInfo } from '@/types/connection.types';
 
-export function SettingsPage() {
+interface SettingsPageProps {
+  connection: ConnectionInfo
+}
+
+export function SettingsPage({ connection }: SettingsPageProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <LayoutPageHeader />
@@ -25,7 +30,7 @@ export function SettingsPage() {
           <SettingsModels />
           <SettingsTools />
           <SettingsSources />
-          <SettingsDevices />
+          <SettingsDevices connection={connection} />
           <ClientOnly>
             <SettingsDesktop />
           </ClientOnly>

@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { useAttachmentUrl } from '@/hooks/use-attachment-url';
 import IconLucideFileText from '~icons/lucide/file-text';
-import type { RoomsFilePart } from '@/types/rooms.types';
+import type { RoomsFilePart } from '@openbots/client/client';
 
 interface RoomsChatFilesItemProps {
   botId: string

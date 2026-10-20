@@ -1,12 +1,13 @@
 import { Link, useRouter } from '@tanstack/react-router';
-import { memo } from 'react';
 import { defaultRemarkPlugins, Streamdown } from 'streamdown';
+import { ResponseHtml } from '@/components/ui/ai/response-html';
 import { cn } from '@/lib/cn';
 import { linkInternalPath } from '@/lib/link';
+import { htmlReplyBlocks } from '@/services/html/html.utils';
 import type { ComponentProps, HTMLAttributes } from 'react';
 import type { Components, ExtraProps } from 'streamdown';
 
-type ResponseProps = ComponentProps<typeof Streamdown>
+type ResponseProps = ComponentProps<typeof Streamdown> & { renderHtml?: boolean }
 
 type ResponseTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'ul' | 'ol' | 'li' | 'blockquote' | 'hr' | 'strong' | 'thead' | 'tbody' | 'tr' | 'th' | 'td' | 'code'
 
@@ -74,17 +75,17 @@ const responseComponents: Components = {
   inlineCode: responseElement('code', 'rounded-md bg-current/10 px-1 py-0.5 font-mono text-xs'),
 };
 
-export const ResponseContent = memo(
-  ({ className, components, remarkPlugins, ...props }: ResponseProps) => (
+export function ResponseContent({ className, components, remarkPlugins, renderHtml = false, ...props }: ResponseProps) {
+  return (
     <Streamdown
+      BlockComponent={renderHtml ? ResponseHtml : undefined}
+      parseIncompleteMarkdown={renderHtml ? props.isAnimating === true : undefined}
+      parseMarkdownIntoBlocksFn={renderHtml ? htmlReplyBlocks : undefined}
       className={cn('size-full space-y-3 **:data-[streamdown=code-block-body]:p-3 **:data-[streamdown=code-block-body]:text-xs [&>*:first-child]:mt-0 [&>*:last-child]:mb-0', className)}
       components={{ ...responseComponents, ...components }}
       controls={{ table: false, code: { copy: true, download: false }, mermaid: false }}
       remarkPlugins={remarkPlugins ? [...Object.values(defaultRemarkPlugins), ...remarkPlugins] : undefined}
       {...props}
     />
-  ),
-  (prevProps, nextProps) => prevProps.children === nextProps.children,
-);
-
-ResponseContent.displayName = 'ResponseContent';
+  );
+}

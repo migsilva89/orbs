@@ -3,6 +3,7 @@ import { defineRegistry, JSONUIProvider, Renderer, useBoundProp } from '@json-re
 import { schema } from '@json-render/react/schema';
 import { artifactComponents } from '@openbots/contracts/universal';
 import { Children, lazy, Suspense, useId } from 'react';
+import { match, P } from 'ts-pattern';
 import { Response } from '@/components/ui/ai/response';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { HtmlFrame } from '@/components/ui/html-frame';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from '@/components/ui/item';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -323,12 +325,25 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
 interface ArtifactViewProps {
   spec: ArtifactSpec
   store: StateStore
+  title: string
 }
 
-export function ArtifactView({ spec, store }: ArtifactViewProps) {
-  return (
-    <JSONUIProvider registry={registry} store={store}>
-      <Renderer registry={registry} spec={spec} />
-    </JSONUIProvider>
-  );
+export function ArtifactView({ spec, store, title }: ArtifactViewProps) {
+  return match(spec)
+    .with({ html: P.string }, ({ html }) => (
+      <HtmlFrame
+        html={html}
+        key={html}
+        title={title}
+      />
+    ))
+    .otherwise((structured) => (
+      <JSONUIProvider
+        key={JSON.stringify(structured.elements)}
+        registry={registry}
+        store={store}
+      >
+        <Renderer registry={registry} spec={structured} />
+      </JSONUIProvider>
+    ));
 }

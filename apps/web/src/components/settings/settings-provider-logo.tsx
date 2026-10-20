@@ -1,6 +1,6 @@
+import { botModelBrand } from '@openbots/client/client';
 import { match } from 'ts-pattern';
 import { BotBrandLogo } from '@/components/bots/bot-brand-logo';
-import { botModelBrand } from '@/services/bot/bot.client';
 import IconCursor from '~icons/logos/cursor-icon';
 import IconOpenrouter from '~icons/logos/openrouter-icon-mono';
 import IconServer from '~icons/lucide/server';

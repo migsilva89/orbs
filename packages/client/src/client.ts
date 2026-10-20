@@ -6,8 +6,12 @@ import { RPCLink } from '@orpc/client/websocket';
 import { match, P } from 'ts-pattern';
 import type { Client, ClientOptions, HttpClientOptions } from './types/client.types';
 
-export function makeHttpClient({ url, token, serverId, fetch }: HttpClientOptions): Client {
-  return createORPCClient(clientHttpLink(url, () => clientHeaders({ token, serverId }), fetch));
+export function makeHttpClient(options: HttpClientOptions | (() => HttpClientOptions | Promise<HttpClientOptions>)): Client {
+  return createORPCClient(new DynamicLink(async () => {
+    const { url, token, serverId, fetch } = typeof options === 'function' ? await options() : options;
+
+    return clientHttpLink(url, () => clientHeaders({ token, serverId }), fetch);
+  }));
 }
 
 export function makeClient({ connect, token, serverId, url }: ClientOptions): Client {

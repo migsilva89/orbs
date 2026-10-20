@@ -1,0 +1,51 @@
+import { m } from '@openbots/i18n/client';
+import { match } from 'ts-pattern';
+import { ROUTINES } from './routines.constants';
+import type { RoutinesScheduleTextParams } from '../../types/routines.types';
+
+export function routinesScheduleText({ schedule, locale }: RoutinesScheduleTextParams): string {
+  function routinesCronText(expression: string): string {
+    const [minute, hour, day, month, weekday] = expression.trim().split(/\s+/u);
+
+    if (!minute || !hour || !/^\d+$/u.test(minute) || !/^\d+$/u.test(hour) || day !== '*' || month !== '*') {
+      return expression;
+    }
+
+    const time = clock.format(new Date(ROUTINES.anchorYear, 0, 1, Number(hour), Number(minute)));
+
+    if (weekday === '*') {
+      return m.rooms_routines_daily({ time });
+    }
+
+    if (weekday === ROUTINES.weekdays) {
+      return m.rooms_routines_weekdays({ time });
+    }
+
+    if (weekday && /^[0-7]$/u.test(weekday)) {
+      const sunday = new Date(ROUTINES.anchorYear, 0, ROUTINES.anchorSunday + (Number(weekday) % 7));
+
+      return m.rooms_routines_weekly({ day: new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(sunday), time });
+    }
+
+    return expression;
+  }
+
+  const clock = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
+
+  return match(schedule)
+    .with({ kind: 'once' }, ({ runAt }) => m.rooms_routines_once({
+      date: new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' }).format(runAt),
+      time: clock.format(runAt),
+    }))
+    .with({ kind: 'interval' }, ({ minutes }) => {
+      const hours = minutes / ROUTINES.minutesPerHour;
+
+      return match({ hours, minutes })
+        .with({ hours: 1 }, () => m.rooms_routines_every_hour())
+        .when(() => Number.isInteger(hours), () => m.rooms_routines_every_hours({ count: hours }))
+        .with({ minutes: 1 }, () => m.rooms_routines_every_minute())
+        .otherwise(() => m.rooms_routines_every_minutes({ count: minutes }));
+    })
+    .with({ kind: 'cron' }, ({ expression }) => routinesCronText(expression))
+    .exhaustive();
+}

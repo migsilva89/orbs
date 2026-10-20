@@ -69,6 +69,7 @@
 @theme {
   /* Native family name registered by the expo-font plugin in app.config.ts. */
   --font-sans: 'Inter';
+  --font-mono: 'Menlo';
   --tracking-body: -0.16px;
 
   --radius-sm: 6px;

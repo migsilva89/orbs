@@ -1,6 +1,5 @@
+import { botSkillName, mentionTarget } from '@openbots/client/client';
 import { Mention } from '@/components/ui/mention';
-import { botSkillName } from '@/services/bot/bot.client';
-import { mentionTarget } from '@/services/mention/mention.client';
 import IconBox from '~icons/lucide/box';
 import IconSquareSlash from '~icons/lucide/square-slash';
 

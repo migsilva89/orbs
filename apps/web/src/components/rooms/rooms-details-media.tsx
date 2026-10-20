@@ -1,3 +1,4 @@
+import { CHAT, ROOMS } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
@@ -7,8 +8,6 @@ import { FormErrors } from '@/components/ui/forms/form';
 import { Item, ItemContent, ItemGroup, ItemLink, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAttachmentUrl } from '@/hooks/use-attachment-url';
-import { CHAT } from '@/services/chat/chat.constants';
-import { ROOMS } from '@/services/rooms/rooms.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconFileText from '~icons/lucide/file-text';
 import IconImages from '~icons/lucide/images';

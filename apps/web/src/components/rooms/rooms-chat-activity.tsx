@@ -1,8 +1,7 @@
+import { BOT_ACTIVITY_LABELS, toolRunning } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { BotAvatar } from '@/components/bots/bot-avatar';
-import { BOT_ACTIVITY_LABELS } from '@/services/bot/bot.constants';
-import { toolRunning } from '@/services/tool/tool.client';
-import type { ChatActivity, ChatMessage } from '@/types/chat.types';
+import type { ChatActivity, ChatMessage } from '@openbots/client/client';
 import type { Bot } from '@openbots/contracts/universal';
 
 interface RoomsChatActivityProps {

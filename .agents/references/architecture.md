@@ -7,11 +7,11 @@ This is the implementation contract. Fix code that conflicts with it; do not rew
 | Location | Owns |
 | --- | --- |
 | `apps/daemon` | Entry, startup composition, listener/transport, signals, shutdown. |
-| `apps/web`, `apps/desktop`, `apps/mobile` | UI, server connections, device credential storage. The web app is a client-rendered TanStack Start app that talks to the daemon over oRPC; its server proxies `/rpc` to the daemon. |
+| `apps/web`, `apps/desktop`, `apps/mobile` | UI, server connections, device credential storage. The web app uses TanStack Start SSR and query hydration. SSR calls use the shared client against the configured daemon. Browser calls use its `/rpc` proxy, with WebSockets for live updates. Web credentials are stored in a cookie and sent to the daemon as Bearer headers. |
 | `packages/server` | Product services: bots, pairing, settings, credentials, permissions, skill, instruction, plugin and MCP selection/discovery; RPC handlers. |
 | `packages/runtime` | Pi integration: Harness, conversations, tools, hooks, approvals, tasks, watches, recovery, skill/instruction/plugin loading, MCP clients. |
 | `packages/contracts` | Public schemas, input/output types, oRPC contracts and errors, including the schemas clients validate forms, search params, pairing codes and stored preferences with. No implementations. |
-| `packages/client` | Typed RPC calls, reconnect, applying Pi view updates. |
+| `packages/client` | Typed RPC calls, reconnect, applying Pi view updates, and the data and view helpers web and mobile share (`src/services/<domain>`). No UI or framework code. |
 | Shared packages | Env, errors, logging, i18n, avatars and tooling. No application dependencies. |
 
 Native code stays in its owning package behind `/native`. Using files, SQLite or subprocesses does **not** make code daemon logic.

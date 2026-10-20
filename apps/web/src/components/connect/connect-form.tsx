@@ -1,23 +1,39 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
 import { authPairCode, connectionPairForm } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
+import { useRouter } from '@tanstack/react-router';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { ButtonLoading } from '@/components/ui/button-loading';
 import { Form } from '@/components/ui/forms/form';
 import { FormInput } from '@/components/ui/forms/form-input';
 import { toasty } from '@/components/ui/sonner';
-import { connectionPair } from '@/services/connection/connection.client';
+import { connectionPair, connectionRead } from '@/services/connection/connection.client';
 import type { ConnectionPairForm } from '@openbots/contracts/universal';
 
 export function ConnectForm() {
+  const router = useRouter();
+
   const form = useForm({
     resolver: standardSchemaResolver(connectionPairForm),
     defaultValues: {
-      code: new URLSearchParams(location.hash.slice(1)).get('code') ?? '',
+      code: '',
       name: m.connect_device_name_default(),
     },
   });
+
+  useEffect(() => {
+    const code = new URLSearchParams(location.hash.slice(1)).get('code');
+
+    if (code) {
+      form.setValue('code', code, { shouldValidate: true });
+    }
+
+    void connectionRead()
+      .then((connection) => connection ? router.invalidate() : undefined)
+      .catch(() => toasty(m.connect_failed(), '🔴', { id: 'connect' }));
+  }, [form, router]);
 
   async function handleSubmit({ code, name }: ConnectionPairForm) {
     const payload = authPairCode.safeParse(code);

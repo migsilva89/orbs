@@ -2,7 +2,7 @@ import { m } from '@openbots/i18n/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
-import type { RoomsReactionGroup } from '@/types/rooms.types';
+import type { RoomsReactionGroup } from '@openbots/client/client';
 
 interface RoomsChatReactionsProps {
   groups: RoomsReactionGroup[]

@@ -1,3 +1,4 @@
+import { ROOMS } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
@@ -5,7 +6,6 @@ import { useEffect, useEffectEvent, useRef } from 'react';
 import { match } from 'ts-pattern';
 import { chatNotificationsOptions } from '@/services/chat/chat.client';
 import { roomsLink } from '@/services/rooms/rooms.client';
-import { ROOMS } from '@/services/rooms/rooms.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { NotificationItem } from '@openbots/contracts/universal';
 

@@ -38,9 +38,9 @@ export function ArtifactDialog({ botId, conversationId, artifactId, title, onOpe
         <div className="-mx-6 min-h-0 flex-1 overflow-y-auto px-6">
           {artifact ? (
             <ArtifactView
-              key={JSON.stringify(artifact.spec.elements)}
               spec={artifact.spec}
               store={store}
+              title={artifact.title}
             />
           ) : null}
           {isPending ? <Skeleton className="h-64 w-full" /> : null}

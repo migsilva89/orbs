@@ -8,8 +8,8 @@ import type { ViewProps } from 'react-native';
 const floatingBarVariants = cva({
   base: 'absolute inset-x-5 flex-row items-center gap-3',
   variants: {
-    // Bottom bars sit slightly inside the home-indicator inset, like iOS 26 toolbars.
-    edge: { top: 'top-2 justify-between', bottom: '-bottom-1' },
+    // Bottom bars sit inside the home-indicator inset, close to the screen edge like iOS 26 toolbars.
+    edge: { top: 'top-2 justify-between', bottom: '-bottom-5' },
   },
 });
 

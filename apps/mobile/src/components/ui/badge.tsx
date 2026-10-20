@@ -11,6 +11,7 @@ const badgeVariants = cva({
   variants: {
     variant: {
       default: 'rounded-md bg-muted px-2 py-0.5',
+      outline: 'rounded-md border border-border px-2 py-0.5',
       pinned: 'size-8 rounded-full border-4 border-background bg-orange-500',
     },
   },

@@ -1,3 +1,4 @@
+import { TOOL_PEER_NAMES, toolCollapsed, toolGroupState, toolIdentity, toolInputText, toolOutputText } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { getLocale } from '@openbots/i18n/runtime';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -7,9 +8,6 @@ import { ToolInput } from '@/components/tools/tool-input';
 import { ToolLabel } from '@/components/tools/tool-label';
 import { Tool, ToolCode, ToolContent, ToolGroup, ToolGroupItem, ToolGroupToggle, ToolTrigger } from '@/components/ui/ai/tool';
 import { rpc } from '@/services/rpc/rpc.client';
-import { toolCollapsed, toolGroupState, toolIdentity, toolOutputText } from '@/services/tool/tool.client';
-import { TOOL_PEER_NAMES } from '@/services/tool/tool.constants';
-import { toolInputText } from '@/services/tool/tool.utils';
 import type { DynamicToolUIPart } from 'ai';
 
 interface RoomsChatToolsItemProps {

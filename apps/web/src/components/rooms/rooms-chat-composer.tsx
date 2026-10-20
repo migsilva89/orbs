@@ -1,3 +1,4 @@
+import { mentionHref, mentionSegments, mentionSubmission, roomsMessageText } from '@openbots/client/client';
 import { ATTACHMENT } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -17,12 +18,10 @@ import { useIsTouch } from '@/hooks/use-is-touch';
 import { usePreferences } from '@/hooks/use-preferences';
 import { useRoomAttachments } from '@/hooks/use-room-attachments';
 import { useRoomDraft } from '@/hooks/use-room-draft';
-import { mentionHref, mentionSegments, mentionSubmission } from '@/services/mention/mention.client';
-import { roomsMessageText } from '@/services/rooms/rooms.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconPaperclip from '~icons/lucide/paperclip';
 import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
-import type { ChatMessage, ChatOutgoing, ChatQueued } from '@/types/chat.types';
+import type { ChatMessage, ChatOutgoing, ChatQueued } from '@openbots/client/client';
 import type { Bot } from '@openbots/contracts/universal';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 

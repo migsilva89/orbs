@@ -14,7 +14,7 @@ import IconPin from '~icons/lucide/pin';
 import IconPinOff from '~icons/lucide/pin-off';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import IconTrash2 from '~icons/lucide/trash-2';
-import type { RoomsChat } from '@/types/rooms.types';
+import type { RoomsChat } from '@openbots/client/client';
 
 interface RoomsActionsProps {
   chat: RoomsChat

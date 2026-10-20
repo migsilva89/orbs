@@ -1,3 +1,4 @@
+import { ROOMS_SEND_MODE_HINTS, ROOMS_SEND_MODES } from '@openbots/client/client';
 import { conversationWhenBusy, preferencesEnterAction } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
@@ -5,7 +6,6 @@ import { SettingsPanel } from '@/components/settings/settings-panel';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/components/ui/panel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePreferences } from '@/hooks/use-preferences';
-import { ROOMS_SEND_MODE_HINTS, ROOMS_SEND_MODES } from '@/services/rooms/rooms.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconListOrdered from '~icons/lucide/list-ordered';
 import IconMessageSquare from '~icons/lucide/message-square';

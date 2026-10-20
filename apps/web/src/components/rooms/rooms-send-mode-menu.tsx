@@ -1,12 +1,12 @@
+import { ROOMS_SEND_MODE_DEFAULT, ROOMS_SEND_MODES } from '@openbots/client/client';
 import { conversationWhenBusy } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
 import { toasty } from '@/components/ui/sonner';
-import { ROOMS_SEND_MODE_DEFAULT, ROOMS_SEND_MODES } from '@/services/rooms/rooms.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconListOrdered from '~icons/lucide/list-ordered';
-import type { RoomsChat } from '@/types/rooms.types';
+import type { RoomsChat } from '@openbots/client/client';
 
 interface RoomsSendModeMenuProps {
   chat: RoomsChat

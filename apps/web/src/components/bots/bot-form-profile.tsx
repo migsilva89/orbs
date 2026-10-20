@@ -1,10 +1,9 @@
+import { BOT, botHandle } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { FormControl, FormErrorsAndHint, FormField, FormItem, FormLabel } from '@/components/ui/forms/form';
 import { FormInput } from '@/components/ui/forms/form-input';
 import { Input } from '@/components/ui/input';
-import { botHandle } from '@/services/bot/bot.client';
-import { BOT } from '@/services/bot/bot.constants';
 import type { BotForm } from '@openbots/contracts/universal';
 
 export function BotFormProfile() {

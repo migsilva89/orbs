@@ -1,14 +1,11 @@
+import { roomsFold, roomsSidebarOrder } from '@openbots/client/client';
 import { getLocale, m } from '@openbots/i18n/client';
 import { match } from 'ts-pattern';
 import type { BotHomeSection, BotHomeSectionsParams } from '@/types/bot-home.types';
 
 export function botHomeSections({ chats, search }: BotHomeSectionsParams) {
-  const needle = search.trim().toLocaleLowerCase(getLocale());
-  const matching = chats.filter((chat) => chat.name.toLocaleLowerCase(getLocale()).includes(needle));
-  const shown = matching.filter((chat) => !chat.isHidden);
-  const pinned = shown.filter((chat) => chat.isPinned);
-  const others = shown.filter((chat) => !chat.isPinned);
-  const hidden = matching.filter((chat) => chat.isHidden);
+  const needle = roomsFold(search.trim());
+  const { pinned, others, hidden } = roomsSidebarOrder({ chats: chats.filter((chat) => roomsFold(chat.name).includes(needle)) });
   const featured = match(needle).with('', () => pinned[0]).otherwise(() => undefined);
 
   const sections: BotHomeSection[] = [

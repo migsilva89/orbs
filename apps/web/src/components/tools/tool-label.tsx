@@ -1,5 +1,5 @@
+import { toolIdentity, toolPresentation, toolPreview } from '@openbots/client/client';
 import { ToolTrigger } from '@/components/ui/ai/tool';
-import { toolIdentity, toolPresentation, toolPreview } from '@/services/tool/tool.client';
 import IconLucideAlarmClock from '~icons/lucide/alarm-clock';
 import IconLucideBot from '~icons/lucide/bot';
 import IconLucideCpu from '~icons/lucide/cpu';
@@ -11,7 +11,7 @@ import IconLucideSearch from '~icons/lucide/search';
 import IconLucideSquarePen from '~icons/lucide/square-pen';
 import IconLucideTerminal from '~icons/lucide/terminal';
 import IconLucideWrench from '~icons/lucide/wrench';
-import type { ToolIconKind } from '@/types/tool.types';
+import type { ToolIconKind } from '@openbots/client/client';
 import type { DynamicToolUIPart } from 'ai';
 import type { ReactNode } from 'react';
 

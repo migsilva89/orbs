@@ -1,8 +1,8 @@
+import { CHAT } from '@openbots/client/client';
 import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { CHAT } from '@/services/chat/chat.constants';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { ChatMessage } from '@/types/chat.types';
+import type { ChatMessage } from '@openbots/client/client';
 
 export function useRoomReactions(botId: string, conversationId: number, messages: ChatMessage[], revision: number) {
   const queryClient = useQueryClient();

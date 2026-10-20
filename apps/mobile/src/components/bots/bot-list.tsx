@@ -14,6 +14,7 @@ import { FloatingBar } from '@/components/ui/floating-bar';
 import { GlassButton } from '@/components/ui/glass-button';
 import { Icon } from '@/components/ui/icon';
 import { Item, ItemContent } from '@/components/ui/item';
+import { KeyboardSticky } from '@/components/ui/keyboard-sticky';
 import { Screen } from '@/components/ui/screen';
 import { SearchField } from '@/components/ui/search-field';
 import { SectionHeading } from '@/components/ui/section-heading';
@@ -123,7 +124,6 @@ function BotListContent({ session }: BotListContentProps) {
 
   return (
     <Screen
-      keyboard
       padding="none"
       scroll={false}
     >
@@ -192,23 +192,25 @@ function BotListContent({ session }: BotListContentProps) {
             <Icon icon={Plus} size="action" />
           </GlassButton>
         </FloatingBar>
-        <FloatingBar edge="bottom">
-          <GlassButton
-            disabled
-            accessibilityHint={m.mobile_home_unavailable()}
-            accessibilityLabel={m.mobile_home_pair()}
-          >
-            <Icon icon={QrCode} size="action" />
-          </GlassButton>
-          <SearchField
-            accessibilityLabel={m.rooms_search()}
-            className="flex-1"
-            placeholder={m.mobile_home_search()}
-            testID="bots-search"
-            value={search}
-            onChangeText={setSearch}
-          />
-        </FloatingBar>
+        <KeyboardSticky>
+          <FloatingBar edge="bottom">
+            <GlassButton
+              disabled
+              accessibilityHint={m.mobile_home_unavailable()}
+              accessibilityLabel={m.mobile_home_pair()}
+            >
+              <Icon icon={QrCode} size="action" />
+            </GlassButton>
+            <SearchField
+              accessibilityLabel={m.rooms_search()}
+              className="flex-1"
+              placeholder={m.mobile_home_search()}
+              testID="bots-search"
+              value={search}
+              onChangeText={setSearch}
+            />
+          </FloatingBar>
+        </KeyboardSticky>
       </View>
     </Screen>
   );

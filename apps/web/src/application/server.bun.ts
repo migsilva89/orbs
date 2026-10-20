@@ -104,7 +104,7 @@ try {
       const headers = new Headers(response.headers);
       const contentType = (headers.get('content-type') ?? '').split(';')[0].trim();
 
-      if (contentType === 'text/html') {
+      if (contentType === 'text/html' && !headers.has('Cache-Control')) {
         headers.set('Cache-Control', 'no-cache');
       }
 

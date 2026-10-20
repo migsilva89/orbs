@@ -1,3 +1,4 @@
+import { toolBlocks } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { isFileUIPart } from 'ai';
 import { Fragment, useState } from 'react';
@@ -13,9 +14,7 @@ import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/a
 import { Response } from '@/components/ui/ai/response';
 import { useLongPress } from '@/hooks/use-long-press';
 import { useShowTools } from '@/hooks/use-show-tools';
-import { toolBlocks } from '@/services/tool/tool.client';
-import type { ChatActivity, ChatMessage } from '@/types/chat.types';
-import type { ToolBot } from '@/types/tool.types';
+import type { ChatActivity, ChatMessage, ToolBot } from '@openbots/client/client';
 import type * as ReactTypes from 'react';
 
 interface RoomsChatMessageProps {
@@ -73,8 +72,8 @@ export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle',
   ) : null;
 
   const withActions = (content: ReactTypes.ReactNode) => (
-    <div className="relative flex max-w-full items-center gap-2 group-data-[role=user]:flex-row-reverse">
-      <div className="min-w-0">{content}</div>
+    <div className="relative flex w-fit max-w-full items-center gap-2 group-data-[role=user]:flex-row-reverse has-[[data-message-wide]]:w-full">
+      <div className="min-w-0 flex-1">{content}</div>
       <div className="pointer-fine:absolute pointer-fine:top-1/2 pointer-fine:-translate-y-1/2 group-data-[role=assistant]:pointer-fine:left-full group-data-[role=assistant]:pointer-fine:ml-2 group-data-[role=user]:pointer-fine:right-full group-data-[role=user]:pointer-fine:mr-2">
         {actions}
       </div>
@@ -134,7 +133,11 @@ export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle',
                 <MessageContent data-quote-id={message.id} tail={block === lastBubble?.at(-1)}>
                   {block === firstText && reply ? <span className="line-clamp-2 border-l-2 border-current/40 pl-2 text-xs opacity-80">{m.rooms_chat_reply_quote({ name: reply.authorName, text: reply.text })}</span> : null}
                   {text.parts.map((part, index) => (
-                    <Response key={`${key}-${index}`}>
+                    <Response
+                      isAnimating={live ? part.state === 'streaming' : false}
+                      key={`${key}-${index}`}
+                      renderHtml={message.role === 'assistant'}
+                    >
                       {part.text}
                     </Response>
                   ))}

@@ -13,6 +13,7 @@ export * from './types/credentials.types';
 export * from './types/device.types';
 export * from './types/entry.types';
 export * from './types/history.types';
+export * from './types/html.types';
 export * from './types/instruction.types';
 export * from './types/limit.types';
 export * from './types/mcp-auth.types';

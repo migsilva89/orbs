@@ -28,7 +28,10 @@ export default createServerEntry<Register>({
       })
       .with(false, async () => {
         try {
-          return await handleStartRequest(request, options);
+          const response = await handleStartRequest(request, options);
+          response.headers.set('Cache-Control', 'private, no-store');
+
+          return response;
         } catch (error) {
           if (request.signal.aborted && error === request.signal.reason) {
             return new Response(null, { status: 499 });

@@ -1,7 +1,20 @@
 import { applyImmutable } from '@earendil-works/chord/delta';
+import { ORPCError } from '@orpc/client';
 import { match } from 'ts-pattern';
 import type { Client } from './types/client.types';
 import type * as UniversalTypes from '@openbots/contracts/universal';
+
+export async function readConversation(
+  client: Client,
+  params: UniversalTypes.ConversationTarget,
+  signal: AbortSignal,
+): Promise<UniversalTypes.ConversationView> {
+  for await (const view of watchConversation(client, params, signal)) {
+    return view;
+  }
+
+  throw new ORPCError('BAD_GATEWAY');
+}
 
 export async function* watchConversation(client: Client, params: UniversalTypes.ConversationTarget, signal: AbortSignal) {
   const frames = await client.conversation.watch(params, { signal });

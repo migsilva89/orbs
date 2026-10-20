@@ -1,3 +1,4 @@
+import { BOT_PERMISSION_LABELS, BOT_THINKING_LEVEL_LABELS, ROOMS_SEND_MODE_DEFAULT, ROOMS_SEND_MODES } from '@openbots/client/client';
 import { botFields, conversationWhenBusy } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -7,14 +8,12 @@ import { SettingsProviderLogo } from '@/components/settings/settings-provider-lo
 import { Item, ItemActions, ItemContent, ItemGroup, ItemLink, ItemMedia, ItemTitle, ItemValue } from '@/components/ui/item';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toasty } from '@/components/ui/sonner';
-import { BOT_PERMISSION_LABELS, BOT_THINKING_LEVEL_LABELS } from '@/services/bot/bot.constants';
-import { ROOMS_SEND_MODE_DEFAULT, ROOMS_SEND_MODES } from '@/services/rooms/rooms.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconChevronRight from '~icons/lucide/chevron-right';
 import IconListOrdered from '~icons/lucide/list-ordered';
 import IconSettings2 from '~icons/lucide/settings-2';
 import IconShieldCheck from '~icons/lucide/shield-check';
-import type { RoomsChat } from '@/types/rooms.types';
+import type { RoomsChat } from '@openbots/client/client';
 import type { Bot } from '@openbots/contracts/universal';
 
 interface RoomsDetailsBotProps {

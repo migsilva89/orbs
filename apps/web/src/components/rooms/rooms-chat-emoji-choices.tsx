@@ -1,9 +1,9 @@
+import { ROOMS } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { cva } from 'cva';
 import { lazy, Suspense, useState } from 'react';
 import { RoomsChatEmojiLoading } from '@/components/rooms/rooms-chat-emoji-loading';
 import { Button } from '@/components/ui/button';
-import { ROOMS } from '@/services/rooms/rooms.constants';
 import IconSmilePlus from '~icons/lucide/smile-plus';
 import type { VariantProps } from 'cva';
 

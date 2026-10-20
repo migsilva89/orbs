@@ -1,5 +1,5 @@
 import { BotAvatar } from '@/components/bots/bot-avatar';
-import type { RoomsChat } from '@/types/rooms.types';
+import type { RoomsChat } from '@openbots/client/client';
 
 interface RoomsDragCardProps {
   chat: RoomsChat

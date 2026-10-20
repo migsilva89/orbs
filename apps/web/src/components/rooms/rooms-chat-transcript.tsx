@@ -1,3 +1,4 @@
+import { CHAT, roomsReactionGroups, roomsTimeLabel } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { getLocale } from '@openbots/i18n/runtime';
 import { RoomsChatHistory } from '@/components/rooms/rooms-chat-history';
@@ -5,11 +6,8 @@ import { RoomsChatTranscriptItem } from '@/components/rooms/rooms-chat-transcrip
 import { RoomsChatUnread } from '@/components/rooms/rooms-chat-unread';
 import { MessageScroller, MessageScrollerButton, MessageScrollerViewport } from '@/components/ui/message-scroller';
 import { botBubbleStyle } from '@/services/bot/bot.client';
-import { CHAT } from '@/services/chat/chat.constants';
-import { roomsReactionGroups, roomsTimeLabel } from '@/services/rooms/rooms.client';
 import type { MessageScrollerRow } from '@/components/ui/message-scroller';
-import type { ChatMessage } from '@/types/chat.types';
-import type { RoomsHistoryLoader, RoomsUnread } from '@/types/rooms.types';
+import type { ChatMessage, RoomsHistoryLoader, RoomsUnread } from '@openbots/client/client';
 import type { Bot, ConversationReaction } from '@openbots/contracts/universal';
 import type { ReactNode } from 'react';
 

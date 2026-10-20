@@ -56,6 +56,7 @@
     "@orpc/tanstack-query": "2.0.0-beta.39",
     "@tanstack/react-query": "^5.103.2",
     "@tanstack/react-router": "^1.170.44",
+    "@tanstack/react-router-ssr-query": "^1.167.3",
     "@tanstack/react-start": "^1.169.2",
     "@tanstack/react-virtual": "^3.14.19",
     "@tiptap/core": "3.31.4",
@@ -70,6 +71,7 @@
     "ai": "^6.0.209",
     "cmdk": "^1.1.1",
     "cn": "^0.3.0",
+    "cookie-es": "^3.1.1",
     "cva": "^1.0.0-beta.4",
     "frimousse": "0.3.0",
     "motion": "^12.41.0",
@@ -103,22 +105,30 @@
   "catalogs": {
     "mobile": {
       "@expo-google-fonts/inter": "^0.4.2",
+      "@legendapp/list": "3.6.0",
       "@react-navigation/native": "^7.5.1",
       "@react-navigation/native-stack": "^7.21.0",
       "babel-preset-expo": "~58.0.18",
       "expo": "~58.0.16",
+      "expo-clipboard": "~58.0.3",
       "expo-constants": "~58.0.12",
       "expo-font": "~58.0.9",
       "expo-glass-effect": "~58.0.4",
       "expo-linear-gradient": "~58.0.3",
-      "lucide-react-native": "^1.60.0",
       "expo-secure-store": "~58.0.2",
       "expo-system-ui": "~58.0.6",
+      "katex": "^0.16.22",
+      "lucide-react-native": "^1.60.0",
       "react": "19.3.0",
       "react-native": "0.88.0",
+      "react-native-enriched-markdown": "1.1.1",
+      "react-native-keyboard-controller": "1.22.7",
+      "react-native-reanimated": "4.7.1",
       "react-native-safe-area-context": "~5.10.1",
       "react-native-screens": "~4.30.0",
       "react-native-svg": "15.16.0",
+      "react-native-webview": "14.0.1",
+      "react-native-worklets": "0.13.0",
       "uniwind": "^1.13.0"
     }
   },
@@ -149,5 +159,8 @@
     "lint:fix": "turbo run lint:fix --continue && oxlint scripts -c ./oxlint.config.ts --disable-nested-config --fix",
     "lint:cycles": "fallow architecture --cycles --fail-on-issues",
     "lint:dead": "fallow dead-code"
-  }
+  },
+  "trustedDependencies": [
+    "react-native-enriched-markdown"
+  ]
 }

@@ -1,8 +1,7 @@
-import { watchConversation, watchConversationContexts, watchNotifications } from '@openbots/client/client';
+import { CHAT, readConversation, watchConversation, watchConversationContexts, watchNotifications } from '@openbots/client/client';
 import { queryOptions, experimental_streamedQuery as streamedQuery } from '@tanstack/react-query';
 import { rpc, rpcClient } from '@/services/rpc/rpc.client';
-import { CHAT } from './chat.constants';
-import type * as ChatTypes from '@/types/chat.types';
+import type { ChatHistoryParams } from '@openbots/client/client';
 import type * as UniversalTypes from '@openbots/contracts/universal';
 
 export function chatViewOptions(target: UniversalTypes.ConversationTarget) {
@@ -15,6 +14,13 @@ export function chatViewOptions(target: UniversalTypes.ConversationTarget) {
       initialValue: null,
     }),
     staleTime: 0,
+  });
+}
+
+export function chatInitialViewOptions(target: UniversalTypes.ConversationTarget) {
+  return queryOptions({
+    ...chatViewOptions(target),
+    queryFn: ({ signal }) => readConversation(rpcClient, target, signal),
   });
 }
 
@@ -31,9 +37,9 @@ export function chatNotificationsOptions() {
   });
 }
 
-export function chatHistoryOptions({ botId, conversationId, cursor }: ChatTypes.ChatHistoryParams) {
+export function chatHistoryOptions({ botId, conversationId, cursor }: ChatHistoryParams) {
   return rpc.conversation.history.infiniteOptions({
-    input: (pageCursor: ChatTypes.ChatHistoryParams['cursor']) => ({
+    input: (pageCursor: ChatHistoryParams['cursor']) => ({
       botId,
       conversationId,
       cursor: pageCursor,

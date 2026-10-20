@@ -4,9 +4,14 @@ import * as Sidebar from '@/components/ui/sidebar';
 import BrandsOpenbots from '~icons/brands/openbots';
 import { LayoutBrand } from './layout-brand';
 import { LayoutNavDevice } from './layout-nav-device';
+import type { ConnectionInfo } from '@/types/connection.types';
 import type { ComponentProps } from 'react';
 
-export function LayoutAppSidebar({ ...props }: ComponentProps<typeof Sidebar.Sidebar>) {
+interface LayoutAppSidebarProps extends ComponentProps<typeof Sidebar.Sidebar> {
+  connection: ConnectionInfo
+}
+
+export function LayoutAppSidebar({ connection, ...props }: LayoutAppSidebarProps) {
   return (
     <Sidebar.Sidebar {...props}>
       <div className="cursor-default electrobun-webkit-app-region-drag">
@@ -21,7 +26,7 @@ export function LayoutAppSidebar({ ...props }: ComponentProps<typeof Sidebar.Sid
       <Sidebar.SidebarContent>
         <RoomsSidebar />
       </Sidebar.SidebarContent>
-      <Sidebar.SidebarFooter className="desktop:group-data-[collapsible=icon]:mb-3"><LayoutNavDevice /></Sidebar.SidebarFooter>
+      <Sidebar.SidebarFooter className="desktop:group-data-[collapsible=icon]:mb-3"><LayoutNavDevice connection={connection} /></Sidebar.SidebarFooter>
       <Sidebar.SidebarRail />
     </Sidebar.Sidebar>
   );

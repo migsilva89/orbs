@@ -1,6 +1,6 @@
+import { CHAT } from '@openbots/client/client';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { CHAT } from '@/services/chat/chat.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 
 export function useAttachmentUrl(botId: string, url: string) {

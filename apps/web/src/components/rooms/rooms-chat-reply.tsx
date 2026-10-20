@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { RoomsChatMessage } from '@/components/rooms/rooms-chat-message';
 import { RoomsChatReactions } from '@/components/rooms/rooms-chat-reactions';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { RoomsReactionGroup } from '@/types/rooms.types';
+import type { RoomsReactionGroup } from '@openbots/client/client';
 import type { ComponentProps } from 'react';
 
 interface RoomsChatReplyProps extends Omit<ComponentProps<typeof RoomsChatMessage>, 'reacting' | 'onReact'> {

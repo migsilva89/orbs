@@ -1,8 +1,8 @@
+import { botFallbackModel } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { BotSettingsFields } from '@/components/bots/bot-settings-fields';
 import { FormErrorsAndHint, FormField, FormItem, FormLabel } from '@/components/ui/forms/form';
-import { botFallbackModel } from '@/services/bot/bot.client';
 import type { BotForm } from '@openbots/contracts/universal';
 
 interface BotFormModelProps {

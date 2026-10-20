@@ -1,3 +1,4 @@
+import { roomsChoice, roomsQuestionText } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { ORPCError } from '@orpc/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -6,7 +7,6 @@ import { match } from 'ts-pattern';
 import { Question, QuestionDescription, QuestionField, QuestionHeader, QuestionHeading, QuestionOption, QuestionOptions, QuestionTitle } from '@/components/ui/ai/question';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { roomsChoice, roomsQuestionText } from '@/services/rooms/rooms.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconArrowUp from '~icons/lucide/arrow-up';
 import IconX from '~icons/lucide/x';

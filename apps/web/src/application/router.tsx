@@ -1,6 +1,6 @@
 import { bootZodErrors } from '@openbots/i18n/validation';
-import { QueryClientProvider } from '@tanstack/react-query';
 import { createRouter as createTanStackRouter } from '@tanstack/react-router';
+import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { tanstackQueryContext } from '@/services/tanstack/tanstack.client';
 import { routeTree } from './routes.tree';
 
@@ -9,10 +9,9 @@ bootZodErrors();
 export function getRouter() {
   const context = tanstackQueryContext();
 
-  return createTanStackRouter({
+  const router = createTanStackRouter({
     routeTree,
     context,
-    Wrap: ({ children }) => <QueryClientProvider client={context.queryClient}>{children}</QueryClientProvider>,
     search: {
       strict: true,
     },
@@ -22,4 +21,11 @@ export function getRouter() {
     defaultPreloadStaleTime: 0,
     defaultStructuralSharing: true,
   });
+
+  setupRouterSsrQueryIntegration({
+    router,
+    queryClient: context.queryClient,
+  });
+
+  return router;
 }

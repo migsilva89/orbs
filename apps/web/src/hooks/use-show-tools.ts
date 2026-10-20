@@ -1,5 +1,5 @@
+import { ROOMS } from '@openbots/client/client';
 import { useSyncExternalStore } from 'react';
-import { ROOMS } from '@/services/rooms/rooms.constants';
 
 export function useShowTools() {
   const shown = useSyncExternalStore(

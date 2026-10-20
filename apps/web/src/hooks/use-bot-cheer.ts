@@ -1,5 +1,5 @@
+import { BOT_CHEER } from '@openbots/client/client';
 import { useEffect, useRef, useState } from 'react';
-import { BOT_CHEER } from '@/services/bot/bot.constants';
 import type { PointerEvent } from 'react';
 
 export function useBotCheer() {

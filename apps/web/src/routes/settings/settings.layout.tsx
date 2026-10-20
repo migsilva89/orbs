@@ -18,15 +18,17 @@ export const Route = createFileRoute('/_chat/settings')({
       context.queryClient.ensureQueryData(rpc.devices.list.queryOptions()),
     ]);
 
-    return { breadcrumb: m.settings_title() };
+    return { breadcrumb: m.settings_title(), connection: context.connection };
   },
   component: SettingsLayout,
 });
 
 function SettingsLayout() {
+  const { connection } = Route.useLoaderData();
+
   return (
     <>
-      <SettingsPage />
+      <SettingsPage connection={connection} />
       <Outlet />
     </>
   );

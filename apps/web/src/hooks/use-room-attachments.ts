@@ -1,16 +1,16 @@
+import { CHAT } from '@openbots/client/client';
 import { ATTACHMENT } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useMutation } from '@tanstack/react-query';
 import { generateId } from 'ai';
 import { useEffect, useRef, useState } from 'react';
 import { toasty } from '@/components/ui/sonner';
-import { CHAT } from '@/services/chat/chat.constants';
 import { rpc } from '@/services/rpc/rpc.client';
-import type * as RoomsTypes from '@/types/rooms.types';
+import type { RoomsAttachment, RoomsAttachmentsState, RoomsFilePart } from '@openbots/client/client';
 import type * as ReactTypes from 'react';
 
 export function useRoomAttachments(botId: string) {
-  const [state, setState] = useState<RoomsTypes.RoomsAttachmentsState>({ botId, items: [] });
+  const [state, setState] = useState<RoomsAttachmentsState>({ botId, items: [] });
   const upload = useMutation(rpc.attachments.upload.mutationOptions());
   const discard = useMutation(rpc.attachments.remove.mutationOptions());
   const previews = useRef(new Map<string, string>());
@@ -24,7 +24,7 @@ export function useRoomAttachments(botId: string) {
   }, [botId]);
   const attachments = state.botId === botId ? state.items : [];
 
-  const update = (change: (items: RoomsTypes.RoomsAttachment[]) => RoomsTypes.RoomsAttachment[]) => {
+  const update = (change: (items: RoomsAttachment[]) => RoomsAttachment[]) => {
     setState((current) => ({ botId, items: change(current.botId === botId ? current.items : []) }));
   };
 
@@ -147,6 +147,6 @@ export function useRoomAttachments(botId: string) {
     uploading: attachments.some((item) => item.status === 'uploading'),
     failed: attachments.some((item) => item.status === 'failed'),
     readyIds: ready.flatMap((item) => (item.id ? [item.id] : [])),
-    readyParts: ready.map((item): RoomsTypes.RoomsFilePart => ({ type: 'file', mediaType: item.mediaType, filename: item.name, url: `${CHAT.attachmentScheme}${item.id ?? ''}` })),
+    readyParts: ready.map((item): RoomsFilePart => ({ type: 'file', mediaType: item.mediaType, filename: item.name, url: `${CHAT.attachmentScheme}${item.id ?? ''}` })),
   };
 }

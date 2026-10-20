@@ -1,3 +1,4 @@
+import { routinesScheduleText } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { getLocale } from '@openbots/i18n/runtime';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -13,7 +14,6 @@ import {
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
 import { toasty } from '@/components/ui/sonner';
 import { Switch } from '@/components/ui/switch';
-import { routinesScheduleText } from '@/services/routines/routines.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconEllipsisVertical from '~icons/lucide/ellipsis-vertical';
 import IconPencil from '~icons/lucide/pencil';

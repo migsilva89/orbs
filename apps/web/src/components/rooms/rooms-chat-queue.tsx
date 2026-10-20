@@ -6,7 +6,7 @@ import { cn } from '@/lib/cn';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCornerUpRight from '~icons/lucide/corner-up-right';
 import IconListOrdered from '~icons/lucide/list-ordered';
-import type { ChatQueued } from '@/types/chat.types';
+import type { ChatQueued } from '@openbots/client/client';
 
 interface RoomsChatQueueProps {
   botId: string

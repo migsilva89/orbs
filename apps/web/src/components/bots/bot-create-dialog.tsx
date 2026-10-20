@@ -1,4 +1,5 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
+import { botHandle } from '@openbots/client/client';
 import { botForm } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,9 +10,8 @@ import { BotFormProfile } from '@/components/bots/bot-form-profile';
 import { ButtonLoading } from '@/components/ui/button-loading';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormErrors } from '@/components/ui/forms/form';
-import { botHandle } from '@/services/bot/bot.client';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { BotSettings } from '@/types/bot.types';
+import type { BotSettings } from '@openbots/client/client';
 import type { Bot } from '@openbots/contracts/universal';
 
 interface BotCreateDialogProps {

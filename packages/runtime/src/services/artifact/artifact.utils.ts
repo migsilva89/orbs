@@ -104,6 +104,12 @@ export async function artifactAppendVersion(
 function artifactSpecIssues(spec: ArtifactSpec): string[] {
   const bytes = new TextEncoder().encode(JSON.stringify(spec)).length;
 
+  return match(spec)
+    .with({ html: P.string }, () => bytes <= ARTIFACT.specBytesMax ? [] : ['spec'])
+    .otherwise((structured) => artifactStructuredSpecIssues(structured, bytes));
+}
+
+function artifactStructuredSpecIssues(spec: Extract<ArtifactSpec, { root: string }>, bytes: number): string[] {
   return match(bytes <= ARTIFACT.specBytesMax && artifactHasTree(spec))
     .with(false, () => ['spec'])
     .with(true, () => [
@@ -126,7 +132,7 @@ function artifactSpecIssues(spec: ArtifactSpec): string[] {
 }
 
 // json-render validates references and props, but does not reject child cycles.
-function artifactHasTree(spec: ArtifactSpec): boolean {
+function artifactHasTree(spec: Extract<ArtifactSpec, { root: string }>): boolean {
   const seen = new Set<string>();
   const pending = [{ id: spec.root, depth: 1 }];
   let isValid = true;

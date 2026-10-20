@@ -1,8 +1,8 @@
+import { ROOMS } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ROOMS } from '@/services/rooms/rooms.constants';
 
 interface RoomsChatEmojiLoadingProps {
   onRetry: () => void

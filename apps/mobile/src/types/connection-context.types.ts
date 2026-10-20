@@ -1,8 +1,8 @@
-import type { rpcClientCreate } from '@/services/rpc/rpc.client';
+import type { RpcSession } from '@/types/rpc.types';
 import type { ConnectionSaved } from '@openbots/contracts/universal';
 
 export interface ConnectionContextValue {
-  session: ReturnType<typeof rpcClientCreate> | null;
+  session: RpcSession | null;
   isLoading: boolean;
   error: string | null;
   connect: (connection: ConnectionSaved) => void;

@@ -31,7 +31,6 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
   const queryClient = useQueryClient();
   const { message: focusEntryId } = useSearch({ from: '/_chat' });
   const composer = useRef<PromptInputEditorHandle>(null);
-  const [text, setText] = useState('');
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const { conversationId } = view;
 
@@ -131,10 +130,8 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
         messages={messages}
         queued={queued}
         replyTo={replyTo}
-        text={text}
         onReplyChange={setReplyTo}
         onSend={focusEntryId ? leaveFocus : undefined}
-        onTextChange={setText}
       />
     </div>
   );

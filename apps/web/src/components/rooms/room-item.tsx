@@ -82,6 +82,7 @@ export function RoomItem({ chat, isSortable = true }: RoomItemProps) {
               <BotAvatar
                 animate={false}
                 bot={{ name: chat.name, avatar: chat.avatar ?? undefined }}
+                cheer={false}
                 size={state === 'collapsed' && !isMobile && buttonSize ? buttonSize : 48}
               />
               {chat.hasUnread && !isActive ? (

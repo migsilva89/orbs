@@ -1,6 +1,6 @@
 import { m } from '@openbots/i18n/client';
 import { isFileUIPart } from 'ai';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useState } from 'react';
 import { match } from 'ts-pattern';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { RoomsChatActions } from '@/components/rooms/rooms-chat-actions';
@@ -34,13 +34,7 @@ interface RoomsChatMessageProps {
 export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle', live = false, hasActions = false, reacting = false, onReply, onReact }: RoomsChatMessageProps) {
   const reply = message.metadata?.replyTo;
   const [sheet, setSheet] = useState(false);
-  const [selecting, setSelecting] = useState(false);
-  const pressed = useRef<HTMLElement>(null);
-
-  const press = useLongPress((element) => {
-    pressed.current = element;
-    setSheet(true);
-  });
+  const press = useLongPress(() => setSheet(true));
 
   const { shown: showTools } = useShowTools();
   const blocks = toolBlocks({ parts: message.parts }).filter((block) => showTools || block.kind !== 'tools');
@@ -50,29 +44,6 @@ export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle',
   const firstText = blocks.find((block) => block.kind === 'text');
   const namedBlock = message.role === 'assistant' ? bubbleBlocks.find((block) => block.kind !== 'reasoning') : undefined;
   const actionsBlock = blocks.filter((block) => block.kind === 'text').at(-1) ?? bubbleBlocks.filter((block) => block.kind !== 'reasoning').at(-1);
-
-  useEffect(() => {
-    if (!selecting) {
-      return;
-    }
-
-    const bubble = pressed.current?.querySelector<HTMLElement>('[data-quote-id]')
-      ?? [...document.querySelectorAll<HTMLElement>(`[data-quote-id="${message.id}"]`)].at(-1);
-
-    if (bubble) {
-      document.getSelection()?.selectAllChildren(bubble);
-    }
-
-    const leave = () => {
-      if (document.getSelection()?.isCollapsed ?? true) {
-        setSelecting(false);
-      }
-    };
-
-    document.addEventListener('selectionchange', leave);
-
-    return () => document.removeEventListener('selectionchange', leave);
-  }, [message.id, selecting]);
 
   const segments: typeof blocks[] = files.length > 0 && bubbleBlocks.length === 0 ? [[]] : [];
 
@@ -93,10 +64,10 @@ export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle',
     <RoomsChatActions
       message={message}
       reacting={reacting}
+      selectable={firstText !== undefined}
       sheet={sheet}
       onReact={onReact}
       onReply={onReply}
-      onSelectText={firstText ? () => setSelecting(true) : undefined}
       onSheetChange={setSheet}
     />
   ) : null;
@@ -136,7 +107,7 @@ export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle',
 
     return (
       <Message from={message.role} key={`${message.id}-${first?.index ?? 'files'}`}>
-        <MessageStack className={hasActions && !selecting ? 'pointer-coarse:select-none' : undefined} {...(hasActions && !selecting ? press : {})}>
+        <MessageStack className={hasActions ? 'pointer-coarse:select-none' : undefined} {...(hasActions ? press : {})}>
           {segment === bubbles.at(0) ? filesContent : null}
           {segment.map((block) => {
             const key = `${message.id}-${block.index}`;

@@ -125,6 +125,7 @@ function ScrollArea({
     const isBoth = orientation === 'both';
     const buttonThreshold = threshold * 100;
     const fadeOptions = { width: maskWidth, alpha: fadeAlpha, inset: fadeInset };
+    let hasMeasured = false;
 
     function recalculate() {
       if (!scroller) {
@@ -148,6 +149,7 @@ function ScrollArea({
 
       // Fast path — nothing changed, no allocations, no DOM writes, no state updates
       if (
+        hasMeasured &&
         prev.badges === badges &&
         prev.isAtTop === isAtTop &&
         prev.isAtBottom === isAtBottom &&
@@ -160,6 +162,8 @@ function ScrollArea({
         }
         return;
       }
+
+      hasMeasured = true;
 
       // Mask — direct DOM mutation, bypasses React reconciliation entirely
       let verticalMask = 'none';
@@ -248,8 +252,8 @@ function ScrollArea({
       }
     }
 
-    // Initial sync — runs synchronously before browser paint (useLayoutEffect guarantee)
-    recalculate();
+    // Measure after the full mount, together with resize and mutation notifications.
+    schedule();
 
     // Passive scroll listener — browser doesn't block compositing waiting for JS
     function handleScroll() {

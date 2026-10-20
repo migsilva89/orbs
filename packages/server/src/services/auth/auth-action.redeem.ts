@@ -13,29 +13,23 @@ export async function authActionRedeem({ database }: AuthServiceDeps, params: Au
     const claimedAt = Date.now();
     const existing = await tx.selectFrom('device').select('id').limit(1).executeTakeFirst();
 
-    const grant = match(await tx.updateTable('pairingGrant')
+    match(await tx.updateTable('pairingGrant')
       .set({ claimedAt })
       .where('tokenHash', '=', grantHash)
       .where('expiresAt', '>', claimedAt)
       .where('claimedAt', 'is', null)
-      .returning(['tokenHash', 'issuedBy'])
+      .returning('tokenHash')
       .executeTakeFirst())
       .with(P.nonNullable, (value) => value)
       .otherwise(() => {
         throw new Errors.UNAUTHORIZED();
       });
 
-    match({ issuedBy: grant.issuedBy, existing })
-      .with({ issuedBy: null, existing: P.nonNullable }, () => {
-        throw new Errors.UNAUTHORIZED();
-      })
-      .otherwise(() => undefined);
-
     const paired = { id: crypto.randomUUID(), name: params.name, createdAt: claimedAt };
     await tx.insertInto('device').values({ ...paired, tokenHash }).execute();
 
-    await match(grant.issuedBy)
-      .with(null, () => tx.deleteFrom('pairingGrant').where('issuedBy', 'is', null).where('claimedAt', 'is', null).execute())
+    await match(existing)
+      .with(undefined, () => tx.deleteFrom('pairingGrant').where('issuedBy', 'is', null).where('claimedAt', 'is', null).execute())
       .otherwise(() => undefined);
 
     return paired;

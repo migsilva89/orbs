@@ -87,7 +87,7 @@ export type SkillService = ReturnType<typeof makeSkillService>;
 ## State and security
 
 - One implicit owner per independent daemon. Devices pair with revocable credentials. No users, organizations, roles or password login.
-- Pairing stores token hashes and atomically consumes grants with device creation. Issuing a grant requires an authenticated device or a trusted local bootstrap. No public grant endpoint or pairing CLI. First-device bootstrap uses an owner-only local socket, and the daemon prints a startup pairing link while no device exists; see [pairing](../plans/main/05-auth-and-pairing.md).
+- Pairing stores token hashes and atomically consumes grants with device creation. Issuing a grant requires an authenticated device or trusted local transport. CLI pairing uses the owner-only daemon socket before or after initial setup; public transport cannot acquire local authority. The daemon prints a startup pairing link while no device exists; see [pairing](../plans/main/05-auth-and-pairing.md).
 - App persistence uses `node:sqlite` and Kysely. SQL identifiers are snake_case; `CamelCasePlugin` maps TypeScript camelCase. Migrations preserve existing data.
 - Generic non-secret key/value data belongs to the shared `settings` service/table, with domain keys such as `skills.directories`, `mcp.paths` and `tools.approvalRules`.
 - Domain settings RPCs return settings objects, not individual flags. Writes are partial: omission preserves, `[]` clears lists, nullable fields use `null` to clear. Return updated settings.

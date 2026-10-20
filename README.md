@@ -25,6 +25,20 @@ bun run lint
 bun run --cwd apps/daemon start
 ```
 
+Run `bun link` from `apps/daemon` to expose `openbots` on your Bun executable path:
+
+```sh
+openbots start                     # Foreground; Ctrl+C stops it
+openbots start --detach            # Background; returns after startup succeeds
+openbots pair [--url <origin>]      # Code, link, and QR from the running daemon
+openbots service register          # Enable startup at the next macOS login
+openbots service unregister        # Disable startup at the next macOS login
+```
+
+`openbots` without a subcommand runs in the foreground. `pair` defaults to `OPENBOTS_PUBLIC_URL`; use an origin reachable by the receiving device. All commands select the daemon using `OPENBOTS_DATA_DIR`. The existing storage lock prevents a second instance from opening the same stores. Detached startup writes to `data/daemon.log` and reports a failure instead of claiming success if startup exits early.
+
+Service registration is macOS-only. It writes a per-user LaunchAgent for the selected data directory, using the current Bun executable, source entrypoint, validated Openbots environment settings, and `PATH`. Keep that executable and checkout available. Different data directories have separate registrations. Register/unregister only changes the next login; neither command loads, unloads, starts, or stops the current daemon. Registration does not copy provider secrets or create a CLI device credential.
+
 The daemon listens on all IPv4 interfaces (`0.0.0.0`), using port 3000 by default, so it can accept LAN and Tailscale connections. Set `OPENBOTS_HOST` to bind a specific interface. `GET /health` returns `{ "status": "ok" }`. The `/rpc` WebSocket carries control and live updates. HTTP POST under `/rpc` carries file upload/download through the same authenticated oRPC router. Pairing redemption uses a single-use pairing token; other RPC calls authenticate a device credential. Other HTTP paths return 404. SIGINT/SIGTERM close connections and stop the listener. Health confirms HTTP handling only, not database or agent readiness.
 
 `OPENBOTS_DATA_DIR` is the only configurable storage path and defaults to `~/.config/openbots/`. Bot records keep IDs, not home-directory paths; derive each working folder from the root and bot ID. The native host expands `~` and resolves relative overrides before using this layout:
@@ -219,11 +233,11 @@ The public budget is checked before authentication, per connection address, so u
 
 ## Device pairing
 
-Each daemon has one owner. There is no local pair CLI. Existing paired devices issue a pairing payload through authenticated `pairing.create`. At startup, while no device is paired, the daemon prints a pairing link (`OPENBOTS_PUBLIC_URL/connect#code=…`) and a terminal QR code. It prints a new one when the grant expires. Open the link to prefill the web connect form. Other first-device clients can get a grant through `pairing.bootstrap` on the owner-only Unix socket at `data/ipc/rpc.sock`. Public HTTP/WebSocket calls cannot bootstrap, even from loopback. The local endpoint issues grants only when no device records remain. Desktop UI integration remains pending.
+Each daemon has one owner. Existing paired devices issue a pairing payload through authenticated `pairing.create`. `openbots pair` uses the existing `pairing.bootstrap` operation on the owner-only Unix socket at `data/ipc/rpc.sock`, before or after initial setup. It does not store a device credential or open the database. Public HTTP/WebSocket calls cannot bootstrap, even from loopback. At startup, while no device is paired, the daemon prints a pairing link (`OPENBOTS_PUBLIC_URL/connect#code=…`) and a terminal QR code, refreshing it when the grant expires. Open the link to prefill the web connect form. Desktop UI integration remains pending.
 
 | RPC call | Access | Result |
 | --- | --- | --- |
-| `pairing.bootstrap({ serverUrl })` | Local Unix socket, no devices yet | Five-minute token, expiry, and QR payload/SVG |
+| `pairing.bootstrap({ serverUrl })` | Owner-only local Unix socket | Five-minute token, expiry, and QR payload/SVG |
 | `pairing.redeem({ token, name })` | Pairing token | Device metadata and a new device token |
 | `pairing.create({ serverUrl })` | Device bearer token | Five-minute token, expiry, and `qr: { payload, svg }` |
 | `pairing.status({ token })` | Device bearer token | Grant expiry, issuer, and `claimedAt` (Unix milliseconds, or `null` while unclaimed) |
@@ -242,7 +256,7 @@ const local = makeHttpClient({
 const grant = await local.pairing.bootstrap({ serverUrl });
 ```
 
-Display `grant.qr.svg`; the new device redeems its token through the normal network endpoint. Competing bootstrap grants can pair only one first device. The winning claim invalidates the other unused bootstrap grants. Revoking every device allows a fresh local bootstrap. Lost device credentials while device records remain require a separate recovery flow, which is not implemented.
+Display `grant.qr.svg`; the new device redeems its token through the normal network endpoint. The first successful pairing invalidates competing unused initial local grants. Later local grants retain their normal expiry and single-use behavior. The local owner can issue a fresh code even when every browser has lost its device credential; existing device credentials remain valid until revoked.
 
 Send device credentials as `Authorization: Bearer <device-token>`. They remain valid until revoked. The database stores SHA-256 hashes of random 256-bit tokens; plaintext credentials are returned only when issued. Losing a redemption response requires a new pairing token. All paired devices have the same owner access.
 

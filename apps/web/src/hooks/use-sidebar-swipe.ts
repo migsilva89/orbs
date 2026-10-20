@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent } from 'react';
 import { useIsStandalone } from '@/hooks/use-is-standalone';
 import type { SidebarSwipeOptions } from '@/types/sidebar.types';
 
-const SWIPE_IGNORE = '[data-vaul-drawer], [data-vaul-overlay], [role="dialog"], [role="menu"], input, textarea, [contenteditable="true"], pre, table';
+const SWIPE_IGNORE = ':is([data-vaul-drawer], [data-vaul-overlay], [role="dialog"]):not([data-state="closed"]), [role="menu"], input, textarea, [contenteditable="true"], pre, table';
 const SWIPE_INTERACTIVE = 'a, button, [role="button"]';
 const SWIPE = { edgePx: 24, slopPx: 10, ratio: 2 } as const;
 

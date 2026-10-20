@@ -43,7 +43,7 @@ export function layoutApplyShell(): void {
   const media = window.matchMedia('(display-mode: standalone)');
   const viewport = window.visualViewport;
   let fullHeight = 0;
-  let closing: ReturnType<typeof setTimeout> | undefined;
+  let viewportFrame: number | undefined;
 
   function layoutUpdateViewport() {
     if (viewport && viewport.scale !== 1) {
@@ -51,42 +51,28 @@ export function layoutApplyShell(): void {
     }
 
     const height = viewport?.height ?? window.innerHeight;
+    const top = viewport?.offsetTop ?? 0;
     fullHeight = Math.max(fullHeight, height);
 
-    if (closing !== undefined && height < fullHeight - 40) {
-      return;
-    }
-
     if (height < fullHeight - 40) {
-      root.dataset.keyboard = 'open';
-
       if (window.scrollY !== 0) {
         window.scrollTo(0, 0);
       }
+
+      root.dataset.keyboard = 'open';
     } else {
       delete root.dataset.keyboard;
     }
 
     root.style.setProperty('--app-height', `${height}px`);
-    root.style.setProperty('--app-top', `${viewport?.offsetTop ?? 0}px`);
+    root.style.setProperty('--app-top', `${top}px`);
   }
 
-  function layoutCloseKeyboard(event: FocusEvent) {
-    const next = event.relatedTarget;
-
-    if (root.dataset.keyboard !== 'open' || (next instanceof Element && next.matches('input, textarea, [contenteditable="true"]'))) {
-      return;
-    }
-
-    clearTimeout(closing);
-    closing = setTimeout(() => {
-      closing = undefined;
+  function layoutScheduleViewport() {
+    viewportFrame ??= requestAnimationFrame(() => {
+      viewportFrame = undefined;
       layoutUpdateViewport();
-    }, 1000);
-
-    delete root.dataset.keyboard;
-    root.style.setProperty('--app-height', `${fullHeight}px`);
-    root.style.setProperty('--app-top', '0px');
+    });
   }
 
   function layoutUpdateMode() {
@@ -99,14 +85,13 @@ export function layoutApplyShell(): void {
 
   screen.orientation.addEventListener('change', () => {
     fullHeight = 0;
-    layoutUpdateViewport();
+    layoutScheduleViewport();
   });
 
-  viewport?.addEventListener('resize', layoutUpdateViewport);
-  viewport?.addEventListener('scroll', layoutUpdateViewport);
-  window.addEventListener('resize', layoutUpdateViewport);
-  window.addEventListener('pageshow', layoutUpdateViewport);
-  document.addEventListener('focusout', layoutCloseKeyboard);
+  viewport?.addEventListener('resize', layoutScheduleViewport);
+  viewport?.addEventListener('scroll', layoutScheduleViewport);
+  window.addEventListener('resize', layoutScheduleViewport);
+  window.addEventListener('pageshow', layoutScheduleViewport);
   media.addEventListener('change', layoutUpdateMode);
   layoutUpdateMode();
   layoutUpdateViewport();

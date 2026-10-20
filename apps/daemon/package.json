@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "bin": {
+    "openbots": "./src/entry.native.ts"
+  },
   "scripts": {
     "dev": "OPENBOTS_DATA_DIR=$HOME/.config/openbots-dev OPENBOTS_HOST=127.0.0.1 OPENBOTS_PORT=47191 OPENBOTS_PUBLIC_URL=http://localhost:47190 bun --watch src/entry.native.ts",
     "start": "bun src/entry.native.ts",
@@ -24,6 +27,7 @@
     "@openbots/runtime": "workspace:*",
     "@openbots/env": "workspace:*",
     "@openbots/logger": "workspace:*",
+    "@orpc/client": "catalog:",
     "@orpc/server": "catalog:",
     "ts-pattern": "catalog:",
     "uqr": "catalog:"

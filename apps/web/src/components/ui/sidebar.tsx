@@ -193,9 +193,10 @@ function Sidebar({
   const mobileContent = useRef<HTMLDivElement | null>(null);
   const mobileDrag = useRef<number | null>(null);
 
-  // The drawer follows the finger with its open animation paused, then plays it, or its close animation, from there.
+  // Follow the finger without animation; release only animates the remaining distance.
   const sidebarFollowDrag = (node: HTMLElement, offset: number) => {
     node.style.animation = 'none';
+    node.style.transition = 'none';
     node.style.transform = side === 'left'
       ? `translate3d(min(0px, calc(${offset}px - 100%)), 0, 0)`
       : `translate3d(max(0px, calc(100% - ${offset}px)), 0, 0)`;
@@ -206,11 +207,10 @@ function Sidebar({
     enabled: isMobile && collapsible !== 'none' && !openMobile,
     onDrag: (offset) => {
       mobileDrag.current = offset;
+      setOpenMobile(true);
 
       if (mobileContent.current) {
         sidebarFollowDrag(mobileContent.current, offset);
-      } else {
-        setOpenMobile(true);
       }
     },
     onRelease: ({ offset, velocity }) => {
@@ -221,17 +221,26 @@ function Sidebar({
         return;
       }
 
-      node.style.removeProperty('animation');
+      node.style.transition = 'none';
+      const width = node.getBoundingClientRect().width;
+      node.style.removeProperty('--initial-transform');
 
-      if (offset < node.offsetWidth * SIDEBAR_SWIPE_OPEN_RATIO && velocity < SIDEBAR_SWIPE_OPEN_VELOCITY) {
+      if (offset < width * SIDEBAR_SWIPE_OPEN_RATIO && velocity < SIDEBAR_SWIPE_OPEN_VELOCITY) {
+        node.style.removeProperty('animation');
         setOpenMobile(false);
 
         return;
       }
 
-      node.style.setProperty('--initial-transform', `${Math.max(node.offsetWidth - offset, 0)}px`);
+      node.style.setProperty('--initial-transform', `${Math.max(width - offset, 0)}px`);
       node.style.removeProperty('transform');
-      node.addEventListener('animationend', () => node.style.removeProperty('--initial-transform'), { once: true });
+      node.style.removeProperty('animation');
+
+      if (offset >= width) {
+        for (const animation of node.getAnimations()) {
+          animation.finish();
+        }
+      }
     },
   });
 
@@ -254,6 +263,10 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           ref={(node) => {
+            mobileContent.current?.style.removeProperty('animation');
+            mobileContent.current?.style.removeProperty('transition');
+            mobileContent.current?.style.removeProperty('transform');
+            mobileContent.current?.style.removeProperty('--initial-transform');
             mobileContent.current = node;
 
             if (node && mobileDrag.current !== null) {
@@ -261,6 +274,15 @@ function Sidebar({
             }
           }}
           style={mobileStyle}
+          onAnimationEnd={(event) => {
+            if (event.target !== event.currentTarget) {
+              return;
+            }
+
+            event.currentTarget.style.removeProperty('--initial-transform');
+            // Restoring transitions before animationend causes a second slide in WebKit.
+            event.currentTarget.style.removeProperty('transition');
+          }}
         >
           <DrawerHeader className="sr-only">
             <DrawerTitle>{m.layout_sidebar_title()}</DrawerTitle>

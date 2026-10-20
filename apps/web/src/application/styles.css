@@ -321,6 +321,11 @@ button {
   }
 }
 
+/* Measure real code-block heights before the virtualized transcript is visible. */
+[data-slot='message-scroller-viewport'] [data-streamdown='code-block'] {
+  content-visibility: visible !important;
+}
+
 /* Shiki dual-theme */
 .shiki {
   color: var(--shiki-light);

@@ -4,7 +4,7 @@ import { RoomsChatEmojiChoices } from '@/components/rooms/rooms-chat-emoji-choic
 import { RoomsChatInfo } from '@/components/rooms/rooms-chat-info';
 import { RoomsChatReactionPicker } from '@/components/rooms/rooms-chat-reaction-picker';
 import { Button } from '@/components/ui/button';
-import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { toasty } from '@/components/ui/sonner';
@@ -25,22 +25,23 @@ interface RoomsChatActionsProps {
   message: ChatMessage
   sheet: boolean
   reacting?: boolean
+  selectable?: boolean
   onSheetChange: (open: boolean) => void
   onReply?: () => void
   onReact?: (emoji: string) => void
-  onSelectText?: () => void
 }
 
 export function RoomsChatActions({
   message,
   sheet,
   reacting = false,
+  selectable = false,
   onSheetChange,
   onReply,
   onReact,
-  onSelectText,
 }: RoomsChatActionsProps) {
   const [copied, setCopied] = useState(false);
+  const [selecting, setSelecting] = useState(false);
   const touch = useIsTouch();
 
   const info = <RoomsChatInfo message={message} />;
@@ -142,12 +143,12 @@ export function RoomsChatActions({
                   <IconCopy className="size-4 text-muted-foreground" />
                   {m.rooms_chat_copy()}
                 </Button>
-                {onSelectText ? (
+                {selectable ? (
                   <Button
                     className="justify-start"
                     size="lg"
                     variant="ghost"
-                    onClick={() => fromSheet(onSelectText)}
+                    onClick={() => fromSheet(() => setSelecting(true))}
                   >
                     <IconTextSelect className="size-4 text-muted-foreground" />
                     {m.rooms_chat_select_text()}
@@ -156,6 +157,21 @@ export function RoomsChatActions({
               </div>
               <Separator />
               <div className="px-3 py-2">{info}</div>
+            </div>
+          </DrawerContent>
+        </Drawer>
+      ) : null}
+      {selectable ? (
+        <Drawer open={selecting} onOpenChange={setSelecting}>
+          <DrawerContent aria-describedby={undefined} className="data-[vaul-drawer-direction=bottom]:h-[80vh]">
+            <DrawerHeader>
+              <DrawerTitle>{m.rooms_chat_select_text()}</DrawerTitle>
+            </DrawerHeader>
+            <div
+              data-vaul-no-drag
+              className="min-h-0 flex-1 overflow-y-auto px-4 pb-[max(--spacing(4),env(safe-area-inset-bottom))] text-sm leading-relaxed wrap-break-word whitespace-pre-wrap select-text"
+            >
+              {roomsMessageText(message)}
             </div>
           </DrawerContent>
         </Drawer>

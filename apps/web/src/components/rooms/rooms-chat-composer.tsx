@@ -2,7 +2,7 @@ import { ATTACHMENT } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { generateId } from 'ai';
-import { lazy, useRef, useState } from 'react';
+import { lazy, Suspense, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
 import { RoomsChatAttachments } from '@/components/rooms/rooms-chat-attachments';
 import { RoomsChatQueue } from '@/components/rooms/rooms-chat-queue';
@@ -34,10 +34,8 @@ interface RoomsChatComposerProps {
   queued: ChatQueued[]
   isBusy: boolean
   isCompacting: boolean
-  text: string
   editor: RefObject<PromptInputEditorHandle | null>
   replyTo: ChatMessage | null
-  onTextChange: (text: string) => void
   onReplyChange: Dispatch<SetStateAction<ChatMessage | null>>
   onSend?: () => void
 }
@@ -49,10 +47,8 @@ export function RoomsChatComposer({
   queued,
   isBusy,
   isCompacting,
-  text,
   editor,
   replyTo,
-  onTextChange,
   onReplyChange,
   onSend,
 }: RoomsChatComposerProps) {
@@ -64,6 +60,7 @@ export function RoomsChatComposer({
   const files = useRoomAttachments(bot.id);
   const fileInput = useRef<HTMLInputElement>(null);
   const pendingRequest = useRef<{ key: string, id: string } | null>(null);
+  const [text, setText] = useState('');
   const [skillsRequested, setSkillsRequested] = useState(false);
   const [commandsRequested, setCommandsRequested] = useState(false);
   const draft = useRoomDraft(bot.id);
@@ -229,58 +226,60 @@ export function RoomsChatComposer({
             }}
           />
         </InputGroupAddon>
-        <PromptInputEditor
-          aria-label={m.rooms_chat_placeholder()}
-          disabled={isCompacting}
-          enterSends={preferences.enterKey[isTouch ? 'mobile' : 'desktop'] === 'send'}
-          focusOnMount={!isMobile}
-          initialContent={draft.draft ? mentionSegments({ text: draft.draft }) : undefined}
-          placeholder={isCompacting ? m.rooms_chat_compacting_wait() : m.rooms_chat_placeholder()}
-          recall={recall}
-          ref={editor}
-          renderItem={(item) => (
-            <RoomsMentionOption
-              commands={commands.data ?? []}
-              href={item.href}
-              label={item.label}
-              skills={skills.data ?? []}
-            />
-          )}
-          renderMention={(item) => <RoomsMention href={item.href} label={item.label} />}
-          triggers={[
-            {
-              char: '$',
-              empty: skillsEmpty,
-              items: async (query) => {
-                setSkillsRequested(true);
+        <Suspense fallback={<div aria-hidden className="h-11 min-w-0 flex-1" />}>
+          <PromptInputEditor
+            aria-label={m.rooms_chat_placeholder()}
+            disabled={isCompacting}
+            enterSends={preferences.enterKey[isTouch ? 'mobile' : 'desktop'] === 'send'}
+            focusOnMount={!isMobile}
+            initialContent={draft.draft ? mentionSegments({ text: draft.draft }) : undefined}
+            placeholder={isCompacting ? m.rooms_chat_compacting_wait() : m.rooms_chat_placeholder()}
+            recall={recall}
+            ref={editor}
+            renderItem={(item) => (
+              <RoomsMentionOption
+                commands={commands.data ?? []}
+                href={item.href}
+                label={item.label}
+                skills={skills.data ?? []}
+              />
+            )}
+            renderMention={(item) => <RoomsMention href={item.href} label={item.label} />}
+            triggers={[
+              {
+                char: '$',
+                empty: skillsEmpty,
+                items: async (query) => {
+                  setSkillsRequested(true);
 
-                const available = await queryClient.fetchQuery({ ...skillsOptions, retry: false }).catch(() => []);
+                  const available = await queryClient.fetchQuery({ ...skillsOptions, retry: false }).catch(() => []);
 
-                return available
-                  .filter((skill) => `${skill.name} ${skill.description}`.toLowerCase().includes(query.toLowerCase()))
-                  .map((skill) => ({ href: mentionHref({ kind: 'skill', name: skill.name }), label: `$${skill.name}` }));
+                  return available
+                    .filter((skill) => `${skill.name} ${skill.description}`.toLowerCase().includes(query.toLowerCase()))
+                    .map((skill) => ({ href: mentionHref({ kind: 'skill', name: skill.name }), label: `$${skill.name}` }));
+                },
               },
-            },
-            {
-              char: '/',
-              empty: commandsEmpty,
-              items: async (query) => {
-                setCommandsRequested(true);
+              {
+                char: '/',
+                empty: commandsEmpty,
+                items: async (query) => {
+                  setCommandsRequested(true);
 
-                const available = await queryClient.fetchQuery({ ...commandsOptions, retry: false }).catch(() => []);
+                  const available = await queryClient.fetchQuery({ ...commandsOptions, retry: false }).catch(() => []);
 
-                return available
-                  .filter((command) => `${command.name} ${command.description}`.toLowerCase().includes(query.toLowerCase()))
-                  .sort((first, second) => Number(!first.name.startsWith(query.toLowerCase())) - Number(!second.name.startsWith(query.toLowerCase())))
-                  .map((command) => ({ href: mentionHref({ kind: 'command', name: command.name }), label: `/${command.name}` }));
+                  return available
+                    .filter((command) => `${command.name} ${command.description}`.toLowerCase().includes(query.toLowerCase()))
+                    .sort((first, second) => Number(!first.name.startsWith(query.toLowerCase())) - Number(!second.name.startsWith(query.toLowerCase())))
+                    .map((command) => ({ href: mentionHref({ kind: 'command', name: command.name }), label: `/${command.name}` }));
+                },
               },
-            },
-          ]}
-          onTextChange={(value) => {
-            onTextChange(value);
-            draft.save(value);
-          }}
-        />
+            ]}
+            onTextChange={(value) => {
+              setText(value);
+              draft.save(value);
+            }}
+          />
+        </Suspense>
         <InputGroupAddon align="inline-end">
           <PromptInputSubmit
             aria-label={isStopping ? m.rooms_chat_stop() : m.rooms_chat_send()}

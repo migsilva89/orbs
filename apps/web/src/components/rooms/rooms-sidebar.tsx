@@ -1,4 +1,4 @@
-import { DndContext, DragOverlay, KeyboardSensor, MeasuringStrategy, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, DragOverlay, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { m } from '@openbots/i18n/client';
@@ -146,7 +146,6 @@ export function RoomsSidebar() {
 
   return (
     <DndContext
-      measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
       sensors={sensors}
       onDragCancel={() => setDraggedId(null)}
       onDragEnd={onDragEnd}

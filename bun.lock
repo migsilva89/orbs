@@ -18,6 +18,9 @@
     "apps/daemon": {
       "name": "@openbots/daemon",
       "version": "1.0.0",
+      "bin": {
+        "openbots": "./src/entry.native.ts",
+      },
       "dependencies": {
         "@openbots/contracts": "workspace:*",
         "@openbots/env": "workspace:*",
@@ -25,6 +28,7 @@
         "@openbots/logger": "workspace:*",
         "@openbots/runtime": "workspace:*",
         "@openbots/server": "workspace:*",
+        "@orpc/client": "catalog:",
         "@orpc/server": "catalog:",
         "ts-pattern": "catalog:",
         "uqr": "catalog:",

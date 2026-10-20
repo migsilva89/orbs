@@ -1,17 +1,19 @@
+#!/usr/bin/env bun
 import { env } from '@openbots/env/server';
+import { isAppError } from '@openbots/errors/universal';
 import { initNativeLogger, log } from '@openbots/logger/server';
-import { coreNativeRun } from './core/core.native';
+import { match } from 'ts-pattern';
+import { coreCommandNative } from './core/core-command.native';
 
 initNativeLogger(env.OPENBOTS_LOG_LEVEL);
 
 try {
-  await coreNativeRun();
-  log.info({ tag: 'daemon', message: 'Daemon stopped' });
+  await coreCommandNative();
 } catch (error) {
   process.exitCode = 1;
   log.error({
     tag: 'daemon',
-    message: 'Daemon failed',
+    message: match(error).when(isAppError, (failure) => failure.internal).otherwise(() => 'Daemon command failed'),
     error,
   });
 }

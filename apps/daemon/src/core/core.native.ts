@@ -41,6 +41,7 @@ export async function coreNativeRun(): Promise<void> {
   });
 
   resources.defer(corePairingNative(services));
+  process.send?.('openbots:ready');
 
   await stopped;
 }

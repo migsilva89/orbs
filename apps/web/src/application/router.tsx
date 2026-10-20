@@ -17,10 +17,9 @@ export function getRouter() {
       strict: true,
     },
     trailingSlash: 'never',
-    defaultPreload: false,
+    defaultPreload: 'intent',
     scrollRestoration: ({ location }) => !location.pathname.startsWith('/rooms'),
     defaultPreloadStaleTime: 0,
-    defaultStaleReloadMode: 'blocking',
     defaultStructuralSharing: true,
   });
 }

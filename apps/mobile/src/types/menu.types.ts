@@ -13,6 +13,7 @@ export interface MenuItem {
 }
 
 export interface MenuProps {
+  title?: string;
   items: MenuItem[];
   children: ReactElement;
   isFullWidth?: boolean;

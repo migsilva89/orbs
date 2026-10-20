@@ -10,3 +10,5 @@ export const deviceList = z.array(device);
 
 export const deviceRevoke = device.pick({ id: true });
 export const deviceRevokeResult = z.void();
+
+export type Device = z.infer<typeof device>;

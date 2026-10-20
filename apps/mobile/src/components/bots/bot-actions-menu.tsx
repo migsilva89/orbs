@@ -18,9 +18,7 @@ export function BotActionsMenu(props: BotActionsMenuProps) {
   const { session } = useConnection();
 
   return match(session)
-    .with(P.nonNullable, (current) => (
-      <BotActionsMenuLoader {...props} session={current} />
-    ))
+    .with(P.nonNullable, (current) => <BotActionsMenuLoader {...props} session={current} />)
     .otherwise(() => props.children);
 }
 
@@ -33,12 +31,12 @@ function BotActionsMenuLoader({ session, botId, ...props }: BotActionsMenuLoader
 
   return match(chats.data?.find((item) => item.botId === botId))
     .with(P.nonNullable, (chat) => (
-<BotActionsMenuContent
-      {...props}
-      chat={chat}
-      session={session}
-    />
-))
+      <BotActionsMenuContent
+        {...props}
+        chat={chat}
+        session={session}
+      />
+    ))
     .otherwise(() => props.children);
 }
 
@@ -51,7 +49,15 @@ function BotActionsMenuContent({ session, chat, mode, children, isFullWidth }: B
   const items = useBotActions(session, chat);
 
   return match(mode)
-    .with('press', () => <Menu items={items}>{children}</Menu>)
-    .with('longPress', () => <ContextMenu isFullWidth={isFullWidth} items={items}>{children}</ContextMenu>)
+    .with('press', () => <Menu items={items} title={chat.name}>{children}</Menu>)
+    .with('longPress', () => (
+      <ContextMenu
+        isFullWidth={isFullWidth}
+        items={items}
+        title={chat.name}
+      >
+        {children}
+      </ContextMenu>
+    ))
     .exhaustive();
 }

@@ -1,5 +1,6 @@
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { match } from 'ts-pattern';
 import { SettingsPanel } from '@/components/settings/settings-panel';
@@ -32,10 +33,9 @@ export function SettingsProviders() {
     },
   }));
 
-  const logout = useMutation(rpc.providers.logout.mutationOptions({ onSuccess: refresh }));
   const latestSession = started ?? data.session;
   const session = latestSession?.id === dismissedSessionId ? null : latestSession;
-  const isBusy = login.isPending || logout.isPending || data.session?.status === 'pending';
+  const isBusy = login.isPending || data.session?.status === 'pending';
   const providers = data.providers.filter((provider) => provider.id !== 'openai-codex');
   const available = providers.filter((provider) => !provider.isConfigured && provider.authTypes.length > 0);
   const selected = available.find((provider) => provider.id === selectedId);
@@ -114,19 +114,24 @@ export function SettingsProviders() {
             ))}
             {provider.isConfigured && provider.source === 'stored' ? (
               <Button
-                disabled={isBusy}
+                asChild
                 size="sm"
                 variant="outline"
-                onClick={() => logout.mutate({ providerId: provider.id })}
               >
-                <IconLogOut />
-                {m.settings_providers_sign_out()}
+                <Link
+                  params={{ providerId: provider.id }}
+                  resetScroll={false}
+                  to="/settings/providers/$providerId/logout"
+                >
+                  <IconLogOut />
+                  {m.settings_providers_sign_out()}
+                </Link>
               </Button>
             ) : null}
           </div>
         </PanelRow>
       ))}
-      <FormErrors error={login.isError || logout.isError ? m.settings_providers_error() : null} />
+      <FormErrors error={login.isError ? m.settings_providers_error() : null} />
     </SettingsPanel>
   );
 }

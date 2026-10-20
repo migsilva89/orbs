@@ -1,4 +1,5 @@
-import { Button, Divider, Host, RNHostView, ContextMenu as SwiftContextMenu, Menu as SwiftMenu } from '@expo/ui/swift-ui';
+import { Button, Divider, Host, RNHostView, Section, ContextMenu as SwiftContextMenu, Menu as SwiftMenu } from '@expo/ui/swift-ui';
+import { buttonStyle, menuIndicator, menuStyle } from '@expo/ui/swift-ui/modifiers';
 import { Fragment, useState } from 'react';
 import { View } from 'react-native';
 import { match, P } from 'ts-pattern';
@@ -6,25 +7,25 @@ import type { MenuItem, MenuProps } from '@/types/menu.types';
 import type { ReactElement } from 'react';
 
 /** A native iOS pull-down menu that opens on tap, like the web dropdown menu. */
-export function Menu({ items, children }: MenuProps) {
+export function Menu({ title, items, children }: MenuProps) {
   return (
     <Host matchContents>
-      <SwiftMenu label={<RNHostView matchContents>{children}</RNHostView>}>
-        <MenuItems items={items} />
+      <SwiftMenu label={<RNHostView matchContents>{children}</RNHostView>} modifiers={[menuStyle('button'), buttonStyle('plain'), menuIndicator('hidden')]}>
+        <MenuContent items={items} title={title} />
       </SwiftMenu>
     </Host>
   );
 }
 
-/** The same menu opened by a long press, like a right-click on web. `isFullWidth` keeps a list row's width. */
-export function ContextMenu({ items, children, isFullWidth = false }: MenuProps) {
+/** The same menu opened by a long press: the view lifts as a preview and the menu shows under it. */
+export function ContextMenu({ title, items, children, isFullWidth = false }: MenuProps) {
   const [width, setWidth] = useState<number>();
 
   const menu = (trigger: ReactElement) => (
     <Host matchContents>
       <SwiftContextMenu>
         <SwiftContextMenu.Items>
-          <MenuItems items={items} />
+          <MenuContent items={items} title={title} />
         </SwiftContextMenu.Items>
         <SwiftContextMenu.Trigger>
           <RNHostView matchContents>{trigger}</RNHostView>
@@ -37,6 +38,22 @@ export function ContextMenu({ items, children, isFullWidth = false }: MenuProps)
     .with({ isFullWidth: false }, () => menu(children))
     .with({ width: P.number }, ({ width: rowWidth }) => menu(<View style={{ width: rowWidth }}>{children}</View>))
     .otherwise(() => <View onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>{children}</View>);
+}
+
+interface MenuContentProps {
+  title?: string;
+  items: MenuItem[];
+}
+
+/** A title shows as the small muted header of a native menu section. */
+function MenuContent({ title, items }: MenuContentProps) {
+  return match(title)
+    .with(P.string, (header) => (
+      <Section title={header}>
+        <MenuItems items={items} />
+      </Section>
+    ))
+    .otherwise(() => <MenuItems items={items} />);
 }
 
 interface MenuItemsProps {

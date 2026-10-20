@@ -26,6 +26,8 @@ import { Route as roomsRoomsDotdirectDothandleRouteImport } from "./../routes/ro
 import { Route as settingsSettingsDotthemesDotcreateRouteImport } from "./../routes/settings/settings.themes.create";
 import { Route as artifactsArtifactsDotbotIdDotconversationIdDotartifactIdRouteImport } from "./../routes/artifacts/artifacts.$botId.$conversationId.$artifactId";
 import { Route as roomsRoomsDotdirectDothandleDotresetRouteImport } from "./../routes/rooms/rooms.direct.$handle.reset";
+import { Route as settingsSettingsDotdevicesDotdeviceIdDotrevokeRouteImport } from "./../routes/settings/settings.devices.$deviceId.revoke";
+import { Route as settingsSettingsDotprovidersDotproviderIdDotlogoutRouteImport } from "./../routes/settings/settings.providers.$providerId.logout";
 import { Route as botsBotsDotbotIdDotroutinesDotroutineIdDotdeleteRouteImport } from "./../routes/bots/bots.$botId.routines.$routineId.delete";
 import { Route as botsBotsDotbotIdDotroutinesDotroutineIdDoteditRouteImport } from "./../routes/bots/bots.$botId.routines.$routineId.edit";
 import { Route as botsBotsDotbotIdDottodosDottodoIdDotdeleteRouteImport } from "./../routes/bots/bots.$botId.todos.$todoId.delete";
@@ -123,6 +125,18 @@ const roomsRoomsDotdirectDothandleDotresetRoute =
     path: "/reset",
     getParentRoute: () => roomsRoomsDotdirectDothandleRoute,
   } as any);
+const settingsSettingsDotdevicesDotdeviceIdDotrevokeRoute =
+  settingsSettingsDotdevicesDotdeviceIdDotrevokeRouteImport.update({
+    id: "/devices/$deviceId/revoke",
+    path: "/devices/$deviceId/revoke",
+    getParentRoute: () => settingsSettingsDotlayoutRoute,
+  } as any);
+const settingsSettingsDotprovidersDotproviderIdDotlogoutRoute =
+  settingsSettingsDotprovidersDotproviderIdDotlogoutRouteImport.update({
+    id: "/providers/$providerId/logout",
+    path: "/providers/$providerId/logout",
+    getParentRoute: () => settingsSettingsDotlayoutRoute,
+  } as any);
 const botsBotsDotbotIdDotroutinesDotroutineIdDotdeleteRoute =
   botsBotsDotbotIdDotroutinesDotroutineIdDotdeleteRouteImport.update({
     id: "/routines/$routineId/delete",
@@ -165,6 +179,8 @@ export interface FileRoutesByFullPath {
   "/settings/themes/create": typeof settingsSettingsDotthemesDotcreateRoute;
   "/artifacts/$botId/$conversationId/$artifactId": typeof artifactsArtifactsDotbotIdDotconversationIdDotartifactIdRoute;
   "/rooms/direct/$handle/reset": typeof roomsRoomsDotdirectDothandleDotresetRoute;
+  "/settings/devices/$deviceId/revoke": typeof settingsSettingsDotdevicesDotdeviceIdDotrevokeRoute;
+  "/settings/providers/$providerId/logout": typeof settingsSettingsDotprovidersDotproviderIdDotlogoutRoute;
   "/bots/$botId/routines/$routineId/delete": typeof botsBotsDotbotIdDotroutinesDotroutineIdDotdeleteRoute;
   "/bots/$botId/routines/$routineId/edit": typeof botsBotsDotbotIdDotroutinesDotroutineIdDoteditRoute;
   "/bots/$botId/todos/$todoId/delete": typeof botsBotsDotbotIdDottodosDottodoIdDotdeleteRoute;
@@ -185,6 +201,8 @@ export interface FileRoutesByTo {
   "/settings/themes/create": typeof settingsSettingsDotthemesDotcreateRoute;
   "/artifacts/$botId/$conversationId/$artifactId": typeof artifactsArtifactsDotbotIdDotconversationIdDotartifactIdRoute;
   "/rooms/direct/$handle/reset": typeof roomsRoomsDotdirectDothandleDotresetRoute;
+  "/settings/devices/$deviceId/revoke": typeof settingsSettingsDotdevicesDotdeviceIdDotrevokeRoute;
+  "/settings/providers/$providerId/logout": typeof settingsSettingsDotprovidersDotproviderIdDotlogoutRoute;
   "/bots/$botId/routines/$routineId/delete": typeof botsBotsDotbotIdDotroutinesDotroutineIdDotdeleteRoute;
   "/bots/$botId/routines/$routineId/edit": typeof botsBotsDotbotIdDotroutinesDotroutineIdDoteditRoute;
   "/bots/$botId/todos/$todoId/delete": typeof botsBotsDotbotIdDottodosDottodoIdDotdeleteRoute;
@@ -209,6 +227,8 @@ export interface FileRoutesById {
   "/_chat/settings/themes/create": typeof settingsSettingsDotthemesDotcreateRoute;
   "/_chat/artifacts/$botId/$conversationId/$artifactId": typeof artifactsArtifactsDotbotIdDotconversationIdDotartifactIdRoute;
   "/_chat/rooms/direct/$handle/reset": typeof roomsRoomsDotdirectDothandleDotresetRoute;
+  "/_chat/settings/devices/$deviceId/revoke": typeof settingsSettingsDotdevicesDotdeviceIdDotrevokeRoute;
+  "/_chat/settings/providers/$providerId/logout": typeof settingsSettingsDotprovidersDotproviderIdDotlogoutRoute;
   "/_chat/bots/$botId/routines/$routineId/delete": typeof botsBotsDotbotIdDotroutinesDotroutineIdDotdeleteRoute;
   "/_chat/bots/$botId/routines/$routineId/edit": typeof botsBotsDotbotIdDotroutinesDotroutineIdDoteditRoute;
   "/_chat/bots/$botId/todos/$todoId/delete": typeof botsBotsDotbotIdDottodosDottodoIdDotdeleteRoute;
@@ -233,6 +253,8 @@ export interface FileRouteTypes {
     | "/settings/themes/create"
     | "/artifacts/$botId/$conversationId/$artifactId"
     | "/rooms/direct/$handle/reset"
+    | "/settings/devices/$deviceId/revoke"
+    | "/settings/providers/$providerId/logout"
     | "/bots/$botId/routines/$routineId/delete"
     | "/bots/$botId/routines/$routineId/edit"
     | "/bots/$botId/todos/$todoId/delete"
@@ -253,6 +275,8 @@ export interface FileRouteTypes {
     | "/settings/themes/create"
     | "/artifacts/$botId/$conversationId/$artifactId"
     | "/rooms/direct/$handle/reset"
+    | "/settings/devices/$deviceId/revoke"
+    | "/settings/providers/$providerId/logout"
     | "/bots/$botId/routines/$routineId/delete"
     | "/bots/$botId/routines/$routineId/edit"
     | "/bots/$botId/todos/$todoId/delete"
@@ -276,6 +300,8 @@ export interface FileRouteTypes {
     | "/_chat/settings/themes/create"
     | "/_chat/artifacts/$botId/$conversationId/$artifactId"
     | "/_chat/rooms/direct/$handle/reset"
+    | "/_chat/settings/devices/$deviceId/revoke"
+    | "/_chat/settings/providers/$providerId/logout"
     | "/_chat/bots/$botId/routines/$routineId/delete"
     | "/_chat/bots/$botId/routines/$routineId/edit"
     | "/_chat/bots/$botId/todos/$todoId/delete"
@@ -410,6 +436,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof roomsRoomsDotdirectDothandleDotresetRouteImport;
       parentRoute: typeof roomsRoomsDotdirectDothandleRoute;
     };
+    "/_chat/settings/devices/$deviceId/revoke": {
+      id: "/_chat/settings/devices/$deviceId/revoke";
+      path: "/devices/$deviceId/revoke";
+      fullPath: "/settings/devices/$deviceId/revoke";
+      preLoaderRoute: typeof settingsSettingsDotdevicesDotdeviceIdDotrevokeRouteImport;
+      parentRoute: typeof settingsSettingsDotlayoutRoute;
+    };
+    "/_chat/settings/providers/$providerId/logout": {
+      id: "/_chat/settings/providers/$providerId/logout";
+      path: "/providers/$providerId/logout";
+      fullPath: "/settings/providers/$providerId/logout";
+      preLoaderRoute: typeof settingsSettingsDotprovidersDotproviderIdDotlogoutRouteImport;
+      parentRoute: typeof settingsSettingsDotlayoutRoute;
+    };
     "/_chat/bots/$botId/routines/$routineId/delete": {
       id: "/_chat/bots/$botId/routines/$routineId/delete";
       path: "/routines/$routineId/delete";
@@ -495,12 +535,18 @@ const botsBotsDotlayoutRouteWithChildren =
 
 interface settingsSettingsDotlayoutRouteChildren {
   settingsSettingsDotthemesDotcreateRoute: typeof settingsSettingsDotthemesDotcreateRoute;
+  settingsSettingsDotdevicesDotdeviceIdDotrevokeRoute: typeof settingsSettingsDotdevicesDotdeviceIdDotrevokeRoute;
+  settingsSettingsDotprovidersDotproviderIdDotlogoutRoute: typeof settingsSettingsDotprovidersDotproviderIdDotlogoutRoute;
 }
 
 const settingsSettingsDotlayoutRouteChildren: settingsSettingsDotlayoutRouteChildren =
   {
     settingsSettingsDotthemesDotcreateRoute:
       settingsSettingsDotthemesDotcreateRoute,
+    settingsSettingsDotdevicesDotdeviceIdDotrevokeRoute:
+      settingsSettingsDotdevicesDotdeviceIdDotrevokeRoute,
+    settingsSettingsDotprovidersDotproviderIdDotlogoutRoute:
+      settingsSettingsDotprovidersDotproviderIdDotlogoutRoute,
   };
 
 const settingsSettingsDotlayoutRouteWithChildren =

@@ -1,7 +1,7 @@
 import { m } from '@openbots/i18n/client';
 import { getLocale } from '@openbots/i18n/runtime';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { useHydrated } from '@tanstack/react-router';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { Link, useHydrated } from '@tanstack/react-router';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { Button } from '@/components/ui/button';
 import { ButtonLoading } from '@/components/ui/button-loading';
@@ -20,14 +20,12 @@ interface SettingsDevicesProps {
 }
 
 export function SettingsDevices({ connection }: SettingsDevicesProps) {
-  const queryClient = useQueryClient();
   const { data: devices } = useSuspenseQuery(rpc.devices.list.queryOptions());
   const hydrated = useHydrated();
   const date = new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium' });
   const pair = useMutation(rpc.pairing.create.mutationOptions());
   const hostname = new URL(connection.serverUrl).hostname;
   const isLoopback = hostname === 'localhost' || hostname === '[::1]' || hostname.startsWith('127.') || hostname.endsWith('.localhost');
-  const revoke = useMutation(rpc.devices.revoke.mutationOptions({ onSuccess: () => queryClient.invalidateQueries({ queryKey: rpc.devices.list.key() }) }));
 
   return (
     <SettingsPanel
@@ -47,12 +45,17 @@ export function SettingsDevices({ connection }: SettingsDevicesProps) {
           </PanelContent>
           {device.id === connection.deviceId ? null : (
             <Button
-              disabled={revoke.isPending}
+              asChild
               size="sm"
               variant="outline"
-              onClick={() => revoke.mutate({ id: device.id })}
             >
-              {m.settings_devices_revoke()}
+              <Link
+                params={{ deviceId: device.id }}
+                resetScroll={false}
+                to="/settings/devices/$deviceId/revoke"
+              >
+                {m.settings_devices_revoke()}
+              </Link>
             </Button>
           )}
         </PanelRow>
@@ -96,7 +99,6 @@ export function SettingsDevices({ connection }: SettingsDevicesProps) {
           </ButtonLoading>
         </div>
       </PanelRow>
-      <FormErrors error={revoke.isError ? m.settings_devices_revoke_error() : null} />
     </SettingsPanel>
   );
 }

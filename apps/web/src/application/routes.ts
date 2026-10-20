@@ -26,7 +26,11 @@ export const routes = rootRoute('root.tsx', [
       index('artifacts/artifacts.index.tsx'),
       route('/$botId/$conversationId/$artifactId', 'artifacts/artifacts.$botId.$conversationId.$artifactId.tsx'),
     ]),
-    route('/settings', 'settings/settings.layout.tsx', [route('/themes/create', 'settings/settings.themes.create.tsx')]),
+    route('/settings', 'settings/settings.layout.tsx', [
+      route('/themes/create', 'settings/settings.themes.create.tsx'),
+      route('/devices/$deviceId/revoke', 'settings/settings.devices.$deviceId.revoke.tsx'),
+      route('/providers/$providerId/logout', 'settings/settings.providers.$providerId.logout.tsx'),
+    ]),
   ]),
   route('/lab/avatars', 'lab/lab.avatars.tsx'),
 ]);

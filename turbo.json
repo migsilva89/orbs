@@ -25,11 +25,6 @@
         "@openbots/daemon#dev"
       ]
     },
-    "@openbots/mobile#dev": {
-      "with": [
-        "@openbots/daemon#dev"
-      ]
-    },
     "dev:macos": {
       "with": [
         "@openbots/daemon#dev"
@@ -40,9 +35,6 @@
     "dev:native": {
       "dependsOn": [
         "@openbots/i18n#i18n:compile"
-      ],
-      "with": [
-        "@openbots/daemon#dev"
       ],
       "persistent": true,
       "cache": false

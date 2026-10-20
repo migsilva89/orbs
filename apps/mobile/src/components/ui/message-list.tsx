@@ -1,4 +1,5 @@
 import { KeyboardAwareLegendList } from '@legendapp/list/keyboard';
+import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { LegendListRef } from '@legendapp/list/react-native';
 import type { ReactElement, Ref } from 'react';
@@ -25,6 +26,7 @@ interface MessageListProps<Item> {
 /** A chat transcript pinned to its newest message that follows the keyboard. */
 export function MessageList<Item>({ ref, data, keyExtractor, renderItem, composerInset, onStartReached, header, footer }: MessageListProps<Item>) {
   const insets = useSafeAreaInsets();
+  const window = useWindowDimensions();
 
   return (
     <KeyboardAwareLegendList
@@ -35,7 +37,8 @@ export function MessageList<Item>({ ref, data, keyExtractor, renderItem, compose
       contentContainerStyle={{ paddingTop: MESSAGE_LIST_TOP, paddingBottom: MESSAGE_LIST_BOTTOM }}
       contentInsetEndAdjustment={composerInset}
       data={data}
-      estimatedItemSize={80}
+      estimatedItemSize={120}
+      estimatedListSize={{ width: window.width, height: window.height }}
       keyboardDismissMode="interactive"
       keyboardOffset={insets.bottom}
       keyboardShouldPersistTaps="handled"

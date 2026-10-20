@@ -1,6 +1,6 @@
 import { BACKGROUND_CONTEXT } from '@earendil-works/chord/context';
 import { createToolSearchExtension } from '@earendil-works/pi-durable/tool-search';
-import { CodingTools } from '@earendil-works/pi-durable/tools';
+import { createCodingTools } from '@earendil-works/pi-durable/tools';
 import { log } from '@openbots/logger/server';
 import { match, P } from 'ts-pattern';
 import { artifactBlocksCatalog } from '../artifact/artifact-blocks.utils';
@@ -77,9 +77,11 @@ export async function makeRuntimeService({
   env,
   permissions,
   collaboration: policy,
+  images,
   toolExtensions = [],
-  readOnlyTools = CodingTools.tools?.filter((tool) => tool.name === 'read') ?? [],
 }: RuntimeTypes.RuntimeServiceParams) {
+  const codingTools = createCodingTools({ images });
+  const readOnlyTools = codingTools.tools?.filter((tool) => tool.name === 'read') ?? [];
   const directory = runtimeDirectory({ open: (botId) => runtimeBotOpen(shared, botId) });
   const collaboration = collaborationExtension({ policy, directory });
   const questions = questionExtension();
@@ -95,7 +97,7 @@ export async function makeRuntimeService({
     permissions,
     directory,
     extensions: [
-      CodingTools,
+      codingTools,
       runtimeSkills,
       collaboration.extension,
       questions.extension,

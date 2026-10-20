@@ -1,8 +1,10 @@
 import { cva } from 'cva';
-import { Pressable, View } from 'react-native';
+import { FileText } from 'lucide-react-native';
+import { Image, Pressable, View } from 'react-native';
 import NativeSvg, { Path } from 'react-native-svg';
 import { useCSSVariable, withUniwind } from 'uniwind';
 import { cn } from '@/lib/cn';
+import { Icon } from './icon';
 import { markdownColorContext } from './markdown';
 import { Text, textContext } from './text';
 import type { BotBubble } from '@openbots/client/client';
@@ -109,6 +111,46 @@ export function MessageBubble({ from, tail = false, wide = false, bubble, classN
           <Path d={MESSAGE_TAIL_PATHS[from]} fill={background} />
         </Svg>
       ) : null}
+    </View>
+  );
+}
+
+interface MessageQuoteProps {
+  children: string;
+}
+
+/** The message a reply answers, quoted at the top of the bubble. */
+export function MessageQuote({ children }: MessageQuoteProps) {
+  return (
+    <View className="mb-1.5 border-l-2 border-muted-foreground/40 pl-2 opacity-80">
+      <Text numberOfLines={2} variant="small">{children}</Text>
+    </View>
+  );
+}
+
+interface MessageImageProps {
+  uri?: string;
+  name: string;
+}
+
+/** A sent photo; a muted block holds its place while it loads. */
+export function MessageImage({ uri, name }: MessageImageProps) {
+  return (
+    <View accessibilityLabel={name} accessibilityRole="image" className="size-48 overflow-hidden rounded-2xl bg-muted">
+      {uri ? <Image className="size-full" resizeMode="cover" source={{ uri }} /> : null}
+    </View>
+  );
+}
+
+interface MessageFileProps {
+  name: string;
+}
+
+export function MessageFile({ name }: MessageFileProps) {
+  return (
+    <View className="max-w-full flex-row items-center gap-2 rounded-xl border border-border px-3 py-2">
+      <Icon icon={FileText} tone="muted" />
+      <Text className="shrink" numberOfLines={1} variant="button">{name}</Text>
     </View>
   );
 }

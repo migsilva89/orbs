@@ -8,6 +8,7 @@ import { ActionSheet, ActionSheetChoice, ActionSheetChoices, ActionSheetGroup, A
 import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
 import { useMessageReaction } from '@/hooks/use-message-reaction';
+import { useToast } from '@/hooks/use-toast';
 import type { ChatActionsRouteParams } from '@/types/chat.types';
 import type { NavigationRoot } from '@/types/navigation.types';
 import type { RpcSession } from '@/types/rpc.types';
@@ -30,6 +31,7 @@ interface ChatMessageActionsContentProps {
 }
 
 function ChatMessageActionsContent({ session, params }: ChatMessageActionsContentProps) {
+  const toast = useToast();
   const navigation = useNavigation<NavigationRoot>();
   const { botId, conversationId, entryId, from, text, details } = params;
   const target = { botId, conversationId, entryId };
@@ -71,13 +73,25 @@ function ChatMessageActionsContent({ session, params }: ChatMessageActionsConten
         <ActionSheetItem
           icon={Copy}
           onPress={() => {
-            void setStringAsync(text);
+            void setStringAsync(text).then(
+              () => toast.show({ message: m.rooms_chat_copied(), variant: 'default' }),
+              () => toast.show({ message: m.ui_copy_failed() }),
+            );
             navigation.goBack();
           }}
         >
           {m.rooms_chat_copy()}
         </ActionSheetItem>
-        <ActionSheetItem icon={TextSelect} onPress={() => navigation.replace('MessageText', { text })}>{m.rooms_chat_select_text()}</ActionSheetItem>
+        <ActionSheetItem
+          icon={TextSelect}
+          onPress={() => navigation.replace('MessageText', {
+            text,
+            botId,
+            entryId,
+          })}
+        >
+          {m.rooms_chat_select_text()}
+        </ActionSheetItem>
       </ActionSheetGroup>
       {details.map((line) => (
         <Text

@@ -8,7 +8,7 @@ export function mentionHref({ kind, name }: MentionTypes.MentionTarget): string 
 export function mentionTarget({ href }: MentionTypes.MentionHrefParams): MentionTypes.MentionTarget | undefined {
   const [, kind, name] = MENTION.target.exec(href) ?? [];
 
-  return (kind === 'skill' || kind === 'command') && name ? { kind, name: decodeURIComponent(name) } : undefined;
+  return (kind === 'skill' || kind === 'command' || kind === 'bot' || kind === 'quote') && name ? { kind, name: decodeURIComponent(name) } : undefined;
 }
 
 export function mentionSegments({ text }: MentionTypes.MentionTextParams): MentionTypes.MentionSegment[] {
@@ -37,5 +37,61 @@ export function mentionSubmission({ text }: MentionTypes.MentionTextParams): Men
     content: command ? '' : content,
     skills: targets.filter((target) => target.kind === 'skill').map((target) => target.name),
     command: command ? { name: command.name, arguments: text.slice(command.end).trim() } : undefined,
+  };
+}
+
+/** Matches `@handle` as a whole word, so `me@handle.dev` and `@handle-two` do not count. */
+export function mentionHandle(handle: string): RegExp {
+  const notInsideAWord = String.raw`(?<![\p{L}\p{N}_.-])`;
+  const notInsideALongerHandle = String.raw`(?![\p{L}\p{N}_-])`;
+
+  return new RegExp(`${notInsideAWord}@${handle}${notInsideALongerHandle}`, 'iu');
+}
+
+/** The mention the caret is typing, such as `@ali` or `$rev`, for composers without rich text. */
+export function mentionQuery({ text, cursor }: MentionTypes.MentionQueryParams): MentionTypes.MentionQuery | undefined {
+  const typed = /(?:^|\s)([@$/])([^\s@$/]*)$/u.exec(text.slice(0, cursor));
+
+  return typed?.[1] ? { char: typed[1], query: typed[2], start: cursor - typed[2].length - 1 } : undefined;
+}
+
+/** Turns the picked mention labels back into links, so a plain-text composer submits what the rich editor does. */
+export function mentionLinks({ text, items }: MentionTypes.MentionLinksParams): string {
+  return items.reduce((value, item) => {
+    const label = new RegExp(`(?<!\\S)${item.label.replaceAll(/[$()*+./?[\\\]^{|}]/gu, String.raw`\$&`)}(?!\\S)`, 'gu');
+
+    return value.replace(label, `[${item.label}](${item.href})`);
+  }, text);
+}
+
+/** Names bot mentions and links plain `@handle` text outside code, so a plain markdown renderer can style them as tags. */
+export function mentionMarkdown({ text, bots }: MentionTypes.MentionMarkdownParams): string {
+  if (bots.length === 0) {
+    return text;
+  }
+
+  const byId = new Map(bots.map((bot) => [bot.id, bot]));
+  const byHandle = new Map(bots.map((bot) => [bot.handle, bot]));
+  const handles = new RegExp(mentionHandle(`(?:${[...byHandle.keys()].join('|')})`).source, 'giu');
+
+  return text.split(/(```[\s\S]*?```|`[^`\n]*`)/u).map((part, index) => (index % 2 === 1 ? part : part
+    .replaceAll(MENTION.link, (link, _label, href: string) => {
+      const target = mentionTarget({ href });
+      const bot = target?.kind === 'bot' ? byId.get(target.name) : undefined;
+
+      return bot ? `[${bot.name}](${href})` : link;
+    })
+    .replaceAll(handles, (handle) => {
+      const bot = byHandle.get(handle.slice(1).toLowerCase());
+
+      return bot ? `[${bot.name}](${mentionHref({ kind: 'bot', name: bot.id })})` : handle;
+    }))).join('');
+}
+
+/** A quote of part of a message, as a pill: the selected text on one line, short enough for a link label. */
+export function mentionQuote({ text, entryId }: MentionTypes.MentionQuoteParams): MentionTypes.MentionItem {
+  return {
+    href: mentionHref({ kind: 'quote', name: String(entryId) }),
+    label: `“${text.replaceAll(/[[\]\s]+/gu, ' ').trim().slice(0, MENTION.quoteMaxChars)}”`,
   };
 }

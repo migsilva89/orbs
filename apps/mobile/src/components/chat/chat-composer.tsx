@@ -1,36 +1,49 @@
+import { mentionLinks, mentionQuery, mentionSubmission, roomsMessageText } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useMutation } from '@tanstack/react-query';
 import { ArrowUp, Plus, Square } from 'lucide-react-native';
 import { useState } from 'react';
+import { ActionSheetIOS, View } from 'react-native';
 import { match } from 'ts-pattern';
 import { Button } from '@/components/ui/button';
-import { FloatingBar } from '@/components/ui/floating-bar';
 import { GlassButton } from '@/components/ui/glass-button';
 import { Icon } from '@/components/ui/icon';
+import { PromptAttachment, PromptAttachments, PromptDock, PromptDrawer, PromptQuote } from '@/components/ui/prompt-drawer';
 import { PromptField } from '@/components/ui/prompt-field';
+import { useChatAttachments } from '@/hooks/use-chat-attachments';
+import { useToast } from '@/hooks/use-toast';
+import { ChatMentions } from './chat-mentions';
+import { ChatQueue } from './chat-queue';
 import type { RpcSession } from '@/types/rpc.types';
-import type { ChatMessage, ChatOutgoing } from '@openbots/client/client';
+import type * as ClientTypes from '@openbots/client/client';
+import type { Bot } from '@openbots/contracts/universal';
 import type { Dispatch, SetStateAction } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 
 interface ChatComposerProps {
   session: RpcSession;
-  botId: string;
+  bot: Bot;
+  bots: Bot[];
   conversationId: number;
   latestEntryId: number;
+  queued: ClientTypes.ChatQueued[];
+  quote?: ClientTypes.MentionItem;
   isBusy: boolean;
-  replyTo: ChatMessage | null;
+  replyTo: ClientTypes.ChatMessage | null;
   onReplyClear: () => void;
-  onOutgoingChange: Dispatch<SetStateAction<ChatOutgoing[]>>;
+  onOutgoingChange: Dispatch<SetStateAction<ClientTypes.ChatOutgoing[]>>;
   onSend: () => void;
   onLayout: (event: LayoutChangeEvent) => void;
 }
 
 export function ChatComposer({
   session,
-  botId,
+  bot,
+  bots,
   conversationId,
   latestEntryId,
+  queued,
+  quote,
   isBusy,
   replyTo,
   onReplyClear,
@@ -38,11 +51,30 @@ export function ChatComposer({
   onSend,
   onLayout,
 }: ChatComposerProps) {
+  const toast = useToast();
   const [text, setText] = useState('');
+  const [cursor, setCursor] = useState(0);
+  const [picked, setPicked] = useState<ClientTypes.MentionItem[]>([]);
+  const [quoted, setQuoted] = useState(quote);
+  const files = useChatAttachments(session, bot.id);
   const submit = useMutation(session.rpc.conversation.submit.mutationOptions());
+  const execute = useMutation(session.rpc.commands.execute.mutationOptions());
   const stop = useMutation(session.rpc.conversation.stop.mutationOptions());
+
+  if (quote !== quoted) {
+    setQuoted(quote);
+
+    if (quote) {
+      setText(`${text.trimEnd()}${text.trim() ? ' ' : ''}${quote.label} `);
+      setPicked([...picked, quote]);
+    }
+  }
+
   const content = text.trim();
-  const isStopping = isBusy && !content;
+  const query = mentionQuery({ text, cursor });
+  const hasFiles = files.readyIds.length > 0;
+  const isStopping = isBusy && !content && files.attachments.length === 0;
+  const canSend = (content !== '' || hasFiles) && !files.uploading;
 
   const stopIcon = (
     <Icon
@@ -57,68 +89,164 @@ export function ChatComposer({
     .with(false, () => ({ label: m.rooms_chat_send(), icon: <Icon icon={ArrowUp} /> }))
     .exhaustive();
 
+  function pick(item: ClientTypes.MentionItem) {
+    const start = query?.start ?? cursor;
+    const next = `${text.slice(0, start)}${item.label} ${text.slice(cursor)}`;
+
+    setText(next);
+    setCursor(start + item.label.length + 1);
+    setPicked((items) => [...items, item]);
+  }
+
+  function attach() {
+    ActionSheetIOS.showActionSheetWithOptions({
+      options: [m.ui_cancel(), m.mobile_chat_attach_photos(), m.mobile_chat_attach_files()],
+      cancelButtonIndex: 0,
+    }, (index) => match(index)
+      .with(1, () => void files.pickPhotos())
+      .with(2, () => void files.pickFiles())
+      .otherwise(() => undefined));
+  }
+
   async function send() {
+    const { content: message, skills, command } = mentionSubmission({ text: mentionLinks({ text: content, items: picked }) });
+    const attachmentIds = files.readyIds;
     const replyToEntryId = replyTo?.metadata?.entryId;
-    onReplyClear();
-    const requestId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    const draft = { text, picked };
+
     setText('');
+    setPicked([]);
+
+    if (command) {
+      await execute.mutateAsync({
+        botId: bot.id,
+        conversationId,
+        name: command.name,
+        arguments: command.arguments || undefined,
+      }).catch(() => {
+        setText((current) => current || draft.text);
+        setPicked((items) => (items.length > 0 ? items : draft.picked));
+        toast.show({ message: m.rooms_chat_send_failed() });
+      });
+
+      return;
+    }
+
+    const requestId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    onReplyClear();
     onSend();
-    onOutgoingChange((items) => [...items, { requestId, botId, text: content, afterEntryId: latestEntryId, createdAt: Date.now() }]);
+
+    if (message) {
+      onOutgoingChange((items) => [...items, { requestId, botId: bot.id, text: message, afterEntryId: latestEntryId, createdAt: Date.now() }]);
+    }
 
     try {
       const { submissionId } = await submit.mutateAsync({
-        botId,
+        botId: bot.id,
         conversationId,
         requestId,
-        content,
+        content: message,
+        attachmentIds,
         replyToEntryId,
+        skills: skills.length > 0 ? skills : undefined,
       });
 
+      files.clear(attachmentIds);
       onOutgoingChange((items) => items.map((item) => (item.requestId === requestId ? { ...item, submissionId } : item)));
     } catch {
       onOutgoingChange((items) => items.filter((item) => item.requestId !== requestId));
-      setText((current) => current || content);
+      setText((current) => current || draft.text);
+      setPicked((items) => (items.length > 0 ? items : draft.picked));
+      toast.show({ message: m.rooms_chat_send_failed() });
     }
   }
 
   function handlePress() {
-    match({ isStopping, content })
-      .with({ isStopping: true }, () => stop.mutate({ botId, conversationId }))
-      .with({ content: '' }, () => undefined)
+    match({ isStopping, canSend })
+      .with({ isStopping: true }, () => stop.mutate({ botId: bot.id, conversationId }))
+      .with({ canSend: false }, () => undefined)
       .otherwise(() => void send());
   }
 
+  const hasDrawer = queued.length > 0 || replyTo !== null;
+
+  const drawer = (
+    <>
+      {query ? (
+        <ChatMentions
+          bot={bot}
+          bots={bots}
+          query={query}
+          session={session}
+          onPick={pick}
+        />
+      ) : null}
+      {hasDrawer ? (
+        <PromptDrawer>
+          <ChatQueue
+            botId={bot.id}
+            botName={bot.name}
+            conversationId={conversationId}
+            queued={queued}
+            session={session}
+          />
+          {replyTo ? (
+            <PromptQuote removeLabel={m.rooms_chat_reply_clear()} onRemove={onReplyClear}>
+              {m.rooms_chat_replying({ name: replyTo.metadata?.authorName ?? '', text: roomsMessageText(replyTo) })}
+            </PromptQuote>
+          ) : null}
+        </PromptDrawer>
+      ) : null}
+    </>
+  );
+
+  const attachments = files.attachments.length > 0 ? (
+    <PromptAttachments>
+      {files.attachments.map((item) => (
+        <PromptAttachment
+          key={item.key}
+          name={item.name}
+          preview={item.preview || undefined}
+          removeLabel={m.rooms_files_remove()}
+          retryLabel={m.mobile_chat_attach_retry()}
+          status={item.status}
+          onRemove={() => files.remove(item.key)}
+          onRetry={() => files.retry(item.key)}
+        />
+      ))}
+    </PromptAttachments>
+  ) : null;
+
   return (
-    <FloatingBar
-      className="items-end"
-      edge="bottom"
-      onLayout={onLayout}
-    >
+    <PromptDock drawer={drawer} onLayout={onLayout}>
       <GlassButton
-        disabled
-        accessibilityHint={m.mobile_home_unavailable()}
         accessibilityLabel={m.rooms_chat_attach()}
+        disabled={files.isFull}
+        onPress={attach}
       >
         <Icon icon={Plus} size="action" />
       </GlassButton>
-      <PromptField
-        accessibilityLabel={m.rooms_chat_placeholder()}
-        actions={(
-          <Button
-            accessibilityLabel={action.label}
-            disabled={!isStopping && !content}
-            size="icon-sm"
-            variant="default"
-            onPress={handlePress}
-          >
-            {action.icon}
-          </Button>
-        )}
-        className="flex-1"
-        placeholder={m.rooms_chat_placeholder()}
-        value={text}
-        onChangeText={setText}
-      />
-    </FloatingBar>
+      <View className="flex-1">
+        <PromptField
+          accessibilityLabel={m.rooms_chat_placeholder()}
+          actions={(
+            <Button
+              accessibilityLabel={action.label}
+              disabled={!isStopping && !canSend}
+              size="icon-sm"
+              variant="default"
+              onPress={handlePress}
+            >
+              {action.icon}
+            </Button>
+          )}
+          header={attachments}
+          placeholder={m.rooms_chat_placeholder()}
+          value={text}
+          onChangeText={setText}
+          onSelectionChange={(event) => setCursor(event.nativeEvent.selection.end)}
+        />
+      </View>
+    </PromptDock>
   );
 }

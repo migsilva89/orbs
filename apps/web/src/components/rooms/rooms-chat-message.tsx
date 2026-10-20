@@ -1,5 +1,6 @@
 import { toolBlocks } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { isFileUIPart } from 'ai';
 import { Fragment, useState } from 'react';
 import { match } from 'ts-pattern';
@@ -7,6 +8,7 @@ import { BotAvatar } from '@/components/bots/bot-avatar';
 import { RoomsChatActions } from '@/components/rooms/rooms-chat-actions';
 import { RoomsChatArtifact } from '@/components/rooms/rooms-chat-artifact';
 import { RoomsChatFiles } from '@/components/rooms/rooms-chat-files';
+import { RoomsChatMention } from '@/components/rooms/rooms-chat-mention';
 import { RoomsChatSubagent } from '@/components/rooms/rooms-chat-subagent';
 import { RoomsChatTools } from '@/components/rooms/rooms-chat-tools';
 import { Message, MessageContent, MessageStack } from '@/components/ui/ai/message';
@@ -14,8 +16,13 @@ import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/a
 import { Response } from '@/components/ui/ai/response';
 import { useLongPress } from '@/hooks/use-long-press';
 import { useShowTools } from '@/hooks/use-show-tools';
+import { MENTION_ALLOWED_TAGS } from '@/services/mention/mention.constants';
+import { mentionRemark } from '@/services/mention/mention.utils';
+import { rpc } from '@/services/rpc/rpc.client';
 import type { ChatActivity, ChatMessage, ToolBot } from '@openbots/client/client';
 import type * as ReactTypes from 'react';
+
+const mentionComponents = { mention: RoomsChatMention };
 
 interface RoomsChatMessageProps {
   message: ChatMessage
@@ -34,6 +41,8 @@ export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle',
   const reply = message.metadata?.replyTo;
   const [sheet, setSheet] = useState(false);
   const press = useLongPress(() => setSheet(true));
+  const { data: bots } = useSuspenseQuery(rpc.bots.list.queryOptions());
+  const remarkPlugins = [mentionRemark({ bots })];
 
   const { shown: showTools } = useShowTools();
   const blocks = toolBlocks({ parts: message.parts }).filter((block) => showTools || block.kind !== 'tools');
@@ -134,8 +143,11 @@ export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle',
                   {block === firstText && reply ? <span className="line-clamp-2 border-l-2 border-current/40 pl-2 text-xs opacity-80">{m.rooms_chat_reply_quote({ name: reply.authorName, text: reply.text })}</span> : null}
                   {text.parts.map((part, index) => (
                     <Response
+                      allowedTags={MENTION_ALLOWED_TAGS}
+                      components={mentionComponents}
                       isAnimating={live ? part.state === 'streaming' : false}
                       key={`${key}-${index}`}
+                      remarkPlugins={remarkPlugins}
                       renderHtml={message.role === 'assistant'}
                     >
                       {part.text}

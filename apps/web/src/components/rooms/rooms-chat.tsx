@@ -1,4 +1,4 @@
-import { CHAT, chatActivity, chatFailure, chatLive, chatMessages, chatOutgoingMessages, chatQueued } from '@openbots/client/client';
+import { CHAT, chatActivity, chatFailure, chatLive, chatMessages, chatOutgoingMessages, chatQueued, mentionQuote } from '@openbots/client/client';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
@@ -6,8 +6,10 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { RoomsChatAround } from '@/components/rooms/rooms-chat-around';
 import { RoomsChatComposer } from '@/components/rooms/rooms-chat-composer';
 import { RoomsChatPill } from '@/components/rooms/rooms-chat-pill';
+import { RoomsChatQuote } from '@/components/rooms/rooms-chat-quote';
 import { RoomsChatRuns } from '@/components/rooms/rooms-chat-runs';
 import { RoomsChatTranscript } from '@/components/rooms/rooms-chat-transcript';
+import { useChatQuote } from '@/hooks/use-chat-quote';
 import { useRoomReactions } from '@/hooks/use-room-reactions';
 import { useRoomRead } from '@/hooks/use-room-read';
 import { chatHistoryOptions, chatViewOptions } from '@/services/chat/chat.client';
@@ -31,6 +33,7 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
   const composer = useRef<PromptInputEditorHandle>(null);
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [outgoing, setOutgoing] = useState<ChatOutgoing[]>([]);
+  const quote = useChatQuote();
   const { conversationId } = view;
 
   const history = useInfiniteQuery(chatHistoryOptions({
@@ -71,6 +74,18 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
   useEffect(() => {
     void queryClient.invalidateQueries({ queryKey: rpc.artifacts.key({ input: { botId: bot.id } }) });
   }, [bot.id, queryClient, view.artifactsRevision]);
+
+  function quoteSelection() {
+    const entryId = messages.find((message) => message.id === quote.selection?.messageId)?.metadata?.entryId;
+
+    if (!quote.selection || entryId === undefined) {
+      return;
+    }
+
+    composer.current?.insert([mentionQuote({ text: quote.selection.text, entryId })]);
+    document.getSelection()?.removeAllRanges();
+    quote.dismiss();
+  }
 
   function leaveFocus() {
     void navigate({
@@ -127,8 +142,16 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
           onReply={setReplyTo}
         />
       )}
+      {quote.selection ? (
+        <RoomsChatQuote
+          rect={quote.selection.rect}
+          onDismiss={quote.dismiss}
+          onQuote={quoteSelection}
+        />
+      ) : null}
       <RoomsChatComposer
         bot={bot}
+        bots={bots}
         conversationId={conversationId}
         editor={composer}
         isBusy={isBusy}

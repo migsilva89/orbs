@@ -24,7 +24,7 @@ import type { ChatRouteParams } from '@/types/chat.types';
 import type { NavigationRoot } from '@/types/navigation.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type { LegendListRef } from '@legendapp/list/react-native';
-import type { ChatOutgoing } from '@openbots/client/client';
+import type { ChatOutgoing, MentionItem } from '@openbots/client/client';
 import type { Bot, ConversationView } from '@openbots/contracts/universal';
 
 interface ChatRoomProps {
@@ -38,6 +38,7 @@ export function ChatRoom({ route }: ChatRoomProps) {
     .with(P.nonNullable, (current) => (
       <ChatRoomContent
         botId={route.params.botId}
+        quote={route.params.quote}
         replyToEntryId={route.params.replyToEntryId}
         session={current}
       />
@@ -49,9 +50,10 @@ interface ChatRoomContentProps {
   session: RpcSession;
   botId: string;
   replyToEntryId?: number;
+  quote?: MentionItem;
 }
 
-function ChatRoomContent({ session, botId, replyToEntryId }: ChatRoomContentProps) {
+function ChatRoomContent({ session, botId, replyToEntryId, quote }: ChatRoomContentProps) {
   const bots = useQuery(session.rpc.bots.list.queryOptions());
   const view = useQuery(chatViewOptions(session, { botId }));
   const bot = bots.data?.find((item) => item.id === botId);
@@ -67,6 +69,7 @@ function ChatRoomContent({ session, botId, replyToEntryId }: ChatRoomContentProp
           <ChatRoomView
             bot={ready.bot}
             bots={bots.data ?? []}
+            quote={quote}
             replyToEntryId={replyToEntryId}
             session={session}
             view={ready.view}
@@ -101,9 +104,10 @@ interface ChatRoomViewProps {
   bots: Bot[];
   view: ConversationView;
   replyToEntryId?: number;
+  quote?: MentionItem;
 }
 
-function ChatRoomView({ session, bot, bots, view, replyToEntryId }: ChatRoomViewProps) {
+function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote }: ChatRoomViewProps) {
   const navigation = useNavigation<NavigationRoot>();
   const list = useRef<LegendListRef>(null);
   const composer = useRef(null);
@@ -211,10 +215,13 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId }: ChatRoomView
       <ChatHeader activity={activity} bot={bot} />
       <KeyboardSticky>
         <ChatComposer
-          botId={bot.id}
+          bot={bot}
+          bots={bots}
           conversationId={conversationId}
           isBusy={view.live.run !== undefined || queued.length > 0}
           latestEntryId={view.latestEntryId}
+          queued={queued}
+          quote={quote}
           replyTo={replyTo}
           session={session}
           onLayout={onComposerLayout}

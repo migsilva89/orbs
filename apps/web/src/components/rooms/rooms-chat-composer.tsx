@@ -29,6 +29,7 @@ const PromptInputEditor = lazy(() => import('@/components/ui/ai/prompt-input-edi
 
 interface RoomsChatComposerProps {
   bot: Bot
+  bots: Bot[]
   conversationId: number
   messages: ChatMessage[]
   queued: ChatQueued[]
@@ -44,6 +45,7 @@ interface RoomsChatComposerProps {
 
 export function RoomsChatComposer({
   bot,
+  bots,
   conversationId,
   messages,
   queued,
@@ -265,6 +267,13 @@ export function RoomsChatComposer({
             )}
             renderMention={(item) => <RoomsMention href={item.href} label={item.label} />}
             triggers={[
+              {
+                char: '@',
+                empty: m.rooms_mention_bots_empty(),
+                items: (query) => bots
+                  .filter((peer) => peer.id !== bot.id && `${peer.name} ${peer.handle}`.toLowerCase().includes(query.toLowerCase()))
+                  .map((peer) => ({ href: mentionHref({ kind: 'bot', name: peer.id }), label: `@${peer.handle}` })),
+              },
               {
                 char: '$',
                 empty: skillsEmpty,

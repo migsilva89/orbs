@@ -2,6 +2,7 @@ import { env } from '@openbots/env/server';
 import { log } from '@openbots/logger/server';
 import {
   makeAlarmService,
+  makeImageService,
   makeInstructionLoaderService,
   makeMcpAuthService,
   makeMcpClientService,
@@ -106,6 +107,7 @@ async function coreNativeServices(resources: AsyncDisposableStack) {
       alarm,
       models: providers.models,
       env: runtimeEnvNative(paths.root),
+      images: await makeImageService(),
     },
   });
 

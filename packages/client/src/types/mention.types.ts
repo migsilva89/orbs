@@ -1,5 +1,8 @@
+import type { Bot } from '@openbots/contracts/universal';
+
 export interface MentionTarget {
-  kind: 'skill' | 'command';
+  kind: 'skill' | 'command' | 'bot' | 'quote';
+  /** The skill or command name, the bot ID, or the quoted entry ID. */
   name: string;
 }
 
@@ -17,4 +20,35 @@ export interface MentionSubmission {
   command?: { name: string; arguments: string };
 }
 
-export type MentionSegment = { kind: 'text', text: string } | { kind: 'pill', item: { href: string, label: string } };
+export type MentionSegment = { kind: 'text', text: string } | { kind: 'pill', item: MentionItem };
+
+export interface MentionItem {
+  href: string;
+  label: string;
+}
+
+export interface MentionQueryParams {
+  text: string;
+  cursor: number;
+}
+
+export interface MentionQuery {
+  char: string;
+  query: string;
+  start: number;
+}
+
+export interface MentionLinksParams {
+  text: string;
+  items: MentionItem[];
+}
+
+export interface MentionMarkdownParams {
+  text: string;
+  bots: Pick<Bot, 'id' | 'handle' | 'name'>[];
+}
+
+export interface MentionQuoteParams {
+  text: string;
+  entryId: number;
+}

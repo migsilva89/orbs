@@ -1,7 +1,8 @@
 import { botUsageLabel, htmlReplySegments, toolBlocks } from '@openbots/client/client';
+import { Errors } from '@openbots/errors/universal';
 import { getLocale, m } from '@openbots/i18n/client';
 import { match } from 'ts-pattern';
-import type { ChatMessagePart, ChatMessageSegment, ChatNoticeTitleParams } from '@/types/chat.types';
+import type * as ChatTypes from '@/types/chat.types';
 import type { ChatMessage } from '@openbots/client/client';
 
 export function chatMessageDetails(message: ChatMessage): string[] {
@@ -12,9 +13,10 @@ export function chatMessageDetails(message: ChatMessage): string[] {
   return [...sent, ...usage];
 }
 
-export function chatMessageSegments(message: ChatMessage): ChatMessageSegment[] {
+export function chatMessageSegments(message: ChatMessage): ChatTypes.ChatMessageSegment[] {
   const isReply = message.role !== 'user';
-  const segments: ChatMessageSegment[] = [];
+  const files = message.parts.filter((part) => part.type === 'file');
+  const segments: ChatTypes.ChatMessageSegment[] = files.length > 0 ? [{ key: 'files', kind: 'bubbles', parts: [{ key: 'files', kind: 'files', files }] }] : [];
 
   for (const block of toolBlocks({ parts: message.parts })) {
     const tools = match(block)
@@ -23,7 +25,7 @@ export function chatMessageSegments(message: ChatMessage): ChatMessageSegment[] 
       .otherwise(() => undefined);
 
     const parts = match(block)
-      .returnType<ChatMessagePart[]>()
+      .returnType<ChatTypes.ChatMessagePart[]>()
       .with({ kind: 'text' }, (text) => text.parts.flatMap((part, index) => match(isReply && part.state !== 'streaming')
         .with(true, () => htmlReplySegments(part.text).map((segment, at) => ({ key: `${block.index}-${index}-${at}`, ...segment, isStreaming: false })))
         .otherwise(() => [{ key: `${block.index}-${index}`, kind: 'markdown', text: part.text, isStreaming: part.state === 'streaming' }])))
@@ -68,7 +70,7 @@ export function chatMessageSegments(message: ChatMessage): ChatMessageSegment[] 
   return segments;
 }
 
-export function chatNoticeTitle({ message, bot }: ChatNoticeTitleParams): string {
+export function chatNoticeTitle({ message, bot }: ChatTypes.ChatNoticeTitleParams): string {
   const name = message.metadata?.authorName ?? '';
   const part = message.parts.at(0);
 
@@ -89,4 +91,30 @@ export function chatNoticeTitle({ message, bot }: ChatNoticeTitleParams): string
   }
 
   return part?.type === 'data-reset' ? m.rooms_notice_reset() : name;
+}
+
+export function chatFileBlob({ uri, name }: Pick<ChatTypes.ChatPicked, 'uri' | 'name'>): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+
+    request.responseType = 'blob';
+    request.onload = () => {
+      // SAFETY: a 'blob' XHR response is a native Blob; an own writable `name` survives Expo's FormData, unlike `File.name`.
+      resolve(Object.defineProperty(request.response as Blob, 'name', { value: name, writable: true }) as File);
+    };
+    request.onerror = () => reject(new Errors.INTERNAL_ERROR({ internal: `Could not read ${uri}` }));
+    request.open('GET', uri);
+    request.send();
+  });
+}
+
+export function chatBlobUri(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    // SAFETY: `readAsDataURL` always resolves `result` as a data URI string.
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(new Errors.INTERNAL_ERROR({ internal: 'Could not read the attachment' }));
+    reader.readAsDataURL(blob);
+  });
 }

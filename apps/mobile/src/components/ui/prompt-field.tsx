@@ -8,19 +8,24 @@ import type { TextInputProps } from 'react-native';
 interface PromptFieldProps extends TextInputProps {
   /** Actions at the end of the field, such as send or stop. */
   actions?: ReactNode;
+  /** Content inside the field above the text, such as attachments. */
+  header?: ReactNode;
 }
 
 /** The chat composer's growing glass input. */
-export function PromptField({ actions, className, ...props }: PromptFieldProps) {
+export function PromptField({ actions, header, className, ...props }: PromptFieldProps) {
   return (
-    <GlassSurface className={cn('min-h-12 flex-row items-center gap-2 py-2 pr-2 pl-4', className)} shape="field">
-      <TextField
-        multiline
-        className="max-h-36 flex-1"
-        placeholderTone="glass-muted"
-        {...props}
-      />
-      <View className="flex-row items-center gap-1">{actions}</View>
+    <GlassSurface className={cn('min-h-12 gap-1 py-2 pr-2 pl-4', className)} shape="field">
+      {header ? <View className="pt-1">{header}</View> : null}
+      <View className="flex-row items-center gap-2">
+        <TextField
+          multiline
+          className="max-h-36 flex-1"
+          placeholderTone="glass-muted"
+          {...props}
+        />
+        <View className="flex-row items-center gap-1">{actions}</View>
+      </View>
     </GlassSurface>
   );
 }

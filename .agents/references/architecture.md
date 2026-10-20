@@ -17,7 +17,7 @@ This is the implementation contract. Fix code that conflicts with it; do not rew
 Native code stays in its owning package behind `/native`. Using files, SQLite or subprocesses does **not** make code daemon logic.
 
 - Server/native owns app database construction, credential-key loading, workspace directories and MCP configuration-file discovery.
-- Runtime/native owns Pi storage, the host alarm, execution environment, skill, instruction and plugin loaders, and MCP connections/tools.
+- Runtime/native owns Pi storage, the host alarm, execution environment, image processing for `read`, skill, instruction and plugin loaders, and MCP connections/tools.
 - The daemon constructs and injects these services. It does not implement their operations.
 - Startup opens stores, runs migrations once, restores bots, resumes Pi, then starts listening. Pairing and other actions use initialized services; they never boot the app or run migrations.
 - Shutdown closes the listener, runtime, MCP clients, app database and Pi storage in reverse dependency order, including on startup failure.

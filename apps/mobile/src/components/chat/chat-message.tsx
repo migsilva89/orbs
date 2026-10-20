@@ -1,16 +1,22 @@
+import { mentionMarkdown, mentionTarget } from '@openbots/client/client';
+import { m } from '@openbots/i18n/client';
+import { useNavigation } from '@react-navigation/native';
+import { Linking } from 'react-native';
 import { match } from 'ts-pattern';
 import { Avatar } from '@/components/ui/avatar';
 import { Markdown } from '@/components/ui/markdown';
-import { Message, MessageBubble, MessageName } from '@/components/ui/message';
+import { Message, MessageBubble, MessageName, MessageQuote } from '@/components/ui/message';
 import { Text } from '@/components/ui/text';
 import { chatMessageSegments } from '@/services/chat/chat.utils';
 import { ChatArtifact } from './chat-artifact';
+import { ChatFiles } from './chat-files';
 import { ChatHtml } from './chat-html';
 import { ChatNotice } from './chat-notice';
 import { ChatReactions } from './chat-reactions';
 import { ChatReasoning } from './chat-reasoning';
 import { ChatTools } from './chat-tools';
 import type { ChatMessagePart } from '@/types/chat.types';
+import type { NavigationRoot } from '@/types/navigation.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type { BotBubble, ChatMessage as ChatMessageItem, RoomsReactionGroup } from '@openbots/client/client';
 import type { Bot } from '@openbots/contracts/universal';
@@ -50,7 +56,10 @@ export function ChatMessage({
   const entryId = message.metadata?.entryId ?? 0;
   const canReact = from === 'assistant' && entryId > 0;
   const name = message.metadata?.authorName ?? bot.name;
+  const navigation = useNavigation<NavigationRoot>();
   const segments = chatMessageSegments(message);
+  const reply = message.metadata?.replyTo;
+  const firstText = segments.flatMap((segment) => (segment.kind === 'bubbles' ? segment.parts : [])).find((part) => part.kind === 'markdown');
   const bubbleSegments = segments.filter((segment) => segment.kind === 'bubbles');
   const firstBubbles = bubbleSegments.at(0);
   const lastBubbles = bubbleSegments.at(-1);
@@ -90,6 +99,15 @@ export function ChatMessage({
     />
   );
 
+  function openLink(url: string) {
+    const target = mentionTarget({ href: url });
+
+    match(target)
+      .with({ kind: 'bot' }, (peer) => navigation.push('Chat', { botId: peer.name }))
+      .with({ kind: 'quote' }, () => undefined)
+      .otherwise(() => void Linking.openURL(url));
+  }
+
   function renderPart(part: ChatMessagePart, isLast: boolean) {
     return match(part)
       .with({ kind: 'markdown' }, (text) => (
@@ -99,7 +117,8 @@ export function ChatMessage({
           key={text.key}
           tail={isLast}
         >
-          <Markdown isStreaming={text.isStreaming}>{text.text}</Markdown>
+          {text === firstText && reply ? <MessageQuote>{m.rooms_chat_reply_quote({ name: reply.authorName, text: reply.text })}</MessageQuote> : null}
+          <Markdown isStreaming={text.isStreaming} onLinkPress={openLink}>{mentionMarkdown({ text: text.text, bots })}</Markdown>
         </MessageBubble>
       ))
       .with({ kind: 'reasoning' }, (reasoning) => (
@@ -115,6 +134,14 @@ export function ChatMessage({
         <ChatArtifact
           artifact={artifact.artifact}
           key={artifact.key}
+          session={session}
+        />
+      ))
+      .with({ kind: 'files' }, (files) => (
+        <ChatFiles
+          botId={bot.id}
+          files={files.files}
+          key={files.key}
           session={session}
         />
       ))

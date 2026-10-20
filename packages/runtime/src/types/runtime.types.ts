@@ -12,6 +12,7 @@ import type { Context } from '@earendil-works/chord/context';
 import type { ToolCall } from '@earendil-works/pi-ai';
 import type { Models } from '@earendil-works/pi-ai/models';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
+import type { ImageProcessor } from '@earendil-works/pi-durable/tools';
 import type { Attachment, ModelSelection, QuestionAnswer } from '@openbots/contracts/universal';
 
 export interface RuntimeServiceParams {
@@ -21,8 +22,9 @@ export interface RuntimeServiceParams {
   env: NonNullable<PiDurableTypes.HarnessOptions['env']>;
   permissions: RuntimeToolPolicy;
   collaboration: CollaborationPolicy;
+  /** Shrinks and converts the images `read` returns, so large photos reach the model. */
+  images?: ImageProcessor;
   toolExtensions?: PiDurableTypes.Extension[];
-  readOnlyTools?: PiDurableTypes.ToolRegistration[];
 }
 
 export interface RuntimeToolPolicy {

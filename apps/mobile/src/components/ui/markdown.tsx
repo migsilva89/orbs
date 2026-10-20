@@ -3,6 +3,7 @@ import { Linking } from 'react-native';
 import { EnrichedMarkdownText } from 'react-native-enriched-markdown';
 import { match } from 'ts-pattern';
 import { useCSSVariable, useUniwind } from 'uniwind';
+import type { ComponentProps } from 'react';
 import type { MarkdownStyle } from 'react-native-enriched-markdown';
 
 /** Text colour for markdown inside a coloured surface, such as the owner's bubble. */
@@ -45,9 +46,13 @@ interface MarkdownProps {
   tone?: 'default' | 'muted';
   /** Native text selection; off in bubbles so a long press opens the message actions. */
   selectable?: boolean;
+  /** Extra actions in the native text selection menu, such as quoting the selection. */
+  menuItems?: ComponentProps<typeof EnrichedMarkdownText>['contextMenuItems'];
+  /** Handles a tapped link; links open in the browser otherwise. */
+  onLinkPress?: (url: string) => void;
 }
 
-export function Markdown({ children, isStreaming = false, tone = 'default', selectable = false }: MarkdownProps) {
+export function Markdown({ children, isStreaming = false, tone = 'default', selectable = false, menuItems, onLinkPress = (url) => void Linking.openURL(url) }: MarkdownProps) {
   const color = use(markdownColorContext);
   const { theme } = useUniwind();
 
@@ -80,6 +85,8 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
     em: { fontStyle: 'italic' },
     strikethrough: { color: text.color },
     link: { color: color ?? link, underline: true },
+    // Bot mentions and quotes read as clean tags, like the pills on web: medium weight, no underline or fill.
+    linkVariants: { '^(bot|quote):': { color: text.color, fontFamily: 'Inter-Medium', underline: false } },
     code: { fontFamily: 'Menlo', fontSize: 14, color: text.color, backgroundColor: codeBackground, borderColor: 'transparent' },
     blockquote: { ...text, color: muted, borderColor: border, borderWidth: 3, gapWidth: 12, backgroundColor: 'transparent' },
     list: { ...text, bulletColor: muted, markerColor: muted, gapWidth: 8 },
@@ -110,12 +117,13 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
 
   return (
     <EnrichedMarkdownText
+      contextMenuItems={menuItems}
       flavor="github"
       selectable={selectable}
       markdown={children}
       markdownStyle={markdownStyle}
       streamingAnimation={isStreaming}
-      onLinkPress={({ url }) => void Linking.openURL(url)}
+      onLinkPress={({ url }) => onLinkPress(url)}
     />
   );
 }

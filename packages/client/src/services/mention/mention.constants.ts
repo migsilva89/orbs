@@ -1,4 +1,5 @@
 export const MENTION = {
-  link: /\[([^\]]*)\]\(((?:skill|command):[^)\s]+)\)/gu,
-  target: /^(skill|command):(.+)$/u,
+  link: /\[([^\]]*)\]\(((?:skill|command|bot|quote):[^)\s]+)\)/gu,
+  target: /^(skill|command|bot|quote):(.+)$/u,
+  quoteMaxChars: 200,
 } as const;

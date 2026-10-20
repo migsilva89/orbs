@@ -64,6 +64,7 @@
     "tailwindcss": "catalog:",
     "ts-pattern": "catalog:",
     "tw-animate-css": "catalog:",
+    "unist-util-visit": "catalog:",
     "vaul": "catalog:",
     "zod": "catalog:"
   },
@@ -79,6 +80,7 @@
     "@tailwindcss/vite": "catalog:",
     "@tanstack/virtual-file-routes": "catalog:",
     "@types/bun": "catalog:",
+    "@types/mdast": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

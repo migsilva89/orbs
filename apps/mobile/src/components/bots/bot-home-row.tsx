@@ -19,29 +19,31 @@ export function BotHomeRow({ chat }: BotHomeRowProps) {
   const navigation = useNavigation<NavigationRoot>();
 
   return (
-    <BotActionsMenu
-      isFullWidth
-      botId={chat.botId}
-      mode="longPress"
-    >
-      <Pressable accessibilityRole="button" onPress={() => navigation.navigate('Chat', { botId: chat.botId })}>
-        <Item size="chat">
-          <Avatar avatar={chat.avatar} name={chat.name} />
-          <ItemContent>
-            <View className="flex-row items-center justify-between gap-2">
-              <ItemTitle className="shrink" numberOfLines={1}>{chat.name}</ItemTitle>
-              {match(chat.lastMessage)
-                .with(P.nonNullable, (message) => <Text tone="muted" variant="conversation-time">{botHomeTime(message.createdAt)}</Text>)
-                .with(null, () => null)
-                .exhaustive()}
-            </View>
-            <View className="flex-row items-center gap-2">
-              <ItemDescription className="flex-1" numberOfLines={1}>{chat.lastMessage?.preview ?? m.rooms_last_activity_none()}</ItemDescription>
-              {chat.hasUnread ? <Badge accessibilityLabel={m.rooms_unread()} variant="unread" /> : null}
-            </View>
-          </ItemContent>
-        </Item>
-      </Pressable>
-    </BotActionsMenu>
+    <View className="py-4">
+      <BotActionsMenu
+        isFullWidth
+        botId={chat.botId}
+        mode="longPress"
+      >
+        <Pressable accessibilityRole="button" onPress={() => navigation.navigate('Chat', { botId: chat.botId })}>
+          <Item size="row">
+            <Avatar avatar={chat.avatar} name={chat.name} />
+            <ItemContent>
+              <View className="flex-row items-center justify-between gap-2">
+                <ItemTitle className="shrink" numberOfLines={1}>{chat.name}</ItemTitle>
+                {match(chat.lastMessage)
+                  .with(P.nonNullable, (message) => <Text tone="muted" variant="conversation-time">{botHomeTime(message.createdAt)}</Text>)
+                  .with(null, () => null)
+                  .exhaustive()}
+              </View>
+              <View className="flex-row items-center gap-2">
+                <ItemDescription className="flex-1" numberOfLines={1}>{chat.lastMessage?.preview ?? m.rooms_last_activity_none()}</ItemDescription>
+                {chat.hasUnread ? <Badge accessibilityLabel={m.rooms_unread()} variant="unread" /> : null}
+              </View>
+            </ItemContent>
+          </Item>
+        </Pressable>
+      </BotActionsMenu>
+    </View>
   );
 }

@@ -70,6 +70,15 @@ interface EmptyDescriptionProps extends ComponentProps<typeof Text> {
   className?: string;
 }
 
+interface EmptyLinkProps extends ComponentProps<typeof Text> {
+  className?: string;
+}
+
+/** A link inside an empty-state sentence, underlined like the web empty state. */
+export function EmptyLink({ className, ...props }: EmptyLinkProps) {
+  return <Text accessibilityRole="link" {...props} className={cn('underline', className)} />;
+}
+
 export function EmptyDescription({ className, ...props }: EmptyDescriptionProps) {
   return <Text {...props} className={cn('max-w-md text-center', className)} tone="muted" variant="empty-description" />;
 }

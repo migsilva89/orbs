@@ -1,10 +1,11 @@
-import { artifactSpec, routineCreate } from '@openbots/contracts/universal';
+import { artifactSpec, routineCreate, todo } from '@openbots/contracts/universal';
 import { z } from 'zod';
 import type { ArtifactService } from '../services/artifact/artifact.service';
 import type { ConversationIndexService } from '../services/conversation-index/conversation-index.service';
 import type { NotificationService } from '../services/notification/notification.service';
 import type { QuestionService } from '../services/question/question.service';
 import type { RoutineService } from '../services/routine/routine.service';
+import type { TodoService } from '../services/todo/todo.service';
 import type { AlarmService } from './alarm.types';
 import type { CollaborationDirectory, CollaborationPolicy } from './collaboration.types';
 import type { StorageService } from './storage.types';
@@ -67,6 +68,7 @@ export interface RuntimeServiceDeps extends RuntimeModelsDeps {
   harness: PiDurableTypes.Harness;
   questions: QuestionService;
   routines: RoutineService;
+  todos: TodoService;
   artifacts: ArtifactService;
   index: ConversationIndexService;
   registry: PiDurableTypes.Registry;
@@ -195,13 +197,18 @@ export interface RuntimeQuestionAnswer extends RuntimeConversationParams {
   answeredBy: string;
 }
 
-/** What a history clear keeps: routines and the latest version of each artifact, with their IDs. */
+/** What a history clear keeps: routines, todos and the latest version of each artifact, with their IDs. */
 export const runtimeCarry = z.object({
   routines: z.array(routineCreate.omit({ botId: true }).extend({ id: z.uuid() })),
   artifacts: z.array(z.object({
     id: z.uuid(),
     title: z.string(),
     spec: artifactSpec,
+  })),
+  todos: z.array(todo.pick({
+    id: true,
+    title: true,
+    isDone: true,
   })),
 });
 

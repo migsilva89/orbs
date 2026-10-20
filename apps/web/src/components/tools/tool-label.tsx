@@ -5,6 +5,7 @@ import IconLucideBot from '~icons/lucide/bot';
 import IconLucideCpu from '~icons/lucide/cpu';
 import IconLucideFileText from '~icons/lucide/file-text';
 import IconLucideLayoutDashboard from '~icons/lucide/layout-dashboard';
+import IconLucideListTodo from '~icons/lucide/list-todo';
 import IconLucideMessageCircleQuestion from '~icons/lucide/message-circle-question';
 import IconLucidePlug from '~icons/lucide/plug';
 import IconLucideSearch from '~icons/lucide/search';
@@ -24,6 +25,7 @@ const toolLabelIcons = {
   model: <IconLucideCpu />,
   question: <IconLucideMessageCircleQuestion />,
   routine: <IconLucideAlarmClock />,
+  todo: <IconLucideListTodo />,
   artifact: <IconLucideLayoutDashboard />,
   mcp: <IconLucidePlug />,
   tool: <IconLucideWrench />,

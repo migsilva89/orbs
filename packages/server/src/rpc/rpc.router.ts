@@ -17,6 +17,7 @@ import { providers } from './rpc.providers';
 import { routines } from './rpc.routines';
 import { rpcServer } from './rpc.server';
 import { skills } from './rpc.skills';
+import { todos } from './rpc.todos';
 import { tools } from './rpc.tools';
 
 export const router = rpcRouter.router({
@@ -25,6 +26,7 @@ export const router = rpcRouter.router({
   providers,
   mcpAuth,
   routines,
+  todos,
   attachments,
   artifacts,
   bots,

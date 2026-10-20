@@ -1,10 +1,10 @@
-import { mentionHref, mentionSegments, mentionSubmission, roomsMessageText } from '@openbots/client/client';
+import { mentionHref, mentionSegments, mentionSubmission, ROOMS, roomsMessageText } from '@openbots/client/client';
 import { ATTACHMENT } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { generateId } from 'ai';
-import { lazy, Suspense, useRef, useState } from 'react';
-import { match } from 'ts-pattern';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { match, P } from 'ts-pattern';
 import { RoomsChatAttachments } from '@/components/rooms/rooms-chat-attachments';
 import { RoomsChatQueue } from '@/components/rooms/rooms-chat-queue';
 import { RoomsMention } from '@/components/rooms/rooms-mention';
@@ -21,6 +21,7 @@ import { useRoomDraft } from '@/hooks/use-room-draft';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconPaperclip from '~icons/lucide/paperclip';
 import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
+import type { RoomsPrefill } from '@/types/rooms.types';
 import type { ChatMessage, ChatOutgoing, ChatQueued } from '@openbots/client/client';
 import type { Bot } from '@openbots/contracts/universal';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
@@ -70,6 +71,20 @@ export function RoomsChatComposer({
   const [skillsRequested, setSkillsRequested] = useState(false);
   const [commandsRequested, setCommandsRequested] = useState(false);
   const draft = useRoomDraft(bot.id);
+
+  useEffect(() => {
+    const restore = (event: Event) => match(event)
+      .with(P.instanceOf(CustomEvent<RoomsPrefill>), ({ detail }) => match(detail.botId === bot.id)
+        .with(true, () => editor.current?.restore(mentionSegments({ text: detail.text })))
+        .with(false, () => undefined)
+        .exhaustive())
+      .otherwise(() => undefined);
+
+    window.addEventListener(ROOMS.prefillEvent, restore);
+
+    return () => window.removeEventListener(ROOMS.prefillEvent, restore);
+  }, [bot.id, editor]);
+
   const submit = useMutation(rpc.conversation.submit.mutationOptions());
   const execute = useMutation(rpc.commands.execute.mutationOptions());
   const stop = useMutation(rpc.conversation.stop.mutationOptions());

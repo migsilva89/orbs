@@ -336,7 +336,7 @@ await client.bots.delete({ botId });        // erase the bot and everything it o
 
 `bots.delete` removes the bot row and its preferences, deletes its Pi store file, closes its MCP connections and deletes `agents/<botId>/` with its attachments. It is permanent. Peers that later message the bot receive an unavailable result; what the deleted bot sent to a peer stays in that peer's store.
 
-`conversation.clear` stops the bot's work, saves its routines and the latest version of each artifact, deletes its store, opens a fresh one and recreates them with the same IDs. Attachments are deleted and the read position resets; usage and artifact version history start over. The saved routines live in `data/bots/<botId>/carry.json` until the refill finishes, so a crash in between finishes on the next start.
+`conversation.clear` stops the bot's work, saves its routines, todos and the latest version of each artifact, deletes its store, opens a fresh one and recreates them with the same IDs. Attachments are deleted and the read position resets; usage and artifact version history start over. The saved routines live in `data/bots/<botId>/carry.json` until the refill finishes, so a crash in between finishes on the next start.
 
 The sidebar list API is described below.
 
@@ -693,6 +693,17 @@ Waiting does not depend on a host timer surviving: after each commit, every bot 
 Bots have `bot_routine_list`, `bot_routine_create`, `bot_routine_update`, `bot_routine_run` and `bot_routine_remove`. These call the same runtime routine service as RPC. Tool schemas are derived once from the public routine contracts. Tools derive the bot identity from Pi; they accept no bot or conversation ID. Private contexts and subagents manage their bot's main-chat routines, with the same permission hook.
 
 Only `bot_routine_list` is a trusted read. Changes use Ask/Auto/Full approval policy; read-only bots cannot change routines. `bot_routine_update` pauses/resumes via `isEnabled`. `bot_routine_run` queues work and returns immediately, so a bot does not wait for its own next turn. Mutating tools use Pi's `replay: 'unsafe'`: a crash after a write can leave it applied, but Pi will not blindly repeat it. The model must list current routines before deciding whether to retry. Scheduled deliveries keep their existing request-ID deduplication.
+
+## Todos
+
+Authenticated `todos.list/create/update/reorder/remove` manage a short todo list for a bot's main conversation. Owner and bot share the list. `update` accepts `title` and `isDone`; `doneAt` records completion. `reorder` puts the given IDs first in that order; todos it does not name, such as one the bot added meanwhile, follow in their current order. The list and the prompt section use that order. Clearing history keeps todos with their IDs and order.
+
+```ts
+const todo = await client.todos.create({ botId, title: 'Renew the domain' });
+await client.todos.update({ botId, todoId: todo.id, isDone: true });
+```
+
+Open todos reach the model through a `todos` system prompt section, not a message. The section is absent while no todo is open and is resent only when the list changes. Bots have `bot_todo_list` (trusted read), `bot_todo_create`, `bot_todo_update` and `bot_todo_remove`; changes use the normal approval policy. Periodic reminders use a routine, for example a weekday routine asking the bot to review its open todos.
 
 ## Bot management tools
 

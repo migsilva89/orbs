@@ -1,5 +1,6 @@
+import { CHAT } from '@openbots/client/client';
 import { MessageFile, MessageImage } from '@/components/ui/message';
-import { useAttachmentUri } from '@/hooks/use-attachment-uri';
+import { connectionFileSource } from '@/services/connection/connection.client';
 import type { RpcSession } from '@/types/rpc.types';
 import type { RoomsFilePart } from '@openbots/client/client';
 
@@ -10,10 +11,13 @@ interface ChatFilesItemProps {
 }
 
 function ChatFilesItem({ session, botId, file }: ChatFilesItemProps) {
-  const uri = useAttachmentUri(session, botId, file.url);
   const name = file.filename ?? '';
 
-  return file.mediaType.startsWith('image/') ? <MessageImage name={name} uri={uri} /> : <MessageFile name={name} />;
+  const source = file.url.startsWith(CHAT.attachmentScheme)
+    ? connectionFileSource(session.connection, { botId, attachmentId: file.url.slice(CHAT.attachmentScheme.length) })
+    : { uri: file.url };
+
+  return file.mediaType.startsWith('image/') ? <MessageImage name={name} source={source} /> : <MessageFile name={name} />;
 }
 
 interface ChatFilesProps {

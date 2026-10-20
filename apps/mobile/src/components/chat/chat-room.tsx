@@ -13,6 +13,7 @@ import { MessageList } from '@/components/ui/message-list';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import { useChatReactions } from '@/hooks/use-chat-reactions';
+import { useChatUnread } from '@/hooks/use-chat-unread';
 import { useConnection } from '@/hooks/use-connection';
 import { chatHistoryOptions, chatViewOptions } from '@/services/chat/chat.client';
 import { chatMessageDetails } from '@/services/chat/chat.utils';
@@ -20,7 +21,7 @@ import { ChatComposer } from './chat-composer';
 import { ChatHeader } from './chat-header';
 import { ChatMessage } from './chat-message';
 import { ChatRuns } from './chat-runs';
-import type { ChatRouteParams } from '@/types/chat.types';
+import type { ChatPrefill, ChatRouteParams } from '@/types/chat.types';
 import type { NavigationRoot } from '@/types/navigation.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type { LegendListRef } from '@legendapp/list/react-native';
@@ -38,6 +39,7 @@ export function ChatRoom({ route }: ChatRoomProps) {
     .with(P.nonNullable, (current) => (
       <ChatRoomContent
         botId={route.params.botId}
+        prefill={route.params.prefill}
         quote={route.params.quote}
         replyToEntryId={route.params.replyToEntryId}
         session={current}
@@ -51,9 +53,10 @@ interface ChatRoomContentProps {
   botId: string;
   replyToEntryId?: number;
   quote?: MentionItem;
+  prefill?: ChatPrefill;
 }
 
-function ChatRoomContent({ session, botId, replyToEntryId, quote }: ChatRoomContentProps) {
+function ChatRoomContent({ session, botId, replyToEntryId, quote, prefill }: ChatRoomContentProps) {
   const bots = useQuery(session.rpc.bots.list.queryOptions());
   const view = useQuery(chatViewOptions(session, { botId }));
   const bot = bots.data?.find((item) => item.id === botId);
@@ -69,6 +72,7 @@ function ChatRoomContent({ session, botId, replyToEntryId, quote }: ChatRoomCont
           <ChatRoomView
             bot={ready.bot}
             bots={bots.data ?? []}
+            prefill={prefill}
             quote={quote}
             replyToEntryId={replyToEntryId}
             session={session}
@@ -105,9 +109,10 @@ interface ChatRoomViewProps {
   view: ConversationView;
   replyToEntryId?: number;
   quote?: MentionItem;
+  prefill?: ChatPrefill;
 }
 
-function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote }: ChatRoomViewProps) {
+function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill }: ChatRoomViewProps) {
   const navigation = useNavigation<NavigationRoot>();
   const list = useRef<LegendListRef>(null);
   const composer = useRef(null);
@@ -148,6 +153,7 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote }: ChatR
 
   const replyTo = messages.find((message) => replyToEntryId !== undefined && message.metadata?.entryId === replyToEntryId) ?? null;
   const reactions = useChatReactions(session, bot, bots, view, messages);
+  const unread = useChatUnread(session, bot.id, list, messages);
   const now = new Date();
 
   const empty = match(messages.length)
@@ -220,14 +226,17 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote }: ChatR
           conversationId={conversationId}
           isBusy={view.live.run !== undefined || queued.length > 0}
           latestEntryId={view.latestEntryId}
+          prefill={prefill}
           queued={queued}
           quote={quote}
           replyTo={replyTo}
           session={session}
+          unread={unread.count}
           onLayout={onComposerLayout}
           onOutgoingChange={setOutgoing}
           onReplyClear={() => navigation.setParams({ replyToEntryId: undefined })}
           onSend={() => void list.current?.scrollToEnd({ animated: true })}
+          onUnreadPress={unread.seeAll}
         />
       </KeyboardSticky>
     </View>

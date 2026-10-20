@@ -18,6 +18,7 @@
     "@inlang/paraglide-js": "^2.25.4",
     "@orpc/client": "2.0.0-beta.39",
     "@orpc/contract": "2.0.0-beta.39",
+    "@orpc/openapi": "2.0.0-beta.39",
     "@orpc/server": "2.0.0-beta.39",
     "@orpc/ratelimit": "2.0.0-beta.39",
     "@orpc/shared": "2.0.0-beta.39",
@@ -107,6 +108,7 @@
   "catalogs": {
     "mobile": {
       "@expo-google-fonts/inter": "^0.4.2",
+      "@expo/ui": "~58.0.21",
       "@legendapp/list": "3.6.0",
       "@react-navigation/native": "^7.5.1",
       "@react-navigation/native-stack": "^7.21.0",

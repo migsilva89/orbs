@@ -1,4 +1,5 @@
-import { defineExtension, defineTool, StorageRequestError } from '@earendil-works/pi-durable';
+import { defineExtension, defineTool, section, StorageRequestError } from '@earendil-works/pi-durable';
+import { REACTION } from '@openbots/contracts/universal';
 import { Errors } from '@openbots/errors/universal';
 import * as m from '@openbots/i18n/messages';
 import { match, P } from 'ts-pattern';
@@ -39,7 +40,7 @@ export function runtimeChatToolsExtension() {
   });
 
   const react = defineTool({
-    name: 'bot_react',
+    name: REACTION.toolName,
     description: m.ui_tool_bot_react_description(),
     parameters: runtimeReactToolParameters,
     replay: 'unsafe',
@@ -49,8 +50,12 @@ export function runtimeChatToolsExtension() {
   });
 
   return {
-    extension: defineExtension({ name: 'openbots.chat-tools', tools: [history, search, react] }),
-    readOnlyTools: [history, search],
+    extension: defineExtension({
+      name: 'openbots.chat-tools',
+      tools: [history, search, react],
+      sections: [section('reactions', () => m.ui_tool_bot_react_prompt())],
+    }),
+    readOnlyTools: [history, search, react],
   };
 }
 

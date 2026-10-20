@@ -1,6 +1,6 @@
 import { cva } from 'cva';
 import { Children, Fragment } from 'react';
-import { Pressable, View } from 'react-native';
+import { ActionSheetIOS, Pressable, View } from 'react-native';
 import { match, P } from 'ts-pattern';
 import { cn } from '@/lib/cn';
 import { Icon } from './icon';
@@ -88,4 +88,28 @@ export function ActionSheetItem({ icon, children, disabled = false, ...props }: 
       </textContext.Provider>
     </Pressable>
   );
+}
+
+interface ActionSheetChoiceOption {
+  label: string;
+  isDestructive?: boolean;
+  onSelect: () => void;
+}
+
+interface ActionSheetShowParams {
+  title?: string;
+  cancelLabel: string;
+  choices: ActionSheetChoiceOption[];
+}
+
+/** Ask for one of a few choices with the native iOS action sheet, as web uses a select or dropdown. */
+export function actionSheetShow({ title, cancelLabel, choices }: ActionSheetShowParams) {
+  const destructiveButtonIndex = choices.flatMap((choice, index) => (choice.isDestructive ? [index + 1] : []));
+
+  ActionSheetIOS.showActionSheetWithOptions({
+    title,
+    options: [cancelLabel, ...choices.map((choice) => choice.label)],
+    cancelButtonIndex: 0,
+    destructiveButtonIndex,
+  }, (index) => choices[index - 1]?.onSelect());
 }

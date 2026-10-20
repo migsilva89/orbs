@@ -1,0 +1,66 @@
+import { Button, Divider, Host, RNHostView, ContextMenu as SwiftContextMenu, Menu as SwiftMenu } from '@expo/ui/swift-ui';
+import { Fragment, useState } from 'react';
+import { View } from 'react-native';
+import { match, P } from 'ts-pattern';
+import type { MenuItem, MenuProps } from '@/types/menu.types';
+import type { ReactElement } from 'react';
+
+/** A native iOS pull-down menu that opens on tap, like the web dropdown menu. */
+export function Menu({ items, children }: MenuProps) {
+  return (
+    <Host matchContents>
+      <SwiftMenu label={<RNHostView matchContents>{children}</RNHostView>}>
+        <MenuItems items={items} />
+      </SwiftMenu>
+    </Host>
+  );
+}
+
+/** The same menu opened by a long press, like a right-click on web. `isFullWidth` keeps a list row's width. */
+export function ContextMenu({ items, children, isFullWidth = false }: MenuProps) {
+  const [width, setWidth] = useState<number>();
+
+  const menu = (trigger: ReactElement) => (
+    <Host matchContents>
+      <SwiftContextMenu>
+        <SwiftContextMenu.Items>
+          <MenuItems items={items} />
+        </SwiftContextMenu.Items>
+        <SwiftContextMenu.Trigger>
+          <RNHostView matchContents>{trigger}</RNHostView>
+        </SwiftContextMenu.Trigger>
+      </SwiftContextMenu>
+    </Host>
+  );
+
+  return match({ isFullWidth, width })
+    .with({ isFullWidth: false }, () => menu(children))
+    .with({ width: P.number }, ({ width: rowWidth }) => menu(<View style={{ width: rowWidth }}>{children}</View>))
+    .otherwise(() => <View onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>{children}</View>);
+}
+
+interface MenuItemsProps {
+  items: MenuItem[];
+}
+
+function MenuItems({ items }: MenuItemsProps) {
+  return items.map((item) => (
+    <Fragment key={item.label}>
+      {item.hasDividerBefore ? <Divider /> : null}
+      {match(item.items)
+        .with(P.nonNullable, (children) => (
+          <SwiftMenu label={item.label} systemImage={item.systemImage}>
+            <MenuItems items={children} />
+          </SwiftMenu>
+        ))
+        .otherwise(() => (
+          <Button
+            label={item.label}
+            role={item.isDestructive ? 'destructive' : 'default'}
+            systemImage={item.systemImage}
+            onPress={item.onSelect}
+          />
+        ))}
+    </Fragment>
+  ));
+}

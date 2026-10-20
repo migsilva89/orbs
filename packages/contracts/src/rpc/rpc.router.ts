@@ -1,5 +1,6 @@
 import { errorSchemas } from '@openbots/errors/universal';
 import { asyncIteratorObject, oc as baseContract } from '@orpc/contract';
+import { openapi } from '@orpc/openapi';
 import {
   artifact,
   artifactBlocks,
@@ -77,6 +78,7 @@ import { conversationReactions, conversationReactionsResult, conversationSetReac
 import { routine, routineCreate, routineList, routineRemoveResult, routineTarget, routineUpdate } from '../types/routine.types';
 import { serverInfo } from '../types/server.types';
 import { skillCatalog, skillConfigure, skillDiscover, skillSettings } from '../types/skill.types';
+import { todo, todoCreate, todoList, todoRemoveResult, todoReorder, todoTarget, todoUpdate } from '../types/todo.types';
 import {
   toolAnswer,
   toolAnswerResult,
@@ -283,6 +285,40 @@ export const contract = {
       .input(routineTarget)
       .output(routineRemoveResult),
   },
+  todos: {
+    list: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(botGet)
+      .output(todoList),
+    create: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(todoCreate)
+      .output(todo),
+    update: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(todoUpdate)
+      .output(todo),
+    reorder: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
+      })
+      .input(todoReorder)
+      .output(todoList),
+    remove: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(todoTarget)
+      .output(todoRemoveResult),
+  },
   attachments: {
     upload: oc
       .errors({
@@ -292,6 +328,7 @@ export const contract = {
       .input(attachmentUpload)
       .output(attachment),
     download: oc
+      .meta(openapi({ method: 'GET', path: '/{botId}/{attachmentId}' }))
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
       .input(attachmentGet)
       .output(attachmentDownload),

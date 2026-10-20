@@ -1,12 +1,12 @@
 import { cva } from 'cva';
-import { createContext, use } from 'react';
-import { View } from 'react-native';
+import { Children, createContext, Fragment, use } from 'react';
+import { Pressable, View } from 'react-native';
 import { match } from 'ts-pattern';
 import { cn } from '@/lib/cn';
 import { Text } from './text';
 import type { VariantProps } from 'cva';
-import type { ComponentProps } from 'react';
-import type { ViewProps } from 'react-native';
+import type { ComponentProps, ReactNode } from 'react';
+import type { PressableProps, ViewProps } from 'react-native';
 
 const itemVariants = cva({
   base: 'relative w-full flex-row flex-wrap items-center rounded-lg border border-transparent',
@@ -53,4 +53,65 @@ interface ItemDescriptionProps extends ComponentProps<typeof Text> {
 export function ItemDescription(props: ItemDescriptionProps) {
   const variant = match(use(itemContext)).with('sm', () => 'small' as const).with('default', () => 'item-description' as const).with('chat', () => 'conversation-preview' as const).exhaustive();
   return <Text numberOfLines={2} {...props} tone="muted" variant={variant} />;
+}
+
+interface ItemButtonProps extends Omit<PressableProps, 'children'>, VariantProps<typeof itemVariants> {
+  children: ReactNode;
+}
+
+/** A row that acts on press, such as one that opens a choice sheet. */
+export function ItemButton({ className, variant, size = 'default', children, ...props }: ItemButtonProps) {
+  return (
+    <Pressable {...props} accessibilityRole="button" className={cn(itemVariants({ variant, size }), 'active:bg-accent', className)}>
+      <itemContext.Provider value={size}>{children}</itemContext.Provider>
+    </Pressable>
+  );
+}
+
+interface ItemGroupProps {
+  children: ReactNode;
+}
+
+/** An outlined group of rows, separated by hairlines. */
+export function ItemGroup({ children }: ItemGroupProps) {
+  const items = Children.toArray(children);
+
+  return (
+    <View className="overflow-hidden rounded-lg border border-border bg-card">
+      {items.map((item, index) => (
+        <Fragment key={index}>
+          {index > 0 ? <View className="h-px bg-border" /> : null}
+          {item}
+        </Fragment>
+      ))}
+    </View>
+  );
+}
+
+const itemMediaVariants = cva({
+  base: 'items-center justify-center',
+  variants: {
+    variant: {
+      default: 'size-5',
+      icon: 'size-8 rounded-sm border border-border bg-muted',
+      image: 'size-8 overflow-hidden rounded-sm bg-muted',
+    },
+  },
+  defaultVariants: { variant: 'default' },
+});
+
+interface ItemMediaProps extends ViewProps, VariantProps<typeof itemMediaVariants> {
+  className?: string;
+}
+
+export function ItemMedia({ className, variant, ...props }: ItemMediaProps) {
+  return <View {...props} className={cn(itemMediaVariants({ variant }), className)} />;
+}
+
+interface ItemValueProps extends ComponentProps<typeof Text> {
+  className?: string;
+}
+
+export function ItemValue(props: ItemValueProps) {
+  return <Text numberOfLines={1} {...props} tone="muted" variant="item-description" />;
 }

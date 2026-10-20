@@ -1,4 +1,4 @@
-import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entryPeerReply, entrySubagentReport, REPLY, replyMessage, toolCallJson } from '@openbots/contracts/universal';
+import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entryPeerReply, entrySubagentReport, REACTION, reactionMessage, REPLY, replyMessage, toolCallJson } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { match, P } from 'ts-pattern';
 import { CHAT } from './chat.constants';
@@ -27,6 +27,14 @@ export function chatMessages({ entries, bot, bots }: ChatTypes.ChatMessagesParam
       .with(REPLY.entryKind, () => match(replyMessage.safeParse(entry.data))
         .with({ success: true }, ({ data }) => messages.push(chatOwnerMessage(entry, {
           text: data.content,
+          files: [],
+          replyTo: { entryId: data.replyTo.entryId, authorName: chatQuoteName(data.replyTo), text: data.replyTo.content },
+          createdAt,
+        })))
+        .otherwise(() => undefined))
+      .with(REACTION.entryKind, () => match(reactionMessage.safeParse(entry.data))
+        .with({ success: true }, ({ data }) => messages.push(chatOwnerMessage(entry, {
+          text: data.emoji,
           files: [],
           replyTo: { entryId: data.replyTo.entryId, authorName: chatQuoteName(data.replyTo), text: data.replyTo.content },
           createdAt,
@@ -132,6 +140,7 @@ export function chatActivity(state: UniversalTypes.ConversationState | undefined
 
 export function chatQueued(state: UniversalTypes.ConversationState | undefined): ChatTypes.ChatQueued[] {
   return (state?.inbox.items ?? []).flatMap((item) => match(item)
+    .with({ entry: { kind: REACTION.entryKind } }, () => [])
     .with({ mode: P.union('steer', 'followUp') }, (queued) => [{
       submissionId: queued.id,
       mode: queued.mode,
@@ -259,6 +268,7 @@ function chatAssistantParts(content: readonly ChatTypes.ChatContentPart[], state
   return content.flatMap((part): ChatTypes.ChatPart[] => match(part)
     .with({ type: 'text' }, ({ text }) => (text.trim() === '' ? [] : [{ type: 'text' as const, text, state }]))
     .with({ type: 'thinking', redacted: P.optional(P.not(true)) }, ({ thinking }) => (thinking.trim() === '' ? [] : [{ type: 'reasoning' as const, text: thinking, state }]))
+    .with({ type: 'toolCall', name: REACTION.toolName }, () => [])
     .with({ type: 'toolCall' }, (call) => [{
       type: 'dynamic-tool' as const,
       toolName: call.name,

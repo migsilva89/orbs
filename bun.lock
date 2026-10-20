@@ -29,6 +29,7 @@
         "@openbots/runtime": "workspace:*",
         "@openbots/server": "workspace:*",
         "@orpc/client": "catalog:",
+        "@orpc/openapi": "catalog:",
         "@orpc/server": "catalog:",
         "ts-pattern": "catalog:",
         "uqr": "catalog:",
@@ -45,6 +46,7 @@
       "version": "1.0.0",
       "dependencies": {
         "@expo-google-fonts/inter": "catalog:mobile",
+        "@expo/ui": "catalog:mobile",
         "@legendapp/list": "catalog:mobile",
         "@openbots/avatar-blobs": "workspace:*",
         "@openbots/client": "workspace:*",
@@ -211,6 +213,7 @@
         "@openbots/avatar-blobs": "workspace:*",
         "@openbots/errors": "workspace:*",
         "@orpc/contract": "catalog:",
+        "@orpc/openapi": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
@@ -382,6 +385,7 @@
     "@json-render/react": "^0.21.1",
     "@orpc/client": "2.0.0-beta.39",
     "@orpc/contract": "2.0.0-beta.39",
+    "@orpc/openapi": "2.0.0-beta.39",
     "@orpc/ratelimit": "2.0.0-beta.39",
     "@orpc/server": "2.0.0-beta.39",
     "@orpc/shared": "2.0.0-beta.39",
@@ -459,6 +463,7 @@
   "catalogs": {
     "mobile": {
       "@expo-google-fonts/inter": "^0.4.2",
+      "@expo/ui": "~58.0.21",
       "@legendapp/list": "3.6.0",
       "@react-navigation/native": "^7.5.1",
       "@react-navigation/native-stack": "^7.21.0",
@@ -836,6 +841,8 @@
     "@expo/spawn-async": ["@expo/spawn-async@1.8.0", "", { "dependencies": { "cross-spawn": "^7.0.6" } }, "sha512-eb9xxd/LbuEGSdua4NumCu/McVB9EM+F/JxB9pWgnERw4HQ9XyTNH1KapG6oqLWR8TuRK2LQfzJlmNi94CVobw=="],
 
     "@expo/sudo-prompt": ["@expo/sudo-prompt@9.3.2", "", {}, "sha512-HHQigo3rQWKMDzYDLkubN5WQOYXJJE2eNqIQC2axC2iO3mHdwnIR7FgZVvHWtBwAdzBgAP0ECp8KqS8TiMKvgw=="],
+
+    "@expo/ui": ["@expo/ui@58.0.21", "", { "dependencies": { "sf-symbols-typescript": "^2.1.0" }, "peerDependencies": { "@babel/core": "*", "expo": "*", "react": "*", "react-dom": "*", "react-native": "*", "react-native-worklets": "*" }, "optionalPeers": ["@babel/core", "react-dom", "react-native-worklets"] }, "sha512-O+8DoGcGKq0/QVkKAndrG26dr4Js5oVgfqhuVP4JpwJVQo/KyEQOBWhXbvmQ+1eG9rxYzRjGPNurYyf4BIbwcA=="],
 
     "@expo/ws-tunnel": ["@expo/ws-tunnel@2.0.1", "", { "peerDependencies": { "ws": "^8.0.0" } }, "sha512-mljsRffbOHzmSimYQbQu9h9NR3alwCCwEEouRGFL4QRTt8dNvsNtKEPa/5jHmtDLDtsh4xXsWKwzjN9BTpeXHQ=="],
 

@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import { cn } from '@/lib/cn';
 import { GlassSurface } from './glass-surface';
 import { TextField } from './text-field';
@@ -28,4 +28,9 @@ export function PromptField({ actions, header, className, ...props }: PromptFiel
       </View>
     </GlassSurface>
   );
+}
+
+/** A picked mention inside the field's text, tinted like a link. */
+export function PromptMention({ children }: { children: string }) {
+  return <Text className="text-blue">{children}</Text>;
 }

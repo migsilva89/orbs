@@ -10,7 +10,7 @@ import { Text, textContext } from './text';
 import type { BotBubble } from '@openbots/client/client';
 import type { VariantProps } from 'cva';
 import type { ReactNode } from 'react';
-import type { ViewProps } from 'react-native';
+import type { ImageURISource, ViewProps } from 'react-native';
 
 const Svg = withUniwind(NativeSvg);
 
@@ -129,15 +129,15 @@ export function MessageQuote({ children }: MessageQuoteProps) {
 }
 
 interface MessageImageProps {
-  uri?: string;
+  source: ImageURISource;
   name: string;
 }
 
 /** A sent photo; a muted block holds its place while it loads. */
-export function MessageImage({ uri, name }: MessageImageProps) {
+export function MessageImage({ source, name }: MessageImageProps) {
   return (
     <View accessibilityLabel={name} accessibilityRole="image" className="size-48 overflow-hidden rounded-2xl bg-muted">
-      {uri ? <Image className="size-full" resizeMode="cover" source={{ uri }} /> : null}
+      <Image className="size-full" resizeMode="cover" source={source} />
     </View>
   );
 }

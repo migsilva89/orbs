@@ -1,4 +1,4 @@
-import { mentionLinks, mentionQuery, mentionSubmission, roomsMessageText } from '@openbots/client/client';
+import { mentionLinks, mentionQuery, mentionSegments, mentionSubmission, roomsMessageText } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useMutation } from '@tanstack/react-query';
 import { ArrowUp, Plus, Square } from 'lucide-react-native';
@@ -8,12 +8,13 @@ import { match } from 'ts-pattern';
 import { Button } from '@/components/ui/button';
 import { GlassButton } from '@/components/ui/glass-button';
 import { Icon } from '@/components/ui/icon';
-import { PromptAttachment, PromptAttachments, PromptDock, PromptDrawer, PromptQuote } from '@/components/ui/prompt-drawer';
-import { PromptField } from '@/components/ui/prompt-field';
+import { PromptAttachment, PromptAttachments, PromptDock, PromptDrawer, PromptJump, PromptQuote } from '@/components/ui/prompt-drawer';
+import { PromptField, PromptMention } from '@/components/ui/prompt-field';
 import { useChatAttachments } from '@/hooks/use-chat-attachments';
 import { useToast } from '@/hooks/use-toast';
 import { ChatMentions } from './chat-mentions';
 import { ChatQueue } from './chat-queue';
+import type { ChatPrefill } from '@/types/chat.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type * as ClientTypes from '@openbots/client/client';
 import type { Bot } from '@openbots/contracts/universal';
@@ -28,8 +29,11 @@ interface ChatComposerProps {
   latestEntryId: number;
   queued: ClientTypes.ChatQueued[];
   quote?: ClientTypes.MentionItem;
+  prefill?: ChatPrefill;
   isBusy: boolean;
   replyTo: ClientTypes.ChatMessage | null;
+  unread: number;
+  onUnreadPress: () => void;
   onReplyClear: () => void;
   onOutgoingChange: Dispatch<SetStateAction<ClientTypes.ChatOutgoing[]>>;
   onSend: () => void;
@@ -44,8 +48,11 @@ export function ChatComposer({
   latestEntryId,
   queued,
   quote,
+  prefill,
   isBusy,
   replyTo,
+  unread,
+  onUnreadPress,
   onReplyClear,
   onOutgoingChange,
   onSend,
@@ -56,6 +63,7 @@ export function ChatComposer({
   const [cursor, setCursor] = useState(0);
   const [picked, setPicked] = useState<ClientTypes.MentionItem[]>([]);
   const [quoted, setQuoted] = useState(quote);
+  const [prefilled, setPrefilled] = useState(prefill);
   const files = useChatAttachments(session, bot.id);
   const submit = useMutation(session.rpc.conversation.submit.mutationOptions());
   const execute = useMutation(session.rpc.commands.execute.mutationOptions());
@@ -67,6 +75,15 @@ export function ChatComposer({
     if (quote) {
       setText(`${text.trimEnd()}${text.trim() ? ' ' : ''}${quote.label} `);
       setPicked([...picked, quote]);
+    }
+  }
+
+  if (prefill !== prefilled) {
+    setPrefilled(prefill);
+
+    if (prefill && !text.trim()) {
+      setText(prefill.text);
+      setCursor(prefill.text.length);
     }
   }
 
@@ -172,6 +189,7 @@ export function ChatComposer({
 
   const drawer = (
     <>
+      {unread > 0 ? <PromptJump onPress={onUnreadPress}>{m.mobile_chat_unread({ count: unread })}</PromptJump> : null}
       {query ? (
         <ChatMentions
           bot={bot}
@@ -242,10 +260,13 @@ export function ChatComposer({
           )}
           header={attachments}
           placeholder={m.rooms_chat_placeholder()}
-          value={text}
           onChangeText={setText}
           onSelectionChange={(event) => setCursor(event.nativeEvent.selection.end)}
-        />
+        >
+          {mentionSegments({ text: mentionLinks({ text, items: picked }) }).map((segment, index) => match(segment)
+            .with({ kind: 'pill' }, ({ item }) => <PromptMention key={index}>{item.label}</PromptMention>)
+            .otherwise((part) => part.text))}
+        </PromptField>
       </View>
     </PromptDock>
   );

@@ -1,6 +1,6 @@
 import { TOOL_PEER_NAMES, toolGroupState, toolIdentity, toolInputText, toolInputTexts, toolOutputText, toolPresentation, toolPreview, toolRunning } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
-import { AlarmClock, Bot, Cpu, FileText, LayoutDashboard, MessageCircleQuestion, Plug, Search, SquarePen, Terminal, Wrench } from 'lucide-react-native';
+import { AlarmClock, Bot, Cpu, FileText, LayoutDashboard, ListTodo, MessageCircleQuestion, Plug, Search, SquarePen, Terminal, Wrench } from 'lucide-react-native';
 import { useState } from 'react';
 import { Avatar } from '@/components/ui/avatar';
 import { Trace, TraceCode, TraceContent, TraceRow } from '@/components/ui/trace';
@@ -18,6 +18,7 @@ const CHAT_TOOL_ICONS = {
   model: Cpu,
   question: MessageCircleQuestion,
   routine: AlarmClock,
+  todo: ListTodo,
   artifact: LayoutDashboard,
   mcp: Plug,
   tool: Wrench,

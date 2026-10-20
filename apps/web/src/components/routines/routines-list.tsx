@@ -1,6 +1,7 @@
 import { ROOMS } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useQuery } from '@tanstack/react-query';
+import { RoomsPrefillLink } from '@/components/rooms/rooms-prefill-link';
 import { RoutinesItem } from '@/components/routines/routines-item';
 import { EmptyCompact } from '@/components/ui/empty';
 import { FormErrors } from '@/components/ui/forms/form';
@@ -30,13 +31,6 @@ export function RoutinesList({ bot }: RoutinesListProps) {
           ))}
         </div>
       ) : null}
-      {list.data?.length === 0 ? (
-        <EmptyCompact
-          description={m.rooms_routines_empty_hint({ bot: bot.name })}
-          icon={<IconCalendarClock />}
-          title={m.rooms_routines_empty_title()}
-        />
-      ) : null}
       {list.data && list.data.length > 0 ? (
         <ItemGroup variant="outline">
           {list.data.map((routine) => (
@@ -47,6 +41,26 @@ export function RoutinesList({ bot }: RoutinesListProps) {
             />
           ))}
         </ItemGroup>
+      ) : null}
+      {list.isSuccess && list.data.length === 0 ? (
+        <EmptyCompact
+          description={(
+            <>
+              {m.rooms_routines_empty_hint({ bot: bot.name })}
+              {' '}
+              <RoomsPrefillLink bot={bot} prompt={m.rooms_routines_prompt()}>{m.rooms_prefill_create_inline()}</RoomsPrefillLink>
+              {' '}
+              {m.rooms_prefill_by_asking({ bot: bot.name })}
+            </>
+          )}
+          icon={<IconCalendarClock />}
+          title={m.rooms_routines_empty_title()}
+        />
+      ) : null}
+      {(list.data ?? []).length > 0 ? (
+        <p className="text-xs text-muted-foreground [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary">
+          <RoomsPrefillLink bot={bot} prompt={m.rooms_routines_prompt()}>{m.rooms_prefill_create()}</RoomsPrefillLink>
+        </p>
       ) : null}
     </div>
   );

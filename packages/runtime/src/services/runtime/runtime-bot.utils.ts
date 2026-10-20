@@ -7,9 +7,11 @@ import { makeConversationIndexService } from '../conversation-index/conversation
 import { makeNotificationService } from '../notification/notification.service';
 import { makeQuestionService } from '../question/question.service';
 import { makeRoutineService } from '../routine/routine.service';
+import { makeTodoService } from '../todo/todo.service';
 import { runtimeArtifactToolsExtension } from './runtime-artifact-tools.utils';
 import { runtimeQueryNextDeadline } from './runtime-query.next-deadline';
 import { runtimeRoutineToolsExtension } from './runtime-routine-tools.utils';
+import { runtimeTodoToolsExtension } from './runtime-todo-tools.utils';
 import { runtimeToolsExtension } from './runtime-tools.utils';
 import { RUNTIME_ALARM_DEBOUNCE_MS } from './runtime.constants';
 import type { RuntimeBot, RuntimeServiceDeps, RuntimeSharedDeps } from '../../types/runtime.types';
@@ -37,7 +39,9 @@ export async function runtimeBotOpen(shared: RuntimeSharedDeps, botId: string): 
     const artifactTools = runtimeArtifactToolsExtension({ artifacts });
     const routines = makeRoutineService({ harness });
     const routineTools = runtimeRoutineToolsExtension({ harness, routines });
-    const readOnlyTools = [...shared.readOnlyTools, ...artifactTools.readOnlyTools, ...routineTools.readOnlyTools];
+    const todos = makeTodoService({ harness });
+    const todoTools = runtimeTodoToolsExtension({ harness, todos });
+    const readOnlyTools = [...shared.readOnlyTools, ...artifactTools.readOnlyTools, ...routineTools.readOnlyTools, ...todoTools.readOnlyTools];
 
     // The permission hook stays last, including for custom and MCP tools.
     const permissionExtension = runtimeToolsExtension({
@@ -46,7 +50,7 @@ export async function runtimeBotOpen(shared: RuntimeSharedDeps, botId: string): 
       permissions: shared.permissions,
     });
 
-    for (const extension of [artifactTools.extension, routineTools.extension, permissionExtension]) {
+    for (const extension of [artifactTools.extension, routineTools.extension, todoTools.extension, permissionExtension]) {
       registry.install(extension);
     }
 
@@ -56,12 +60,13 @@ export async function runtimeBotOpen(shared: RuntimeSharedDeps, botId: string): 
       harness,
       questions: makeQuestionService({ harness }),
       routines,
+      todos,
       artifacts,
       index: await makeConversationIndexService({ harness }),
       registry,
       models: shared.models,
       readOnlyTools,
-      extensions: [...shared.extensions, artifactTools.extension, routineTools.extension, permissionExtension],
+      extensions: [...shared.extensions, artifactTools.extension, routineTools.extension, todoTools.extension, permissionExtension],
     };
 
     const arm = runtimeBotAlarm(shared, deps);

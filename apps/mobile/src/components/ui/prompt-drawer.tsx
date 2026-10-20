@@ -1,6 +1,7 @@
 import { cva } from 'cva';
-import { FileText, RotateCw, X } from 'lucide-react-native';
+import { ChevronDown, FileText, RotateCw, X } from 'lucide-react-native';
 import { ActivityIndicator, Image, Pressable, ScrollView, View } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { match } from 'ts-pattern';
 import { cn } from '@/lib/cn';
 import { FloatingBar } from './floating-bar';
@@ -173,5 +174,30 @@ export function PromptAttachment({ name, preview, status, removeLabel, retryLabe
         <Icon icon={X} size="sm" />
       </Pressable>
     </View>
+  );
+}
+
+interface PromptJumpProps {
+  children: string;
+  onPress: () => void;
+}
+
+/** A centered pill above the composer that jumps to the newest messages. */
+export function PromptJump({ children, onPress }: PromptJumpProps) {
+  return (
+    <Animated.View className="mb-6 self-center" entering={FadeIn} exiting={FadeOut}>
+      <Pressable
+        accessibilityRole="button"
+        className="h-9 flex-row items-center gap-2 rounded-full border border-blue-400/70 bg-blue pr-4 pl-3.5 shadow-sm active:scale-[0.97]"
+        hitSlop={8}
+        style={{ borderCurve: 'continuous' }}
+        onPress={onPress}
+      >
+        <textContext.Provider value={{ tone: 'on-blue' }}>
+          <Icon icon={ChevronDown} strokeWidth={2.75} />
+          <Text className="text-[15px] font-light">{children}</Text>
+        </textContext.Provider>
+      </Pressable>
+    </Animated.View>
   );
 }

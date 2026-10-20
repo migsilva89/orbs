@@ -3,6 +3,7 @@ import { m } from '@openbots/i18n/client';
 import { useNavigation } from '@react-navigation/native';
 import { ChevronLeft, Ellipsis } from 'lucide-react-native';
 import { View } from 'react-native';
+import { BotActionsMenu } from '@/components/bots/bot-actions-menu';
 import { Avatar } from '@/components/ui/avatar';
 import { FloatingBar } from '@/components/ui/floating-bar';
 import { GlassButton } from '@/components/ui/glass-button';
@@ -26,30 +27,28 @@ export function ChatHeader({ bot, activity }: ChatHeaderProps) {
       <GlassButton accessibilityLabel={m.mobile_chat_back()} onPress={() => navigation.goBack()}>
         <Icon icon={ChevronLeft} size="action" />
       </GlassButton>
-      <GlassSurface className="h-11 shrink">
-        <View className="flex-1 flex-row items-center gap-2 pr-4 pl-1.5">
-          <Avatar
-            avatar={bot.avatar}
-            name={bot.name}
-            size="sm"
-          />
-          <View className="shrink">
-            <Text numberOfLines={1} variant="chat-title">{bot.name}</Text>
-            <Text
-              numberOfLines={1}
-              tone="muted"
-              variant="chat-status"
-            >
-              {BOT_ACTIVITY_LABELS[activity]()}
-            </Text>
+      <BotActionsMenu botId={bot.id} mode="longPress">
+        <GlassSurface className="h-11 shrink">
+          <View className="flex-1 flex-row items-center gap-2 pr-4 pl-1.5">
+            <Avatar
+              avatar={bot.avatar}
+              name={bot.name}
+              size="sm"
+            />
+            <View className="shrink">
+              <Text numberOfLines={1} variant="chat-title">{bot.name}</Text>
+              <Text
+                numberOfLines={1}
+                tone="muted"
+                variant="chat-status"
+              >
+                {BOT_ACTIVITY_LABELS[activity]()}
+              </Text>
+            </View>
           </View>
-        </View>
-      </GlassSurface>
-      <GlassButton
-        disabled
-        accessibilityHint={m.mobile_home_unavailable()}
-        accessibilityLabel={m.rooms_details_more()}
-      >
+        </GlassSurface>
+      </BotActionsMenu>
+      <GlassButton accessibilityLabel={m.rooms_details_more()} onPress={() => navigation.navigate('BotDetails', { botId: bot.id })}>
         <Icon icon={Ellipsis} size="action" />
       </GlassButton>
     </FloatingBar>

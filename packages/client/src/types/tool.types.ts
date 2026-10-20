@@ -35,7 +35,7 @@ export interface ToolInputText {
 
 export type ToolBot = Pick<Bot, 'name'> & Partial<Pick<Bot, 'avatar'>>;
 
-export type ToolIconKind = 'terminal' | 'file' | 'edit' | 'search' | 'bot' | 'model' | 'question' | 'routine' | 'artifact' | 'mcp' | 'tool';
+export type ToolIconKind = 'terminal' | 'file' | 'edit' | 'search' | 'bot' | 'model' | 'question' | 'routine' | 'todo' | 'artifact' | 'mcp' | 'tool';
 
 export interface ToolPresentation {
   label: string;

@@ -12,6 +12,7 @@ import { makePluginService } from '../services/plugin/plugin.service';
 import { makeRoutineService } from '../services/routine/routine.service';
 import { makeServerService } from '../services/server/server.service';
 import { makeSkillService } from '../services/skill/skill.service';
+import { makeTodoService } from '../services/todo/todo.service';
 import { makeToolService } from '../services/tool/tool.service';
 import type { CoreServicesParams } from '../types/core.types';
 
@@ -80,6 +81,7 @@ export async function makeServices({
 
     return {
       routines: makeRoutineService({ bots, runtime }),
+      todos: makeTodoService({ bots, runtime }),
       artifacts: makeArtifactService({ bots, runtime }),
       server,
       limits,

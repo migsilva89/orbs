@@ -35,6 +35,19 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
           })
           .with({ matched: false }, () => new Response(null, { status: 404 }))
           .exhaustive()))
+        .with({ path: P.string.startsWith('/files/'), isAllowedOrigin: false }, () => new Response(null, { status: 403 }))
+        .with({ path: P.string.startsWith('/files/'), method: P.union('GET', 'OPTIONS') }, () => rpc.files.handle(request, {
+          prefix: '/files',
+          context: { ...rpc.context, peerAddress: server.requestIP(request)?.address ?? null },
+        }).then((result) => match(result)
+          .with({ matched: true }, ({ response }) => {
+            response.headers.set('Cache-Control', response.ok ? 'private, max-age=31536000, immutable' : 'no-store');
+            response.headers.set('X-Content-Type-Options', 'nosniff');
+
+            return response;
+          })
+          .with({ matched: false }, () => new Response(null, { status: 404 }))
+          .exhaustive()))
         .with({ path: '/rpc', method: 'GET' }, () => match(server.upgrade(request, { data: undefined }))
           .with(true, () => undefined)
           .with(false, () => new Response(null, { status: 426 }))

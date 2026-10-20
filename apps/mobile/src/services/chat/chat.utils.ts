@@ -107,14 +107,3 @@ export function chatFileBlob({ uri, name }: Pick<ChatTypes.ChatPicked, 'uri' | '
     request.send();
   });
 }
-
-export function chatBlobUri(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    // SAFETY: `readAsDataURL` always resolves `result` as a data URI string.
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Errors.INTERNAL_ERROR({ internal: 'Could not read the attachment' }));
-    reader.readAsDataURL(blob);
-  });
-}

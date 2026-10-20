@@ -30,6 +30,7 @@ export * from './types/routine.types';
 export * from './types/server.types';
 export * from './types/skill.types';
 export * from './types/theme.types';
+export * from './types/todo.types';
 export * from './types/tool-call.types';
 export * from './types/tool.types';
 export * from './types/usage.types';

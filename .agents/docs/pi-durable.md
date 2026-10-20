@@ -272,6 +272,12 @@ Disposable native SQLite/faux-provider checks verified no model calls while wait
 
 Routine tools use native `defineTool` registrations, with schemas derived once from the public contracts. The runtime binds the caller's Pi bot identity to its main conversation and calls the existing routine service. Only the exact `bot_routine_list` registration enters the trusted-read set. Permission hooks are installed after the tool extension. Mutations are replay-unsafe, following Pi's documented interrupted-tool behavior; they do not introduce a second receipt or transaction log. `bot_routine_run` returns after requesting delivery and never waits for a future turn of the calling conversation.
 
+## Todo integration
+
+Todos use a conversation-scoped `openbots.todos` document (`fork: 'initial'`) on the bot's main conversation: `{ nextId, todos }` with small numeric IDs the model can quote. No SQL table or task is needed. The `openbots.todos` extension adds a `todos` system prompt [section](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/durable/README.md#system-prompt) that reads the document through `input.read` and lists up to 20 open todos. An empty list omits the section, so ordinary chats are unchanged.
+
+Pi stores sections as positional system entries and appends one only when the text changes. A disposable faux-provider check on 2026-10-20 confirmed: no section before the first todo, one entry after it, the same entry reused on an unchanged turn, and a `todos: null` removal entry after the last todo was done. Subagents and temporary contexts have their own empty document, so the section appears only in the main chat. `bot_todo_*` tools still target the main chat from any context.
+
 ## Bot tools, bounded search, reactions and artifacts
 
 Bot CRUD tools receive the whole server bot service through runtime registration before restore/resume. Runtime declares its required service interface without importing server. The installed permission hook remains last; trust uses tool registration identity. Mutating tools use native unsafe replay, so a model must inspect saved state before retrying an interrupted operation.

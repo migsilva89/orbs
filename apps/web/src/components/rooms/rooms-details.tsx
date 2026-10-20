@@ -9,6 +9,7 @@ import { RoomsDetailsMedia } from '@/components/rooms/rooms-details-media';
 import { RoomsDetailsSection } from '@/components/rooms/rooms-details-section';
 import { RoomsSettingsMenu } from '@/components/rooms/rooms-settings-menu';
 import { RoutinesList } from '@/components/routines/routines-list';
+import { TodosList } from '@/components/todos/todos-list';
 import { Button } from '@/components/ui/button';
 import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle, ItemValue } from '@/components/ui/item';
 import * as Sidebar from '@/components/ui/sidebar';
@@ -94,6 +95,9 @@ function RoomsDetailsPanel({ botId, tab, onTabChange }: RoomsDetailsPanelProps) 
         <Sidebar.SidebarContent>
           <TabsContent className="flex flex-col gap-4 px-4 py-2" value="details">
             <RoomsDetailsBot bot={bot} chat={chat} />
+            <RoomsDetailsSection title={m.rooms_todos()}>
+              <TodosList bot={bot} handle={bot.handle} />
+            </RoomsDetailsSection>
             <RoomsDetailsSection title={m.rooms_routines()}>
               <RoutinesList bot={bot} />
             </RoomsDetailsSection>

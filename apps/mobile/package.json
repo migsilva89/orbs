@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@expo-google-fonts/inter": "catalog:mobile",
+    "@expo/ui": "catalog:mobile",
     "@legendapp/list": "catalog:mobile",
     "@openbots/avatar-blobs": "workspace:*",
     "@openbots/client": "workspace:*",

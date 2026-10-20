@@ -4,7 +4,7 @@ import type { RuntimeCarryOverDeps, RuntimeCarryOverParams } from '../../types/r
 import type { Context } from '@earendil-works/chord/context';
 
 /**
- * Finish a history clear: recreate the saved routines and artifacts in the fresh store with their IDs, then drop the
+ * Finish a history clear: recreate the saved routines, todos and artifacts in the fresh store with their IDs, then drop the
  * carry file. Creation skips IDs that already exist, so a crash here simply reruns on the next configuration.
  */
 export async function runtimeActionCarryOver(deps: RuntimeCarryOverDeps, { conversationId }: RuntimeCarryOverParams, context: Context) {
@@ -24,6 +24,8 @@ export async function runtimeActionCarryOver(deps: RuntimeCarryOverDeps, { conve
         botId: deps.botId,
         conversationId,
       }, context)));
+      await Promise.all(carry.todos.map((todo) => deps.todos.actions.create({ ...todo, conversationId }, context)));
+      await deps.todos.actions.reorder({ conversationId, todoIds: carry.todos.map((todo) => todo.id) }, context);
       await deps.storage.removeCarry({ botId: deps.botId });
     })
     .otherwise(() => undefined);

@@ -5,6 +5,11 @@ export interface ChatRouteParams {
   botId: string;
   replyToEntryId?: number;
   quote?: ClientTypes.MentionItem;
+  prefill?: ChatPrefill;
+}
+
+export interface ChatPrefill {
+  text: string;
 }
 
 export interface ChatReactionParams {

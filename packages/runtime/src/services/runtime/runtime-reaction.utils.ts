@@ -9,6 +9,8 @@ import type { Context } from '@earendil-works/chord/context';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
 import type { ConversationReaction } from '@openbots/contracts/universal';
 
+const runtimeReactionOwnerKinds = new Set<string>([UserEntry.kind, ATTACHMENT.entryKind, REPLY.entryKind]);
+
 export function runtimeReactionTarget(entry: PiDurableTypes.EntryRecord | undefined, conversationId: PiDurableTypes.ConversationId) {
   return match(entry)
     .with({
@@ -91,15 +93,18 @@ export async function runtimeReactionSetBot(
     });
 
   return api.commit(async (tx) => {
-    return match(runtimeReactionTarget(await tx.entry(params.entryId as PiDurableTypes.EntryId), api.conversationId))
+    const entryId = params.entryId ?? (await tx.scanEntries({ conversationId: api.conversationId, order: 'descending' }, 50)).items
+      .find((entry) => runtimeReactionOwnerKinds.has(entry.kind))?.id;
+
+    return match(runtimeReactionTarget(entryId === undefined ? undefined : await tx.entry(entryId as PiDurableTypes.EntryId), api.conversationId))
       .with(P.nullish, () => {
-        throw new Errors.NOT_FOUND({ resource: 'entry', resourceId: params.entryId });
+        throw new Errors.NOT_FOUND({ resource: 'entry', resourceId: entryId ?? 0 });
       })
-      .otherwise(async () => {
-        const document = await tx.doc(runtimeReactions, api.conversationId, String(params.entryId), null);
+      .otherwise(async (entry) => {
+        const document = await tx.doc(runtimeReactions, api.conversationId, String(entry.id), null);
         runtimeReactionApplyBot(document, botId, params);
 
-        return runtimeReactionView(params.entryId, document);
+        return runtimeReactionView(entry.id, document);
       });
   }, context);
 }

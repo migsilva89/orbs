@@ -9,6 +9,7 @@ import { notificationItemKey, notificationRecentAppend } from '../notification/n
 import { questionExtension } from '../question/question.service';
 import { routineExtension } from '../routine/routine.service';
 import { subagentExtension } from '../subagent/subagent.service';
+import { todoExtension } from '../todo/todo.service';
 import { runtimeActionAddAttachment } from './runtime-action.add-attachment';
 import { runtimeActionAnswerQuestion } from './runtime-action.answer-question';
 import { runtimeActionApprove } from './runtime-action.approve';
@@ -16,11 +17,14 @@ import { runtimeActionCarryOver } from './runtime-action.carry-over';
 import { runtimeActionConfigureBot } from './runtime-action.configure-bot';
 import { runtimeActionCreateArtifact } from './runtime-action.create-artifact';
 import { runtimeActionCreateRoutine } from './runtime-action.create-routine';
+import { runtimeActionCreateTodo } from './runtime-action.create-todo';
 import { runtimeActionExecuteCommand } from './runtime-action.execute-command';
 import { runtimeActionExpireAttachments } from './runtime-action.expire-attachments';
 import { runtimeActionRegisterBotTools } from './runtime-action.register-bot-tools';
 import { runtimeActionRemoveAttachment } from './runtime-action.remove-attachment';
 import { runtimeActionRemoveRoutine } from './runtime-action.remove-routine';
+import { runtimeActionRemoveTodo } from './runtime-action.remove-todo';
+import { runtimeActionReorderTodos } from './runtime-action.reorder-todos';
 import { runtimeActionRestoreArtifact } from './runtime-action.restore-artifact';
 import { runtimeActionRetainAttachments } from './runtime-action.retain-attachments';
 import { runtimeActionRunRoutine } from './runtime-action.run-routine';
@@ -30,6 +34,7 @@ import { runtimeActionSubmit } from './runtime-action.submit';
 import { runtimeActionUpdateArtifact } from './runtime-action.update-artifact';
 import { runtimeActionUpdateRoutine } from './runtime-action.update-routine';
 import { runtimeActionUpdateSubmission } from './runtime-action.update-submission';
+import { runtimeActionUpdateTodo } from './runtime-action.update-todo';
 import { runtimeBotOpen } from './runtime-bot.utils';
 import { runtimeChatToolsExtension } from './runtime-chat-tools.utils';
 import { runtimeDirectory } from './runtime-directory.utils';
@@ -50,6 +55,7 @@ import { runtimeQueryHistory } from './runtime-query.history';
 import { runtimeQueryListArtifacts } from './runtime-query.list-artifacts';
 import { runtimeQueryListBotArtifacts } from './runtime-query.list-bot-artifacts';
 import { runtimeQueryListRoutines } from './runtime-query.list-routines';
+import { runtimeQueryListTodos } from './runtime-query.list-todos';
 import { runtimeQueryModels } from './runtime-query.models';
 import { runtimeQueryQuestions } from './runtime-query.questions';
 import { runtimeQueryReactions } from './runtime-query.reactions';
@@ -59,6 +65,7 @@ import { runtimeQueryUsage } from './runtime-query.usage';
 import { runtimeQueryValidateModel } from './runtime-query.validate-model';
 import { runtimeQueryWatch } from './runtime-query.watch';
 import { runtimeQueryWatchContexts } from './runtime-query.watch-contexts';
+import { runtimeReactionExtension } from './runtime-reaction.task';
 import { runtimeSkills } from './runtime-skills.utils';
 import { runtimeWatchMerge } from './runtime-watch-merge.utils';
 import { RUNTIME_ALARM_HEARTBEAT_MS } from './runtime.constants';
@@ -104,6 +111,8 @@ export async function makeRuntimeService({
       chatTools.extension,
       subagentExtension(),
       routineExtension,
+      runtimeReactionExtension,
+      todoExtension,
       toolSearch,
       ...toolExtensions,
     ],
@@ -156,6 +165,10 @@ export async function makeRuntimeService({
       runRoutine: inBot(runtimeActionRunRoutine),
       updateRoutine: inBot(runtimeActionUpdateRoutine),
       createRoutine: inBot(runtimeActionCreateRoutine),
+      createTodo: inBot(runtimeActionCreateTodo),
+      updateTodo: inBot(runtimeActionUpdateTodo),
+      removeTodo: inBot(runtimeActionRemoveTodo),
+      reorderTodos: inBot(runtimeActionReorderTodos),
       answerQuestion: inBot(runtimeActionAnswerQuestion),
       setReaction: inBot(runtimeActionSetReaction),
       executeCommand: inBot(runtimeActionExecuteCommand),
@@ -166,7 +179,7 @@ export async function makeRuntimeService({
         directory.unregister(botId);
         await directory.close(botId, () => storage.remove({ botId }));
       },
-      /** Save routines and artifacts, then delete the bot's store. The next `configureBot` opens a fresh one and refills it. */
+      /** Save routines, todos and artifacts, then delete the bot's store. The next `configureBot` opens a fresh one and refills it. */
       clearBot: async ({ botId }: UniversalTypes.BotGetInput, context: Context = BACKGROUND_CONTEXT) => {
         const { deps } = await directory.bot(botId);
         await storage.saveCarry({ botId, carry: await runtimeQueryCarry(deps, context) });
@@ -190,6 +203,7 @@ export async function makeRuntimeService({
       botArtifacts: inBot(runtimeQueryListBotArtifacts),
       search: inBot((deps, params: RuntimeSearchParams, context) => runtimeQuerySearch(deps, params, context)),
       routines: inBot(runtimeQueryListRoutines),
+      todos: inBot(runtimeQueryListTodos),
       questions: inBot(runtimeQueryQuestions),
       reactions: inBot(runtimeQueryReactions),
       attachment: inBot((deps, params: AttachmentTypes.RuntimeAttachmentIdParams, context) => runtimeQueryAttachment(deps, params, context)),

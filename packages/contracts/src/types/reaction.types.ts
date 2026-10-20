@@ -1,8 +1,13 @@
 import { z } from 'zod';
 import { conversationTarget } from './conversation.types';
+import { messageQuote } from './reply.types';
 
 export const REACTION = {
   docKind: 'openbots.entry-reaction',
+  entryKind: 'openbots.reaction-message',
+  toolName: 'bot_react',
+  /** The owner can take a reaction back this long before the bot hears about it. */
+  deliverMs: 2000,
   maxPerEntry: 20,
   maxEmoji: 64,
 } as const;
@@ -15,6 +20,8 @@ export const reactionEmoji = z.string().min(1).max(REACTION.maxEmoji).refine((va
 
   return graphemes.length === 1 && reactionEmojiPattern.test(value);
 });
+
+export const reactionMessage = z.object({ emoji: z.string().min(1).max(REACTION.maxEmoji), replyTo: messageQuote });
 
 export const conversationSetReaction = conversationTarget.extend({
   entryId: z.number().int().positive(),

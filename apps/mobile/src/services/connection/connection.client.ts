@@ -1,10 +1,11 @@
 import { makeHttpClient } from '@openbots/client/client';
-import { connectionStored } from '@openbots/contracts/universal';
+import { connectionStored, SERVER_PROTOCOL } from '@openbots/contracts/universal';
 import * as SecureStore from 'expo-secure-store';
 import { match } from 'ts-pattern';
 import { CONNECTION_STORAGE_KEY } from './connection.constants';
-import type { ConnectionPairParams } from '@/types/connection.types';
+import type { ConnectionFileParams, ConnectionPairParams } from '@/types/connection.types';
 import type { ConnectionSaved } from '@openbots/contracts/universal';
+import type { ImageURISource } from 'react-native';
 
 export async function connectionRead(): Promise<ConnectionSaved | null> {
   const saved = await SecureStore.getItemAsync(CONNECTION_STORAGE_KEY);
@@ -42,4 +43,17 @@ export function connectionSocketUrl(connection: Pick<ConnectionSaved, 'serverUrl
   url.protocol = match(url.protocol).with('https:', () => 'wss:').otherwise(() => 'ws:');
 
   return url.toString();
+}
+
+export function connectionFileSource(connection: ConnectionSaved, { botId, attachmentId }: ConnectionFileParams): ImageURISource {
+  return {
+    uri: new URL(`/files/${encodeURIComponent(botId)}/${encodeURIComponent(attachmentId)}`, connection.serverUrl).toString(),
+    headers: {
+      authorization: `Bearer ${connection.token}`,
+      [SERVER_PROTOCOL.versionHeader]: String(SERVER_PROTOCOL.version),
+      ...match(connection.serverId)
+        .with(undefined, () => ({}))
+        .otherwise((id) => ({ [SERVER_PROTOCOL.serverIdHeader]: id })),
+    },
+  };
 }

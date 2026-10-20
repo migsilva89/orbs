@@ -76,7 +76,7 @@ try {
     fetch: async (request, bun) => {
       const { pathname, search } = new URL(request.url);
 
-      if (pathname === '/rpc' || pathname.startsWith('/rpc/')) {
+      if (pathname === '/rpc' || pathname.startsWith('/rpc/') || pathname.startsWith('/files/')) {
         const target = new URL(pathname + search, env.OPENBOTS_DAEMON_URL);
         const headers = new Headers(request.headers);
         headers.delete('host');

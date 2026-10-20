@@ -12,6 +12,7 @@ import type { PluginService } from '../services/plugin/plugin.service';
 import type { RoutineService } from '../services/routine/routine.service';
 import type { ServerService } from '../services/server/server.service';
 import type { SkillService } from '../services/skill/skill.service';
+import type { TodoService } from '../services/todo/todo.service';
 import type { ToolService } from '../services/tool/tool.service';
 import type { ProviderService, RuntimeService } from '@openbots/runtime/server';
 import type { RequestHeadersPluginContext } from '@orpc/server/plugins';
@@ -22,6 +23,7 @@ export interface RpcContext extends RequestHeadersPluginContext {
   providers: ProviderService;
   mcpAuth: McpAuthService;
   routines: RoutineService;
+  todos: TodoService;
   artifacts: ArtifactService;
   attachments: AttachmentService;
   auth: AuthService;

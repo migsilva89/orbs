@@ -7,7 +7,10 @@ export const routes = rootRoute('root.tsx', [
   layout('chat', 'chat.layout.tsx', [
     route('/rooms', [
       index('rooms/rooms.index.tsx'),
-      route('/direct/$handle', 'rooms/rooms.direct.$handle.tsx', [route('/reset', 'rooms/rooms.direct.$handle.reset.tsx')]),
+      route('/direct/$handle', 'rooms/rooms.direct.$handle.tsx', [
+        route('/reset', 'rooms/rooms.direct.$handle.reset.tsx'),
+        route('/todos/$todoId/delete', 'rooms/rooms.direct.$handle.todos.$todoId.delete.tsx'),
+      ]),
     ]),
     route('/bots', 'bots/bots.layout.tsx', [
       index('bots/bots.index.tsx'),
@@ -16,6 +19,7 @@ export const routes = rootRoute('root.tsx', [
         route('/delete', 'bots/bots.$botId.delete.tsx'),
         route('/routines/$routineId/edit', 'bots/bots.$botId.routines.$routineId.edit.tsx'),
         route('/routines/$routineId/delete', 'bots/bots.$botId.routines.$routineId.delete.tsx'),
+        route('/todos/$todoId/delete', 'bots/bots.$botId.todos.$todoId.delete.tsx'),
       ]),
     ]),
     route('/artifacts', 'artifacts/artifacts.layout.tsx', [

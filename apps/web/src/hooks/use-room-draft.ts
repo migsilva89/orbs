@@ -1,5 +1,6 @@
 import { ROOMS } from '@openbots/client/client';
 import { useSyncExternalStore } from 'react';
+import type { RoomsPrefill } from '@/types/rooms.types';
 
 export function useRoomDraft(botId: string) {
   const key = `${ROOMS.draftKeyPrefix}${botId}`;
@@ -24,5 +25,14 @@ export function useRoomDraft(botId: string) {
     window.dispatchEvent(new StorageEvent('storage', { key }));
   }
 
-  return { draft, save };
+  function prefill(text: string) {
+    if (localStorage.getItem(key)) {
+      return;
+    }
+
+    save(text);
+    window.dispatchEvent(new CustomEvent<RoomsPrefill>(ROOMS.prefillEvent, { detail: { botId, text } }));
+  }
+
+  return { draft, save, prefill };
 }

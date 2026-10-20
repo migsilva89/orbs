@@ -12,6 +12,7 @@ import { BotFormProfile } from '@/components/bots/bot-form-profile';
 import { LayoutPageHeader } from '@/components/layout/layout-page-header';
 import { RoutinesPanel } from '@/components/routines/routines-panel';
 import { SettingsPanel } from '@/components/settings/settings-panel';
+import { TodosPanel } from '@/components/todos/todos-panel';
 import { Button } from '@/components/ui/button';
 import { ButtonLoading } from '@/components/ui/button-loading';
 import { Form } from '@/components/ui/forms/form';
@@ -144,6 +145,7 @@ function BotPageForm({ bot, deletable }: BotPageFormProps) {
           </SettingsPanel>
         </fieldset>
       </form>
+      <TodosPanel bot={bot} />
       <RoutinesPanel bot={bot} />
       {deletable ? (
         <Button

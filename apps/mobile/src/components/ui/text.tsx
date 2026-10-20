@@ -18,6 +18,7 @@ export const textBaseVariants = cva({
       destructive: 'text-destructive',
       'destructive-subtle': 'text-destructive/40',
       'on-destructive': 'text-destructive-foreground',
+      'on-blue': 'text-white',
       card: 'text-card-foreground',
     },
   },

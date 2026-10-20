@@ -1,6 +1,7 @@
 import { env } from '@openbots/env/server';
 import { errorStatusMap } from '@openbots/errors/universal';
 import { log } from '@openbots/logger/server';
+import { OpenAPIHandler } from '@orpc/openapi/fetch';
 import { onError, ORPCError } from '@orpc/server';
 import { RPCHandler as FetchRPCHandler } from '@orpc/server/fetch';
 import { CORSPlugin, RequestHeadersPlugin } from '@orpc/server/plugins';
@@ -32,6 +33,7 @@ export function coreRpcNative(
       providers: services.providers,
       mcpAuth: services.mcpAuth,
       routines: services.routines,
+      todos: services.todos,
       auth: services.auth,
       credentials: services.credentials,
       isLocal,
@@ -48,6 +50,11 @@ export function coreRpcNative(
       artifacts: services.artifacts,
     },
     http: new FetchRPCHandler(router, {
+      plugins: [...plugins, new CORSPlugin({ origin: env.OPENBOTS_ALLOWED_ORIGINS })],
+      interceptors,
+      errorStatusMap,
+    }),
+    files: new OpenAPIHandler({ download: router.attachments.download }, {
       plugins: [...plugins, new CORSPlugin({ origin: env.OPENBOTS_ALLOWED_ORIGINS })],
       interceptors,
       errorStatusMap,

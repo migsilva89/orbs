@@ -24,6 +24,7 @@ export function conversationPreferencesView(preference: BotPreferences, lastAssi
     rank: preference.rank,
     readThroughEntryId: preference.readThroughEntryId,
     hasUnread: lastAssistantEntryId > preference.readThroughEntryId,
+    whenBusy: preference.whenBusy,
   };
 }
 

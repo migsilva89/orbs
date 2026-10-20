@@ -26,6 +26,7 @@ export type PromptInputEditorSegment = { kind: 'text', text: string } | { kind: 
 
 export interface PromptInputEditorHandle {
   insert: (items: PromptInputEditorItem[]) => void
+  restore: (segments: PromptInputEditorSegment[]) => void
 }
 
 /** A character that opens a list of things to insert as pills; `items` may load them, `empty` shows when none match. */
@@ -339,6 +340,11 @@ export function PromptInputEditor({
   useImperativeHandle(ref, () => ({
     insert: (items) => {
       editor?.chain().focus().insertContent(items.flatMap((item) => [{ type: PromptInputEditorPillNode.name, attrs: { id: item.href, label: item.label } }, { type: 'text', text: ' ' }])).run();
+    },
+    restore: (segments) => {
+      if (editor?.isEmpty) {
+        editor.chain().setContent(promptInputEditorDocument(segments)).focus('end').run();
+      }
     },
   }), [editor]);
 

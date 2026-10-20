@@ -1,6 +1,7 @@
 import { botFields } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { BOT_PERMISSION_LABELS } from '@/services/bot/bot.constants';
 import type { BotPermission } from '@/types/bot.types';
 
 interface BotPermissionSelectProps {
@@ -10,13 +11,6 @@ interface BotPermissionSelectProps {
 }
 
 export function BotPermissionSelect({ value, disabled, onChange }: BotPermissionSelectProps) {
-  const labels = {
-    'read-only': m.rooms_bot_permission_read_only(),
-    ask: m.rooms_bot_permission_ask(),
-    auto: m.rooms_bot_permission_auto(),
-    full: m.rooms_bot_permission_full(),
-  } satisfies Record<BotPermission, string>;
-
   const hints = {
     'read-only': m.rooms_bot_permission_read_only_hint(),
     ask: m.rooms_bot_permission_ask_hint(),
@@ -35,7 +29,7 @@ export function BotPermissionSelect({ value, disabled, onChange }: BotPermission
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {botFields.shape.permission.options.map((option) => <SelectItem key={option} value={option}>{labels[option]}</SelectItem>)}
+          {botFields.shape.permission.options.map((option) => <SelectItem key={option} value={option}>{BOT_PERMISSION_LABELS[option]()}</SelectItem>)}
         </SelectContent>
       </Select>
       <p className="text-xs text-muted-foreground">{hints[value]}</p>

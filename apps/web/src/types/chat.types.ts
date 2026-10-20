@@ -62,6 +62,21 @@ export interface ChatQueued {
   text: string;
 }
 
+export interface ChatOutgoing {
+  requestId: string;
+  botId: string;
+  text: string;
+  afterEntryId: number;
+  createdAt: number;
+  submissionId?: number;
+}
+
+export interface ChatOutgoingParams {
+  botId: string;
+  latestEntryId: number;
+  queued: ChatQueued[];
+}
+
 type ChatQueuedInput = Extract<UniversalTypes.ConversationState['inbox']['items'][number], { mode: 'steer' | 'followUp' }>;
 
 export type ChatInputContent = ChatQueuedInput['content'] | Extract<ChatPiMessage, { role: 'user' | 'toolResult' }>['content'];

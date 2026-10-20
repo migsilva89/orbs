@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot, ConversationWhenBusy } from '@openbots/contracts/universal';
 import type { Generated } from 'kysely';
 import type { DatabaseSync } from 'node:sqlite';
 
@@ -17,6 +17,7 @@ export interface DatabaseBotPreference {
   isMuted: Generated<number>;
   mutedUntil: number | null;
   readThroughEntryId: Generated<number>;
+  whenBusy: ConversationWhenBusy | null;
   updatedAt: number;
 }
 

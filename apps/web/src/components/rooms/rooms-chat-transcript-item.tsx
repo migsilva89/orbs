@@ -16,12 +16,13 @@ interface RoomsChatTranscriptItemProps {
   time: string | undefined
   isFocused: boolean
   isLive: boolean
+  isSending: boolean
   onReply: (message: ChatMessage) => void
 }
 
-export function RoomsChatTranscriptItem({ message, bot, peer, groups, time, isFocused, isLive, onReply }: RoomsChatTranscriptItemProps) {
+export function RoomsChatTranscriptItem({ message, bot, peer, groups, time, isFocused, isLive, isSending, onReply }: RoomsChatTranscriptItemProps) {
   return (
-    <MessageScrollerItem variant={isFocused ? 'highlight' : 'default'}>
+    <MessageScrollerItem className={isSending ? 'opacity-60' : undefined} variant={isFocused ? 'highlight' : 'default'}>
       {time ? <p className="my-3 zoom-[0.8] text-center text-xs text-muted-foreground">{time}</p> : null}
       {match(message.role)
         .with('system', () => (
@@ -46,8 +47,8 @@ export function RoomsChatTranscriptItem({ message, bot, peer, groups, time, isFo
         .otherwise(() => (
           <>
             <RoomsChatMessage
-              hasActions
               botId={bot.id}
+              hasActions={!isSending}
               message={message}
               name={message.metadata?.authorName ?? ''}
               onReply={() => onReply(message)}

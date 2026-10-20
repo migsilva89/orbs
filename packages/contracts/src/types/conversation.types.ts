@@ -3,6 +3,7 @@ import { type } from '@orpc/contract';
 import { z } from 'zod';
 import { attachmentIds } from './attachment.types';
 import { botAvatar } from './bot.types';
+import { conversationWhenBusy } from './conversation-preference.types';
 import type { JsonValue } from '@earendil-works/chord';
 import type { Op } from '@earendil-works/chord/delta';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
@@ -139,6 +140,7 @@ export const conversationPreferences = z.object({
   rank: z.number().int().nonnegative().nullable(),
   readThroughEntryId: z.number().int().nonnegative(),
   hasUnread: z.boolean(),
+  whenBusy: conversationWhenBusy.nullable(),
 });
 
 export const conversationMarkRead = z.object({

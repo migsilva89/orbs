@@ -26,7 +26,15 @@ import {
 import { bot, botCatalog, botCreate, botDeleteResult, botGet, botList, botSwapModels, botSwapModelsResult, botUpdate } from '../types/bot.types';
 import { commandCatalog, commandExecute, commandExecuteResult, commandList } from '../types/command.types';
 import { conversationContextUsage } from '../types/context-usage.types';
-import { conversationArrange, conversationArrangeResult, conversationSetHidden, conversationSetMuted } from '../types/conversation-preference.types';
+import {
+  conversationArrange,
+  conversationArrangeResult,
+  conversationConfigure,
+  conversationSetHidden,
+  conversationSetMuted,
+  conversationSettings,
+  conversationSetWhenBusy,
+} from '../types/conversation-preference.types';
 import {
   conversationClearResult,
   conversationContextPage,
@@ -563,6 +571,17 @@ export const contract = {
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
       .input(conversationSetMuted)
       .output(conversationPreferences),
+    setWhenBusy: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(conversationSetWhenBusy)
+      .output(conversationPreferences),
+    settings: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(conversationSettings),
+    configure: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(conversationConfigure)
+      .output(conversationSettings),
     arrange: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
       .input(conversationArrange)

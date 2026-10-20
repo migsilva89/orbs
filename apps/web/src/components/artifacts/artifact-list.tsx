@@ -4,7 +4,7 @@ import { useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useHydrated } from '@tanstack/react-router';
 import { LayoutPageHeader } from '@/components/layout/layout-page-header';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
-import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item';
+import { Item, ItemActions, ItemContent, ItemDescription, ItemLink, ItemMedia, ItemTitle, ItemValue } from '@/components/ui/item';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconChevronRight from '~icons/lucide/chevron-right';
 import IconLayoutDashboard from '~icons/lucide/layout-dashboard';
@@ -35,29 +35,28 @@ export function ArtifactList() {
           ) : (
             <ul className="grid gap-2 sm:grid-cols-2">
               {artifacts.map((artifact) => (
-                <Item
-                  className="relative"
-                  key={artifact.id}
-                  variant="outline"
-                >
+                <Item key={artifact.id} variant="outline">
                   <ItemMedia variant="icon">
                     <IconLayoutDashboard />
                   </ItemMedia>
                   <ItemContent className="min-w-0">
                     <ItemTitle className="w-full">
-                      <Link
-                        className="truncate after:absolute after:inset-0"
-                        params={{ botId: artifact.botId, conversationId: artifact.conversationId, artifactId: artifact.id }}
-                        to="/artifacts/$botId/$conversationId/$artifactId"
-                      >
-                        {artifact.title}
-                      </Link>
+                      <ItemLink asChild>
+                        <Link
+                          params={{ botId: artifact.botId, conversationId: artifact.conversationId, artifactId: artifact.id }}
+                          to="/artifacts/$botId/$conversationId/$artifactId"
+                        >
+                          {artifact.title}
+                        </Link>
+                      </ItemLink>
                     </ItemTitle>
                     <ItemDescription className="truncate">
                       {m.artifacts_meta({ version: artifact.version, date: hydrated ? dates.format(new Date(artifact.updatedAt)) : '' })}
                     </ItemDescription>
                   </ItemContent>
-                  <IconChevronRight className="size-4 text-muted-foreground" />
+                  <ItemActions>
+                    <ItemValue><IconChevronRight /></ItemValue>
+                  </ItemActions>
                 </Item>
               ))}
             </ul>

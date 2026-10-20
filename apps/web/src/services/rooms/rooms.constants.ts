@@ -1,5 +1,5 @@
 import { m } from '@openbots/i18n/client';
-import type { ConversationSubmitInput } from '@openbots/contracts/universal';
+import type { ConversationWhenBusy } from '@openbots/contracts/universal';
 
 export const ROOMS_MUTE_DURATIONS = [
   { duration: 60 * 60 * 1000, label: m.rooms_mute_1h },
@@ -37,7 +37,15 @@ export const ROOMS_SEND_MODE_HINTS = {
   followUp: m.rooms_send_queue_hint,
   steer: m.rooms_send_steer_hint,
   interrupt: m.rooms_send_interrupt_hint,
-} satisfies Record<Exclude<NonNullable<ConversationSubmitInput['whenBusy']>, 'reject'>, () => string>;
+} satisfies Record<ConversationWhenBusy, () => string>;
+
+export const ROOMS_SEND_MODE_DEFAULT = 'default';
+
+export const ROOMS_SEND_MODES = {
+  followUp: m.rooms_send_queue,
+  steer: m.rooms_send_steer,
+  interrupt: m.rooms_send_interrupt,
+} satisfies Record<ConversationWhenBusy, () => string>;
 
 export const ROOMS_APPROVAL_CHOICES = [
   { approved: true, label: m.rooms_chat_approval_once },

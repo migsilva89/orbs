@@ -1,10 +1,12 @@
-import { preferencesEnterAction, preferencesWhenBusy } from '@openbots/contracts/universal';
+import { conversationWhenBusy, preferencesEnterAction } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/components/ui/panel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePreferences } from '@/hooks/use-preferences';
-import { ROOMS_SEND_MODE_HINTS } from '@/services/rooms/rooms.constants';
+import { ROOMS_SEND_MODE_HINTS, ROOMS_SEND_MODES } from '@/services/rooms/rooms.constants';
+import { rpc } from '@/services/rpc/rpc.client';
 import IconListOrdered from '~icons/lucide/list-ordered';
 import IconMessageSquare from '~icons/lucide/message-square';
 import IconMonitor from '~icons/lucide/monitor';
@@ -17,10 +19,14 @@ const SETTINGS_ENTER_KEYS = [
 
 const SETTINGS_ENTER_ACTIONS = { send: m.settings_chat_enter_send, newline: m.settings_chat_enter_newline };
 
-const SETTINGS_WHEN_BUSY = { followUp: m.rooms_send_queue, steer: m.rooms_send_steer, interrupt: m.rooms_send_interrupt };
-
 export function SettingsChat() {
   const { preferences, save } = usePreferences();
+  const queryClient = useQueryClient();
+  const { data: settings } = useSuspenseQuery(rpc.conversation.settings.queryOptions());
+
+  const configure = useMutation(rpc.conversation.configure.mutationOptions({
+    onSuccess: (saved) => queryClient.setQueryData(rpc.conversation.settings.queryKey(), saved),
+  }));
 
   return (
     <SettingsPanel
@@ -53,14 +59,18 @@ export function SettingsChat() {
         <IconListOrdered />
         <PanelContent>
           <PanelTitle>{m.rooms_send_mode()}</PanelTitle>
-          <PanelDescription>{ROOMS_SEND_MODE_HINTS[preferences.whenBusy]()}</PanelDescription>
+          <PanelDescription>{ROOMS_SEND_MODE_HINTS[settings.whenBusy]()}</PanelDescription>
         </PanelContent>
-        <Select value={preferences.whenBusy} onValueChange={(value) => save({ ...preferences, whenBusy: preferencesWhenBusy.parse(value) })}>
+        <Select
+          disabled={configure.isPending}
+          value={settings.whenBusy}
+          onValueChange={(value) => configure.mutate({ whenBusy: conversationWhenBusy.parse(value) })}
+        >
           <SelectTrigger aria-label={m.rooms_send_mode()} className="w-auto">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {preferencesWhenBusy.options.map((mode) => <SelectItem key={mode} value={mode}>{SETTINGS_WHEN_BUSY[mode]()}</SelectItem>)}
+            {conversationWhenBusy.options.map((mode) => <SelectItem key={mode} value={mode}>{ROOMS_SEND_MODES[mode]()}</SelectItem>)}
           </SelectContent>
         </Select>
       </PanelRow>

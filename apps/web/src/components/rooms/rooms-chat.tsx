@@ -11,11 +11,11 @@ import { useRoomReactions } from '@/hooks/use-room-reactions';
 import { useRoomRead } from '@/hooks/use-room-read';
 import { chatHistoryOptions, chatViewOptions } from '@/services/chat/chat.client';
 import { CHAT } from '@/services/chat/chat.constants';
-import { chatActivity, chatFailure, chatLive, chatMessages, chatQueued } from '@/services/chat/chat.utils';
+import { chatActivity, chatFailure, chatLive, chatMessages, chatOutgoingMessages, chatQueued } from '@/services/chat/chat.utils';
 import { LAYOUT_SHORTCUT_OPTIONS, LAYOUT_SHORTCUT_OVERLAYS, LAYOUT_SHORTCUTS } from '@/services/layout/layout.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
-import type { ChatMessage } from '@/types/chat.types';
+import type { ChatMessage, ChatOutgoing } from '@/types/chat.types';
 import type { RoomsChat as RoomsChatItem } from '@/types/rooms.types';
 import type { Bot, ConversationView } from '@openbots/contracts/universal';
 
@@ -32,6 +32,7 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
   const { message: focusEntryId } = useSearch({ from: '/_chat' });
   const composer = useRef<PromptInputEditorHandle>(null);
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
+  const [outgoing, setOutgoing] = useState<ChatOutgoing[]>([]);
   const { conversationId } = view;
 
   const history = useInfiniteQuery(chatHistoryOptions({
@@ -59,6 +60,13 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
   const unread = useRoomRead(bot.id, chat.readThroughEntryId, view.latestEntryId);
   const activity = chatActivity(view);
   const queued = chatQueued(view);
+
+  const sending = chatOutgoingMessages(outgoing, {
+    botId: bot.id,
+    latestEntryId: view.latestEntryId,
+    queued,
+  });
+
   const isBusy = view.live.run !== undefined || queued.length > 0;
   const around = focusEntryId !== undefined && !messages.some((message) => message.metadata?.entryIds.includes(focusEntryId)) ? focusEntryId : undefined;
 
@@ -110,7 +118,7 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
               questions={questions}
             />
           )}
-          messages={messages}
+          messages={[...messages, ...sending]}
           older={{
             isEnabled: view.historyCursor !== undefined && (history.hasNextPage || !history.isFetched),
             isLoading: history.isFetching,
@@ -127,9 +135,11 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
         editor={composer}
         isBusy={isBusy}
         isCompacting={activity === 'compacting'}
+        latestEntryId={view.latestEntryId}
         messages={messages}
         queued={queued}
         replyTo={replyTo}
+        onOutgoingChange={setOutgoing}
         onReplyChange={setReplyTo}
         onSend={focusEntryId ? leaveFocus : undefined}
       />

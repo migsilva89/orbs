@@ -140,6 +140,21 @@ export function chatQueued(state: UniversalTypes.ConversationState | undefined):
     .otherwise(() => []));
 }
 
+export function chatOutgoingMessages(outgoing: ChatTypes.ChatOutgoing[], params: ChatTypes.ChatOutgoingParams): ChatTypes.ChatMessage[] {
+  return outgoing.filter((item) => chatOutgoingIsShown(item, params)).map((item) => ({
+    id: `${CHAT.outgoingPrefix}${item.requestId}`,
+    role: 'user',
+    metadata: chatMetadata(0, item.createdAt, null, m.rooms_chat_you()),
+    parts: [{ type: 'text', text: item.text, state: 'done' }],
+  }));
+}
+
+function chatOutgoingIsShown(item: ChatTypes.ChatOutgoing, { botId, latestEntryId, queued }: ChatTypes.ChatOutgoingParams): boolean {
+  const isPlaced = latestEntryId > item.afterEntryId || queued.some((entry) => entry.submissionId === item.submissionId);
+
+  return item.botId === botId && (item.submissionId === undefined || !isPlaced);
+}
+
 export function chatFailure(state: UniversalTypes.ConversationState | undefined): string | null {
   return match(state)
     .with({ live: { run: P.nullish }, lastRun: { outcome: { status: 'failed', error: { message: P.string.select() } } } }, (message) => message)

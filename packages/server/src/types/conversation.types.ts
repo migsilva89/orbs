@@ -1,6 +1,7 @@
 import type { AttachmentService } from '../services/attachment/attachment.service';
 import type { AuthService } from '../services/auth/auth.service';
 import type { BotService } from '../services/bot/bot.service';
+import type { SettingsService } from '../services/settings/settings.service';
 import type { SkillService } from '../services/skill/skill.service';
 import type { AuthAuthenticateParams } from './auth.types';
 import type { BotPreferences } from './bot.types';
@@ -13,6 +14,7 @@ export interface ConversationServiceDeps {
   attachments: AttachmentService;
   bots: BotService;
   runtime: RuntimeService;
+  settings: SettingsService;
   skill: SkillService;
 }
 

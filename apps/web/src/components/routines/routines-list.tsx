@@ -1,12 +1,13 @@
 import { m } from '@openbots/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { RoutinesItem } from '@/components/routines/routines-item';
-import { Empty, EmptyDescription, EmptyHeader } from '@/components/ui/empty';
+import { EmptyCompact } from '@/components/ui/empty';
 import { FormErrors } from '@/components/ui/forms/form';
 import { ItemGroup } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ROOMS } from '@/services/rooms/rooms.constants';
 import { rpc } from '@/services/rpc/rpc.client';
+import IconCalendarClock from '~icons/lucide/calendar-clock';
 import type { Bot } from '@openbots/contracts/universal';
 
 interface RoutinesListProps {
@@ -30,11 +31,11 @@ export function RoutinesList({ bot }: RoutinesListProps) {
         </div>
       ) : null}
       {list.data?.length === 0 ? (
-        <Empty size="sm">
-          <EmptyHeader>
-            <EmptyDescription>{m.rooms_routines_empty({ bot: bot.name })}</EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <EmptyCompact
+          description={m.rooms_routines_empty_hint({ bot: bot.name })}
+          icon={<IconCalendarClock />}
+          title={m.rooms_routines_empty_title()}
+        />
       ) : null}
       {list.data && list.data.length > 0 ? (
         <ItemGroup variant="outline">

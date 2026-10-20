@@ -40,6 +40,7 @@ export interface BotPreferences {
   isMuted: boolean;
   mutedUntil: number | null;
   readThroughEntryId: number;
+  whenBusy: UniversalTypes.ConversationWhenBusy | null;
 }
 
 export type BotPreferencesUpdate = Partial<BotPreferences> & UniversalTypes.BotGetInput;
@@ -59,4 +60,5 @@ export interface BotPreferenceRow {
   isMuted: number | null;
   mutedUntil: number | null;
   readThroughEntryId: number | null;
+  whenBusy: UniversalTypes.ConversationWhenBusy | null;
 }

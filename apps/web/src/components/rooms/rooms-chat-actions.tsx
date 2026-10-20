@@ -163,7 +163,7 @@ export function RoomsChatActions({
       ) : null}
       {selectable ? (
         <Drawer open={selecting} onOpenChange={setSelecting}>
-          <DrawerContent aria-describedby={undefined} className="data-[vaul-drawer-direction=bottom]:h-[80vh]">
+          <DrawerContent aria-describedby={undefined} className="data-[vaul-drawer-direction=bottom]:h-[calc(var(--app-height)-env(safe-area-inset-top)-4rem)] data-[vaul-drawer-direction=bottom]:max-h-none">
             <DrawerHeader>
               <DrawerTitle>{m.rooms_chat_select_text()}</DrawerTitle>
             </DrawerHeader>

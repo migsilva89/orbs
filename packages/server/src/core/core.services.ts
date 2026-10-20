@@ -105,6 +105,7 @@ export async function makeServices({
         runtime,
         auth,
         bots,
+        settings,
         skill,
         attachments,
       }),

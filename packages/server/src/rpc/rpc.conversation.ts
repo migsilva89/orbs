@@ -18,6 +18,9 @@ export const conversation = {
   reactions: authedRouter.conversation.reactions.handler(async ({ context, input }) => context.conversation.queries.reactions(input)),
   setHidden: authedRouter.conversation.setHidden.handler(async ({ context, input }) => context.conversation.actions.setHidden(input)),
   setMuted: authedRouter.conversation.setMuted.handler(async ({ context, input }) => context.conversation.actions.setMuted(input)),
+  setWhenBusy: authedRouter.conversation.setWhenBusy.handler(async ({ context, input }) => context.conversation.actions.setWhenBusy(input)),
+  settings: authedRouter.conversation.settings.handler(async ({ context }) => context.conversation.queries.settings()),
+  configure: authedRouter.conversation.configure.handler(async ({ context, input }) => context.conversation.actions.configure(input)),
   arrange: authedRouter.conversation.arrange.handler(async ({ context, input }) => context.conversation.actions.arrange(input)),
 
   contextUsage: authedRouter.conversation.contextUsage.handler(async ({ context, input }) => context.conversation.queries.contextUsage(input)),

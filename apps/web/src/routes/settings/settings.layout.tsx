@@ -10,6 +10,7 @@ export const Route = createFileRoute('/_chat/settings')({
     await Promise.all([
       context.queryClient.ensureQueryData(rpc.providers.list.queryOptions()),
       context.queryClient.ensureQueryData(rpc.tools.settings.queryOptions()),
+      context.queryClient.ensureQueryData(rpc.conversation.settings.queryOptions()),
       context.queryClient.ensureQueryData(rpc.skills.settings.queryOptions()),
       context.queryClient.ensureQueryData(rpc.instructions.settings.queryOptions()),
       context.queryClient.ensureQueryData(rpc.plugins.settings.queryOptions()),

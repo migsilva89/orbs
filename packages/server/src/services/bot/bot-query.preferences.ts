@@ -12,6 +12,7 @@ export async function botQueryPreferences({ database }: BotDatabaseDeps): Promis
       'botPreference.isMuted',
       'botPreference.mutedUntil',
       'botPreference.readThroughEntryId',
+      'botPreference.whenBusy',
     ])
     .execute();
 

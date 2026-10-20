@@ -12,6 +12,7 @@ export async function botActionSetPreferences(deps: BotServiceDeps, { botId, ...
     isMuted: botPreferenceFlag(patch.isMuted),
     mutedUntil: patch.mutedUntil,
     readThroughEntryId: patch.readThroughEntryId,
+    whenBusy: patch.whenBusy,
     updatedAt: Date.now(),
   };
 

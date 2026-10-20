@@ -11,6 +11,7 @@ import { RoomsMentionOption } from '@/components/rooms/rooms-mention-option';
 import { PromptInput, PromptInputActionMenu, PromptInputActionMenuContent, PromptInputActionMenuItem, PromptInputActionMenuTrigger, PromptInputQuote, PromptInputSubmit } from '@/components/ui/ai/prompt-input';
 import { InputGroupAddon } from '@/components/ui/input-group';
 import { useMessageScroller } from '@/components/ui/message-scroller';
+import { toasty } from '@/components/ui/sonner';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { useIsTouch } from '@/hooks/use-is-touch';
 import { usePreferences } from '@/hooks/use-preferences';
@@ -21,7 +22,7 @@ import { roomsMessageText } from '@/services/rooms/rooms.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconPaperclip from '~icons/lucide/paperclip';
 import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
-import type { ChatMessage, ChatQueued } from '@/types/chat.types';
+import type { ChatMessage, ChatOutgoing, ChatQueued } from '@/types/chat.types';
 import type { Bot } from '@openbots/contracts/universal';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 
@@ -34,9 +35,11 @@ interface RoomsChatComposerProps {
   queued: ChatQueued[]
   isBusy: boolean
   isCompacting: boolean
+  latestEntryId: number
   editor: RefObject<PromptInputEditorHandle | null>
   replyTo: ChatMessage | null
   onReplyChange: Dispatch<SetStateAction<ChatMessage | null>>
+  onOutgoingChange: Dispatch<SetStateAction<ChatOutgoing[]>>
   onSend?: () => void
 }
 
@@ -47,9 +50,11 @@ export function RoomsChatComposer({
   queued,
   isBusy,
   isCompacting,
+  latestEntryId,
   editor,
   replyTo,
   onReplyChange,
+  onOutgoingChange,
   onSend,
 }: RoomsChatComposerProps) {
   const queryClient = useQueryClient();
@@ -83,10 +88,10 @@ export function RoomsChatComposer({
   });
 
   const isStopping = isBusy && !text.trim() && files.attachments.length === 0;
+  const isSendingFiles = submit.isPending && files.readyIds.length > 0;
 
   const submitStatus = match({ isStopping, submit })
     .with({ isStopping: true }, () => 'streaming' as const)
-    .with({ submit: { isPending: true } }, () => 'submitted' as const)
     .with({ submit: { isError: true } }, () => 'error' as const)
     .otherwise(() => 'ready' as const);
 
@@ -131,20 +136,38 @@ export function RoomsChatComposer({
     });
 
     const pending = pendingRequest.current?.key === key ? pendingRequest.current : { key, id: generateId() };
-    pendingRequest.current = pending;
-
-    await submit.mutateAsync({
-      botId: bot.id,
-      conversationId,
-      requestId: pending.id,
-      content,
-      attachmentIds,
-      replyToEntryId,
-      skills: chosen.length > 0 ? chosen : undefined,
-      whenBusy: preferences.whenBusy,
-    });
-
     pendingRequest.current = null;
+
+    const outgoing: ChatOutgoing = {
+      requestId: pending.id,
+      botId: bot.id,
+      text: content,
+      afterEntryId: latestEntryId,
+      createdAt: Date.now(),
+    };
+
+    if (content) {
+      onOutgoingChange((items) => [...items.filter((item) => item.requestId !== pending.id), outgoing]);
+    }
+
+    try {
+      const { submissionId } = await submit.mutateAsync({
+        botId: bot.id,
+        conversationId,
+        requestId: pending.id,
+        content,
+        attachmentIds,
+        replyToEntryId,
+        skills: chosen.length > 0 ? chosen : undefined,
+      });
+
+      onOutgoingChange((items) => items.map((item) => (item.requestId === pending.id ? { ...item, submissionId } : item)));
+    } catch (error) {
+      pendingRequest.current = pending;
+      onOutgoingChange((items) => items.filter((item) => item.requestId !== pending.id));
+      throw error;
+    }
+
     files.clear(attachmentIds);
     onReplyChange((current) => (current?.metadata?.entryId === replyToEntryId ? null : current));
   }
@@ -156,8 +179,8 @@ export function RoomsChatComposer({
         onDragOver={files.onDragOver}
         onDrop={files.onDrop}
         onPaste={files.onPaste}
-        onSubmit={async ({ text: value }) => {
-          if (isCompacting || files.uploading) {
+        onSubmit={({ text: value }) => {
+          if (isCompacting || files.uploading || isSendingFiles) {
             return false;
           }
 
@@ -177,15 +200,12 @@ export function RoomsChatComposer({
           scroller.scrollToEnd({ behavior: 'smooth' });
           draft.save('');
 
-          try {
-            await send(value);
+          void send(value).catch(() => {
+            editor.current?.restore(mentionSegments({ text: value }));
+            toasty(m.rooms_chat_send_failed(), '⚠️');
+          });
 
-            return true;
-          } catch {
-            draft.save(value);
-
-            return false;
-          }
+          return true;
         }}
       >
         <RoomsChatQueue
@@ -283,7 +303,7 @@ export function RoomsChatComposer({
         <InputGroupAddon align="inline-end">
           <PromptInputSubmit
             aria-label={isStopping ? m.rooms_chat_stop() : m.rooms_chat_send()}
-            disabled={isCompacting || files.uploading || (!isBusy && !text.trim() && files.readyIds.length === 0)}
+            disabled={isCompacting || files.uploading || isSendingFiles || (!isBusy && !text.trim() && files.readyIds.length === 0)}
             status={submitStatus}
             title={isStopping ? m.rooms_chat_stop() : m.rooms_chat_send()}
           />

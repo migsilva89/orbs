@@ -4,6 +4,7 @@ export default preset({
   root: import.meta.dirname,
   architecture: {
     'apps/daemon': 'server',
+    'apps/mobile': 'web',
     'apps/web': 'web',
     'apps/desktop': 'scripts',
     scripts: 'scripts',

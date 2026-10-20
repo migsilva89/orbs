@@ -2,6 +2,7 @@ import { m } from '@openbots/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { RoomsMuteMenu } from '@/components/rooms/rooms-mute-menu';
+import { RoomsSendModeMenu } from '@/components/rooms/rooms-send-mode-menu';
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { useRoomsArrange } from '@/hooks/use-rooms-arrange';
 import { useRoomsHide } from '@/hooks/use-rooms-hide';
@@ -50,6 +51,7 @@ export function RoomsActions({ chat }: RoomsActionsProps) {
         {chat.isHidden ? m.rooms_action_unhide() : m.rooms_action_hide()}
       </DropdownMenuItem>
       <RoomsMuteMenu chat={chat} />
+      <RoomsSendModeMenu chat={chat} />
       <DropdownMenuSeparator />
       <DropdownMenuItem asChild>
         <Link

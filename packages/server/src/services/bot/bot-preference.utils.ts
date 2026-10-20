@@ -12,6 +12,7 @@ export function botPreferenceRecord(row: BotPreferenceRow | undefined, now = Dat
     isMuted: row?.isMuted === 1 && (mutedUntil === null || mutedUntil > now),
     mutedUntil,
     readThroughEntryId: row?.readThroughEntryId ?? 0,
+    whenBusy: row?.whenBusy ?? null,
   };
 }
 

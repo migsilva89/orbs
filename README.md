@@ -610,7 +610,7 @@ const retried = await client.conversation.submit(request);
 await client.conversation.stop({ botId });
 ```
 
-Submit requires a bot UUID, text or attachments, and a request ID of 1–128 characters. Request IDs are scoped to that bot's Pi conversation. The returned numeric `submissionId` acknowledges durable admission, not a completed answer; observe the conversation for progress. Pi defaults to `followUp` when busy. `steer` queues input for a steering boundary; `reject` returns `CONFLICT` if busy. Pi treats a reused request ID as the same submission even if its content differs, so use a new ID for new input. Pass uploaded files through `attachmentIds`; raw image blocks are not accepted by this contract.
+Submit requires a bot UUID, text or attachments, and a request ID of 1–128 characters. Request IDs are scoped to that bot's Pi conversation. The returned numeric `submissionId` acknowledges durable admission, not a completed answer; observe the conversation for progress. An omitted `whenBusy` uses the chat's mode from `conversation.setWhenBusy`, then the default from `conversation.configure` (read with `conversation.settings`), then `followUp`. `steer` queues input for a steering boundary; `reject` returns `CONFLICT` if busy. Pi treats a reused request ID as the same submission even if its content differs, so use a new ID for new input. Pass uploaded files through `attachmentIds`; raw image blocks are not accepted by this contract.
 
 | Composer mode | `whenBusy` | Behavior |
 | --- | --- | --- |

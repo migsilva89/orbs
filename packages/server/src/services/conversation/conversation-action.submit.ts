@@ -1,11 +1,14 @@
 import { match, P } from 'ts-pattern';
+import { conversationQuerySettings } from './conversation-query.settings';
 import type { ConversationServiceDeps } from '../../types/conversation.types';
 import type { ConversationSubmitInput } from '@openbots/contracts/universal';
 
 export async function conversationActionSubmit(
-  { runtime, bots, skill, attachments }: ConversationServiceDeps,
+  deps: ConversationServiceDeps,
   { content, skills, attachmentIds, ...params }: ConversationSubmitInput,
 ) {
+  const { runtime, bots, skill, attachments } = deps;
+
   await bots.queries.get({ botId: params.botId });
   const existing = await runtime.queries.submission(params);
 
@@ -23,9 +26,11 @@ export async function conversationActionSubmit(
         }));
 
       const files = await attachments.actions.prepare({ ...params, attachmentIds });
+      const preferences = await bots.queries.preferences();
 
       const submission = await runtime.actions.submit({
         ...params,
+        whenBusy: params.whenBusy ?? preferences.get(params.botId)?.whenBusy ?? (await conversationQuerySettings(deps)).whenBusy,
         content: expanded.content,
         attachments: files,
       });

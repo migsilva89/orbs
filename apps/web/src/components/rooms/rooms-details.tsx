@@ -1,15 +1,16 @@
 import { m } from '@openbots/i18n/client';
 import { getLocale } from '@openbots/i18n/runtime';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Link, useMatch } from '@tanstack/react-router';
+import { useMatch } from '@tanstack/react-router';
 import { useState } from 'react';
 import { BotAvatar } from '@/components/bots/bot-avatar';
+import { RoomsDetailsBot } from '@/components/rooms/rooms-details-bot';
 import { RoomsDetailsMedia } from '@/components/rooms/rooms-details-media';
 import { RoomsDetailsSection } from '@/components/rooms/rooms-details-section';
 import { RoomsSettingsMenu } from '@/components/rooms/rooms-settings-menu';
 import { RoutinesList } from '@/components/routines/routines-list';
 import { Button } from '@/components/ui/button';
-import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup } from '@/components/ui/item';
+import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle, ItemValue } from '@/components/ui/item';
 import * as Sidebar from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { rpc } from '@/services/rpc/rpc.client';
@@ -92,24 +93,7 @@ function RoomsDetailsPanel({ botId, tab, onTabChange }: RoomsDetailsPanelProps) 
         </TabsList>
         <Sidebar.SidebarContent>
           <TabsContent className="flex flex-col gap-4 px-4 py-2" value="details">
-            <RoomsDetailsSection title={m.bots_settings()}>
-              <ItemGroup variant="outline">
-                <Item size="sm">
-                  <ItemContent className="min-w-0">
-                    <ItemDescription>{m.bots_settings_hint()}</ItemDescription>
-                  </ItemContent>
-                  <ItemActions>
-                    <Button
-                      asChild
-                      size="xs"
-                      variant="ghost"
-                    >
-                      <Link params={{ botId: bot.id }} to="/bots/$botId">{m.bots_open()}</Link>
-                    </Button>
-                  </ItemActions>
-                </Item>
-              </ItemGroup>
-            </RoomsDetailsSection>
+            <RoomsDetailsBot bot={bot} chat={chat} />
             <RoomsDetailsSection title={m.rooms_routines()}>
               <RoutinesList bot={bot} />
             </RoomsDetailsSection>
@@ -142,16 +126,12 @@ function RoomsDetailsFacts({ bot, chat }: RoomsDetailsFactsProps) {
     <RoomsDetailsSection title={m.rooms_details_general()}>
       <ItemGroup variant="outline">
         {facts.map((fact) => (
-          <Item
-            className="flex-nowrap"
-            key={fact.label}
-            size="sm"
-          >
-            <ItemContent className="flex-none">
-              <ItemDescription>{fact.label}</ItemDescription>
+          <Item key={fact.label} size="sm">
+            <ItemContent>
+              <ItemTitle>{fact.label}</ItemTitle>
             </ItemContent>
-            <ItemActions className="ml-auto min-w-0">
-              <span className="truncate text-sm">{fact.value}</span>
+            <ItemActions className="min-w-0">
+              <ItemValue>{fact.value}</ItemValue>
             </ItemActions>
           </Item>
         ))}

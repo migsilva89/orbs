@@ -25,6 +25,13 @@ export const BOT_ACTIVITY_LABELS = {
   failed: m.avatars_activity_failed,
 } satisfies Record<ChatActivity, () => string>;
 
+export const BOT_PERMISSION_LABELS = {
+  'read-only': m.rooms_bot_permission_read_only,
+  ask: m.rooms_bot_permission_ask,
+  auto: m.rooms_bot_permission_auto,
+  full: m.rooms_bot_permission_full,
+} satisfies Record<BotTypes.BotPermission, () => string>;
+
 export const BOT_THINKING_LEVEL_LABELS = {
   off: m.rooms_bot_thinking_level_off,
   minimal: m.rooms_bot_thinking_level_minimal,

@@ -45,6 +45,7 @@ export function RoomsChatTranscript({ bot, bots, messages, reactions, focusedEnt
             groups={roomsReactionGroups({ reaction: reactionsByEntry.get(message.metadata?.entryId ?? 0), bots })}
             isFocused={message.id === focusedId}
             isLive={message.id === CHAT.liveMessageId}
+            isSending={message.id.startsWith(CHAT.outgoingPrefix)}
             message={message}
             peer={botsById.get(message.metadata?.authorId ?? '')}
             time={message.metadata

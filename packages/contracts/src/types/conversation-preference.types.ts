@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export const conversationWhenBusy = z.enum(['followUp', 'steer', 'interrupt']);
+
 export const conversationSetHidden = z.object({
   botId: z.uuid(),
   isHidden: z.boolean(),
@@ -17,6 +19,21 @@ export const conversationArrange = z.object({
 
 export const conversationArrangeResult = z.void();
 
+export const conversationSetWhenBusy = z.object({
+  botId: z.uuid(),
+  whenBusy: conversationWhenBusy.nullable(),
+});
+
+export const conversationSettings = z.object({
+  whenBusy: conversationWhenBusy,
+});
+
+export const conversationConfigure = conversationSettings.partial();
+
 export type ConversationSetHiddenInput = z.infer<typeof conversationSetHidden>;
 export type ConversationSetMutedInput = z.infer<typeof conversationSetMuted>;
 export type ConversationArrangeInput = z.infer<typeof conversationArrange>;
+export type ConversationWhenBusy = z.infer<typeof conversationWhenBusy>;
+export type ConversationSetWhenBusyInput = z.infer<typeof conversationSetWhenBusy>;
+export type ConversationSettings = z.infer<typeof conversationSettings>;
+export type ConversationConfigureInput = z.infer<typeof conversationConfigure>;

@@ -15,7 +15,9 @@ export function useLongPress(onLongPress: (element: HTMLElement) => void) {
 
   return {
     onPointerDown: (event: PointerEvent<HTMLElement>) => {
-      if (event.pointerType !== 'touch') {
+      const inside = event.target instanceof Node && event.currentTarget.contains(event.target);
+
+      if (event.pointerType !== 'touch' || !inside) {
         return;
       }
 

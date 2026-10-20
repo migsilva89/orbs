@@ -2,9 +2,9 @@ import { m } from '@openbots/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { RoomsDetailsSection } from '@/components/rooms/rooms-details-section';
-import { Empty, EmptyDescription, EmptyHeader, EmptyIcons, EmptyTitle } from '@/components/ui/empty';
+import { EmptyCompact } from '@/components/ui/empty';
 import { FormErrors } from '@/components/ui/forms/form';
-import { Item, ItemContent, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
+import { Item, ItemContent, ItemGroup, ItemLink, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAttachmentUrl } from '@/hooks/use-attachment-url';
 import { CHAT } from '@/services/chat/chat.constants';
@@ -40,16 +40,13 @@ export function RoomsDetailsMedia({ botId }: RoomsDetailsMediaProps) {
 
   if (sections.length === 0 && !artifacts.data?.length) {
     return (
-      <Empty size="sm">
-        <EmptyHeader>
-          <EmptyIcons>
-            <IconImages />
-          </EmptyIcons>
-          <EmptyTitle>{m.rooms_media_empty_title()}</EmptyTitle>
-          <EmptyDescription>{m.rooms_media_empty_hint()}</EmptyDescription>
-          <FormErrors error={files.isError || artifacts.isError ? m.rooms_media_error() : null} />
-        </EmptyHeader>
-      </Empty>
+      <EmptyCompact
+        description={m.rooms_media_empty_hint()}
+        icon={<IconImages />}
+        title={m.rooms_media_empty_title()}
+      >
+        <FormErrors error={files.isError || artifacts.isError ? m.rooms_media_error() : null} />
+      </EmptyCompact>
     );
   }
 
@@ -61,17 +58,20 @@ export function RoomsDetailsMedia({ botId }: RoomsDetailsMediaProps) {
           <ItemGroup variant="outline">
             {artifacts.data.map((artifact) => (
               <Item key={artifact.id} size="sm">
-                <Link
-                  className="flex min-w-0 flex-1 items-center gap-2.5"
-                  params={{ botId, conversationId: artifact.conversationId, artifactId: artifact.id }}
-                  title={artifact.title}
-                  to="/artifacts/$botId/$conversationId/$artifactId"
-                >
-                  <ItemMedia variant="icon"><IconLayoutDashboard /></ItemMedia>
-                  <ItemContent className="min-w-0">
-                    <ItemTitle className="w-full"><span className="truncate">{artifact.title}</span></ItemTitle>
-                  </ItemContent>
-                </Link>
+                <ItemMedia variant="icon"><IconLayoutDashboard /></ItemMedia>
+                <ItemContent className="min-w-0">
+                  <ItemTitle className="w-full">
+                    <ItemLink asChild>
+                      <Link
+                        params={{ botId, conversationId: artifact.conversationId, artifactId: artifact.id }}
+                        title={artifact.title}
+                        to="/artifacts/$botId/$conversationId/$artifactId"
+                      >
+                        {artifact.title}
+                      </Link>
+                    </ItemLink>
+                  </ItemTitle>
+                </ItemContent>
               </Item>
             ))}
           </ItemGroup>
@@ -113,23 +113,22 @@ function RoomsDetailsMediaItem({ botId, file }: RoomsDetailsMediaItemProps) {
 
   return (
     <Item size="sm">
-      <a
-        className="flex min-w-0 flex-1 items-center gap-2.5"
-        download={image ? undefined : file.name}
-        href={url}
-        rel="noreferrer"
-        target={image ? '_blank' : undefined}
-        title={file.name}
-      >
-        <ItemMedia variant={image ? 'image' : 'icon'}>
-          {thumbnail}
-        </ItemMedia>
-        <ItemContent className="min-w-0">
-          <ItemTitle className="w-full">
-            <span className="truncate">{file.name}</span>
-          </ItemTitle>
-        </ItemContent>
-      </a>
+      <ItemMedia variant={image ? 'image' : 'icon'}>
+        {thumbnail}
+      </ItemMedia>
+      <ItemContent className="min-w-0">
+        <ItemTitle className="w-full">
+          <ItemLink
+            download={image ? undefined : file.name}
+            href={url}
+            rel="noreferrer"
+            target={image ? '_blank' : undefined}
+            title={file.name}
+          >
+            {file.name}
+          </ItemLink>
+        </ItemTitle>
+      </ItemContent>
     </Item>
   );
 }

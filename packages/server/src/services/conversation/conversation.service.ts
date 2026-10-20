@@ -2,12 +2,14 @@ import { conversationActionAnswerQuestion } from './conversation-action.answer-q
 import { conversationActionApprove } from './conversation-action.approve';
 import { conversationActionArrange } from './conversation-action.arrange';
 import { conversationActionClear } from './conversation-action.clear';
+import { conversationActionConfigure } from './conversation-action.configure';
 import { conversationActionExecuteCommand } from './conversation-action.execute-command';
 import { conversationActionMarkRead } from './conversation-action.mark-read';
 import { conversationActionSetHidden } from './conversation-action.set-hidden';
 import { conversationActionSetMuted } from './conversation-action.set-muted';
 import { conversationActionSetPinned } from './conversation-action.set-pinned';
 import { conversationActionSetReaction } from './conversation-action.set-reaction';
+import { conversationActionSetWhenBusy } from './conversation-action.set-when-busy';
 import { conversationActionStop } from './conversation-action.stop';
 import { conversationActionSubmit } from './conversation-action.submit';
 import { conversationActionUpdateSubmission } from './conversation-action.update-submission';
@@ -20,6 +22,7 @@ import { conversationQueryList } from './conversation-query.list';
 import { conversationQueryQuestions } from './conversation-query.questions';
 import { conversationQueryReactions } from './conversation-query.reactions';
 import { conversationQuerySearch } from './conversation-query.search';
+import { conversationQuerySettings } from './conversation-query.settings';
 import { conversationQueryUsage } from './conversation-query.usage';
 import { conversationQueryWatch } from './conversation-query.watch';
 import { conversationQueryWatchContexts } from './conversation-query.watch-contexts';
@@ -36,6 +39,8 @@ export function makeConversationService(deps: ConversationTypes.ConversationServ
       setReaction: (params: UniversalTypes.ConversationSetReactionInput) => conversationActionSetReaction(deps, params),
       setHidden: (params: UniversalTypes.ConversationSetHiddenInput) => conversationActionSetHidden(deps, params),
       setMuted: (params: UniversalTypes.ConversationSetMutedInput) => conversationActionSetMuted(deps, params),
+      setWhenBusy: (params: UniversalTypes.ConversationSetWhenBusyInput) => conversationActionSetWhenBusy(deps, params),
+      configure: (params: UniversalTypes.ConversationConfigureInput) => conversationActionConfigure(deps, params),
       arrange: (params: UniversalTypes.ConversationArrangeInput) => conversationActionArrange(deps, params),
 
       markRead: (params: UniversalTypes.ConversationMarkReadInput) => conversationActionMarkRead(deps, params),
@@ -49,6 +54,7 @@ export function makeConversationService(deps: ConversationTypes.ConversationServ
     },
     queries: {
       search: (params: UniversalTypes.ConversationSearchInput) => conversationQuerySearch(deps, params),
+      settings: () => conversationQuerySettings(deps),
       questions: (params: UniversalTypes.ConversationTarget) => conversationQueryQuestions(deps, params),
       reactions: (params: UniversalTypes.ConversationReactionsInput) => conversationQueryReactions(deps, params),
       contextUsage: (params: UniversalTypes.ConversationTarget) => conversationQueryContextUsage(deps, params),

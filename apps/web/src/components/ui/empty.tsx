@@ -47,7 +47,7 @@ function EmptyContent({ className, ...props }: ComponentProps<'div'>) {
 }
 
 const emptyIconBox =
-  'bg-background dark:bg-muted size-14 group-data-[size=sm]/empty:size-10 grid place-items-center rounded-xl shadow-lg ring-1 ring-border transition duration-500 group-hover:duration-200 [&_svg]:size-7 group-data-[size=sm]/empty:[&_svg]:size-5 [&_svg]:text-muted-foreground';
+  'bg-background dark:bg-muted size-14 group-data-[size=sm]/empty:size-10 grid place-items-center rounded-xl shadow-lg ring-1 ring-border [&_svg]:size-7 group-data-[size=sm]/empty:[&_svg]:size-5 [&_svg]:text-muted-foreground';
 
 function EmptyIcons({ children }: { children: ReactNode }) {
   const icons = Children.toArray(children);
@@ -60,19 +60,41 @@ function EmptyIcons({ children }: { children: ReactNode }) {
     <div className="isolate mb-2 flex justify-center">
       {icons.length === 3 ? (
         <>
-          <div className={cn(emptyIconBox, 'relative top-1.5 left-3 -rotate-6 group-hover:-translate-x-1 group-hover:-translate-y-0.5 group-hover:-rotate-8')}>
+          <div className={cn(emptyIconBox, 'relative top-1.5 left-3 -rotate-6')}>
             {icons[0]}
           </div>
-          <div className={cn(emptyIconBox, 'relative z-10 group-hover:-translate-y-1')}>{icons[1]}</div>
-          <div className={cn(emptyIconBox, 'relative top-1.5 right-3 rotate-6 group-hover:translate-x-1 group-hover:-translate-y-0.5 group-hover:rotate-8')}>
+          <div className={cn(emptyIconBox, 'relative z-10')}>{icons[1]}</div>
+          <div className={cn(emptyIconBox, 'relative top-1.5 right-3 rotate-6')}>
             {icons[2]}
           </div>
         </>
       ) : (
-        <div className={cn(emptyIconBox, 'group-hover:-translate-y-1')}>{icons[0]}</div>
+        <div className={emptyIconBox}>{icons[0]}</div>
       )}
     </div>
   );
 }
 
-export { Empty, EmptyHeader, EmptyIcons, EmptyTitle, EmptyDescription, EmptyContent };
+interface EmptyCompactProps {
+  icon: ReactNode
+  title: string
+  description?: ReactNode
+  children?: ReactNode
+  className?: string
+}
+
+/** The one small empty state for panels and lists: an icon, a title, an optional hint and action. */
+function EmptyCompact({ icon, title, description, children, className }: EmptyCompactProps) {
+  return (
+    <Empty className={className} size="sm">
+      <EmptyHeader>
+        <EmptyIcons>{icon}</EmptyIcons>
+        <EmptyTitle>{title}</EmptyTitle>
+        {description ? <EmptyDescription>{description}</EmptyDescription> : null}
+      </EmptyHeader>
+      {children ? <EmptyContent>{children}</EmptyContent> : null}
+    </Empty>
+  );
+}
+
+export { Empty, EmptyHeader, EmptyIcons, EmptyTitle, EmptyDescription, EmptyContent, EmptyCompact };

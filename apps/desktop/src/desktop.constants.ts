@@ -29,4 +29,18 @@ export const DESKTOP = {
   tray: { image: 'views://openbots/web/dist/client/img/brand/tray.svg', width: 19, height: 16 },
   login: { label: 'app.openbots.desktop.login', env: 'OPENBOTS_DESKTOP_LOGIN', agents: 'Library/LaunchAgents' },
   headless: { env: 'OPENBOTS_DESKTOP_HEADLESS' },
+  notify: {
+    frameworks: {
+      notifications: '/System/Library/Frameworks/UserNotifications.framework/UserNotifications',
+      intents: '/System/Library/Frameworks/Intents.framework/Intents',
+    },
+    options: 7,
+    avatarPath: '/avatars/bots/',
+    avatarTimeoutMs: 3_000,
+    messageTypeText: 1,
+    directionIncoming: 2,
+    folder: 'notify',
+    legacySound: 'DefaultSoundName',
+    legacyImageKey: '_identityImage',
+  },
 };

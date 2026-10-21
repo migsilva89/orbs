@@ -1,6 +1,7 @@
 import { m } from '@openbots/i18n/client';
 import Electrobun, { ApplicationMenu, BrowserView, BrowserWindow, PATHS, Screen, Tray, Utils } from 'electrobun/main';
 import { desktopNetworkFind, desktopNetworkProbe, desktopNetworkSelf, desktopNetworkTailscale } from './desktop-network';
+import { desktopNotify } from './desktop-notify';
 import { desktopProcessRuns, desktopServerLeftovers, desktopServerPairLink, desktopServerStart } from './desktop-server';
 import { desktopLoginEnabled, desktopLoginSet, desktopSettingsPrompt, desktopSettingsRead, desktopSettingsWrite, desktopStateRead, desktopStateWrite } from './desktop-settings';
 import { desktopWindowAppearance, desktopWindowTitleBarDoubleClick, desktopWindowToolbar } from './desktop-window';
@@ -151,7 +152,7 @@ function desktopMainOpen(url: string): void {
     }
 
     if (notify) {
-      Utils.showNotification(notify);
+      void desktopNotify({ notify, serverUrl: new URL(url).origin });
     }
 
     if (copy !== undefined) {

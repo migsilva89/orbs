@@ -20,6 +20,13 @@ const desktopNotify = z.object({
 
 export const desktopNotifyMessage = z.object({ data: z.object({ detail: z.object({ notify: desktopNotify }) }) });
 
+export type DesktopNotify = z.infer<typeof desktopNotify>;
+
+export interface DesktopNotifyParams {
+  notify: DesktopNotify;
+  serverUrl: string;
+}
+
 export const desktopPairMessage = z.object({ data: z.object({ detail: z.object({ pair: z.literal(true) }) }) });
 
 export const desktopCopyMessage = z.object({ data: z.object({ detail: z.object({ copy: z.string() }) }) });

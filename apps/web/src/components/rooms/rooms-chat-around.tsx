@@ -1,8 +1,8 @@
-import { CHAT, chatMessages } from '@openbots/client/client';
+import { CHAT, chatEntryIds, chatMessages } from '@openbots/client/client';
+import { useChatReactions } from '@openbots/client/react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { RoomsChatTranscript } from '@/components/rooms/rooms-chat-transcript';
-import { useRoomReactions } from '@/hooks/use-room-reactions';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { ChatMessage } from '@openbots/client/client';
 import type { Bot, ConversationView } from '@openbots/contracts/universal';
@@ -50,7 +50,12 @@ export function RoomsChatAround({ bot, bots, view, entryId, onLatest, onReply }:
     bots,
   });
 
-  const reactions = useRoomReactions(bot.id, view.conversationId, messages, view.interactionsRevision);
+  const reactions = useChatReactions({
+    botId: bot.id,
+    conversationId: view.conversationId,
+    entryIds: chatEntryIds(messages),
+    revision: view.interactionsRevision,
+  });
 
   return (
     <RoomsChatTranscript

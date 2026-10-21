@@ -1,14 +1,17 @@
-import { CHAT, readConversation, watchConversation, watchConversationContexts, watchNotifications } from '@openbots/client/client';
 import { queryOptions, experimental_streamedQuery as streamedQuery } from '@tanstack/react-query';
-import { rpc, rpcClient } from '@/services/rpc/rpc.client';
-import type { ChatHistoryParams } from '@openbots/client/client';
+import { watchConversationContexts } from '../../contexts';
+import { readConversation, watchConversation } from '../../conversation';
+import { watchNotifications } from '../../notifications';
+import { CHAT } from './chat.constants';
+import type { ChatHistoryParams } from '../../types/chat.types';
+import type { RpcContextValue } from '../../types/rpc.types';
 import type * as UniversalTypes from '@openbots/contracts/universal';
 
-export function chatViewOptions(target: UniversalTypes.ConversationTarget) {
+export function chatViewOptions({ client, rpc }: RpcContextValue, target: UniversalTypes.ConversationTarget) {
   return queryOptions({
     queryKey: rpc.conversation.watch.queryKey({ input: target }),
     queryFn: streamedQuery({
-      streamFn: ({ signal }) => watchConversation(rpcClient, target, signal),
+      streamFn: ({ signal }) => watchConversation(client, target, signal),
       refetchMode: 'append',
       reducer: (_view: UniversalTypes.ConversationView | null, next: UniversalTypes.ConversationView) => next,
       initialValue: null,
@@ -17,18 +20,19 @@ export function chatViewOptions(target: UniversalTypes.ConversationTarget) {
   });
 }
 
-export function chatInitialViewOptions(target: UniversalTypes.ConversationTarget) {
+/** The first conversation frame as a one-shot read, for server rendering before the live watch takes over. */
+export function chatInitialViewOptions(rpcs: RpcContextValue, target: UniversalTypes.ConversationTarget) {
   return queryOptions({
-    ...chatViewOptions(target),
-    queryFn: ({ signal }) => readConversation(rpcClient, target, signal),
+    ...chatViewOptions(rpcs, target),
+    queryFn: ({ signal }) => readConversation(rpcs.client, target, signal),
   });
 }
 
-export function chatNotificationsOptions() {
+export function chatNotificationsOptions({ client, rpc }: RpcContextValue) {
   return queryOptions({
     queryKey: rpc.conversation.watchNotifications.queryKey(),
     queryFn: streamedQuery({
-      streamFn: ({ signal }) => watchNotifications(rpcClient, signal),
+      streamFn: ({ signal }) => watchNotifications(client, signal),
       refetchMode: 'append',
       reducer: (_state: UniversalTypes.NotificationState | null, next: UniversalTypes.NotificationState) => next,
       initialValue: null,
@@ -37,7 +41,7 @@ export function chatNotificationsOptions() {
   });
 }
 
-export function chatHistoryOptions({ botId, conversationId, cursor }: ChatHistoryParams) {
+export function chatHistoryOptions({ rpc }: RpcContextValue, { botId, conversationId, cursor }: ChatHistoryParams) {
   return rpc.conversation.history.infiniteOptions({
     input: (pageCursor: ChatHistoryParams['cursor']) => ({
       botId,
@@ -51,11 +55,11 @@ export function chatHistoryOptions({ botId, conversationId, cursor }: ChatHistor
   });
 }
 
-export function chatContextsWatchOptions(target: UniversalTypes.ConversationTarget) {
+export function chatContextsWatchOptions({ client, rpc }: RpcContextValue, target: UniversalTypes.ConversationTarget) {
   return queryOptions({
     queryKey: rpc.conversation.watchContexts.queryKey({ input: target }),
     queryFn: streamedQuery({
-      streamFn: ({ signal }) => watchConversationContexts(rpcClient, target, signal),
+      streamFn: ({ signal }) => watchConversationContexts(client, target, signal),
       refetchMode: 'append',
       reducer: (_state: UniversalTypes.ConversationContextWatchState | null, next: UniversalTypes.ConversationContextWatchState) => next,
       initialValue: null,

@@ -1,9 +1,11 @@
+import { rpcContext } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { focusManager, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect, useEffectEvent, useState } from 'react';
 import { AppState } from 'react-native';
 import { match, P } from 'ts-pattern';
 import { connectionContext } from '@/context/connection';
+import { useToast } from '@/hooks/use-toast';
 import { connectionForget, connectionRead } from '@/services/connection/connection.client';
 import { rpcClientCreate } from '@/services/rpc/rpc.client';
 import type { ConnectionContextValue } from '@/types/connection-context.types';
@@ -18,11 +20,13 @@ export function ContextConnection({ children }: ContextConnectionProps) {
   const [session, setSession] = useState<ConnectionContextValue['session']>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
 
   function connect(connection: ConnectionSaved) {
     setError(null);
     setSession(rpcClientCreate({
       connection,
+      notify: ({ message, variant }) => toast.show({ message, variant: variant === 'error' ? 'error' : 'default' }),
       onUnauthorized: () => {
         setSession((current) => (current?.connection === connection ? null : current));
         void connectionForget(connection).then(
@@ -75,7 +79,9 @@ export function ContextConnection({ children }: ContextConnectionProps) {
     <connectionContext.Provider value={{ session, isLoading, error, connect, restore }}>
       {match(session)
         .with(P.nonNullable, (current) => (
-          <QueryClientProvider client={current.queryClient}>{children}</QueryClientProvider>
+          <QueryClientProvider client={current.queryClient}>
+            <rpcContext.Provider value={current}>{children}</rpcContext.Provider>
+          </QueryClientProvider>
         ))
         .otherwise(() => children)}
     </connectionContext.Provider>

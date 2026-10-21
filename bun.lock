@@ -194,6 +194,7 @@
         "@earendil-works/chord": "catalog:",
         "@openbots/avatar-blobs": "workspace:*",
         "@openbots/contracts": "workspace:*",
+        "@openbots/errors": "workspace:*",
         "@openbots/i18n": "workspace:*",
         "@orpc/client": "catalog:",
         "@orpc/contract": "catalog:",
@@ -202,8 +203,17 @@
       },
       "devDependencies": {
         "@openbots/typescript-config": "workspace:*",
+        "@orpc/tanstack-query": "catalog:",
+        "@tanstack/react-query": "catalog:",
         "@types/node": "catalog:",
+        "@types/react": "catalog:",
+        "react": "catalog:",
         "typescript": "catalog:",
+      },
+      "peerDependencies": {
+        "@orpc/tanstack-query": "catalog:",
+        "@tanstack/react-query": "catalog:",
+        "react": "catalog:",
       },
     },
     "packages/contracts": {

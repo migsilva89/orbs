@@ -1,5 +1,6 @@
 import { useKeyboardChatComposerInset } from '@legendapp/list/keyboard';
-import { botBubble, CHAT, chatActivity, chatFailure, chatLive, chatMessages, chatOutgoingMessages, chatQueued, roomsMessageText, roomsTimeLabel } from '@openbots/client/client';
+import { botBubble, CHAT, chatActivity, chatEntryIds, chatFailure, chatLive, chatMessages, chatOutgoingMessages, chatQueued, roomsMessageText, roomsReactionGroups, roomsTimeLabel } from '@openbots/client/client';
+import { chatHistoryOptions, chatViewOptions, useChatReaction, useChatReactions } from '@openbots/client/react';
 import { getLocale, m } from '@openbots/i18n/client';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -12,10 +13,8 @@ import { KeyboardSticky } from '@/components/ui/keyboard-sticky';
 import { MessageList } from '@/components/ui/message-list';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
-import { useChatReactions } from '@/hooks/use-chat-reactions';
 import { useChatUnread } from '@/hooks/use-chat-unread';
 import { useConnection } from '@/hooks/use-connection';
-import { chatHistoryOptions, chatViewOptions } from '@/services/chat/chat.client';
 import { chatMessageDetails } from '@/services/chat/chat.utils';
 import { ChatComposer } from './chat-composer';
 import { ChatHeader } from './chat-header';
@@ -23,7 +22,7 @@ import { ChatMessage } from './chat-message';
 import { ChatRuns } from './chat-runs';
 import type { RpcSession } from '@/types/rpc.types';
 import type { LegendListRef } from '@legendapp/list/react-native';
-import type { ChatOutgoing, MentionItem } from '@openbots/client/client';
+import type { ChatMessage as ChatMessageItem, ChatOutgoing, MentionItem } from '@openbots/client/client';
 import type { Bot, ConversationView } from '@openbots/contracts/universal';
 
 interface ChatRoomProps {
@@ -153,7 +152,16 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
   ];
 
   const replyTo = messages.find((message) => replyToEntryId !== undefined && message.metadata?.entryId === replyToEntryId) ?? null;
-  const reactions = useChatReactions(session, bot, bots, view, messages);
+
+  const reactionsByEntry = useChatReactions({
+    botId: bot.id,
+    conversationId,
+    entryIds: chatEntryIds(messages),
+    revision: view.interactionsRevision,
+  });
+
+  const reaction = useChatReaction(bot.id);
+  const groups = (message: ChatMessageItem) => roomsReactionGroups({ reaction: reactionsByEntry.get(message.metadata?.entryId ?? 0), bots });
   const unread = useChatUnread(session, bot.id, list, messages);
   const now = new Date();
 
@@ -190,9 +198,9 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
             isLive={message.id === CHAT.liveMessageId}
             isSending={message.id.startsWith(CHAT.outgoingPrefix)}
             message={message}
-            reacting={reactions.isPending}
-            reactionFailed={reactions.isError}
-            reactions={reactions.groups(message)}
+            reacting={reaction.isPending}
+            reactionFailed={reaction.isError}
+            reactions={groups(message)}
             session={session}
             time={message.metadata
               ? roomsTimeLabel({
@@ -213,7 +221,11 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
                 details: chatMessageDetails(message).join('\n'),
               },
             })}
-            onReact={(emoji) => reactions.react(message, emoji)}
+            onReact={(emoji) => reaction.react({
+              entryId: message.metadata?.entryId ?? 0,
+              emoji,
+              groups: groups(message),
+            })}
           />
         )}
         onStartReached={() => {

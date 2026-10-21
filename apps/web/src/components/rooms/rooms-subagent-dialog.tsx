@@ -1,4 +1,5 @@
 import { chatLive, chatMessages, roomsMessageText } from '@openbots/client/client';
+import { chatViewOptions } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { BotAvatar } from '@/components/bots/bot-avatar';
@@ -8,8 +9,8 @@ import { Message, MessageContent, MessageStack } from '@/components/ui/ai/messag
 import { Response } from '@/components/ui/ai/response';
 import { Clamp } from '@/components/ui/clamp';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { chatViewOptions } from '@/services/chat/chat.client';
 import { rpc } from '@/services/rpc/rpc.client';
+import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
 import type { ToolBot } from '@openbots/client/client';
 
 interface RoomsSubagentDialogProps {
@@ -23,7 +24,7 @@ interface RoomsSubagentDialogProps {
 
 export function RoomsSubagentDialog({ botId, bot, conversationId, name, task, onOpenChange }: RoomsSubagentDialogProps) {
   const { data: bots } = useSuspenseQuery(rpc.bots.list.queryOptions());
-  const { data: view } = useQuery(chatViewOptions({ botId, conversationId }));
+  const { data: view } = useQuery(chatViewOptions(RPC_CONTEXT, { botId, conversationId }));
   const { data: pending = [] } = useQuery(rpc.tools.pending.queryOptions({ input: { botId } }));
   const { data: questions = [] } = useQuery(rpc.conversation.questions.queryOptions({ input: { botId, conversationId } }));
   const approvals = pending.filter((approval) => approval.conversationId === conversationId);

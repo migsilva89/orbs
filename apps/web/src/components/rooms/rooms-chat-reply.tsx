@@ -1,7 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useChatReaction } from '@openbots/client/react';
 import { RoomsChatMessage } from '@/components/rooms/rooms-chat-message';
 import { RoomsChatReactions } from '@/components/rooms/rooms-chat-reactions';
-import { rpc } from '@/services/rpc/rpc.client';
 import type { RoomsReactionGroup } from '@openbots/client/client';
 import type { ComponentProps } from 'react';
 
@@ -10,19 +9,13 @@ interface RoomsChatReplyProps extends Omit<ComponentProps<typeof RoomsChatMessag
 }
 
 export function RoomsChatReply({ groups, ...props }: RoomsChatReplyProps) {
-  const queryClient = useQueryClient();
   const entryId = props.message.metadata?.entryId ?? 0;
-  const queryKey = rpc.conversation.reactions.key();
+  const toggle = useChatReaction(props.botId);
 
-  const toggle = useMutation(rpc.conversation.setReaction.mutationOptions({
-    onSettled: () => queryClient.invalidateQueries({ queryKey }),
-  }));
-
-  const react = (emoji: string) => toggle.mutate({
-    botId: props.botId,
+  const react = (emoji: string) => toggle.react({
     entryId,
     emoji,
-    isPresent: !groups.some((group) => group.emoji === emoji && group.isMine),
+    groups,
   });
 
   return (

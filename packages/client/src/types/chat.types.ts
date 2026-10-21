@@ -1,3 +1,4 @@
+import type { RoomsReactionGroup } from './rooms.types';
 import type * as UniversalTypes from '@openbots/contracts/universal';
 import type { UIMessage } from 'ai';
 
@@ -94,4 +95,18 @@ export interface ChatHistoryParams {
   botId: string;
   conversationId: number;
   cursor: UniversalTypes.ConversationView['historyCursor'];
+}
+
+export interface ChatReactionsParams {
+  botId: string;
+  conversationId: number;
+  entryIds: number[];
+  /** The view's `interactionsRevision`; a change refetches reactions other devices or bots added. */
+  revision?: number;
+}
+
+export interface ChatReactParams {
+  entryId: number;
+  emoji: string;
+  groups: RoomsReactionGroup[];
 }

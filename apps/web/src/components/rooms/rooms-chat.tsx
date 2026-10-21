@@ -1,4 +1,5 @@
-import { CHAT, chatActivity, chatFailure, chatLive, chatMessages, chatOutgoingMessages, chatQueued, mentionQuote } from '@openbots/client/client';
+import { CHAT, chatActivity, chatEntryIds, chatFailure, chatLive, chatMessages, chatOutgoingMessages, chatQueued, mentionQuote } from '@openbots/client/client';
+import { chatHistoryOptions, chatViewOptions, useChatReactions } from '@openbots/client/react';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
@@ -10,11 +11,10 @@ import { RoomsChatQuote } from '@/components/rooms/rooms-chat-quote';
 import { RoomsChatRuns } from '@/components/rooms/rooms-chat-runs';
 import { RoomsChatTranscript } from '@/components/rooms/rooms-chat-transcript';
 import { useChatQuote } from '@/hooks/use-chat-quote';
-import { useRoomReactions } from '@/hooks/use-room-reactions';
 import { useRoomRead } from '@/hooks/use-room-read';
-import { chatHistoryOptions, chatViewOptions } from '@/services/chat/chat.client';
 import { LAYOUT_SHORTCUT_OPTIONS, LAYOUT_SHORTCUT_OVERLAYS, LAYOUT_SHORTCUTS } from '@/services/layout/layout.constants';
 import { rpc } from '@/services/rpc/rpc.client';
+import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
 import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
 import type { ChatMessage, ChatOutgoing, RoomsChat as RoomsChatItem } from '@openbots/client/client';
 import type { Bot, ConversationView } from '@openbots/contracts/universal';
@@ -36,7 +36,7 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
   const quote = useChatQuote();
   const { conversationId } = view;
 
-  const history = useInfiniteQuery(chatHistoryOptions({
+  const history = useInfiniteQuery(chatHistoryOptions(RPC_CONTEXT, {
     botId: bot.id,
     conversationId,
     cursor: view.historyCursor,
@@ -57,7 +57,13 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
     bots,
   }));
 
-  const reactions = useRoomReactions(bot.id, conversationId, messages, view.interactionsRevision);
+  const reactions = useChatReactions({
+    botId: bot.id,
+    conversationId,
+    entryIds: chatEntryIds(messages),
+    revision: view.interactionsRevision,
+  });
+
   const unread = useRoomRead(bot.id, chat.readThroughEntryId, view.latestEntryId);
   const activity = chatActivity(view);
   const queued = chatQueued(view);
@@ -175,7 +181,7 @@ interface RoomsChatProps {
 }
 
 export function RoomsChat({ bot, bots, chat }: RoomsChatProps) {
-  const { data: view } = useQuery(chatViewOptions({ botId: bot.id }));
+  const { data: view } = useQuery(chatViewOptions(RPC_CONTEXT, { botId: bot.id }));
 
   return view ? (
     <RoomsChatView

@@ -1,17 +1,15 @@
-import type { Client } from '@openbots/client/client';
+import type { QueryNotifyParams, RpcContextValue } from '@openbots/client/react';
 import type { ConnectionSaved } from '@openbots/contracts/universal';
-import type { createRouterUtils } from '@orpc/tanstack-query';
 import type { QueryClient } from '@tanstack/react-query';
 
 export interface RpcClientParams {
   connection: ConnectionSaved;
+  notify: (params: QueryNotifyParams) => void;
   onUnauthorized: () => void;
 }
 
-export interface RpcSession {
+export interface RpcSession extends RpcContextValue {
   connection: ConnectionSaved;
-  client: Client;
-  rpc: ReturnType<typeof createRouterUtils<Client>>;
   queryClient: QueryClient;
   pause: () => void;
   resume: () => void;

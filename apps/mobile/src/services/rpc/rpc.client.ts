@@ -1,14 +1,15 @@
 import { makeClient } from '@openbots/client/client';
+import { queryMutationCache } from '@openbots/client/react';
 import { Errors } from '@openbots/errors/universal';
 import { ORPCError } from '@orpc/client';
 import { createRouterUtils } from '@orpc/tanstack-query';
-import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
+import { QueryCache, QueryClient } from '@tanstack/react-query';
 import { AppState } from 'react-native';
 import { match } from 'ts-pattern';
 import { connectionRpcUrl, connectionSocketUrl } from '@/services/connection/connection.client';
 import type { RpcClientParams, RpcSession } from '@/types/rpc.types';
 
-export function rpcClientCreate({ connection, onUnauthorized }: RpcClientParams): RpcSession {
+export function rpcClientCreate({ connection, notify, onUnauthorized }: RpcClientParams): RpcSession {
   let socket: WebSocket | undefined;
   let isActive = AppState.currentState === 'active';
 
@@ -37,7 +38,7 @@ export function rpcClientCreate({ connection, onUnauthorized }: RpcClientParams)
 
   const queryClient = new QueryClient({
     queryCache: new QueryCache({ onError: rpcOnError }),
-    mutationCache: new MutationCache({ onError: rpcOnError }),
+    mutationCache: queryMutationCache({ notify, onError: rpcOnError }),
     defaultOptions: {
       queries: {
         retry: false,

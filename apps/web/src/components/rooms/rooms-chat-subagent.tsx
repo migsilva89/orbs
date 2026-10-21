@@ -1,4 +1,5 @@
 import { toolRunning } from '@openbots/client/client';
+import { chatContextsWatchOptions } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -6,8 +7,8 @@ import { match } from 'ts-pattern';
 import { RoomsSubagentDialog } from '@/components/rooms/rooms-subagent-dialog';
 import { Question, QuestionDescription, QuestionHeader, QuestionHeading, QuestionIcon, QuestionItem, QuestionList, QuestionTitle } from '@/components/ui/ai/question';
 import { Button } from '@/components/ui/button';
-import { chatContextsWatchOptions } from '@/services/chat/chat.client';
 import { rpc } from '@/services/rpc/rpc.client';
+import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
 import IconLucideCheck from '~icons/lucide/check';
 import IconLucideLoaderCircle from '~icons/lucide/loader-circle';
 import IconLucideSquare from '~icons/lucide/square';
@@ -27,7 +28,7 @@ export function RoomsChatSubagent({ botId, bot, part, subagent }: RoomsChatSubag
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const isBackground = subagent.operation !== 'run';
-  const watch = useQuery({ ...chatContextsWatchOptions({ botId }), enabled: isBackground });
+  const watch = useQuery({ ...chatContextsWatchOptions(RPC_CONTEXT, { botId }), enabled: isBackground });
   const contexts = useQuery({ ...rpc.conversation.contexts.queryOptions({ input: { botId, kind: 'subagent' } }), enabled: isBackground });
   const stop = useMutation(rpc.conversation.stop.mutationOptions());
   const context = contexts.data?.items.find((item) => item.conversationId === subagent.conversationId);

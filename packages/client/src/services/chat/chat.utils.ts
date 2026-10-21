@@ -379,3 +379,8 @@ function chatUsageAdd(current: ChatTypes.ChatUsage | null, usage: ChatTypes.Chat
     cost: { total: (current?.cost.total ?? 0) + usage.cost.total },
   };
 }
+
+/** The distinct conversation entry ids behind `messages`, for per-entry lookups such as reactions. */
+export function chatEntryIds(messages: ChatTypes.ChatMessage[]): number[] {
+  return [...new Set(messages.flatMap((message) => (message.metadata?.entryId ? [message.metadata.entryId] : [])))];
+}

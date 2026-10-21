@@ -11,7 +11,7 @@ This is the implementation contract. Fix code that conflicts with it; do not rew
 | `packages/server` | Product services: bots, pairing, settings, credentials, permissions, skill, instruction, plugin and MCP selection/discovery; RPC handlers. |
 | `packages/runtime` | Pi integration: Harness, conversations, tools, hooks, approvals, tasks, watches, recovery, skill/instruction/plugin loading, MCP clients. |
 | `packages/contracts` | Public schemas, input/output types, oRPC contracts and errors, including the schemas clients validate forms, search params, pairing codes and stored preferences with. No implementations. |
-| `packages/client` | Typed RPC calls, reconnect, applying Pi view updates, and the data and view helpers web and mobile share (`src/services/<domain>`). No UI or framework code. |
+| `packages/client` | Typed RPC calls, reconnect, applying Pi view updates, and the data and view helpers web and mobile share (`src/services/<domain>`). Shared React data hooks and TanStack Query options live in `src/hooks` and `src/services/<domain>/*.query.ts` behind the `./react` entry; `./client` stays free of React. No UI components or platform APIs (DOM, React Native, Expo); apps inject platform pieces and show their own toasts and navigation. |
 | Shared packages | Env, errors, logging, i18n, avatars and tooling. No application dependencies. |
 
 Native code stays in its owning package behind `/native`. Using files, SQLite or subprocesses does **not** make code daemon logic.

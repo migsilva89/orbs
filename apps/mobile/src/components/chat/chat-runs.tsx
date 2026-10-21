@@ -7,12 +7,10 @@ import { Text } from '@/components/ui/text';
 import { TraceRow } from '@/components/ui/trace';
 import { ChatApproval } from './chat-approval';
 import { ChatQuestion } from './chat-question';
-import type { RpcSession } from '@/types/rpc.types';
 import type { ChatActivity, ChatMessage } from '@openbots/client/client';
 import type { Bot, ConversationQuestion, ToolApproval } from '@openbots/contracts/universal';
 
 interface ChatRunsProps {
-  session: RpcSession;
   bot: Bot;
   activity: ChatActivity;
   failure: string | null;
@@ -21,7 +19,7 @@ interface ChatRunsProps {
   questions: ConversationQuestion[];
 }
 
-export function ChatRuns({ session, bot, activity, failure, draft, approvals, questions }: ChatRunsProps) {
+export function ChatRuns({ bot, activity, failure, draft, approvals, questions }: ChatRunsProps) {
   const last = draft?.parts.filter((part) => part.type !== 'step-start').at(-1);
   const isWaiting = activity === 'queued';
 
@@ -45,7 +43,6 @@ export function ChatRuns({ session, bot, activity, failure, draft, approvals, qu
         <ChatQuestion
           key={question.id}
           question={question}
-          session={session}
         />
       ))}
       {approvals.map((approval) => (
@@ -53,7 +50,6 @@ export function ChatRuns({ session, bot, activity, failure, draft, approvals, qu
           approval={approval}
           botName={bot.name}
           key={approval.id}
-          session={session}
         />
       ))}
       {failure ? (

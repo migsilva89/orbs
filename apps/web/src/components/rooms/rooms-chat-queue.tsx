@@ -1,9 +1,8 @@
+import { useChatQueue } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
-import { useMutation } from '@tanstack/react-query';
 import { PromptInputDrawer } from '@/components/ui/ai/prompt-input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
-import { rpc } from '@/services/rpc/rpc.client';
 import IconCornerUpRight from '~icons/lucide/corner-up-right';
 import IconListOrdered from '~icons/lucide/list-ordered';
 import type { ChatQueued } from '@openbots/client/client';
@@ -16,7 +15,7 @@ interface RoomsChatQueueProps {
 }
 
 export function RoomsChatQueue({ botId, botName, conversationId, queued }: RoomsChatQueueProps) {
-  const promote = useMutation(rpc.conversation.updateSubmission.mutationOptions());
+  const queue = useChatQueue({ botId, conversationId });
 
   if (queued.length === 0) {
     return null;
@@ -31,7 +30,7 @@ export function RoomsChatQueue({ botId, botName, conversationId, queued }: Rooms
         </header>
         <ol>
           {queued.map((item) => {
-            const isFailed = promote.isError && promote.variables.submissionId === item.submissionId;
+            const isFailed = queue.isFailed(item.submissionId);
 
             return (
               <li className="flex min-w-0 items-center gap-2 rounded-lg py-0.5 pr-0.5 pl-2 text-xs" key={item.submissionId}>
@@ -40,16 +39,11 @@ export function RoomsChatQueue({ botId, botName, conversationId, queued }: Rooms
                 </span>
                 {item.mode === 'followUp' ? (
                   <Button
-                    disabled={promote.isPending}
+                    disabled={queue.isPending}
                     size="xs"
                     title={m.rooms_chat_queue_steer_hint({ bot: botName })}
                     variant="ghost"
-                    onClick={() => promote.mutate({
-                      botId,
-                      conversationId,
-                      submissionId: item.submissionId,
-                      whenBusy: 'steer',
-                    })}
+                    onClick={() => queue.steer(item.submissionId)}
                   >
                     <IconCornerUpRight />
                     {m.rooms_chat_queue_steer()}

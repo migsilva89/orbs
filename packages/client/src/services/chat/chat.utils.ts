@@ -384,3 +384,11 @@ function chatUsageAdd(current: ChatTypes.ChatUsage | null, usage: ChatTypes.Chat
 export function chatEntryIds(messages: ChatTypes.ChatMessage[]): number[] {
   return [...new Set(messages.flatMap((message) => (message.metadata?.entryId ? [message.metadata.entryId] : [])))];
 }
+
+/** Why an approval or question answer did not land: it is no longer pending, or sending failed. */
+export function chatAnswerProblem({ isGone, isError }: ChatTypes.ChatAnswerProblemParams): string | null {
+  return match({ isGone, isError })
+    .with({ isGone: true }, () => m.rooms_chat_approval_gone())
+    .with({ isError: true }, () => m.rooms_chat_approval_error())
+    .otherwise(() => null);
+}

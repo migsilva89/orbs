@@ -110,3 +110,8 @@ export interface ChatReactParams {
   emoji: string;
   groups: RoomsReactionGroup[];
 }
+
+export interface ChatAnswerProblemParams {
+  isGone: boolean;
+  isError: boolean;
+}

@@ -1,4 +1,7 @@
 export * from './context/rpc';
+export * from './hooks/use-chat-approval';
+export * from './hooks/use-chat-question';
+export * from './hooks/use-chat-queue';
 export * from './hooks/use-chat-reaction';
 export * from './hooks/use-chat-reactions';
 export * from './hooks/use-rpc';

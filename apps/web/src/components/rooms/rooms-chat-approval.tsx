@@ -1,11 +1,9 @@
 import { ROOMS_APPROVAL_CHOICES, roomsApprovalText, toolPresentation } from '@openbots/client/client';
+import { useChatApproval } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
-import { ORPCError } from '@orpc/client';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ToolInput } from '@/components/tools/tool-input';
 import { Question, QuestionDescription, QuestionHeader, QuestionHeading, QuestionOption, QuestionOptions, QuestionTitle } from '@/components/ui/ai/question';
 import { ToolCode } from '@/components/ui/ai/tool';
-import { rpc } from '@/services/rpc/rpc.client';
 import type { ToolApproval } from '@openbots/contracts/universal';
 
 interface RoomsChatApprovalProps {
@@ -15,14 +13,7 @@ interface RoomsChatApprovalProps {
 }
 
 export function RoomsChatApproval({ approval, botName, className }: RoomsChatApprovalProps) {
-  const queryClient = useQueryClient();
-
-  const answer = useMutation(rpc.tools.answer.mutationOptions({
-    onSettled: () => queryClient.invalidateQueries({ queryKey: rpc.tools.pending.key() }),
-  }));
-
-  const isGone = (answer.error instanceof ORPCError && answer.error.code === 'NOT_FOUND') || answer.data?.accepted === false;
-  const isAnswered = answer.isPending || answer.data?.accepted === true;
+  const answer = useChatApproval(approval);
   const text = roomsApprovalText({ input: approval.arguments });
 
   return (
@@ -42,21 +33,17 @@ export function RoomsChatApproval({ approval, botName, className }: RoomsChatApp
       <QuestionOptions>
         {ROOMS_APPROVAL_CHOICES.map((choice, index) => (
           <QuestionOption
-            aria-pressed={answer.variables?.approved === choice.approved}
-            disabled={isAnswered}
+            aria-pressed={answer.chosen === choice.approved}
+            disabled={answer.isAnswered}
             index={index}
             key={choice.label()}
-            onClick={() => answer.mutate({
-              botId: approval.botId,
-              id: approval.id,
-              approved: choice.approved,
-            })}
+            onClick={() => answer.answer(choice.approved)}
           >
             {choice.label()}
           </QuestionOption>
         ))}
       </QuestionOptions>
-      {answer.isError || isGone ? <p className="px-1 text-xs text-destructive" role="alert">{isGone ? m.rooms_chat_approval_gone() : m.rooms_chat_approval_error()}</p> : null}
+      {answer.problem ? <p className="px-1 text-xs text-destructive" role="alert">{answer.problem}</p> : null}
     </Question>
   );
 }

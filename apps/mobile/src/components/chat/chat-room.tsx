@@ -184,7 +184,6 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
             draft={messages.find((message) => message.id === CHAT.liveMessageId)}
             failure={chatFailure(view)}
             questions={questions}
-            session={session}
           />
         )}
         header={empty}

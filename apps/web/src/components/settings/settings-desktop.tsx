@@ -30,7 +30,6 @@ export function SettingsDesktop() {
 
   return (
     <SettingsPanel
-      description={m.settings_desktop_hint()}
       icon={IconMonitor}
       id="desktop"
       title={m.settings_desktop()}

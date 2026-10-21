@@ -3,7 +3,7 @@ import { useChatSearch } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { experimental_streamedQuery as streamedQuery, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { Bot, Plus, QrCode, Star, UserRound } from 'lucide-react-native';
+import { Bot, LayoutDashboard, Plus, QrCode, Star, UserRound } from 'lucide-react-native';
 import { useState } from 'react';
 import { SectionList, View } from 'react-native';
 import { match, P } from 'ts-pattern';
@@ -193,17 +193,18 @@ function BotListContent({ session }: BotListContentProps) {
           <GlassButton accessibilityLabel={m.settings_title()} onPress={() => router.push('/settings')}>
             <Icon icon={UserRound} size="action" />
           </GlassButton>
-          <GlassButton accessibilityLabel={m.rooms_bot_title()} onPress={() => router.push('/bots/create')}>
-            <Icon icon={Plus} size="action" />
-          </GlassButton>
+          <View className="flex-row gap-3">
+            <GlassButton accessibilityLabel={m.artifacts_title()} onPress={() => router.push('/artifacts')}>
+              <Icon icon={LayoutDashboard} size="action" />
+            </GlassButton>
+            <GlassButton accessibilityLabel={m.rooms_bot_title()} onPress={() => router.push('/bots/create')}>
+              <Icon icon={Plus} size="action" />
+            </GlassButton>
+          </View>
         </FloatingBar>
         <KeyboardSticky>
           <FloatingBar edge="bottom">
-            <GlassButton
-              disabled
-              accessibilityHint={m.mobile_home_unavailable()}
-              accessibilityLabel={m.mobile_home_pair()}
-            >
+            <GlassButton accessibilityLabel={m.mobile_home_pair()} onPress={() => router.push('/settings/devices/pair')}>
               <Icon icon={QrCode} size="action" />
             </GlassButton>
             <SearchField

@@ -36,12 +36,6 @@ export const ROOMS = {
   weekDays: 7,
 } as const;
 
-export const ROOMS_SEND_MODE_HINTS = {
-  followUp: m.rooms_send_queue_hint,
-  steer: m.rooms_send_steer_hint,
-  interrupt: m.rooms_send_interrupt_hint,
-} satisfies Record<ConversationWhenBusy, () => string>;
-
 export const ROOMS_SEND_MODE_DEFAULT = 'default';
 
 export const ROOMS_SEND_MODES = {

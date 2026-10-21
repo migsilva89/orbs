@@ -26,5 +26,7 @@
   "connect_friends_natural": "Act natural.",
   "connect_friends_typing": "Someone's typing…",
   "mobile_photos_permission": "Openbots shares the photos you pick with your bots.",
-  "mobile_camera_permission": "Openbots shares the photos you take with your bots."
+  "mobile_camera_permission": "Openbots shares the photos you take with your bots.",
+  "mobile_theme_storage_error": "The theme could not be saved on this phone.",
+  "mobile_local_network_permission": "Openbots connects to your bots on your own network."
 }

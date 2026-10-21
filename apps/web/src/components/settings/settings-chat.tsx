@@ -1,10 +1,10 @@
-import { ROOMS_SEND_MODE_HINTS, ROOMS_SEND_MODES } from '@openbots/client/client';
+import { ROOMS_SEND_MODES } from '@openbots/client/client';
 import { useChatDefaults } from '@openbots/client/react';
 import { conversationWhenBusy, preferencesEnterAction } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { SettingsPanel } from '@/components/settings/settings-panel';
-import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/components/ui/panel';
+import { PanelContent, PanelRow, PanelTitle } from '@/components/ui/panel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePreferences } from '@/hooks/use-preferences';
 import { rpc } from '@/services/rpc/rpc.client';
@@ -14,8 +14,8 @@ import IconMonitor from '~icons/lucide/monitor';
 import IconSmartphone from '~icons/lucide/smartphone';
 
 const SETTINGS_ENTER_KEYS = [
-  { device: 'desktop', icon: IconMonitor, label: m.settings_chat_enter_desktop, hint: m.settings_chat_enter_desktop_hint },
-  { device: 'mobile', icon: IconSmartphone, label: m.settings_chat_enter_mobile, hint: m.settings_chat_enter_mobile_hint },
+  { device: 'desktop', icon: IconMonitor, label: m.settings_chat_enter_desktop },
+  { device: 'mobile', icon: IconSmartphone, label: m.settings_chat_enter_mobile },
 ] as const;
 
 const SETTINGS_ENTER_ACTIONS = { send: m.settings_chat_enter_send, newline: m.settings_chat_enter_newline };
@@ -27,7 +27,6 @@ export function SettingsChat() {
 
   return (
     <SettingsPanel
-      description={m.settings_chat_hint()}
       icon={IconMessageSquare}
       id="chat"
       title={m.settings_chat()}
@@ -37,7 +36,6 @@ export function SettingsChat() {
           <row.icon />
           <PanelContent>
             <PanelTitle>{row.label()}</PanelTitle>
-            <PanelDescription>{row.hint()}</PanelDescription>
           </PanelContent>
           <Select
             value={preferences.enterKey[row.device]}
@@ -56,7 +54,6 @@ export function SettingsChat() {
         <IconListOrdered />
         <PanelContent>
           <PanelTitle>{m.rooms_send_mode()}</PanelTitle>
-          <PanelDescription>{ROOMS_SEND_MODE_HINTS[settings.whenBusy]()}</PanelDescription>
         </PanelContent>
         <Select
           disabled={configure.isPending}

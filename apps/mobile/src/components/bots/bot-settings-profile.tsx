@@ -18,7 +18,6 @@ export function BotSettingsProfile({ isDisabled }: BotSettingsProfileProps) {
 
   return (
     <BotDetailsSection
-      description={m.bots_profile_hint()}
       icon={Bot}
       title={m.bots_profile()}
     >

@@ -141,7 +141,7 @@ interface MessageFileProps {
 
 export function MessageFile({ name }: MessageFileProps) {
   return (
-    <View className="max-w-full flex-row items-center gap-2 rounded-xl border border-border px-3 py-2">
+    <View className="max-w-full flex-row items-center gap-2 rounded-2xl border border-border px-3 py-2">
       <Icon icon={FileText} tone="muted" />
       <Text className="shrink" numberOfLines={1} variant="button">{name}</Text>
     </View>

@@ -119,7 +119,13 @@ export function ChatMessage({
           text={reasoning.text}
         />
       ))
-      .with({ kind: 'html' }, (html) => <ChatHtml html={html.text} key={html.key} />)
+      .with({ kind: 'html' }, (html) => (
+        <ChatHtml
+          botId={bot.id}
+          html={html.text}
+          key={html.key}
+        />
+      ))
       .with({ kind: 'artifact' }, (artifact) => (
         <ChatArtifact
           artifact={artifact.artifact}

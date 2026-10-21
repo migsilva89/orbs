@@ -24,7 +24,6 @@ export function SettingsModels() {
   return (
     <>
       <SettingsPanel
-        description={m.settings_models_hint()}
         icon={IconCpu}
         id="models"
         title={m.settings_models_title()}

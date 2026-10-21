@@ -31,7 +31,6 @@ export function SettingsTools() {
       <form onSubmit={form.handleSubmit(save.save)}>
         <fieldset className="contents" disabled={save.isPending}>
           <SettingsPanel
-            description={m.settings_tools_hint()}
             icon={IconShieldCheck}
             id="tools"
             title={m.settings_tools()}
@@ -47,7 +46,6 @@ export function SettingsTools() {
               <div className="min-w-0 flex-1">
                 <FormInput
                   autoComplete="off"
-                  hint={m.settings_tools_jev_hint()}
                   label={m.settings_tools_jev()}
                   name="jevApiKey"
                   placeholder={settings.isJevConfigured ? m.settings_secret_saved() : m.settings_tools_jev_placeholder()}

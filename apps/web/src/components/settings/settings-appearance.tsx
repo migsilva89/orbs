@@ -7,7 +7,7 @@ import { ButtonGroup } from '@/components/ui/button-group';
 import { ColorSwatches } from '@/components/ui/color-swatches';
 import { FormErrors } from '@/components/ui/forms/form';
 import { Label } from '@/components/ui/label';
-import { PanelContent, PanelDescription, PanelRow } from '@/components/ui/panel';
+import { PanelContent, PanelRow } from '@/components/ui/panel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTheme } from '@/hooks/use-theme';
@@ -50,7 +50,6 @@ function SettingsAppearanceControls() {
         <IconPalette />
         <PanelContent>
           <Label htmlFor={paletteId}>{m.settings_appearance_theme()}</Label>
-          <PanelDescription>{m.settings_appearance_theme_hint()}</PanelDescription>
         </PanelContent>
         <ButtonGroup aria-label={m.settings_appearance_theme()} className="col-start-2 max-w-full @lg/panel:col-start-auto">
           <Select value={theme.selected} onValueChange={(id) => setFailed(!theme.select(id))}>
@@ -97,7 +96,6 @@ function SettingsAppearanceControls() {
 export function SettingsAppearance() {
   return (
     <SettingsPanel
-      description={m.settings_appearance_hint()}
       icon={IconPalette}
       id="appearance"
       title={m.settings_appearance()}

@@ -24,7 +24,6 @@ export function SettingsProviders() {
 
   return (
     <SettingsPanel
-      description={m.settings_providers_hint()}
       icon={IconKeyRound}
       id="providers"
       title={m.settings_providers()}

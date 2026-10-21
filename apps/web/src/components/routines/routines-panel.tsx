@@ -12,7 +12,6 @@ interface RoutinesPanelProps {
 export function RoutinesPanel({ bot }: RoutinesPanelProps) {
   return (
     <SettingsPanel
-      description={m.bots_routines_hint()}
       icon={IconCalendarClock}
       id="routines"
       title={m.rooms_routines()}

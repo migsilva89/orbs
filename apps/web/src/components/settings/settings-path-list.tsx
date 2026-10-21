@@ -9,7 +9,6 @@ import IconTrash2 from '~icons/lucide/trash-2';
 
 interface SettingsPathListProps {
   title: string
-  hint: string
   placeholder: string
   paths: string[]
   isPending: boolean
@@ -17,7 +16,7 @@ interface SettingsPathListProps {
   onChange: (paths: string[]) => void
 }
 
-export function SettingsPathList({ title, hint, placeholder, paths, isPending, isFailed, onChange }: SettingsPathListProps) {
+export function SettingsPathList({ title, placeholder, paths, isPending, isFailed, onChange }: SettingsPathListProps) {
   const [draft, setDraft] = useState('');
   const path = skillSettings.shape.directories.element.safeParse(draft);
   const isValid = path.success && !paths.includes(path.data);
@@ -29,10 +28,7 @@ export function SettingsPathList({ title, hint, placeholder, paths, isPending, i
 
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1">
-        <h3 className="text-sm font-medium">{title}</h3>
-        <p className="text-xs text-pretty text-muted-foreground">{hint}</p>
-      </div>
+      <h3 className="text-sm font-medium">{title}</h3>
       <div className="flex items-center gap-2">
         <Input
           aria-label={title}

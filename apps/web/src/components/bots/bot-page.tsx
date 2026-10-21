@@ -88,7 +88,6 @@ function BotPageForm({ bot, deletable }: BotPageFormProps) {
       >
         <fieldset className="contents" disabled={busy}>
           <SettingsPanel
-            description={m.bots_profile_hint()}
             icon={IconBot}
             id="profile"
             title={m.bots_profile()}
@@ -105,7 +104,6 @@ function BotPageForm({ bot, deletable }: BotPageFormProps) {
             {footer}
           </SettingsPanel>
           <SettingsPanel
-            description={m.bots_instructions_hint()}
             icon={IconScrollText}
             id="instructions"
             title={m.rooms_bot_instructions()}
@@ -114,7 +112,6 @@ function BotPageForm({ bot, deletable }: BotPageFormProps) {
             {footer}
           </SettingsPanel>
           <SettingsPanel
-            description={m.bots_model_hint()}
             icon={IconCpu}
             id="model"
             title={m.rooms_bot_model()}
@@ -128,7 +125,6 @@ function BotPageForm({ bot, deletable }: BotPageFormProps) {
             {footer}
           </SettingsPanel>
           <SettingsPanel
-            description={m.bots_access_hint()}
             icon={IconShieldCheck}
             id="access"
             title={m.bots_access()}

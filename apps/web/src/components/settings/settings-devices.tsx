@@ -28,7 +28,6 @@ export function SettingsDevices({ connection }: SettingsDevicesProps) {
 
   return (
     <SettingsPanel
-      description={m.settings_devices_hint()}
       icon={IconLaptop}
       id="devices"
       title={m.settings_devices()}
@@ -64,7 +63,6 @@ export function SettingsDevices({ connection }: SettingsDevicesProps) {
         <div className="flex min-w-0 flex-1 flex-col gap-3">
           <PanelContent>
             <PanelTitle>{m.settings_devices_pair()}</PanelTitle>
-            <PanelDescription>{m.settings_devices_pair_hint()}</PanelDescription>
           </PanelContent>
           {settings.pairing ? (
             <div className="flex flex-col items-start gap-2">

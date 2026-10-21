@@ -25,7 +25,6 @@ export function SettingsTools() {
 
   return (
     <BotDetailsSection
-      description={m.settings_tools_hint()}
       icon={ShieldCheck}
       title={m.settings_tools()}
     >
@@ -63,7 +62,6 @@ function SettingsToolsForm({ settings, tools }: SettingsToolsFormProps) {
   return (
     <View className="gap-3 rounded-lg border border-border bg-card p-3">
       <Text variant="label">{m.settings_tools_rules()}</Text>
-      <LabelDescription>{m.settings_tools_rules_hint()}</LabelDescription>
       <Input
         accessibilityLabel={m.settings_tools_rules_when()}
         autoCapitalize="none"
@@ -138,7 +136,6 @@ function SettingsToolsForm({ settings, tools }: SettingsToolsFormProps) {
         value={jevApiKey}
         onChangeText={setJevApiKey}
       />
-      <LabelDescription>{m.settings_tools_jev_hint()}</LabelDescription>
       {tools.problem ? <LabelDescription accessibilityRole="alert" variant="error">{tools.problem}</LabelDescription> : null}
       <Button
         loading={tools.isPending}

@@ -21,7 +21,7 @@ export function ResponseHtml(props: BlockProps) {
   }
 
   return (
-    <div className="min-w-0 overflow-hidden rounded-lg border" data-message-wide>
+    <div className="min-w-0 overflow-hidden rounded-2xl border" data-message-wide>
       <div className="flex items-center justify-between gap-2 border-b px-3 py-1.5">
         <span className="text-xs text-muted-foreground">{m.ui_html_preview()}</span>
         <div className="flex items-center gap-1">
@@ -37,7 +37,9 @@ export function ResponseHtml(props: BlockProps) {
       {source ? (
         <pre className="max-h-96 overflow-auto p-3 text-xs"><code>{html}</code></pre>
       ) : (
-        <HtmlFrame html={html} title={m.ui_html_preview()} />
+        <div className="p-3">
+          <HtmlFrame html={html} title={m.ui_html_preview()} />
+        </div>
       )}
       {expanded ? (
         <Dialog open onOpenChange={setExpanded}>

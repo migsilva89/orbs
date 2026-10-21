@@ -6,18 +6,18 @@ import { Switch } from 'react-native';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { BotSettingsMenuRow } from '@/components/bots/bot-settings-menu-row';
 import { Icon } from '@/components/ui/icon';
-import { Item, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
+import { Item, ItemContent, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { botMenuPermissions } from '@/services/bot/bot-menu.utils';
 import type { BotInherit } from '@openbots/client/client';
 import type { BotForm } from '@openbots/contracts/universal';
 import type { LucideIcon } from 'lucide-react-native';
 
 const BOT_SETTINGS_INHERIT = [
-  { resource: 'skills', icon: Sparkles, label: m.rooms_bot_global_skills, hint: m.rooms_bot_global_skills_hint },
-  { resource: 'agentsFile', icon: FileText, label: m.rooms_bot_global_agents_md, hint: m.rooms_bot_global_agents_md_hint },
-  { resource: 'mcp', icon: Plug, label: m.rooms_bot_global_mcp, hint: m.rooms_bot_global_mcp_hint },
-  { resource: 'plugins', icon: Blocks, label: m.rooms_bot_global_plugins, hint: m.rooms_bot_global_plugins_hint },
-] satisfies { resource: BotInherit; icon: LucideIcon; label: () => string; hint: () => string }[];
+  { resource: 'skills', icon: Sparkles, label: m.rooms_bot_global_skills },
+  { resource: 'agentsFile', icon: FileText, label: m.rooms_bot_global_agents_md },
+  { resource: 'mcp', icon: Plug, label: m.rooms_bot_global_mcp },
+  { resource: 'plugins', icon: Blocks, label: m.rooms_bot_global_plugins },
+] satisfies { resource: BotInherit; icon: LucideIcon; label: () => string }[];
 
 interface BotSettingsAccessProps {
   isDisabled: boolean;
@@ -30,7 +30,6 @@ export function BotSettingsAccess({ isDisabled }: BotSettingsAccessProps) {
 
   return (
     <BotDetailsSection
-      description={m.bots_access_hint()}
       icon={ShieldCheck}
       title={m.bots_access()}
     >
@@ -43,14 +42,13 @@ export function BotSettingsAccess({ isDisabled }: BotSettingsAccessProps) {
           title={m.rooms_bot_permission()}
           value={BOT_PERMISSION_LABELS[permission.field.value]()}
         />
-        {BOT_SETTINGS_INHERIT.map(({ resource, icon, label, hint }) => (
+        {BOT_SETTINGS_INHERIT.map(({ resource, icon, label }) => (
           <Item key={resource}>
             <ItemMedia className="mt-1 self-start">
               <Icon icon={icon} tone="muted" />
             </ItemMedia>
             <ItemContent>
               <ItemTitle>{label()}</ItemTitle>
-              <ItemDescription numberOfLines={0}>{hint()}</ItemDescription>
             </ItemContent>
             <Switch
               accessibilityLabel={label()}

@@ -2,13 +2,16 @@ import { ROOMS_SEND_MODES } from '@openbots/client/client';
 import { useChatDefaults, useChatHideVerbose } from '@openbots/client/react';
 import { conversationWhenBusy } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
-import { EyeOff, ListOrdered, Monitor, Settings } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { EyeOff, ListOrdered, Monitor, Palette, Settings } from 'lucide-react-native';
 import { useState } from 'react';
 import { Switch } from 'react-native';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { BotSettingsMenuRow } from '@/components/bots/bot-settings-menu-row';
 import { Icon } from '@/components/ui/icon';
-import { Item, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
+import { Item, ItemContent, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
+import { useAppearance } from '@/hooks/use-appearance';
+import { useToast } from '@/hooks/use-toast';
 import { appearanceRead, appearanceSave } from '@/services/appearance/appearance.client';
 import { APPEARANCE_CHOICES } from '@/services/appearance/appearance.constants';
 import type { AppearanceChoice } from '@/types/appearance.types';
@@ -22,6 +25,9 @@ const SETTINGS_APPEARANCE_LABELS = {
 export function SettingsGeneral() {
   const defaults = useChatDefaults();
   const verbose = useChatHideVerbose();
+  const router = useRouter();
+  const toast = useToast();
+  const palettes = useAppearance();
   const [appearance, setAppearance] = useState(appearanceRead);
   const whenBusy = defaults.settings?.whenBusy;
 
@@ -34,7 +40,6 @@ export function SettingsGeneral() {
           </ItemMedia>
           <ItemContent>
             <ItemTitle>{m.settings_general_verbose()}</ItemTitle>
-            <ItemDescription numberOfLines={0}>{m.settings_general_verbose_hint()}</ItemDescription>
           </ItemContent>
           <Switch
             accessibilityLabel={m.settings_general_verbose()}
@@ -66,6 +71,24 @@ export function SettingsGeneral() {
           }))}
           title={m.settings_appearance_mode()}
           value={SETTINGS_APPEARANCE_LABELS[appearance]()}
+        />
+        <BotSettingsMenuRow
+          icon={Palette}
+          items={[
+            ...palettes.themes.map((palette) => ({
+              label: palette.name,
+              systemImage: palette.id === palettes.selected ? 'checkmark' as const : undefined,
+              onSelect: () => palettes.select(palette.id) || toast.show({ message: m.mobile_theme_storage_error() }),
+            })),
+            {
+              label: m.settings_theme_add(),
+              systemImage: 'plus',
+              hasDividerBefore: true,
+              onSelect: () => router.push('/settings/themes/create'),
+            },
+          ]}
+          title={m.settings_appearance_theme()}
+          value={palettes.themes.find((palette) => palette.id === palettes.selected)?.name ?? ''}
         />
       </ItemGroup>
     </BotDetailsSection>

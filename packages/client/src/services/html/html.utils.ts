@@ -83,7 +83,7 @@ export function htmlDocument(html: string) {
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; connect-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>:root{color-scheme:light dark}body{margin:0;background:var(--background,transparent);color:var(--foreground,inherit);font-family:system-ui,sans-serif}*,*::before,*::after{box-sizing:border-box}img,svg,canvas{max-width:100%}</style>
+<style>:root{color-scheme:light dark}html{background:var(--background,transparent);color:var(--foreground,inherit);font-family:system-ui,sans-serif}body{margin:0}*,*::before,*::after{box-sizing:border-box}img,svg,canvas{max-width:100%}</style>
 <script>(${htmlBootstrap.toString()})();</script>
 </head><body>${html}</body></html>`;
 }

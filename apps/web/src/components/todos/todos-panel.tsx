@@ -12,7 +12,6 @@ interface TodosPanelProps {
 export function TodosPanel({ bot }: TodosPanelProps) {
   return (
     <SettingsPanel
-      description={m.bots_todos_hint()}
       icon={IconListTodo}
       id="todos"
       title={m.rooms_todos()}

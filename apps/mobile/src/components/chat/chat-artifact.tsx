@@ -23,15 +23,17 @@ export function ChatArtifact({ session, artifact }: ChatArtifactProps) {
   const description = m.artifacts_chat_card({ version: saved?.version ?? artifact.version });
   const html = match(saved?.spec).with({ html: P.string }, (spec) => spec.html).otherwise(() => undefined);
 
+  const open = () => router.push({
+    pathname: '/bots/[botId]/artifacts/[artifactId]',
+    params: { botId: artifact.botId, artifactId: artifact.id, conversationId: artifact.conversationId },
+  });
+
   if (html === undefined) {
     return (
       <ItemButton
         accessibilityLabel={m.artifacts_open()}
-        variant="outline"
-        onPress={() => router.push({
-          pathname: '/bots/[botId]/artifacts/[artifactId]',
-          params: { botId: artifact.botId, artifactId: artifact.id, conversationId: artifact.conversationId },
-        })}
+        variant="bubble"
+        onPress={open}
       >
         <ItemMedia>
           <Icon icon={LayoutDashboard} tone="muted" />
@@ -48,15 +50,9 @@ export function ChatArtifact({ session, artifact }: ChatArtifactProps) {
   return (
     <PreviewCard
       description={description}
-      expanded={(
-        <HtmlFrame
-          fill
-          html={html}
-          title={title}
-        />
-      )}
       icon={LayoutDashboard}
       title={title}
+      onExpand={open}
     >
       <HtmlFrame html={html} title={title} />
     </PreviewCard>

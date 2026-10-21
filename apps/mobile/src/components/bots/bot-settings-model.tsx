@@ -94,7 +94,6 @@ export function BotSettingsModel({ session, isDisabled }: BotSettingsModelProps)
 
   return (
     <BotDetailsSection
-      description={m.bots_model_hint()}
       icon={Cpu}
       title={m.rooms_bot_model()}
     >

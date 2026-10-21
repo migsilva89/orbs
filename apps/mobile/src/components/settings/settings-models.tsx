@@ -20,7 +20,6 @@ export function SettingsModels() {
 
   return (
     <BotDetailsSection
-      description={m.settings_models_hint()}
       icon={Cpu}
       title={m.settings_models_title()}
     >

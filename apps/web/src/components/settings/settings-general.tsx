@@ -23,9 +23,7 @@ function SettingsGeneralNotifications() {
       <IconBellRing />
       <PanelContent>
         <Label htmlFor={id}>{m.settings_general_notifications()}</Label>
-        <PanelDescription>
-          {permission === 'denied' ? m.settings_general_notifications_blocked() : m.settings_general_notifications_hint()}
-        </PanelDescription>
+        {permission === 'denied' ? <PanelDescription>{m.settings_general_notifications_blocked()}</PanelDescription> : null}
       </PanelContent>
       <Button
         disabled={permission !== 'default'}
@@ -46,7 +44,6 @@ export function SettingsGeneral() {
 
   return (
     <SettingsPanel
-      description={m.settings_general_hint()}
       icon={IconSettings}
       id="general"
       title={m.settings_general()}
@@ -55,7 +52,6 @@ export function SettingsGeneral() {
         <IconWrench />
         <PanelContent>
           <Label htmlFor={verboseId}>{m.settings_general_verbose()}</Label>
-          <PanelDescription>{m.settings_general_verbose_hint()}</PanelDescription>
         </PanelContent>
         <Switch
           checked={verbose.hideVerbose}

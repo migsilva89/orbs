@@ -20,7 +20,7 @@ function RoomsChatFilesItem({ botId, file }: RoomsChatFilesItemProps) {
       >
         <img
           alt={file.filename ?? ''}
-          className="max-h-64 rounded-xl object-cover"
+          className="max-h-64 rounded-2xl object-cover"
           loading="lazy"
           src={url}
         />

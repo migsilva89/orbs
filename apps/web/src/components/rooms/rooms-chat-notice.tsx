@@ -45,7 +45,7 @@ export function RoomsChatNotice({ message, bot }: RoomsChatNoticeProps) {
         </Button>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <p className="mt-1 max-w-prose rounded-lg border px-3 py-2 text-xs whitespace-pre-wrap text-muted-foreground">{text}</p>
+        <p className="mt-1 max-w-prose rounded-2xl border px-3 py-2 text-xs whitespace-pre-wrap text-muted-foreground">{text}</p>
       </CollapsibleContent>
     </Collapsible>
   );

@@ -146,7 +146,6 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
         >
           <BotSettingsProfile isDisabled={isBusy} />
           <BotDetailsSection
-            description={m.bots_instructions_hint()}
             icon={ScrollText}
             title={m.rooms_bot_instructions()}
           >
@@ -166,7 +165,6 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
           <BotSettingsModel isDisabled={isBusy} session={session} />
           <BotSettingsAccess isDisabled={isBusy} />
           <BotDetailsSection
-            description={m.bots_todos_hint()}
             icon={ListTodo}
             title={m.rooms_todos()}
           >
@@ -177,7 +175,6 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
             />
           </BotDetailsSection>
           <BotDetailsSection
-            description={m.bots_routines_hint()}
             icon={CalendarClock}
             title={m.rooms_routines()}
           >

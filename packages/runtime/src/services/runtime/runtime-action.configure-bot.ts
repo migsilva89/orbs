@@ -2,7 +2,7 @@ import { configure, defineExtension } from '@earendil-works/pi-durable';
 import { match } from 'ts-pattern';
 import { runtimeModelRef } from './runtime-models.utils';
 import { runtimePluginsInstall } from './runtime-plugins.utils';
-import { runtimeBot, runtimeBotConversations } from './runtime.constants';
+import { RUNTIME_HTML_GUIDE, runtimeBot, runtimeBotConversations } from './runtime.constants';
 import type { RuntimeBotParams, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 
@@ -36,6 +36,7 @@ export async function runtimeActionConfigureBot(
         `Your Openbots bot ID is ${bot.id}. Your configured primary model is ${bot.modelProvider}/${bot.modelId}, with ${bot.thinkingLevel} thinking. This is configuration, not proof of which model served a particular response; a configured fallback may be used.`,
         'Openbots persists your conversation and runs your tools. The available tool schemas describe your current capabilities. Openbots tools use the bot_ prefix for bot management, peer messaging, questions, routines, todos, history, reactions, and artifacts. Native Pi tools, MCP tools, and plugins retain their own names. Use only tools actually available to you; access is subject to your bot permission policy.',
         'Bot settings, selected instruction files, and skills provide additional context. Do not infer your machine, deployment location, or launcher from a provider name or an instruction file path. If the current context does not establish those details, say they are unknown.',
+        RUNTIME_HTML_GUIDE,
         ...bot.instructionFiles.map(({ path, content }) => `# ${path}\n\n${content}`),
         bot.instructions,
       ].filter(Boolean).join('\n\n'),

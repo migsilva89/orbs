@@ -14,7 +14,6 @@ export function SettingsSources() {
 
   return (
     <SettingsPanel
-      description={m.settings_sources_hint()}
       icon={IconFolderTree}
       id="sources"
       title={m.settings_sources()}
@@ -23,7 +22,6 @@ export function SettingsSources() {
         <IconBox />
         <div className="min-w-0 flex-1">
           <SettingsPathList
-            hint={m.settings_sources_skills_hint()}
             isFailed={sources.skills.isFailed}
             isPending={sources.skills.isPending}
             paths={sources.skills.paths}
@@ -37,7 +35,6 @@ export function SettingsSources() {
         <IconFileText />
         <div className="min-w-0 flex-1">
           <SettingsPathList
-            hint={m.settings_sources_instructions_hint()}
             isFailed={sources.instructions.isFailed}
             isPending={sources.instructions.isPending}
             paths={sources.instructions.paths}
@@ -51,7 +48,6 @@ export function SettingsSources() {
         <IconPuzzle />
         <div className="min-w-0 flex-1">
           <SettingsPathList
-            hint={m.settings_sources_plugins_hint()}
             isFailed={sources.plugins.isFailed}
             isPending={sources.plugins.isPending}
             paths={sources.plugins.paths}
@@ -65,7 +61,6 @@ export function SettingsSources() {
         <IconPlug />
         <div className="min-w-0 flex-1">
           <SettingsPathList
-            hint={m.settings_sources_mcp_hint()}
             isFailed={sources.mcp.isFailed}
             isPending={sources.mcp.isPending}
             paths={sources.mcp.paths}

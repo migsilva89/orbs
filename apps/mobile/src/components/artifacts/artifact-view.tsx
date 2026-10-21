@@ -323,12 +323,15 @@ interface ArtifactViewProps {
 export function ArtifactView({ spec, store, title }: ArtifactViewProps) {
   return match(spec)
     .with({ html: P.string }, ({ html }) => (
-      <HtmlFrame
-        fill
-        html={html}
-        key={html}
-        title={title}
-      />
+      <View className="flex-1 px-4">
+        <HtmlFrame
+          fill
+          isUnderHeader
+          html={html}
+          key={html}
+          title={title}
+        />
+      </View>
     ))
     .otherwise((structured) => (
       <ScrollView contentContainerClassName="gap-6 px-4 pt-4 pb-12" contentInsetAdjustmentBehavior="automatic">

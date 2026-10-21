@@ -11,7 +11,7 @@ import type { PressableProps, ViewProps } from 'react-native';
 const itemVariants = cva({
   base: 'relative w-full flex-row flex-wrap items-center rounded-lg border border-transparent',
   variants: {
-    variant: { default: '', outline: 'border-border bg-card' },
+    variant: { default: '', outline: 'border-border bg-card', bubble: 'rounded-2xl border-border bg-card' },
     size: { default: 'gap-2.5 px-3 py-2.5', sm: 'min-h-9.5 flex-nowrap gap-2 px-2.5 py-1.5', chat: 'flex-nowrap gap-4 rounded-none border-0 px-5 py-4', row: 'flex-nowrap gap-4 rounded-none border-0 px-5' },
   },
   defaultVariants: { variant: 'default', size: 'default' },

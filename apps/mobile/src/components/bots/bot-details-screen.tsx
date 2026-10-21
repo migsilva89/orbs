@@ -20,30 +20,30 @@ import type { BotDetailsTab } from '@/types/bot-details.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type { Bot, ConversationListItem } from '@openbots/contracts/universal';
 
-interface BotDetailsSheetProps {
+interface BotDetailsScreenProps {
   botId: string;
 }
 
-export function BotDetailsSheet({ botId }: BotDetailsSheetProps) {
+export function BotDetailsScreen({ botId }: BotDetailsScreenProps) {
   const { session } = useConnection();
 
   return match(session)
-    .with(P.nonNullable, (current) => <BotDetailsSheetLoader botId={botId} session={current} />)
+    .with(P.nonNullable, (current) => <BotDetailsScreenLoader botId={botId} session={current} />)
     .otherwise(() => null);
 }
 
-interface BotDetailsSheetLoaderProps {
+interface BotDetailsScreenLoaderProps {
   session: RpcSession;
   botId: string;
 }
 
-function BotDetailsSheetLoader({ session, botId }: BotDetailsSheetLoaderProps) {
+function BotDetailsScreenLoader({ session, botId }: BotDetailsScreenLoaderProps) {
   const bots = useQuery(session.rpc.bots.list.queryOptions());
   const chats = useQuery(session.rpc.conversation.list.queryOptions());
 
   return match({ bot: bots.data?.find((item) => item.id === botId), chat: chats.data?.find((item) => item.botId === botId) })
     .with({ bot: P.nonNullable, chat: P.nonNullable }, ({ bot, chat }) => (
-      <BotDetailsSheetContent
+      <BotDetailsScreenContent
         bot={bot}
         chat={chat}
         session={session}
@@ -61,19 +61,23 @@ function BotDetailsSheetLoader({ session, botId }: BotDetailsSheetLoaderProps) {
     ));
 }
 
-interface BotDetailsSheetContentProps {
+interface BotDetailsScreenContentProps {
   session: RpcSession;
   bot: Bot;
   chat: ConversationListItem;
 }
 
-function BotDetailsSheetContent({ session, bot, chat }: BotDetailsSheetContentProps) {
+function BotDetailsScreenContent({ session, bot, chat }: BotDetailsScreenContentProps) {
   const returnToChat = useChatReturn();
   const [tab, setTab] = useState<BotDetailsTab>('details');
   const prefill = (text: string) => returnToChat({ botId: bot.id, prefill: text });
 
   return (
-    <ScrollView contentContainerClassName="gap-4 px-4 pt-8 pb-10">
+    <ScrollView
+      className="flex-1 bg-background"
+      contentContainerClassName="gap-4 px-4 pt-4 pb-12"
+      contentInsetAdjustmentBehavior="automatic"
+    >
       <View className="items-center gap-1">
         <BotActionsMenu botId={bot.id} mode="press">
           <View

@@ -12,7 +12,6 @@ import { Text } from '@/components/ui/text';
 
 interface SettingsPathListProps {
   title: string;
-  hint: string;
   placeholder: string;
   paths: string[];
   isPending: boolean;
@@ -20,7 +19,7 @@ interface SettingsPathListProps {
   onChange: (paths: string[]) => void;
 }
 
-export function SettingsPathList({ title, hint, placeholder, paths, isPending, isFailed, onChange }: SettingsPathListProps) {
+export function SettingsPathList({ title, placeholder, paths, isPending, isFailed, onChange }: SettingsPathListProps) {
   const [draft, setDraft] = useState('');
   const path = skillSettings.shape.directories.element.safeParse(draft.trim());
   const isValid = path.success && !paths.includes(path.data);
@@ -28,7 +27,6 @@ export function SettingsPathList({ title, hint, placeholder, paths, isPending, i
   return (
     <View className="gap-2 rounded-lg border border-border bg-card p-3">
       <Text variant="label">{title}</Text>
-      <LabelDescription>{hint}</LabelDescription>
       <View className="flex-row items-center gap-2">
         <Input
           accessibilityLabel={title}

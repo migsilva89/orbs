@@ -42,6 +42,11 @@ export interface ChatResetRouteParams extends ChatSearchParams {
   handoff?: string;
 }
 
+export interface ChatHtmlRouteParams extends ChatSearchParams {
+  botId: string;
+  html: string;
+}
+
 export interface ChatTextRouteParams extends ChatSearchParams {
   botId: string;
   entryId: string;

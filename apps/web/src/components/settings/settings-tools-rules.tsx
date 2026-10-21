@@ -41,10 +41,7 @@ export function SettingsToolsRules({ disabled }: SettingsToolsRulesProps) {
 
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1">
-        <h3 className="text-sm font-medium">{m.settings_tools_rules()}</h3>
-        <p className="text-xs text-pretty text-muted-foreground">{m.settings_tools_rules_hint()}</p>
-      </div>
+      <h3 className="text-sm font-medium">{m.settings_tools_rules()}</h3>
       <Input
         aria-label={m.settings_tools_rules_when()}
         disabled={disabled}

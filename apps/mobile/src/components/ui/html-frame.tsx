@@ -45,10 +45,12 @@ interface HtmlFrameProps {
   title: string;
   /** Fill the parent and scroll, instead of growing to the page height. */
   fill?: boolean;
+  /** Keep the page clear of a see-through navigation header. */
+  isUnderHeader?: boolean;
 }
 
 /** A model-written HTML page, sandboxed, themed like the app and sized to its content. */
-export function HtmlFrame({ html, title, fill = false }: HtmlFrameProps) {
+export function HtmlFrame({ html, title, fill = false, isUnderHeader = false }: HtmlFrameProps) {
   const view = useRef<WebView<object>>(null);
   const [height, setHeight] = useState(HTML_FRAME_HEIGHT.initial);
   const { theme } = useUniwind();
@@ -82,6 +84,7 @@ export function HtmlFrame({ html, title, fill = false }: HtmlFrameProps) {
     <WebView<object>
       accessibilityLabel={title}
       bounces={false}
+      contentInsetAdjustmentBehavior={isUnderHeader ? 'automatic' : 'never'}
       injectedJavaScriptBeforeContentLoaded={themeScript}
       originWhitelist={['about:blank']}
       ref={view}

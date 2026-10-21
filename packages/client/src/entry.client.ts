@@ -16,6 +16,7 @@ export * from './services/rooms/rooms.utils';
 export * from './services/artifacts/artifacts.client';
 export * from './services/routines/routines.client';
 export * from './services/routines/routines.constants';
+export * from './services/theme/theme.constants';
 export * from './services/tool/tool.client';
 export * from './services/tool/tool.constants';
 export * from './services/tool/tool.utils';

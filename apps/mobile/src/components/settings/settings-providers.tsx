@@ -35,7 +35,6 @@ export function SettingsProviders() {
 
   return (
     <BotDetailsSection
-      description={m.settings_providers_hint()}
       icon={KeyRound}
       title={m.settings_providers()}
     >

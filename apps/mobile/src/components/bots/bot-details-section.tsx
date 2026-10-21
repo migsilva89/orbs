@@ -7,11 +7,10 @@ import type { ReactNode } from 'react';
 interface BotDetailsSectionProps {
   title: string;
   icon?: LucideIcon;
-  description?: string;
   children: ReactNode;
 }
 
-export function BotDetailsSection({ title, icon, description, children }: BotDetailsSectionProps) {
+export function BotDetailsSection({ title, icon, children }: BotDetailsSectionProps) {
   return (
     <View accessibilityLabel={title} className="gap-1.5">
       <View className="flex-row items-center gap-1.5 px-3">
@@ -25,11 +24,6 @@ export function BotDetailsSection({ title, icon, description, children }: BotDet
         <Text tone="muted" variant="small">{title}</Text>
       </View>
       {children}
-      {description ? (
-        <View className="px-3">
-          <Text tone="muted" variant="small">{description}</Text>
-        </View>
-      ) : null}
     </View>
   );
 }

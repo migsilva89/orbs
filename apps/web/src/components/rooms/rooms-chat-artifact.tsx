@@ -7,7 +7,6 @@ import { match, P } from 'ts-pattern';
 import { ArtifactDialog } from '@/components/artifacts/artifact-dialog';
 import { ArtifactView } from '@/components/artifacts/artifact-view';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toasty } from '@/components/ui/sonner';
 import { rpc } from '@/services/rpc/rpc.client';
@@ -36,7 +35,7 @@ export function RoomsChatArtifact({ artifact }: RoomsChatArtifactProps) {
   });
 
   return (
-    <Card data-message-wide className="w-full self-start overflow-hidden">
+    <div data-message-wide className="relative flex w-full flex-col self-start overflow-hidden rounded-2xl border bg-card text-card-foreground">
       <div className="flex items-center gap-2 px-3 py-2">
         <IconLayoutDashboard className="size-4 shrink-0 text-muted-foreground" />
         <div className="grid min-w-0 flex-1 gap-0.5">
@@ -72,11 +71,13 @@ export function RoomsChatArtifact({ artifact }: RoomsChatArtifactProps) {
           <Separator />
           {match(saved.spec)
             .with({ html: P.string }, (spec) => (
-              <ArtifactView
-                spec={spec}
-                store={store}
-                title={saved.title}
-              />
+              <div className="p-3">
+                <ArtifactView
+                  spec={spec}
+                  store={store}
+                  title={saved.title}
+                />
+              </div>
             ))
             .otherwise((spec) => (
               <button
@@ -105,6 +106,6 @@ export function RoomsChatArtifact({ artifact }: RoomsChatArtifactProps) {
           onOpenChange={setExpanded}
         />
       ) : null}
-    </Card>
+    </div>
   );
 }

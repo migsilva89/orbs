@@ -34,12 +34,17 @@ export default (): ExpoConfig => ({
   ios: {
     bundleIdentifier: variant.bundleIdentifier,
     supportsTablet: true,
+    infoPlist: {
+      ITSAppUsesNonExemptEncryption: false,
+      NSLocalNetworkUsageDescription: m.mobile_local_network_permission(),
+    },
   },
   android: {
     package: variant.bundleIdentifier,
   },
   experiments: { typedRoutes: true },
-  extra: { eas: { projectId: process.env.EAS_PROJECT_ID } },
+  owner: 'nikuscs',
+  extra: { eas: { projectId: '00000000-0000-0000-0000-000000000000' } },
   plugins: [
     'expo-router',
     'expo-secure-store',

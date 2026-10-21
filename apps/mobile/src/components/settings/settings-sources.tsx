@@ -9,12 +9,10 @@ export function SettingsSources() {
 
   return (
     <BotDetailsSection
-      description={m.settings_sources_hint()}
       icon={FolderTree}
       title={m.settings_sources()}
     >
       <SettingsPathList
-        hint={m.settings_sources_skills_hint()}
         isFailed={sources.skills.isFailed}
         isPending={sources.skills.isPending || sources.isLoading}
         paths={sources.skills.paths}
@@ -23,7 +21,6 @@ export function SettingsSources() {
         onChange={sources.skills.save}
       />
       <SettingsPathList
-        hint={m.settings_sources_instructions_hint()}
         isFailed={sources.instructions.isFailed}
         isPending={sources.instructions.isPending || sources.isLoading}
         paths={sources.instructions.paths}
@@ -32,7 +29,6 @@ export function SettingsSources() {
         onChange={sources.instructions.save}
       />
       <SettingsPathList
-        hint={m.settings_sources_plugins_hint()}
         isFailed={sources.plugins.isFailed}
         isPending={sources.plugins.isPending || sources.isLoading}
         paths={sources.plugins.paths}
@@ -41,7 +37,6 @@ export function SettingsSources() {
         onChange={sources.plugins.save}
       />
       <SettingsPathList
-        hint={m.settings_sources_mcp_hint()}
         isFailed={sources.mcp.isFailed}
         isPending={sources.mcp.isPending || sources.isLoading}
         paths={sources.mcp.paths}

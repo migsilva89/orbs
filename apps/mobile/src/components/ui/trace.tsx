@@ -18,7 +18,7 @@ const traceVariants = cva({
 });
 
 const traceCodeVariants = cva({
-  base: 'max-h-64 rounded-xl border border-border bg-muted',
+  base: 'max-h-64 rounded-2xl border border-border bg-muted',
   variants: { tone: { default: '', destructive: 'border-destructive/40' } },
   defaultVariants: { tone: 'default' },
 });

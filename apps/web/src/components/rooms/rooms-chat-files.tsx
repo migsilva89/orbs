@@ -1,5 +1,5 @@
+import { useChatAttachmentUrl } from '@openbots/client/web';
 import { Button } from '@/components/ui/button';
-import { useAttachmentUrl } from '@/hooks/use-attachment-url';
 import IconLucideFileText from '~icons/lucide/file-text';
 import type { RoomsFilePart } from '@openbots/client/client';
 
@@ -9,7 +9,7 @@ interface RoomsChatFilesItemProps {
 }
 
 function RoomsChatFilesItem({ botId, file }: RoomsChatFilesItemProps) {
-  const url = useAttachmentUrl(botId, file.url);
+  const url = useChatAttachmentUrl(botId, file.url);
 
   if (file.mediaType.startsWith('image/')) {
     return (

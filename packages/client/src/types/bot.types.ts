@@ -71,3 +71,9 @@ export interface BotDefaultSettingsParams {
   models: BotModel[];
   thinkingLevel: BotThinkingLevel;
 }
+
+export interface BotDeleteParams {
+  botId: string;
+  /** Leaves the deleted bot's screens once the bot list no longer has it. */
+  onDeleted: () => unknown;
+}

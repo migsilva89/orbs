@@ -1,8 +1,9 @@
-import { ROOMS } from '@openbots/client/client';
 import { useSyncExternalStore } from 'react';
-import type { RoomsPrefill } from '@/types/rooms.types';
+import { ROOMS } from '../services/rooms/rooms.constants';
+import type { RoomsPrefill } from '../types/rooms.types';
 
-export function useRoomDraft(botId: string) {
+/** The composer draft for one bot, kept in localStorage and shared across tabs. */
+export function useChatDraft(botId: string) {
   const key = `${ROOMS.draftKeyPrefix}${botId}`;
 
   const draft = useSyncExternalStore(

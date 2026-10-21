@@ -1,3 +1,4 @@
+import { useChatMessageReaction } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -8,11 +9,9 @@ import { ActionSheetChoice } from '@/components/ui/action-sheet';
 import { SearchField } from '@/components/ui/search-field';
 import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
-import { useMessageReaction } from '@/hooks/use-message-reaction';
 import { emojiListOptions, emojiSearch } from '@/services/emoji/emoji.client';
 import { EMOJI } from '@/services/emoji/emoji.constants';
-import type { ChatReactionParams } from '@/types/chat.types';
-import type { RpcSession } from '@/types/rpc.types';
+import type { ChatMessageReactionParams } from '@openbots/client/client';
 
 interface ChatReactionPickerProps {
   botId: string;
@@ -24,20 +23,19 @@ export function ChatReactionPicker(params: ChatReactionPickerProps) {
   const { session } = useConnection();
 
   return match(session)
-    .with(P.nonNullable, (current) => <ChatReactionPickerContent params={params} session={current} />)
+    .with(P.nonNullable, () => <ChatReactionPickerContent params={params} />)
     .otherwise(() => null);
 }
 
 interface ChatReactionPickerContentProps {
-  session: RpcSession;
-  params: ChatReactionParams;
+  params: ChatMessageReactionParams;
 }
 
-function ChatReactionPickerContent({ session, params }: ChatReactionPickerContentProps) {
+function ChatReactionPickerContent({ params }: ChatReactionPickerContentProps) {
   const router = useRouter();
   const [search, setSearch] = useState('');
   const emoji = useQuery(emojiListOptions());
-  const reaction = useMessageReaction(session, params);
+  const reaction = useChatMessageReaction(params);
   const items = emojiSearch({ items: emoji.data ?? [], query: search });
 
   const empty = match(emoji.status)

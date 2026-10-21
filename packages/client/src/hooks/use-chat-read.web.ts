@@ -1,14 +1,16 @@
 import { useEffect, useEffectEvent, useState } from 'react';
-import { rpc } from '@/services/rpc/rpc.client';
+import { useChatMarkRead } from './use-chat-mark-read';
 
-export function useRoomRead(botId: string, readThroughEntryId: number, latestEntryId: number) {
+/** Marks new entries read while the tab is visible and focused; the unread divider stays where it was until the owner comes back. */
+export function useChatRead(botId: string, readThroughEntryId: number, latestEntryId: number) {
   const [divider, setDivider] = useState(readThroughEntryId);
   const [isSeen, setIsSeen] = useState(false);
+  const markRead = useChatMarkRead(botId);
   const isPending = () => latestEntryId > readThroughEntryId && document.visibilityState === 'visible' && document.hasFocus();
 
   const read = useEffectEvent(() => {
     if (isPending()) {
-      void rpc.conversation.markRead.call({ botId, throughEntryId: latestEntryId });
+      markRead(latestEntryId);
     }
   });
 

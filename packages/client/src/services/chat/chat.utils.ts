@@ -2,7 +2,7 @@ import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entryPeerReply,
 import { m } from '@openbots/i18n/client';
 import { match, P } from 'ts-pattern';
 import { mentionSubmission } from '../mention/mention.client';
-import { CHAT } from './chat.constants';
+import { CHAT, CHAT_FILE_TYPES } from './chat.constants';
 import type * as ChatTypes from '../../types/chat.types';
 import type * as UniversalTypes from '@openbots/contracts/universal';
 
@@ -399,4 +399,11 @@ export function chatResetCommand(text: string): ChatTypes.ChatResetCommand | nul
   const { command } = mentionSubmission({ text });
 
   return command?.name === 'reset' ? { handoff: command.arguments || undefined } : null;
+}
+
+/** Media type from the picker, or guessed from the file extension when the picker gives none. */
+export function chatFileType({ name, mediaType }: ChatTypes.ChatFileTypeParams): string {
+  const extension = name.split('.').at(-1)?.toLowerCase();
+
+  return mediaType ?? Object.entries(CHAT_FILE_TYPES).find(([type]) => type === extension)?.[1] ?? '';
 }

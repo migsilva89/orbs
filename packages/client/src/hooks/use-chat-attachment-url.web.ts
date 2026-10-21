@@ -1,9 +1,11 @@
-import { CHAT } from '@openbots/client/client';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { rpc } from '@/services/rpc/rpc.client';
+import { CHAT } from '../services/chat/chat.constants';
+import { useRpc } from './use-rpc';
 
-export function useAttachmentUrl(botId: string, url: string) {
+/** A browser url for a message file: downloads `attachment:` links into an object url, passes other urls through. */
+export function useChatAttachmentUrl(botId: string, url: string) {
+  const { rpc } = useRpc();
   const attachmentId = url.startsWith(CHAT.attachmentScheme) ? url.slice(CHAT.attachmentScheme.length) : undefined;
 
   const { data: objectUrl } = useQuery({

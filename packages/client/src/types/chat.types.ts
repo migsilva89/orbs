@@ -138,3 +138,41 @@ export type ChatSendResult = { kind: 'sent' } | { kind: 'command' } | { kind: 'r
 export interface ChatResetCommand {
   handoff?: string;
 }
+
+export interface ChatRoomParams {
+  bot: UniversalTypes.Bot;
+  bots: UniversalTypes.Bot[];
+  view: UniversalTypes.ConversationView;
+  outgoing: ChatOutgoing[];
+}
+
+export interface ChatResetParams {
+  botId: string;
+  handoff?: string;
+  onDone?: () => void;
+}
+
+export interface ChatMessageReactionParams {
+  botId: string;
+  conversationId: number;
+  entryId: number;
+}
+
+export interface ChatFileTypeParams {
+  name: string;
+  mediaType?: string;
+}
+
+/** A file chosen in a native picker, read later from its local uri. */
+export interface ChatPicked {
+  uri: string;
+  name: string;
+  mediaType: string;
+  size: number;
+}
+
+export interface ChatAttachmentsPlatformParams {
+  botId: string;
+  /** Shows why a file was refused or failed to upload. */
+  onProblem: (message: string) => void;
+}

@@ -1,4 +1,5 @@
 import { toolBlocks } from '@openbots/client/client';
+import { useChatShowTools } from '@openbots/client/web';
 import { m } from '@openbots/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { isFileUIPart } from 'ai';
@@ -15,7 +16,6 @@ import { Message, MessageContent, MessageStack } from '@/components/ui/ai/messag
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
 import { Response } from '@/components/ui/ai/response';
 import { useLongPress } from '@/hooks/use-long-press';
-import { useShowTools } from '@/hooks/use-show-tools';
 import { MENTION_ALLOWED_TAGS } from '@/services/mention/mention.constants';
 import { mentionRemark } from '@/services/mention/mention.utils';
 import { rpc } from '@/services/rpc/rpc.client';
@@ -44,7 +44,7 @@ export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle',
   const { data: bots } = useSuspenseQuery(rpc.bots.list.queryOptions());
   const remarkPlugins = [mentionRemark({ bots })];
 
-  const { shown: showTools } = useShowTools();
+  const { shown: showTools } = useChatShowTools();
   const blocks = toolBlocks({ parts: message.parts }).filter((block) => showTools || block.kind !== 'tools');
   const files = message.parts.filter(isFileUIPart);
   const standalone = (block: typeof blocks[number] | undefined) => block?.kind === 'tools';

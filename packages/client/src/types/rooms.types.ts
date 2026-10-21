@@ -15,11 +15,6 @@ export interface RoomsAttachment {
   status: 'uploading' | 'ready' | 'failed';
 }
 
-export interface RoomsAttachmentsState {
-  botId: string;
-  items: RoomsAttachment[];
-}
-
 export interface RoomsChoiceParams {
   choice: string;
 }
@@ -120,4 +115,39 @@ export interface RoomsUnread {
 export interface RoomsArrangeParams {
   botIds: string[];
   pinnedIds: string[];
+}
+
+export interface RoomsAttachmentFile {
+  name: string;
+  mediaType: string;
+  size: number;
+}
+
+export interface RoomsAttachmentsParams<Source> {
+  botId: string;
+  /** Reads name, type and size without loading the file. */
+  describe: (source: Source) => RoomsAttachmentFile;
+  /** Image preview url for an accepted file, or an empty string. */
+  preview: (source: Source) => string;
+  read: (source: Source) => Promise<File>;
+  /** Frees a preview url once its attachment leaves the composer. */
+  release?: (attachment: RoomsAttachment) => void;
+  onFailed?: (attachment: RoomsAttachment) => void;
+  /** Shows why a file was refused. */
+  onProblem: (message: string) => void;
+}
+
+export interface RoomsSourcedAttachment<Source> extends RoomsAttachment {
+  source: Source;
+}
+
+export interface RoomsPrefill {
+  botId: string;
+  text: string;
+}
+
+export interface RoomsQuoteSelection {
+  messageId: string;
+  text: string;
+  rect: DOMRect;
 }

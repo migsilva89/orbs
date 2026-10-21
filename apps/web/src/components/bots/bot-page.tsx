@@ -1,7 +1,8 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
+import { useBotUpdate } from '@openbots/client/react';
 import { botForm } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, Outlet, useRouter } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import { BotFormAccess } from '@/components/bots/bot-form-access';
@@ -17,7 +18,6 @@ import { Button } from '@/components/ui/button';
 import { ButtonLoading } from '@/components/ui/button-loading';
 import { Form } from '@/components/ui/forms/form';
 import { PanelFooter, PanelRow } from '@/components/ui/panel';
-import { toasty } from '@/components/ui/sonner';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconAtSign from '~icons/lucide/at-sign';
 import IconBot from '~icons/lucide/bot';
@@ -35,7 +35,6 @@ interface BotPageFormProps {
 }
 
 function BotPageForm({ bot, deletable }: BotPageFormProps) {
-  const queryClient = useQueryClient();
   const router = useRouter();
 
   const form = useForm({
@@ -55,18 +54,7 @@ function BotPageForm({ bot, deletable }: BotPageFormProps) {
     },
   });
 
-  const save = useMutation(rpc.bots.update.mutationOptions({
-    onSuccess: async (saved) => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: rpc.bots.list.key() }),
-        queryClient.invalidateQueries({ queryKey: rpc.bots.catalog.key({ input: { botId: saved.id } }) }),
-      ]);
-      form.reset(form.getValues());
-      await router.invalidate();
-      toasty(m.bots_saved(), '✅');
-    },
-    onError: () => toasty(m.rooms_bot_save_error(), '🔴'),
-  }));
+  const save = useBotUpdate(m.bots_saved());
 
   const busy = save.isPending;
 
@@ -91,6 +79,11 @@ function BotPageForm({ bot, deletable }: BotPageFormProps) {
           ...input,
           handle: input.handle === '' ? bot.handle : input.handle,
           botId: bot.id,
+        }, {
+          onSuccess: () => {
+            form.reset(form.getValues());
+            void router.invalidate();
+          },
         }))}
       >
         <fieldset className="contents" disabled={busy}>

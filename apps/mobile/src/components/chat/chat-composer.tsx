@@ -1,4 +1,5 @@
 import { chatResetCommand, mentionLinks, mentionQuery, mentionSegments, roomsMessageText } from '@openbots/client/client';
+import { useChatAttachmentsNative } from '@openbots/client/native';
 import { useChatSend } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { useRouter } from 'expo-router';
@@ -11,7 +12,7 @@ import { GlassButton } from '@/components/ui/glass-button';
 import { Icon } from '@/components/ui/icon';
 import { PromptAttachment, PromptAttachments, PromptDock, PromptDrawer, PromptJump, PromptQuote } from '@/components/ui/prompt-drawer';
 import { PromptField, PromptMention } from '@/components/ui/prompt-field';
-import { useChatAttachments } from '@/hooks/use-chat-attachments';
+import { useToast } from '@/hooks/use-toast';
 import { ChatMentions } from './chat-mentions';
 import { ChatQueue } from './chat-queue';
 import type { RpcSession } from '@/types/rpc.types';
@@ -58,13 +59,14 @@ export function ChatComposer({
   onLayout,
 }: ChatComposerProps) {
   const router = useRouter();
+  const toast = useToast();
   const [text, setText] = useState('');
   const [cursor, setCursor] = useState(0);
   const [picked, setPicked] = useState<ClientTypes.MentionItem[]>([]);
   const quoteKey = quote ? `${quote.href} ${quote.label}` : undefined;
   const [quotedKey, setQuotedKey] = useState<string>();
   const [prefilled, setPrefilled] = useState<string>();
-  const files = useChatAttachments(session, bot.id);
+  const files = useChatAttachmentsNative({ botId: bot.id, onProblem: (message) => toast.show({ message }) });
 
   const chat = useChatSend({
     botId: bot.id,

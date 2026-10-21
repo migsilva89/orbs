@@ -1,9 +1,10 @@
-import { ROOMS } from '@openbots/client/client';
 import { useEffect, useRef, useState } from 'react';
-import type { QuoteSelection } from '@/types/quote.types';
+import { ROOMS } from '../services/rooms/rooms.constants';
+import type { RoomsQuoteSelection } from '../types/rooms.types';
 
+/** Text the owner selected inside one message bubble, offered for quoting after a short pause. */
 export function useChatQuote() {
-  const [selection, setSelection] = useState<QuoteSelection | null>(null);
+  const [selection, setSelection] = useState<RoomsQuoteSelection | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {

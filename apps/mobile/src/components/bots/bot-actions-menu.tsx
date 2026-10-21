@@ -34,19 +34,17 @@ function BotActionsMenuLoader({ session, botId, ...props }: BotActionsMenuLoader
       <BotActionsMenuContent
         {...props}
         chat={chat}
-        session={session}
       />
     ))
     .otherwise(() => props.children);
 }
 
 interface BotActionsMenuContentProps extends Omit<BotActionsMenuProps, 'botId'> {
-  session: RpcSession;
   chat: ConversationListItem;
 }
 
-function BotActionsMenuContent({ session, chat, mode, children, isFullWidth }: BotActionsMenuContentProps) {
-  const items = useBotActions(session, chat);
+function BotActionsMenuContent({ chat, mode, children, isFullWidth }: BotActionsMenuContentProps) {
+  const items = useBotActions(chat);
 
   return match(mode)
     .with('press', () => <Menu items={items} title={chat.name}>{children}</Menu>)

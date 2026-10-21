@@ -1,6 +1,7 @@
-import { CHAT, chatActivity, chatEntryIds, chatFailure, chatLive, chatMessages, chatOutgoingMessages, chatQueued, mentionQuote } from '@openbots/client/client';
-import { chatHistoryOptions, chatViewOptions, useChatReactions } from '@openbots/client/react';
-import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
+import { CHAT, mentionQuote } from '@openbots/client/client';
+import { chatViewOptions, useChatRoom } from '@openbots/client/react';
+import { useChatQuote, useChatRead } from '@openbots/client/web';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -10,8 +11,6 @@ import { RoomsChatPill } from '@/components/rooms/rooms-chat-pill';
 import { RoomsChatQuote } from '@/components/rooms/rooms-chat-quote';
 import { RoomsChatRuns } from '@/components/rooms/rooms-chat-runs';
 import { RoomsChatTranscript } from '@/components/rooms/rooms-chat-transcript';
-import { useChatQuote } from '@/hooks/use-chat-quote';
-import { useRoomRead } from '@/hooks/use-room-read';
 import { LAYOUT_SHORTCUT_OPTIONS, LAYOUT_SHORTCUT_OVERLAYS, LAYOUT_SHORTCUTS } from '@/services/layout/layout.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
@@ -36,45 +35,15 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
   const quote = useChatQuote();
   const { conversationId } = view;
 
-  const history = useInfiniteQuery(chatHistoryOptions(RPC_CONTEXT, {
-    botId: bot.id,
-    conversationId,
-    cursor: view.historyCursor,
-  }));
-
-  const { data: pending = [] } = useQuery(rpc.tools.pending.queryOptions({ input: { botId: bot.id } }));
-  const { data: questions = [] } = useQuery(rpc.conversation.questions.queryOptions({ input: { botId: bot.id, conversationId } }));
-  const approvals = pending.filter((approval) => approval.conversationId === conversationId);
-  const older = [...(history.data?.pages.flatMap((page) => page.items) ?? [])].reverse();
-
-  const messages = chatLive({
-    state: view,
-    bot,
-    approvals,
-  }, chatMessages({
-    entries: [...older, ...view.entries],
+  const room = useChatRoom({
     bot,
     bots,
-  }));
-
-  const reactions = useChatReactions({
-    botId: bot.id,
-    conversationId,
-    entryIds: chatEntryIds(messages),
-    revision: view.interactionsRevision,
+    view,
+    outgoing,
   });
 
-  const unread = useRoomRead(bot.id, chat.readThroughEntryId, view.latestEntryId);
-  const activity = chatActivity(view);
-  const queued = chatQueued(view);
-
-  const sending = chatOutgoingMessages(outgoing, {
-    botId: bot.id,
-    latestEntryId: view.latestEntryId,
-    queued,
-  });
-
-  const isBusy = view.live.run !== undefined || queued.length > 0;
+  const { messages, activity, queued, isBusy } = room;
+  const unread = useChatRead(bot.id, chat.readThroughEntryId, view.latestEntryId);
   const around = focusEntryId !== undefined && !messages.some((message) => message.metadata?.entryIds.includes(focusEntryId)) ? focusEntryId : undefined;
 
   useEffect(() => {
@@ -130,20 +99,16 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
           footer={(
             <RoomsChatRuns
               activity={activity}
-              approvals={approvals}
+              approvals={room.approvals}
               bot={bot}
               draft={messages.find((message) => message.id === CHAT.liveMessageId)}
-              failure={chatFailure(view)}
-              questions={questions}
+              failure={room.failure}
+              questions={room.questions}
             />
           )}
-          messages={[...messages, ...sending]}
-          older={{
-            isEnabled: view.historyCursor !== undefined && (history.hasNextPage || !history.isFetched),
-            isLoading: history.isFetching,
-            onLoad: () => void history.fetchNextPage(),
-          }}
-          reactions={reactions}
+          messages={[...messages, ...room.sending]}
+          older={room.older}
+          reactions={room.reactions}
           unread={chat.hasUnread || unread.throughEntryId < view.latestEntryId ? unread : undefined}
           onReply={setReplyTo}
         />

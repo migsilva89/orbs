@@ -1,4 +1,5 @@
 import { ROOMS } from '@openbots/client/client';
+import { useChatMessageReaction } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { setStringAsync } from 'expo-clipboard';
 import { useRouter } from 'expo-router';
@@ -8,12 +9,10 @@ import { ActionSheet, ActionSheetChoice, ActionSheetChoices, ActionSheetGroup, A
 import { Text } from '@/components/ui/text';
 import { useChatReturn } from '@/hooks/use-chat-return';
 import { useConnection } from '@/hooks/use-connection';
-import { useMessageReaction } from '@/hooks/use-message-reaction';
 import { useToast } from '@/hooks/use-toast';
-import type { ChatReactionParams } from '@/types/chat.types';
-import type { RpcSession } from '@/types/rpc.types';
+import type { ChatMessageReactionParams } from '@openbots/client/client';
 
-interface ChatMessageActionsProps extends ChatReactionParams {
+interface ChatMessageActionsProps extends ChatMessageReactionParams {
   from: 'user' | 'assistant';
   text: string;
   details: string[];
@@ -23,22 +22,21 @@ export function ChatMessageActions(params: ChatMessageActionsProps) {
   const { session } = useConnection();
 
   return match(session)
-    .with(P.nonNullable, (current) => <ChatMessageActionsContent params={params} session={current} />)
+    .with(P.nonNullable, () => <ChatMessageActionsContent params={params} />)
     .otherwise(() => null);
 }
 
 interface ChatMessageActionsContentProps {
-  session: RpcSession;
   params: ChatMessageActionsProps;
 }
 
-function ChatMessageActionsContent({ session, params }: ChatMessageActionsContentProps) {
+function ChatMessageActionsContent({ params }: ChatMessageActionsContentProps) {
   const toast = useToast();
   const router = useRouter();
   const returnToChat = useChatReturn();
   const { botId, conversationId, entryId, from, text, details } = params;
   const target = { botId, conversationId, entryId };
-  const reaction = useMessageReaction(session, target);
+  const reaction = useChatMessageReaction(target);
 
   function react(emoji: string) {
     reaction.react(emoji);

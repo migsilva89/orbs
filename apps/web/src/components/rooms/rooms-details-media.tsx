@@ -1,4 +1,5 @@
 import { CHAT, ROOMS } from '@openbots/client/client';
+import { useChatAttachmentUrl } from '@openbots/client/web';
 import { m } from '@openbots/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
@@ -7,7 +8,6 @@ import { EmptyCompact } from '@/components/ui/empty';
 import { FormErrors } from '@/components/ui/forms/form';
 import { Item, ItemContent, ItemGroup, ItemLink, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAttachmentUrl } from '@/hooks/use-attachment-url';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconFileText from '~icons/lucide/file-text';
 import IconImages from '~icons/lucide/images';
@@ -100,7 +100,7 @@ interface RoomsDetailsMediaItemProps {
 
 function RoomsDetailsMediaItem({ botId, file }: RoomsDetailsMediaItemProps) {
   const image = file.mediaType.startsWith('image/');
-  const url = useAttachmentUrl(botId, `${CHAT.attachmentScheme}${file.id}`);
+  const url = useChatAttachmentUrl(botId, `${CHAT.attachmentScheme}${file.id}`);
 
   const thumbnail = image ? (
     <img

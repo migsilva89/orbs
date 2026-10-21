@@ -35,7 +35,7 @@ function EmptyTitle({ className, ...props }: ComponentProps<'div'>) {
 function EmptyDescription({ className, ...props }: ComponentProps<'p'>) {
   return (
     <div
-      className={cn('max-w-md text-center text-sm/relaxed text-muted-foreground [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary', className)}
+      className={cn('max-w-xs text-center text-xxs/relaxed text-muted-foreground/70 [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary', className)}
       data-slot="empty-description"
       {...props}
     />

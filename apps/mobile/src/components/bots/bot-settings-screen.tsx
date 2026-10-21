@@ -1,7 +1,8 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
+import { useBotUpdate } from '@openbots/client/react';
 import { botForm } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Stack, usePreventRemove, useRouter } from 'expo-router';
 import { CalendarClock, ListTodo, ScrollText, Trash2 } from 'lucide-react-native';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -21,7 +22,6 @@ import { FormField } from '@/components/ui/form-field';
 import { Icon } from '@/components/ui/icon';
 import { useChatReturn } from '@/hooks/use-chat-return';
 import { useConnection } from '@/hooks/use-connection';
-import { useToast } from '@/hooks/use-toast';
 import type { RpcSession } from '@/types/rpc.types';
 import type { Bot, BotForm } from '@openbots/contracts/universal';
 
@@ -70,10 +70,8 @@ interface BotSettingsScreenFormProps {
 }
 
 function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenFormProps) {
-  const queryClient = useQueryClient();
   const router = useRouter();
   const returnToChat = useChatReturn();
-  const toast = useToast();
   const [primary, primaryForeground] = useCSSVariable(['--color-primary', '--color-primary-foreground']).map(String);
 
   const form = useForm({
@@ -108,19 +106,7 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
     }],
   }));
 
-  const save = useMutation(session.rpc.bots.update.mutationOptions({
-    onSuccess: async (saved) => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: session.rpc.bots.list.key() }),
-        queryClient.invalidateQueries({ queryKey: session.rpc.bots.catalog.key({ input: { botId: saved.id } }) }),
-      ]);
-      disablePrevention();
-      form.reset(form.getValues());
-      toast.show({ message: m.bots_saved(), variant: 'default' });
-      router.back();
-    },
-    onError: () => toast.show({ message: m.rooms_bot_save_error() }),
-  }));
+  const save = useBotUpdate(m.bots_saved());
 
   const isBusy = save.isPending;
   const prefill = (text: string) => returnToChat({ botId: bot.id, prefill: text });
@@ -129,6 +115,12 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
     ...input,
     handle: input.handle === '' ? bot.handle : input.handle,
     botId: bot.id,
+  }, {
+    onSuccess: () => {
+      disablePrevention();
+      form.reset(form.getValues());
+      router.back();
+    },
   }));
 
   return (

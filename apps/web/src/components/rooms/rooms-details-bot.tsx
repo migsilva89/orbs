@@ -1,13 +1,13 @@
 import { BOT_PERMISSION_LABELS, BOT_THINKING_LEVEL_LABELS, ROOMS_SEND_MODE_DEFAULT, ROOMS_SEND_MODES } from '@openbots/client/client';
+import { useBotUpdate, useChatSettings } from '@openbots/client/react';
 import { botFields, conversationWhenBusy } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { RoomsDetailsSection } from '@/components/rooms/rooms-details-section';
 import { SettingsProviderLogo } from '@/components/settings/settings-provider-logo';
 import { Item, ItemActions, ItemContent, ItemGroup, ItemLink, ItemMedia, ItemTitle, ItemValue } from '@/components/ui/item';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toasty } from '@/components/ui/sonner';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconChevronRight from '~icons/lucide/chevron-right';
 import IconListOrdered from '~icons/lucide/list-ordered';
@@ -22,16 +22,10 @@ interface RoomsDetailsBotProps {
 }
 
 export function RoomsDetailsBot({ bot, chat }: RoomsDetailsBotProps) {
-  const queryClient = useQueryClient();
   const { data: models = [] } = useQuery({ ...rpc.models.list.queryOptions(), retry: false });
-  const { data: settings } = useQuery(rpc.conversation.settings.queryOptions());
   const model = models.find((item) => item.provider === bot.modelProvider && item.id === bot.modelId);
-  const setWhenBusy = useMutation(rpc.conversation.setWhenBusy.mutationOptions({ onError: () => toasty(m.rooms_hide_failed(), '⚠️') }));
-
-  const update = useMutation(rpc.bots.update.mutationOptions({
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: rpc.bots.list.key() }),
-    onError: () => toasty(m.rooms_bot_save_error(), '🔴'),
-  }));
+  const settings = useChatSettings(bot.id);
+  const update = useBotUpdate();
 
   return (
     <RoomsDetailsSection title={m.bots_settings()}>
@@ -56,12 +50,9 @@ export function RoomsDetailsBot({ bot, chat }: RoomsDetailsBotProps) {
           </ItemContent>
           <ItemActions>
             <Select
-              disabled={setWhenBusy.isPending}
+              disabled={settings.isSendModePending}
               value={chat.whenBusy ?? ROOMS_SEND_MODE_DEFAULT}
-              onValueChange={(value) => setWhenBusy.mutate({
-                botId: bot.id,
-                whenBusy: value === ROOMS_SEND_MODE_DEFAULT ? null : conversationWhenBusy.parse(value),
-              })}
+              onValueChange={(value) => settings.setSendMode(value === ROOMS_SEND_MODE_DEFAULT ? null : conversationWhenBusy.parse(value))}
             >
               <SelectTrigger
                 aria-label={m.rooms_action_send_mode()}
@@ -72,7 +63,7 @@ export function RoomsDetailsBot({ bot, chat }: RoomsDetailsBotProps) {
               </SelectTrigger>
               <SelectContent align="end">
                 <SelectItem value={ROOMS_SEND_MODE_DEFAULT}>
-                  {m.rooms_send_mode_default({ mode: settings ? ROOMS_SEND_MODES[settings.whenBusy]() : '…' })}
+                  {settings.defaultSendModeLabel}
                 </SelectItem>
                 {conversationWhenBusy.options.map((mode) => <SelectItem key={mode} value={mode}>{ROOMS_SEND_MODES[mode]()}</SelectItem>)}
               </SelectContent>

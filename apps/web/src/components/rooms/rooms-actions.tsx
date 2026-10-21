@@ -1,11 +1,10 @@
+import { useChatArrange, useChatSettings } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { RoomsMuteMenu } from '@/components/rooms/rooms-mute-menu';
 import { RoomsSendModeMenu } from '@/components/rooms/rooms-send-mode-menu';
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { useRoomsArrange } from '@/hooks/use-rooms-arrange';
-import { useRoomsHide } from '@/hooks/use-rooms-hide';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconEye from '~icons/lucide/eye';
 import IconEyeOff from '~icons/lucide/eye-off';
@@ -22,8 +21,8 @@ interface RoomsActionsProps {
 
 export function RoomsActions({ chat }: RoomsActionsProps) {
   const { data: chats } = useSuspenseQuery(rpc.conversation.list.queryOptions());
-  const arrange = useRoomsArrange();
-  const hide = useRoomsHide();
+  const arrange = useChatArrange();
+  const settings = useChatSettings(chat.botId);
   const shown = chats.filter((item) => !item.isHidden);
   const pinnedIds = shown.filter((item) => item.isPinned).map((item) => item.botId);
 
@@ -46,12 +45,12 @@ export function RoomsActions({ chat }: RoomsActionsProps) {
           {chat.isPinned ? m.rooms_action_unpin() : m.rooms_action_pin()}
         </DropdownMenuItem>
       )}
-      <DropdownMenuItem onSelect={() => hide(chat.botId, !chat.isHidden)}>
+      <DropdownMenuItem onSelect={() => settings.hide(!chat.isHidden)}>
         {chat.isHidden ? <IconEye className="size-4" /> : <IconEyeOff className="size-4" />}
         {chat.isHidden ? m.rooms_action_unhide() : m.rooms_action_hide()}
       </DropdownMenuItem>
-      <RoomsMuteMenu chat={chat} />
-      <RoomsSendModeMenu chat={chat} />
+      <RoomsMuteMenu chat={chat} settings={settings} />
+      <RoomsSendModeMenu chat={chat} settings={settings} />
       <DropdownMenuSeparator />
       <DropdownMenuItem asChild>
         <Link

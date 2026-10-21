@@ -1,13 +1,13 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { MENTION } from '@openbots/client/client';
+import { useChatDraft } from '@openbots/client/web';
 import { m } from '@openbots/i18n/client';
 import { Link, useMatch } from '@tanstack/react-router';
 import { useState } from 'react';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { RoomsSettingsMenu } from '@/components/rooms/rooms-settings-menu';
 import * as Sidebar from '@/components/ui/sidebar';
-import { useRoomDraft } from '@/hooks/use-room-draft';
 import IconBellOff from '~icons/lucide/bell-off';
 import IconEllipsisVertical from '~icons/lucide/ellipsis-vertical';
 import IconPin from '~icons/lucide/pin';
@@ -36,7 +36,7 @@ export function RoomItem({ chat, isSortable = true }: RoomItemProps) {
 
   const { listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: chat.botId, disabled: !isSortable });
   const isActive = current?.params.handle === chat.handle;
-  const { draft } = useRoomDraft(chat.botId);
+  const { draft } = useChatDraft(chat.botId);
   const lastActivity = chat.lastMessage?.preview ?? m.rooms_last_activity_none();
 
   return (

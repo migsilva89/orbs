@@ -11,6 +11,14 @@
     "./react": {
       "types": "./src/entry.react.ts",
       "default": "./src/entry.react.ts"
+    },
+    "./web": {
+      "types": "./src/entry.web.ts",
+      "default": "./src/entry.web.ts"
+    },
+    "./native": {
+      "types": "./src/entry.native.ts",
+      "default": "./src/entry.native.ts"
     }
   },
   "scripts": {
@@ -19,11 +27,14 @@
     "lint:fix": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
   },
   "devDependencies": {
+    "@legendapp/list": "catalog:mobile",
     "@openbots/typescript-config": "workspace:*",
     "@orpc/tanstack-query": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
+    "expo-document-picker": "catalog:mobile",
+    "expo-image-picker": "catalog:mobile",
     "react": "catalog:",
     "typescript": "catalog:"
   },
@@ -39,8 +50,22 @@
     "ts-pattern": "catalog:"
   },
   "peerDependencies": {
+    "@legendapp/list": "catalog:mobile",
     "@orpc/tanstack-query": "catalog:",
     "@tanstack/react-query": "catalog:",
+    "expo-document-picker": "catalog:mobile",
+    "expo-image-picker": "catalog:mobile",
     "react": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "@legendapp/list": {
+      "optional": true
+    },
+    "expo-document-picker": {
+      "optional": true
+    },
+    "expo-image-picker": {
+      "optional": true
+    }
   }
 }

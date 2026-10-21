@@ -1,5 +1,5 @@
+import { useChatDraft } from '@openbots/client/web';
 import { Link } from '@tanstack/react-router';
-import { useRoomDraft } from '@/hooks/use-room-draft';
 import { roomsLink } from '@/services/rooms/rooms.client';
 import type { Bot } from '@openbots/contracts/universal';
 import type { ReactNode } from 'react';
@@ -11,7 +11,7 @@ interface RoomsPrefillLinkProps {
 }
 
 export function RoomsPrefillLink({ bot, prompt, children }: RoomsPrefillLinkProps) {
-  const draft = useRoomDraft(bot.id);
+  const draft = useChatDraft(bot.id);
 
   return <Link {...roomsLink(bot)} onClick={() => draft.prefill(prompt)}>{children}</Link>;
 }

@@ -1,7 +1,8 @@
-import { ROOMS } from '@openbots/client/client';
 import { useSyncExternalStore } from 'react';
+import { ROOMS } from '../services/rooms/rooms.constants';
 
-export function useShowTools() {
+/** Whether tool calls show in the transcript, kept in localStorage. */
+export function useChatShowTools() {
   const shown = useSyncExternalStore(
     (onStoreChange) => {
       window.addEventListener('storage', onStoreChange);

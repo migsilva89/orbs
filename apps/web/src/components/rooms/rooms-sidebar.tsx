@@ -2,6 +2,7 @@ import { DndContext, DragOverlay, KeyboardSensor, MouseSensor, TouchSensor, useS
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { ROOMS_DRAG_PRESS, roomsSidebarOrder } from '@openbots/client/client';
+import { useChatArrange } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
@@ -14,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader } from '@/components/ui/empty';
 import * as Sidebar from '@/components/ui/sidebar';
-import { useRoomsArrange } from '@/hooks/use-rooms-arrange';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconPlus from '~icons/lucide/plus';
 import IconSearch from '~icons/lucide/search';
@@ -104,7 +104,7 @@ function RoomsSidebarEmpty({ hasBots }: RoomsSidebarEmptyProps) {
 export function RoomsSidebar() {
   const { data: chats } = useSuspenseQuery(rpc.conversation.list.queryOptions());
   const { data: bots } = useSuspenseQuery(rpc.bots.list.queryOptions());
-  const arrange = useRoomsArrange();
+  const arrange = useChatArrange();
   const [draggedId, setDraggedId] = useState<string | null>(null);
 
   const sensors = useSensors(

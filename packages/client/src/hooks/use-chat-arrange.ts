@@ -1,14 +1,15 @@
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toasty } from '@/components/ui/sonner';
-import { rpc } from '@/services/rpc/rpc.client';
-import type { RoomsArrangeParams } from '@openbots/client/client';
+import { useRpc } from './use-rpc';
+import type { RoomsArrangeParams } from '../types/rooms.types';
 
-export function useRoomsArrange() {
+/** Saves a new chat order and pinned set, updating the cached list at once so the move shows before the server answers. */
+export function useChatArrange() {
   const queryClient = useQueryClient();
-  const onError = () => toasty(m.rooms_arrange_failed(), '⚠️');
-  const arrange = useMutation(rpc.conversation.arrange.mutationOptions({ onError }));
-  const pin = useMutation(rpc.conversation.setPinned.mutationOptions({ onError }));
+  const { rpc } = useRpc();
+  const meta = { error: m.rooms_arrange_failed() };
+  const arrange = useMutation(rpc.conversation.arrange.mutationOptions({ meta }));
+  const pin = useMutation(rpc.conversation.setPinned.mutationOptions({ meta }));
 
   return ({ botIds, pinnedIds }: RoomsArrangeParams) => {
     const chats = queryClient.getQueryData(rpc.conversation.list.queryKey()) ?? [];

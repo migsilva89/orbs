@@ -34,12 +34,6 @@ export interface ChatTextRouteParams extends ChatSearchParams {
   text: string;
 }
 
-export interface ChatReactionParams {
-  botId: string;
-  conversationId: number;
-  entryId: number;
-}
-
 export type ChatMessagePart =
   | { key: string; kind: 'markdown' | 'html' | 'failure' | 'reasoning'; text: string; isStreaming: boolean }
   | { key: string; kind: 'artifact'; artifact: ToolCallArtifact }
@@ -52,20 +46,4 @@ export type ChatMessageSegment =
 export interface ChatNoticeTitleParams {
   message: ClientTypes.ChatMessage;
   bot: Bot;
-}
-
-export interface ChatFileTypeParams {
-  name: string;
-  mediaType?: string;
-}
-
-export interface ChatPicked {
-  uri: string;
-  name: string;
-  mediaType: string;
-  size: number;
-}
-
-export interface ChatAttachment extends ClientTypes.RoomsAttachment {
-  uri: string;
 }

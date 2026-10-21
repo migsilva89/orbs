@@ -1,21 +1,19 @@
 import { ROOMS_MUTE_DURATIONS } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
-import { useMutation } from '@tanstack/react-query';
 import { DropdownMenuItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { rpc } from '@/services/rpc/rpc.client';
 import IconBell from '~icons/lucide/bell';
 import IconBellOff from '~icons/lucide/bell-off';
 import type { RoomsChat } from '@openbots/client/client';
+import type { useChatSettings } from '@openbots/client/react';
 
 interface RoomsMuteMenuProps {
   chat: RoomsChat
+  settings: ReturnType<typeof useChatSettings>
 }
 
-export function RoomsMuteMenu({ chat }: RoomsMuteMenuProps) {
-  const mute = useMutation(rpc.conversation.setMuted.mutationOptions());
-
+export function RoomsMuteMenu({ chat, settings }: RoomsMuteMenuProps) {
   return chat.isMuted ? (
-    <DropdownMenuItem onSelect={() => mute.mutate({ botId: chat.botId, isMuted: false })}>
+    <DropdownMenuItem onSelect={settings.unmute}>
       <IconBell className="size-4" />
       {m.rooms_unmute()}
     </DropdownMenuItem>
@@ -29,11 +27,7 @@ export function RoomsMuteMenu({ chat }: RoomsMuteMenuProps) {
         {ROOMS_MUTE_DURATIONS.map((item) => (
           <DropdownMenuItem
             key={item.duration}
-            onSelect={() => mute.mutate({
-              botId: chat.botId,
-              isMuted: true,
-              mutedUntil: item.duration === null ? null : Date.now() + item.duration,
-            })}
+            onSelect={() => settings.mute(item.duration)}
           >
             {item.label()}
           </DropdownMenuItem>

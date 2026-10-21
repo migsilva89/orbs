@@ -1,5 +1,6 @@
 import { chatResetCommand, mentionHref, mentionSegments, ROOMS, roomsMessageText } from '@openbots/client/client';
 import { useChatSend } from '@openbots/client/react';
+import { useChatAttachmentsWeb, useChatDraft } from '@openbots/client/web';
 import { ATTACHMENT } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -13,16 +14,14 @@ import { RoomsMentionOption } from '@/components/rooms/rooms-mention-option';
 import { PromptInput, PromptInputActionMenu, PromptInputActionMenuContent, PromptInputActionMenuItem, PromptInputActionMenuTrigger, PromptInputQuote, PromptInputSubmit } from '@/components/ui/ai/prompt-input';
 import { InputGroupAddon } from '@/components/ui/input-group';
 import { useMessageScroller } from '@/components/ui/message-scroller';
+import { toasty } from '@/components/ui/sonner';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { useIsTouch } from '@/hooks/use-is-touch';
 import { usePreferences } from '@/hooks/use-preferences';
-import { useRoomAttachments } from '@/hooks/use-room-attachments';
-import { useRoomDraft } from '@/hooks/use-room-draft';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconPaperclip from '~icons/lucide/paperclip';
 import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
-import type { RoomsPrefill } from '@/types/rooms.types';
-import type { ChatMessage, ChatOutgoing, ChatQueued } from '@openbots/client/client';
+import type * as ClientTypes from '@openbots/client/client';
 import type { Bot } from '@openbots/contracts/universal';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 
@@ -32,15 +31,15 @@ interface RoomsChatComposerProps {
   bot: Bot
   bots: Bot[]
   conversationId: number
-  messages: ChatMessage[]
-  queued: ChatQueued[]
+  messages: ClientTypes.ChatMessage[]
+  queued: ClientTypes.ChatQueued[]
   isBusy: boolean
   isCompacting: boolean
   latestEntryId: number
   editor: RefObject<PromptInputEditorHandle | null>
-  replyTo: ChatMessage | null
-  onReplyChange: Dispatch<SetStateAction<ChatMessage | null>>
-  onOutgoingChange: Dispatch<SetStateAction<ChatOutgoing[]>>
+  replyTo: ClientTypes.ChatMessage | null
+  onReplyChange: Dispatch<SetStateAction<ClientTypes.ChatMessage | null>>
+  onOutgoingChange: Dispatch<SetStateAction<ClientTypes.ChatOutgoing[]>>
   onSend?: () => void
 }
 
@@ -64,16 +63,16 @@ export function RoomsChatComposer({
   const isMobile = useIsMobile();
   const isTouch = useIsTouch();
   const { preferences } = usePreferences();
-  const files = useRoomAttachments(bot.id);
+  const files = useChatAttachmentsWeb({ botId: bot.id, onProblem: (message) => toasty(message, '⚠️') });
   const fileInput = useRef<HTMLInputElement>(null);
   const [text, setText] = useState('');
   const [skillsRequested, setSkillsRequested] = useState(false);
   const [commandsRequested, setCommandsRequested] = useState(false);
-  const draft = useRoomDraft(bot.id);
+  const draft = useChatDraft(bot.id);
 
   useEffect(() => {
     const restore = (event: Event) => match(event)
-      .with(P.instanceOf(CustomEvent<RoomsPrefill>), ({ detail }) => match(detail.botId === bot.id)
+      .with(P.instanceOf(CustomEvent<ClientTypes.RoomsPrefill>), ({ detail }) => match(detail.botId === bot.id)
         .with(true, () => editor.current?.restore(mentionSegments({ text: detail.text })))
         .with(false, () => undefined)
         .exhaustive())

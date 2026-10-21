@@ -45,7 +45,7 @@ export const textVariants = cva({
       'item-title': 'text-sm leading-snug font-medium',
       'item-description': 'text-sm leading-snug',
       'empty-title': 'text-lg font-medium tracking-tight',
-      'empty-description': 'text-xs leading-relaxed',
+      'empty-description': 'text-xxs leading-relaxed',
       'conversation-title': 'text-xl font-medium',
       'conversation-preview': 'text-[17px]',
       'conversation-time': 'text-[15px]',

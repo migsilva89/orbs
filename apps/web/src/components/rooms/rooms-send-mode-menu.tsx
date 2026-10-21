@@ -1,21 +1,17 @@
 import { ROOMS_SEND_MODE_DEFAULT, ROOMS_SEND_MODES } from '@openbots/client/client';
 import { conversationWhenBusy } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { toasty } from '@/components/ui/sonner';
-import { rpc } from '@/services/rpc/rpc.client';
 import IconListOrdered from '~icons/lucide/list-ordered';
 import type { RoomsChat } from '@openbots/client/client';
+import type { useChatSettings } from '@openbots/client/react';
 
 interface RoomsSendModeMenuProps {
   chat: RoomsChat
+  settings: ReturnType<typeof useChatSettings>
 }
 
-export function RoomsSendModeMenu({ chat }: RoomsSendModeMenuProps) {
-  const { data: settings } = useQuery(rpc.conversation.settings.queryOptions());
-  const setWhenBusy = useMutation(rpc.conversation.setWhenBusy.mutationOptions({ onError: () => toasty(m.rooms_hide_failed(), '⚠️') }));
-
+export function RoomsSendModeMenu({ chat, settings }: RoomsSendModeMenuProps) {
   return (
     <DropdownMenuSub>
       <DropdownMenuSubTrigger>
@@ -25,13 +21,10 @@ export function RoomsSendModeMenu({ chat }: RoomsSendModeMenuProps) {
       <DropdownMenuSubContent>
         <DropdownMenuRadioGroup
           value={chat.whenBusy ?? ROOMS_SEND_MODE_DEFAULT}
-          onValueChange={(value) => setWhenBusy.mutate({
-            botId: chat.botId,
-            whenBusy: value === ROOMS_SEND_MODE_DEFAULT ? null : conversationWhenBusy.parse(value),
-          })}
+          onValueChange={(value) => settings.setSendMode(value === ROOMS_SEND_MODE_DEFAULT ? null : conversationWhenBusy.parse(value))}
         >
           <DropdownMenuRadioItem value={ROOMS_SEND_MODE_DEFAULT}>
-            {m.rooms_send_mode_default({ mode: settings ? ROOMS_SEND_MODES[settings.whenBusy]() : '…' })}
+            {settings.defaultSendModeLabel}
           </DropdownMenuRadioItem>
           <DropdownMenuSeparator />
           {conversationWhenBusy.options.map((mode) => (

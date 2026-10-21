@@ -1,8 +1,9 @@
 import { useKeyboardChatComposerInset } from '@legendapp/list/keyboard';
-import { botBubble, CHAT, chatActivity, chatEntryIds, chatFailure, chatLive, chatMessages, chatOutgoingMessages, chatQueued, roomsMessageText, roomsReactionGroups, roomsTimeLabel } from '@openbots/client/client';
-import { chatHistoryOptions, chatViewOptions, useChatReaction, useChatReactions } from '@openbots/client/react';
+import { botBubble, CHAT, roomsMessageText, roomsReactionGroups, roomsTimeLabel } from '@openbots/client/client';
+import { useChatUnread } from '@openbots/client/native';
+import { chatViewOptions, useChatReaction, useChatRoom } from '@openbots/client/react';
 import { getLocale, m } from '@openbots/i18n/client';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { View } from 'react-native';
@@ -13,7 +14,6 @@ import { KeyboardSticky } from '@/components/ui/keyboard-sticky';
 import { MessageList } from '@/components/ui/message-list';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
-import { useChatUnread } from '@/hooks/use-chat-unread';
 import { useConnection } from '@/hooks/use-connection';
 import { chatMessageDetails } from '@/services/chat/chat.utils';
 import { ChatComposer } from './chat-composer';
@@ -120,56 +120,27 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
   const { contentInsetEndAdjustment, onComposerLayout } = useKeyboardChatComposerInset(list, composer);
   const { conversationId } = view;
 
-  const history = useInfiniteQuery(chatHistoryOptions(session, {
-    botId: bot.id,
-    conversationId,
-    cursor: view.historyCursor,
-  }));
+  const room = useChatRoom({
+    bot,
+    bots,
+    view,
+    outgoing,
+  });
 
-  const { data: pending = [] } = useQuery(session.rpc.tools.pending.queryOptions({ input: { botId: bot.id } }));
-  const older = [...(history.data?.pages.flatMap((page) => page.items) ?? [])].reverse();
-  const approvals = pending.filter((approval) => approval.conversationId === conversationId);
-  const { data: questions = [] } = useQuery(session.rpc.conversation.questions.queryOptions({ input: { botId: bot.id, conversationId } }));
-  const queued = chatQueued(view);
-  const activity = chatActivity(view);
+  const { activity, queued } = room;
+  const messages = [...room.messages, ...room.sending];
   const bubble = botBubble(bot);
-
-  const messages = [
-    ...chatLive({
-      state: view,
-      bot,
-      approvals,
-    }, chatMessages({
-      entries: [...older, ...view.entries],
-      bot,
-      bots,
-    })),
-    ...chatOutgoingMessages(outgoing, {
-      botId: bot.id,
-      latestEntryId: view.latestEntryId,
-      queued,
-    }),
-  ];
 
   const replyTo = messages.find((message) => replyToEntryId !== undefined && message.metadata?.entryId === replyToEntryId) ?? null;
 
-  const reactionsByEntry = useChatReactions({
-    botId: bot.id,
-    conversationId,
-    entryIds: chatEntryIds(messages),
-    revision: view.interactionsRevision,
-  });
-
   const reaction = useChatReaction(bot.id);
-  const groups = (message: ChatMessageItem) => roomsReactionGroups({ reaction: reactionsByEntry.get(message.metadata?.entryId ?? 0), bots });
-  const unread = useChatUnread(session, bot.id, list, messages);
+  const groups = (message: ChatMessageItem) => roomsReactionGroups({ reaction: room.reactions.get(message.metadata?.entryId ?? 0), bots });
+  const unread = useChatUnread(bot.id, list, messages);
   const now = new Date();
 
   const empty = match(messages.length)
     .with(0, () => <Text className="mx-5 mt-8 text-center" tone="muted">{m.mobile_chat_empty({ name: bot.name })}</Text>)
     .otherwise(() => null);
-
-  const canLoadOlder = view.historyCursor !== undefined && (history.hasNextPage || !history.isFetched) && !history.isFetching;
 
   return (
     <View className="flex-1">
@@ -179,11 +150,11 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
         footer={(
           <ChatRuns
             activity={activity}
-            approvals={approvals}
+            approvals={room.approvals}
             bot={bot}
             draft={messages.find((message) => message.id === CHAT.liveMessageId)}
-            failure={chatFailure(view)}
-            questions={questions}
+            failure={room.failure}
+            questions={room.questions}
           />
         )}
         header={empty}
@@ -228,8 +199,8 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
           />
         )}
         onStartReached={() => {
-          if (canLoadOlder) {
-            void history.fetchNextPage();
+          if (room.older.isEnabled && !room.older.isLoading) {
+            room.older.onLoad();
           }
         }}
       />
@@ -239,7 +210,7 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
           bot={bot}
           bots={bots}
           conversationId={conversationId}
-          isBusy={view.live.run !== undefined || queued.length > 0}
+          isBusy={room.isBusy}
           latestEntryId={view.latestEntryId}
           prefill={prefill}
           queued={queued}

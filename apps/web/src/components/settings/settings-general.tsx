@@ -1,3 +1,4 @@
+import { useChatShowTools } from '@openbots/client/web';
 import { m } from '@openbots/i18n/client';
 import { ClientOnly } from '@tanstack/react-router';
 import { useId, useState } from 'react';
@@ -6,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { PanelContent, PanelDescription, PanelRow } from '@/components/ui/panel';
 import { Switch } from '@/components/ui/switch';
-import { useShowTools } from '@/hooks/use-show-tools';
 import IconBellRing from '~icons/lucide/bell-ring';
 import IconSettings from '~icons/lucide/settings';
 import IconWrench from '~icons/lucide/wrench';
@@ -41,7 +41,7 @@ function SettingsGeneralNotifications() {
 }
 
 export function SettingsGeneral() {
-  const tools = useShowTools();
+  const tools = useChatShowTools();
   const toolsId = useId();
 
   return (

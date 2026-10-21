@@ -52,7 +52,7 @@
     "expo-system-ui": "catalog:mobile",
     "katex": "catalog:mobile",
     "lucide-react-native": "catalog:mobile",
-    "react": "catalog:mobile",
+    "react": "catalog:",
     "react-hook-form": "catalog:",
     "react-native": "catalog:mobile",
     "react-native-enriched-markdown": "catalog:mobile",

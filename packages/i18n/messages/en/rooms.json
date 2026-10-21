@@ -304,5 +304,11 @@
   "rooms_notice_reset": "New session started",
   "mobile_bot_discard_title": "Discard your changes?",
   "mobile_bot_discard": "Discard changes",
-  "mobile_bot_keep_editing": "Keep editing"
+  "mobile_bot_keep_editing": "Keep editing",
+  "rooms_reaction_loading": "Loading emoji…",
+  "rooms_reaction_load_failed": "Emoji could not load. Check your internet connection.",
+  "rooms_chat_stop_failed": "The reply could not be stopped. Try again.",
+  "mobile_bot_loading": "Loading bot…",
+  "mobile_bot_error_title": "Could not load this bot",
+  "mobile_bot_missing": "This bot no longer exists."
 }

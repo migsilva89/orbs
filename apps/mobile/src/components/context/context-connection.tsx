@@ -24,9 +24,11 @@ export function ContextConnection({ children }: ContextConnectionProps) {
     setSession(rpcClientCreate({
       connection,
       onUnauthorized: () => {
-        setSession(null);
-        setError(m.mobile_connection_revoked());
-        void connectionForget().catch(() => setError(m.mobile_storage_failed()));
+        setSession((current) => (current?.connection === connection ? null : current));
+        void connectionForget(connection).then(
+          (isForgotten) => isForgotten && setError(m.mobile_connection_revoked()),
+          () => setError(m.mobile_storage_failed()),
+        );
       },
     }));
   }

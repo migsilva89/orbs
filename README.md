@@ -1,6 +1,6 @@
 # Openbots
 
-A Bun/Turbo bot backend with a native daemon, device pairing, bot configuration, and authenticated submit, stop, and live views of persistent per-bot Pi Durable conversations. Pi supplies shared provider authentication. Explicit skill invocation, private peer messages, and foreground/background subagents are available. Attachment APIs are available. Desktop, mobile, and a provider-login UI are not implemented yet.
+A Bun/Turbo bot backend with a native daemon, device pairing, bot configuration, and authenticated submit, stop, and live views of persistent per-bot Pi Durable conversations. Pi supplies shared provider authentication. Explicit skill invocation, private peer messages, and foreground/background subagents are available. Attachment APIs are available. The web client (`apps/web`) includes provider login, and an iOS client lives in `apps/mobile`. Desktop is not implemented yet.
 
 ```text
 apps/       daemon, desktop, mobile

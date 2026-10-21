@@ -161,7 +161,7 @@ interface ConfirmationDialogProps extends Omit<ComponentProps<typeof AlertDialog
   onConfirm: () => void
   onOpenChange: (open: boolean) => void
   variant?: ComponentProps<typeof AlertDialogAction>['variant']
-  /** Text the user must type before the confirm button is enabled, such as the bot name. */
+  /** Text the user must type before the confirm button is enabled, such as the bot name; empty while it loads keeps the button disabled. */
   confirmText?: string
   error?: string | null
   children: ReactNode
@@ -170,7 +170,7 @@ interface ConfirmationDialogProps extends Omit<ComponentProps<typeof AlertDialog
 function ConfirmationDialog(props: ConfirmationDialogProps) {
   const { title, confirmLabel, pending, onConfirm, onOpenChange, variant, confirmText, error, children, ...rootProps } = props;
   const [typed, setTyped] = useState('');
-  const isConfirmed = !confirmText || typed.trim() === confirmText;
+  const isConfirmed = confirmText === undefined || (confirmText !== '' && typed.trim() === confirmText);
 
   return (
     <AlertDialog open onOpenChange={(open) => !pending && onOpenChange(open)} {...rootProps}>

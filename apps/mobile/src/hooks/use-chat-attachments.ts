@@ -3,15 +3,16 @@ import { m } from '@openbots/i18n/client';
 import { useMutation } from '@tanstack/react-query';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { chatFileBlob } from '@/services/chat/chat.utils';
+import { chatFileBlob, chatFileType } from '@/services/chat/chat.utils';
 import type { ChatAttachment, ChatPicked } from '@/types/chat.types';
 import type { RpcSession } from '@/types/rpc.types';
 
 export function useChatAttachments(session: RpcSession, botId: string) {
   const toast = useToast();
   const [attachments, setAttachments] = useState<ChatAttachment[]>([]);
+  const kept = useRef(new Set<string>());
   const upload = useMutation(session.rpc.attachments.upload.mutationOptions());
   const discard = useMutation(session.rpc.attachments.remove.mutationOptions());
   const remaining = ATTACHMENT.maxPerMessage - attachments.length;
@@ -25,11 +26,18 @@ export function useChatAttachments(session: RpcSession, botId: string) {
     void chatFileBlob(item)
       .then((file) => upload.mutateAsync({ botId, file }))
       .then(
-        (saved) => update(key, {
-          id: saved.id,
-          name: saved.name,
-          status: 'ready',
-        }),
+        (saved) => {
+          if (!kept.current.has(key)) {
+            discard.mutate({ botId, attachmentId: saved.id });
+            return;
+          }
+
+          update(key, {
+            id: saved.id,
+            name: saved.name,
+            status: 'ready',
+          });
+        },
         () => {
           update(key, { status: 'failed' });
           toast.show({ message: m.mobile_chat_attach_failed({ name: item.name }) });
@@ -56,6 +64,7 @@ export function useChatAttachments(session: RpcSession, botId: string) {
       const key = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
       const preview = item.mediaType.startsWith('image/') ? item.uri : '';
 
+      kept.current.add(key);
       setAttachments((items) => [...items, { key, id: null, uri: item.uri, name: item.name, mediaType: item.mediaType, preview, status: 'uploading' }]);
       send(key, item);
     }
@@ -70,12 +79,16 @@ export function useChatAttachments(session: RpcSession, botId: string) {
     });
 
     if (!result.canceled) {
-      add(result.assets.map((asset) => ({
-        uri: asset.uri,
-        name: asset.fileName ?? asset.uri.split('/').at(-1) ?? '',
-        mediaType: asset.mimeType ?? '',
-        size: asset.fileSize ?? 0,
-      })));
+      add(result.assets.map((asset) => {
+        const name = asset.fileName ?? asset.uri.split('/').at(-1) ?? '';
+
+        return {
+          uri: asset.uri,
+          name,
+          mediaType: chatFileType({ name, mediaType: asset.mimeType }),
+          size: asset.fileSize ?? 0,
+        };
+      }));
     }
   };
 
@@ -86,7 +99,7 @@ export function useChatAttachments(session: RpcSession, botId: string) {
       add(result.assets.map((asset) => ({
         uri: asset.uri,
         name: asset.name,
-        mediaType: asset.mimeType ?? '',
+        mediaType: chatFileType({ name: asset.name, mediaType: asset.mimeType }),
         size: asset.size ?? 0,
       })));
     }
@@ -99,6 +112,7 @@ export function useChatAttachments(session: RpcSession, botId: string) {
       discard.mutate({ botId, attachmentId: item.id });
     }
 
+    kept.current.delete(key);
     setAttachments((items) => items.filter((attachment) => attachment.key !== key));
   };
 

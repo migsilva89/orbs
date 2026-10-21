@@ -1,5 +1,4 @@
 import { BOT_PERMISSION_LABELS, BOT_THINKING_LEVEL_LABELS, ROOMS_SEND_MODES } from '@openbots/client/client';
-import { botFields, conversationWhenBusy } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -9,6 +8,7 @@ import { actionSheetShow } from '@/components/ui/action-sheet';
 import { Icon } from '@/components/ui/icon';
 import { Item, ItemButton, ItemContent, ItemGroup, ItemMedia, ItemTitle, ItemValue } from '@/components/ui/item';
 import { useToast } from '@/hooks/use-toast';
+import { botMenuPermissions, botMenuSendModes } from '@/services/bot/bot-menu.utils';
 import type { RpcSession } from '@/types/rpc.types';
 import type { Bot, ConversationListItem } from '@openbots/contracts/universal';
 
@@ -42,22 +42,20 @@ export function BotDetailsSettings({ session, bot, chat }: BotDetailsSettingsPro
   const chooseSendMode = () => actionSheetShow({
     title: m.rooms_action_send_mode(),
     cancelLabel: m.ui_cancel(),
-    choices: [
-      { label: defaultMode, onSelect: () => setWhenBusy.mutate({ botId: bot.id, whenBusy: null }) },
-      ...conversationWhenBusy.options.map((mode) => ({
-        label: ROOMS_SEND_MODES[mode](),
-        onSelect: () => setWhenBusy.mutate({ botId: bot.id, whenBusy: mode }),
-      })),
-    ],
+    choices: botMenuSendModes({
+      defaultLabel: defaultMode,
+      whenBusy: chat.whenBusy,
+      onSelect: (whenBusy) => setWhenBusy.mutate({ botId: bot.id, whenBusy }),
+    }).map(({ label, onSelect }) => ({ label, onSelect: () => onSelect?.() })),
   });
 
   const choosePermission = () => actionSheetShow({
     title: m.rooms_bot_permission(),
     cancelLabel: m.ui_cancel(),
-    choices: botFields.shape.permission.options.map((permission) => ({
-      label: BOT_PERMISSION_LABELS[permission](),
-      onSelect: () => update.mutate({ botId: bot.id, permission }),
-    })),
+    choices: botMenuPermissions({
+      permission: bot.permission,
+      onSelect: (permission) => update.mutate({ botId: bot.id, permission }),
+    }).map(({ label, onSelect }) => ({ label, onSelect: () => onSelect?.() })),
   });
 
   return (

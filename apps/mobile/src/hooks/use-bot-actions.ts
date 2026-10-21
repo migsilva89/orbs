@@ -1,9 +1,9 @@
 import { ROOMS_MUTE_DURATIONS, ROOMS_SEND_MODES } from '@openbots/client/client';
-import { conversationWhenBusy } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useToast } from '@/hooks/use-toast';
+import { botMenuSendModes } from '@/services/bot/bot-menu.utils';
 import type { MenuItem } from '@/types/menu.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type { ConversationListItem } from '@openbots/contracts/universal';
@@ -49,19 +49,11 @@ export function useBotActions(session: RpcSession, chat: ConversationListItem): 
   const sendModeItem: MenuItem = {
     label: m.rooms_action_send_mode(),
     systemImage: 'list.number',
-    items: [
-      {
-        label: m.rooms_send_mode_default({ mode: settings ? ROOMS_SEND_MODES[settings.whenBusy]() : '…' }),
-        systemImage: chat.whenBusy ? undefined : 'checkmark',
-        onSelect: () => setWhenBusy.mutate({ botId, whenBusy: null }),
-      },
-      ...conversationWhenBusy.options.map((mode, index): MenuItem => ({
-        label: ROOMS_SEND_MODES[mode](),
-        systemImage: chat.whenBusy === mode ? 'checkmark' : undefined,
-        hasDividerBefore: index === 0,
-        onSelect: () => setWhenBusy.mutate({ botId, whenBusy: mode }),
-      })),
-    ],
+    items: botMenuSendModes({
+      defaultLabel: m.rooms_send_mode_default({ mode: settings ? ROOMS_SEND_MODES[settings.whenBusy]() : '…' }),
+      whenBusy: chat.whenBusy,
+      onSelect: (whenBusy) => setWhenBusy.mutate({ botId, whenBusy }),
+    }),
   };
 
   return [

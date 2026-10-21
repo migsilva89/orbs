@@ -6,7 +6,10 @@ export function connectionCodeFromUrl(value: string | null): string | null {
     .with(true, () => {
       const url = new URL(value ?? '');
       const schemes = [Constants.expoConfig?.scheme].flat();
-      return match(schemes.some((scheme) => url.protocol === `${scheme}:`) && url.hostname === 'connect')
+      const isAppLink = schemes.some((scheme) => url.protocol === `${scheme}:`) && url.hostname === 'connect';
+      const isWebLink = ['http:', 'https:'].includes(url.protocol) && url.pathname === '/connect';
+
+      return match(isAppLink || isWebLink)
         .with(true, () => new URLSearchParams(url.hash.slice(1)).get('code'))
         .with(false, () => null)
         .exhaustive();

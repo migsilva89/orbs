@@ -1,5 +1,5 @@
 import { htmlDocument } from '@openbots/client/client';
-import { htmlFrameMessage } from '@openbots/contracts/universal';
+import { htmlFrameMessageText } from '@openbots/contracts/universal';
 import { useEffect, useRef, useState } from 'react';
 import { Linking } from 'react-native';
 import { WebView } from 'react-native-webview';
@@ -68,7 +68,7 @@ export function HtmlFrame({ html, title, fill = false }: HtmlFrameProps) {
   }, [themeScript]);
 
   function handleMessage(event: WebViewMessageEvent) {
-    const message = htmlFrameMessage.safeParse(JSON.parse(event.nativeEvent.data));
+    const message = htmlFrameMessageText.safeParse(event.nativeEvent.data);
 
     if (message.success) {
       match(message.data)

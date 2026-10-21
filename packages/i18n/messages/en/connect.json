@@ -24,5 +24,6 @@
   "connect_friends_human": "Is it the human?",
   "connect_friends_meeting": "Did I miss the meeting?",
   "connect_friends_natural": "Act natural.",
-  "connect_friends_typing": "Someone's typing…"
+  "connect_friends_typing": "Someone's typing…",
+  "mobile_photos_permission": "Openbots shares the photos you pick with your bots."
 }

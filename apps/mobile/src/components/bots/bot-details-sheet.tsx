@@ -8,6 +8,7 @@ import { BotDetailsFacts } from '@/components/bots/bot-details-facts';
 import { BotDetailsMedia } from '@/components/bots/bot-details-media';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { BotDetailsSettings } from '@/components/bots/bot-details-settings';
+import { BotLoadState } from '@/components/bots/bot-load-state';
 import { RoutinesList } from '@/components/routines/routines-list';
 import { TodosList } from '@/components/todos/todos-list';
 import { Avatar } from '@/components/ui/avatar';
@@ -48,7 +49,16 @@ function BotDetailsSheetLoader({ session, botId }: BotDetailsSheetLoaderProps) {
         session={session}
       />
     ))
-    .otherwise(() => null);
+    .otherwise(() => (
+      <BotLoadState
+        isError={[bots, chats].some((query) => query.isError)}
+        isMissing={[bots, chats].every((query) => query.isSuccess)}
+        onRetry={() => void Promise.all([
+          bots.refetch(),
+          chats.refetch(),
+        ])}
+      />
+    ));
 }
 
 interface BotDetailsSheetContentProps {

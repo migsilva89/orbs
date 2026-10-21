@@ -41,8 +41,8 @@ function ChatReactionPickerContent({ session, params }: ChatReactionPickerConten
   const items = emojiSearch({ items: emoji.data ?? [], query: search });
 
   const empty = match(emoji.status)
-    .with('pending', () => m.rooms_mention_skills_loading())
-    .with('error', () => m.rooms_mention_skills_offline())
+    .with('pending', () => m.rooms_reaction_loading())
+    .with('error', () => m.rooms_reaction_load_failed())
     .otherwise(() => m.rooms_reaction_empty());
 
   return (

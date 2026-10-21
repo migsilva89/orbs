@@ -54,6 +54,11 @@ export interface ChatNoticeTitleParams {
   bot: Bot;
 }
 
+export interface ChatFileTypeParams {
+  name: string;
+  mediaType?: string;
+}
+
 export interface ChatPicked {
   uri: string;
   name: string;

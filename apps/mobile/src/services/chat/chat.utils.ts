@@ -2,6 +2,7 @@ import { botUsageLabel, htmlReplySegments, toolBlocks } from '@openbots/client/c
 import { Errors } from '@openbots/errors/universal';
 import { getLocale, m } from '@openbots/i18n/client';
 import { match } from 'ts-pattern';
+import { CHAT_FILE_TYPES } from './chat.constants';
 import type * as ChatTypes from '@/types/chat.types';
 import type { ChatMessage } from '@openbots/client/client';
 
@@ -91,6 +92,12 @@ export function chatNoticeTitle({ message, bot }: ChatTypes.ChatNoticeTitleParam
   }
 
   return part?.type === 'data-reset' ? m.rooms_notice_reset() : name;
+}
+
+export function chatFileType({ name, mediaType }: ChatTypes.ChatFileTypeParams): string {
+  const extension = name.split('.').at(-1)?.toLowerCase();
+
+  return mediaType ?? Object.entries(CHAT_FILE_TYPES).find(([type]) => type === extension)?.[1] ?? '';
 }
 
 export function chatFileBlob({ uri, name }: Pick<ChatTypes.ChatPicked, 'uri' | 'name'>): Promise<File> {

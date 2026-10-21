@@ -1,5 +1,4 @@
 import { BOT_PERMISSION_HINTS, BOT_PERMISSION_LABELS } from '@openbots/client/client';
-import { botFields } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { Blocks, FileText, Plug, Shield, ShieldCheck, Sparkles } from 'lucide-react-native';
 import { useController, useFormContext } from 'react-hook-form';
@@ -8,6 +7,7 @@ import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { BotSettingsMenuRow } from '@/components/bots/bot-settings-menu-row';
 import { Icon } from '@/components/ui/icon';
 import { Item, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
+import { botMenuPermissions } from '@/services/bot/bot-menu.utils';
 import type { BotInherit } from '@openbots/client/client';
 import type { BotForm } from '@openbots/contracts/universal';
 import type { LucideIcon } from 'lucide-react-native';
@@ -39,11 +39,7 @@ export function BotSettingsAccess({ isDisabled }: BotSettingsAccessProps) {
           description={BOT_PERMISSION_HINTS[permission.field.value]()}
           icon={Shield}
           isDisabled={isDisabled}
-          items={botFields.shape.permission.options.map((option) => ({
-            label: BOT_PERMISSION_LABELS[option](),
-            systemImage: option === permission.field.value ? 'checkmark' : undefined,
-            onSelect: () => permission.field.onChange(option),
-          }))}
+          items={botMenuPermissions({ permission: permission.field.value, onSelect: permission.field.onChange })}
           title={m.rooms_bot_permission()}
           value={BOT_PERMISSION_LABELS[permission.field.value]()}
         />

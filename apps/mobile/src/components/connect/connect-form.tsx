@@ -2,14 +2,15 @@ import { authPairCode, connectionPairForm } from '@openbots/contracts/universal'
 import { m } from '@openbots/i18n/client';
 import { useState } from 'react';
 import { View } from 'react-native';
-import { match } from 'ts-pattern';
-import { ButtonLoading } from '@/components/ui/button-loading';
+import { match, P } from 'ts-pattern';
+import { Button } from '@/components/ui/button';
 import { CardFooter } from '@/components/ui/card';
 import { FormInput } from '@/components/ui/form-input';
 import { LabelDescription } from '@/components/ui/label';
 import { useConnection } from '@/hooks/use-connection';
 import { useConnectionCode } from '@/hooks/use-connection-code';
-import { connectionPair } from '@/services/connection/connection.client';
+import { connectionPair, connectionRead } from '@/services/connection/connection.client';
+import { connectionCodeFromUrl } from '@/services/connection/connection.utils';
 
 export function ConnectForm() {
   const { connect } = useConnection();
@@ -19,10 +20,11 @@ export function ConnectForm() {
   const [nameError, setNameError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPairing, setIsPairing] = useState(false);
-  const form = connectionPairForm.safeParse({ code, name });
+  const pairCode = connectionCodeFromUrl(code.trim()) ?? code;
+  const form = connectionPairForm.safeParse({ code: pairCode, name });
 
   async function handleSubmit() {
-    const payload = authPairCode.safeParse(code);
+    const payload = authPairCode.safeParse(pairCode);
     await match({ payload, form })
       .with({ payload: { success: false } }, () => setCodeError(m.connect_code_invalid()))
       .with({ form: { success: false } }, () => setNameError(m.mobile_device_name_invalid()))
@@ -34,7 +36,11 @@ export function ConnectForm() {
         try {
           connect(await connectionPair({ payload: parsed.data, name: values.data.name }));
         } catch {
-          setError(m.connect_failed());
+          const saved = await connectionRead().catch(() => null);
+
+          match(saved)
+            .with(P.nonNullable, connect)
+            .otherwise(() => setError(m.connect_failed()));
         } finally {
           setIsPairing(false);
         }
@@ -76,7 +82,7 @@ export function ConnectForm() {
       />
       {(error ?? linkError) ? <LabelDescription accessibilityRole="alert" variant="error">{error ?? linkError}</LabelDescription> : null}
       <CardFooter>
-        <ButtonLoading
+        <Button
           className="w-full"
           disabled={!form.success}
           loading={isPairing}
@@ -84,7 +90,7 @@ export function ConnectForm() {
           onPress={() => void handleSubmit()}
         >
           {m.connect_submit()}
-        </ButtonLoading>
+        </Button>
       </CardFooter>
     </View>
   );

@@ -70,7 +70,7 @@ export function ChatComposer({
   const files = useChatAttachments(session, bot.id);
   const submit = useMutation(session.rpc.conversation.submit.mutationOptions());
   const execute = useMutation(session.rpc.commands.execute.mutationOptions());
-  const stop = useMutation(session.rpc.conversation.stop.mutationOptions());
+  const stop = useMutation(session.rpc.conversation.stop.mutationOptions({ onError: () => toast.show({ message: m.rooms_chat_stop_failed() }) }));
 
   const executed = useMutationState<MutationState<void, Error, CommandExecuteInput>>({
     filters: { mutationKey: session.rpc.commands.execute.mutationKey(), status: 'success' },
@@ -110,7 +110,8 @@ export function ChatComposer({
   const query = mentionQuery({ text, cursor });
   const hasFiles = files.readyIds.length > 0;
   const isStopping = isBusy && !content && files.attachments.length === 0;
-  const canSend = (content !== '' || hasFiles) && !files.uploading;
+  const isSendingFiles = submit.isPending && hasFiles;
+  const canSend = (content !== '' || hasFiles) && !files.uploading && !isSendingFiles;
 
   const stopIcon = (
     <Icon

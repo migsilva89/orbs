@@ -90,7 +90,7 @@ export function RoomsChatComposer({
   const submit = useMutation(rpc.conversation.submit.mutationOptions());
   const navigate = useNavigate();
   const execute = useMutation(rpc.commands.execute.mutationOptions());
-  const stop = useMutation(rpc.conversation.stop.mutationOptions());
+  const stop = useMutation(rpc.conversation.stop.mutationOptions({ onError: () => toasty(m.rooms_chat_stop_failed(), '⚠️') }));
 
   const executed = useMutationState<MutationState<void, Error, CommandExecuteInput>>({
     filters: { mutationKey: rpc.commands.execute.mutationKey(), status: 'success' },

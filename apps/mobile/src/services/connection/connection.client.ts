@@ -12,8 +12,16 @@ export async function connectionRead(): Promise<ConnectionSaved | null> {
   return connectionStored.safeParse(saved).data ?? null;
 }
 
-export async function connectionForget(): Promise<void> {
+export async function connectionForget(connection: ConnectionSaved): Promise<boolean> {
+  const saved = await connectionRead();
+
+  if (saved?.token !== connection.token) {
+    return false;
+  }
+
   await SecureStore.deleteItemAsync(CONNECTION_STORAGE_KEY);
+
+  return true;
 }
 
 export async function connectionPair({ payload, name }: ConnectionPairParams): Promise<ConnectionSaved> {

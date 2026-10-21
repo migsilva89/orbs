@@ -10,7 +10,7 @@ interface ConfirmDialogProps {
   title: string;
   description?: string;
   confirmLabel: string;
-  /** Text the user must type before the confirm button is enabled, such as the bot name. */
+  /** Text the user must type before the confirm button is enabled, such as the bot name; empty while it loads keeps the button disabled. */
   confirmText?: string;
   error?: string | null;
   isPending: boolean;
@@ -23,7 +23,7 @@ interface ConfirmDialogProps {
 export function ConfirmDialog(props: ConfirmDialogProps) {
   const { title, description, confirmLabel, confirmText, error, isPending, isDestructive = false, onConfirm, onCancel } = props;
   const [typed, setTyped] = useState('');
-  const isConfirmed = !confirmText || typed.trim() === confirmText;
+  const isConfirmed = confirmText === undefined || (confirmText !== '' && typed.trim() === confirmText);
 
   return (
     <KeyboardAvoidingView behavior="padding" className="flex-1">

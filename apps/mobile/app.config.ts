@@ -1,3 +1,4 @@
+import { m } from '@openbots/i18n/messages';
 import { z } from 'zod';
 import type { ExpoConfig } from 'expo/config';
 
@@ -41,7 +42,7 @@ export default (): ExpoConfig => ({
   plugins: [
     'expo-router',
     'expo-secure-store',
-    ['expo-image-picker', { photosPermission: 'Openbots shares the photos you pick with your bots.', cameraPermission: false, microphonePermission: false }],
+    ['expo-image-picker', { photosPermission: m.mobile_photos_permission(), cameraPermission: false, microphonePermission: false }],
     [
       'expo-font',
       {

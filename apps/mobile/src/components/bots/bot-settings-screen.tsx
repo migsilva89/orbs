@@ -9,6 +9,7 @@ import { ScrollView, View } from 'react-native';
 import { match, P } from 'ts-pattern';
 import { useCSSVariable } from 'uniwind';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
+import { BotLoadState } from '@/components/bots/bot-load-state';
 import { BotSettingsAccess } from '@/components/bots/bot-settings-access';
 import { BotSettingsModel } from '@/components/bots/bot-settings-model';
 import { BotSettingsProfile } from '@/components/bots/bot-settings-profile';
@@ -53,7 +54,13 @@ function BotSettingsScreenLoader({ session, botId }: BotSettingsScreenLoaderProp
         session={session}
       />
     ))
-    .otherwise(() => null);
+    .otherwise(() => (
+      <BotLoadState
+        isError={bots.isError}
+        isMissing={bots.isSuccess}
+        onRetry={() => void bots.refetch()}
+      />
+    ));
 }
 
 interface BotSettingsScreenFormProps {
@@ -109,7 +116,7 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
       ]);
       disablePrevention();
       form.reset(form.getValues());
-      toast.show({ message: m.bots_saved() });
+      toast.show({ message: m.bots_saved(), variant: 'default' });
       router.back();
     },
     onError: () => toast.show({ message: m.rooms_bot_save_error() }),

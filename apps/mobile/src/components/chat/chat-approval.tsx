@@ -3,7 +3,6 @@ import { useChatApproval } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { QuestionCard, QuestionCardHeader, QuestionCardOption, QuestionCardOptions } from '@/components/ui/question-card';
 import { Text } from '@/components/ui/text';
-import { TraceCode } from '@/components/ui/trace';
 import type { ToolApproval } from '@openbots/contracts/universal';
 
 interface ChatApprovalProps {
@@ -19,14 +18,25 @@ export function ChatApproval({ approval, botName }: ChatApprovalProps) {
   return (
     <QuestionCard>
       <QuestionCardHeader descriptions={[label, ...(text.description ? [text.description] : [])]} title={m.rooms_chat_approval_title({ bot: botName })} />
-      {text.code ? <TraceCode>{text.code}</TraceCode> : null}
+      {text.code ? (
+        <Text
+          selectable
+          className="mx-1"
+          tone="muted"
+          variant="trace-code"
+        >
+          {text.code}
+        </Text>
+      ) : null}
       <QuestionCardOptions>
-        {ROOMS_APPROVAL_CHOICES.map((choice) => (
+        {ROOMS_APPROVAL_CHOICES.map((choice, index) => (
           <QuestionCardOption
             disabled={answer.isAnswered}
-            key={choice.label()}
-            selected={answer.chosen === choice.approved}
-            onPress={() => answer.answer(choice.approved)}
+            index={index}
+            key={choice.decision}
+            selected={answer.chosen === choice.decision}
+            tone={choice.tone}
+            onPress={() => answer.answer(choice.decision)}
           >
             <Text>{choice.label()}</Text>
           </QuestionCardOption>

@@ -3,6 +3,7 @@ import { match, P } from 'ts-pattern';
 import { collaborationActionTarget } from './collaboration-action.target';
 import { collaborationQueryOrigin } from './collaboration-query.origin';
 import { COLLABORATION, collaborationCall, collaborationStore, collaborationTemporaryLinks } from './collaboration.constants';
+import { collaborationFailureNote } from './collaboration.utils';
 import type { CollaborationSendParams, CollaborationToolDeps } from '../../types/collaboration.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ToolExecutionApi } from '@earendil-works/pi-durable';
@@ -97,8 +98,8 @@ export async function collaborationActionSend(
 
   const delivery = await api.getTask(deliveryId, context);
 
-  const recipientConversationId = match<unknown>(delivery?.input)
-    .with({ recipientConversationId: P.number }, (input) => input.recipientConversationId)
+  const { recipientConversationId, recipientName } = match<unknown>(delivery?.input)
+    .with({ recipientConversationId: P.number, recipientName: P.string }, (input) => input)
     .otherwise(() => {
       throw new Errors.INTERNAL_ERROR({ internal: 'Bot delivery target is unavailable.' });
     });
@@ -118,7 +119,7 @@ export async function collaborationActionSend(
         }))
         .with({ status: 'completed', result: { status: 'unanswered' } }, ({ result }) => ({
           isError: true,
-          output: [{ type: 'text' as const, text: result.reason }],
+          output: [{ type: 'text' as const, text: collaborationFailureNote(recipientName, result.reason) }],
         }))
         .otherwise(() => ({ isError: true, output: [{ type: 'text' as const, text: 'Bot delivery did not complete.' }] }));
     })

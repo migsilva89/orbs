@@ -26,7 +26,6 @@ export const conversationSetWhenBusy = z.object({
 
 export const conversationSettings = z.object({
   whenBusy: conversationWhenBusy,
-  /** Hides tool calls and thinking from chat transcripts. */
   hideVerbose: z.boolean(),
 });
 

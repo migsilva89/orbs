@@ -94,6 +94,7 @@ export async function makeRuntimeService({
   const questions = questionExtension();
   const chatTools = runtimeChatToolsExtension();
   const toolSearch = createToolSearchExtension();
+  const subagents = subagentExtension();
 
   // One model limiter and one extension list for every bot store.
   const shared: RuntimeTypes.RuntimeSharedDeps = {
@@ -109,7 +110,7 @@ export async function makeRuntimeService({
       collaboration.extension,
       questions.extension,
       chatTools.extension,
-      subagentExtension(),
+      subagents,
       routineExtension,
       runtimeReactionExtension,
       todoExtension,
@@ -123,6 +124,7 @@ export async function makeRuntimeService({
       ...chatTools.readOnlyTools,
       ...(toolSearch.tools ?? []),
     ],
+    ownTools: [collaboration.extension, questions.extension, chatTools.extension, subagents].flatMap((extension) => extension.tools ?? []),
   };
 
   // An alarm reopens a bot whose store closed, so its routines and deadlines still run.

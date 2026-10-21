@@ -3,6 +3,7 @@ import type { AuthService } from '../services/auth/auth.service';
 import type { BotService } from '../services/bot/bot.service';
 import type { SettingsService } from '../services/settings/settings.service';
 import type { SkillService } from '../services/skill/skill.service';
+import type { ToolService } from '../services/tool/tool.service';
 import type { AuthAuthenticateParams } from './auth.types';
 import type { BotPreferences } from './bot.types';
 import type { ReplicatedState } from '@earendil-works/chord';
@@ -16,6 +17,7 @@ export interface ConversationServiceDeps {
   runtime: RuntimeService;
   settings: SettingsService;
   skill: SkillService;
+  tools: ToolService;
 }
 
 export interface ConversationPreferencesParams {
@@ -47,6 +49,7 @@ export interface ConversationApproveParams {
   botId: string;
   id: number;
   approved: boolean;
+  always?: boolean;
   answeredBy: string;
 }
 

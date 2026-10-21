@@ -43,10 +43,18 @@ export async function runtimeBotOpen(shared: RuntimeSharedDeps, botId: string): 
     const todoTools = runtimeTodoToolsExtension({ harness, todos });
     const readOnlyTools = [...shared.readOnlyTools, ...artifactTools.readOnlyTools, ...routineTools.readOnlyTools, ...todoTools.readOnlyTools];
 
+    const ownTools = [
+      ...shared.ownTools,
+      ...(artifactTools.extension.tools ?? []),
+      ...(routineTools.extension.tools ?? []),
+      ...(todoTools.extension.tools ?? []),
+    ];
+
     // The permission hook stays last, including for custom and MCP tools.
     const permissionExtension = runtimeToolsExtension({
       harness,
       readOnlyTools,
+      ownTools,
       permissions: shared.permissions,
     });
 
@@ -66,6 +74,7 @@ export async function runtimeBotOpen(shared: RuntimeSharedDeps, botId: string): 
       registry,
       models: shared.models,
       readOnlyTools,
+      ownTools,
       extensions: [...shared.extensions, artifactTools.extension, routineTools.extension, todoTools.extension, permissionExtension],
     };
 

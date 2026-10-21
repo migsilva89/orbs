@@ -1,5 +1,5 @@
 import { Button, Divider, Host, RNHostView, Section, ContextMenu as SwiftContextMenu, Menu as SwiftMenu } from '@expo/ui/swift-ui';
-import { buttonStyle, disabled, menuIndicator, menuStyle } from '@expo/ui/swift-ui/modifiers';
+import { buttonStyle, disabled, menuIndicator, menuOrder, menuStyle } from '@expo/ui/swift-ui/modifiers';
 import { Fragment, useState } from 'react';
 import { View } from 'react-native';
 import { match, P } from 'ts-pattern';
@@ -13,7 +13,7 @@ export function Menu({ title, items, children, isFullWidth = false, isDisabled =
       isFullWidth={isFullWidth}
       render={(trigger) => (
         <Host matchContents>
-          <SwiftMenu label={<RNHostView matchContents>{trigger}</RNHostView>} modifiers={[menuStyle('button'), buttonStyle('plain'), menuIndicator('hidden'), disabled(isDisabled)]}>
+          <SwiftMenu label={<RNHostView matchContents>{trigger}</RNHostView>} modifiers={[menuStyle('button'), buttonStyle('plain'), menuIndicator('hidden'), menuOrder('fixed'), disabled(isDisabled)]}>
             <MenuContent items={items} title={title} />
           </SwiftMenu>
         </Host>

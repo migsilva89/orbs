@@ -1,7 +1,7 @@
 import { ConversationBusy, defineTask } from '@earendil-works/pi-durable';
 import { match, P } from 'ts-pattern';
 import { COLLABORATION } from './collaboration.constants';
-import { collaborationAnswer } from './collaboration.utils';
+import { collaborationAnswer, collaborationFailureNote } from './collaboration.utils';
 import type * as CollaborationTypes from '../../types/collaboration.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { Harness } from '@earendil-works/pi-durable';
@@ -29,9 +29,9 @@ export function collaborationDeliveryTask({ directory }: Pick<CollaborationTypes
           .with('ask', () => ({ status: 'terminal' as const, outcome: { status: 'completed' as const, result } }))
           .with('send', () => {
             const report = match(result)
-              .with({ status: 'answered' }, ({ text }) => text)
+              .with({ status: 'answered' }, ({ text }) => `[${input.recipientName} replied privately. Tell the user what matters in a short message; do not message ${input.recipientName} again about this.]\n\n${text}`)
               .with({ status: 'unanswered', reason: 'aborted' }, () => null)
-              .with({ status: 'unanswered' }, ({ reason }) => `Delivery failed: ${reason}`)
+              .with({ status: 'unanswered' }, ({ reason }) => collaborationFailureNote(input.recipientName, reason))
               .exhaustive();
 
             return { status: 'running' as const, checkpoint: { phase: 'report' as const, result, report } };
@@ -46,7 +46,7 @@ export function collaborationDeliveryTask({ directory }: Pick<CollaborationTypes
             const sender = await api.conversation(api.conversationId, context);
             await sender?.submit({
               type: 'input',
-              content: `[${task.input.recipientName} replied. No reply or further delegation is needed.]\n\n${answer}`,
+              content: answer,
               whenBusy: 'followUp',
               requestId: `openbots.reply:${task.input.requestId}`,
               entry: { kind: COLLABORATION.reply,

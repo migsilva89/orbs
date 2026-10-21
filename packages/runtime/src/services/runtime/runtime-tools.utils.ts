@@ -6,7 +6,7 @@ import type { RuntimeToolsDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { Conversation } from '@earendil-works/pi-durable';
 
-export function runtimeToolsExtension({ harness, readOnlyTools, permissions }: RuntimeToolsDeps) {
+export function runtimeToolsExtension({ harness, readOnlyTools, ownTools, permissions }: RuntimeToolsDeps) {
   return defineExtension({
     name: 'openbots.tools',
     hooks: [hook(ToolTask, {
@@ -26,6 +26,7 @@ export function runtimeToolsExtension({ harness, readOnlyTools, permissions }: R
               name: call.name,
               arguments: call.arguments,
               isReadOnly: tool !== undefined && readOnlyTools.includes(tool),
+              isOwn: tool !== undefined && ownTools.includes(tool),
               getRequest: () => runtimeToolsRequest(conversation, context),
             };
 

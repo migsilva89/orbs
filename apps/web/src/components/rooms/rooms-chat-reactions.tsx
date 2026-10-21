@@ -1,5 +1,4 @@
 import { m } from '@openbots/i18n/client';
-import { cn } from '@/lib/cn';
 import type { RoomsReactionGroup } from '@openbots/client/client';
 
 interface RoomsChatReactionsProps {
@@ -15,10 +14,7 @@ export function RoomsChatReactions({ groups, disabled = false, onToggle }: Rooms
         <button
           aria-label={m.rooms_reaction_chip({ emoji: group.emoji, names: group.names.join(', ') })}
           aria-pressed={group.isMine}
-          className={cn(
-            'flex h-7 min-w-7 items-center justify-center gap-0.5 rounded-full border bg-background px-1.5 text-xs shadow-xs transition-colors enabled:hover:bg-accent disabled:cursor-default',
-            group.isMine && 'border-blue-500/40 bg-blue-500/15',
-          )}
+          className="flex h-5.5 min-w-5.5 items-center justify-center gap-0.5 rounded-full bg-background px-1 text-xxs shadow-xs ring-2 ring-background transition-colors enabled:hover:bg-accent disabled:cursor-default"
           disabled={disabled || !onToggle}
           key={group.emoji}
           title={group.names.join(', ')}

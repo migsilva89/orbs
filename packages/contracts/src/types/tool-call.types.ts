@@ -43,6 +43,8 @@ export const toolCallSubagent = z.object({
 
 export const toolCallSubagentDetails = z.object({ conversationId: z.number().int().positive() });
 
+export const toolCallPeerDetails = z.object({ recipientId: z.uuid(), recipientConversationId: z.number().int().positive() });
+
 export type ToolCallJson = z.infer<typeof toolCallJson>;
 export type ToolCallJsonValue = ToolCallJson[string];
 export type ToolCallArtifact = z.infer<typeof toolCallArtifact>;

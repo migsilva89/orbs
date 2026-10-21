@@ -1,0 +1,147 @@
+import { botBubble, CHAT, chatPairMessages, roomsTimeLabel } from '@openbots/client/client';
+import { chatViewOptions, useChatPendingSync, useChatRoom } from '@openbots/client/react';
+import { getLocale, m } from '@openbots/i18n/client';
+import { useQuery } from '@tanstack/react-query';
+import { View } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { match, P } from 'ts-pattern';
+import { MessageList } from '@/components/ui/message-list';
+import { Screen } from '@/components/ui/screen';
+import { Text } from '@/components/ui/text';
+import { useConnection } from '@/hooks/use-connection';
+import { ChatMessage } from './chat-message';
+import { ChatPairHeader } from './chat-pair-header';
+import { ChatRuns } from './chat-runs';
+import type { RpcSession } from '@/types/rpc.types';
+import type { Bot, ConversationView } from '@openbots/contracts/universal';
+
+interface ChatPairProps {
+  botId: string;
+  peerId: string;
+  conversationId: number;
+}
+
+export function ChatPair(props: ChatPairProps) {
+  const { session } = useConnection();
+
+  return match(session)
+    .with(P.nonNullable, (current) => <ChatPairContent {...props} session={current} />)
+    .otherwise(() => null);
+}
+
+interface ChatPairContentProps extends ChatPairProps {
+  session: RpcSession;
+}
+
+function ChatPairContent({ session, botId, peerId, conversationId }: ChatPairContentProps) {
+  const bots = useQuery(session.rpc.bots.list.queryOptions());
+  const view = useQuery(chatViewOptions(session, { botId: peerId, conversationId }));
+
+  return (
+    <Screen padding="none" scroll={false}>
+      {match({
+        asker: bots.data?.find((item) => item.id === botId),
+        peer: bots.data?.find((item) => item.id === peerId),
+        view: view.data,
+        isError: bots.isError || view.isError,
+      })
+        .with({
+          asker: P.nonNullable,
+          peer: P.nonNullable,
+          view: P.nonNullable,
+        }, (ready) => (
+          <ChatPairView
+            asker={ready.asker}
+            bots={bots.data ?? []}
+            peer={ready.peer}
+            session={session}
+            view={ready.view}
+          />
+        ))
+        .otherwise(({ isError }) => (
+          <View className="flex-1 items-center justify-center">
+            <Text tone={isError ? 'destructive' : 'muted'}>{isError ? m.mobile_chat_error_title() : m.mobile_chat_loading()}</Text>
+          </View>
+        ))}
+    </Screen>
+  );
+}
+
+interface ChatPairViewProps {
+  session: RpcSession;
+  asker: Bot;
+  peer: Bot;
+  bots: Bot[];
+  view: ConversationView;
+}
+
+function ChatPairView({ session, asker, peer, bots, view }: ChatPairViewProps) {
+  const insets = useSafeAreaInsets();
+  const bottomInset = useSharedValue(insets.bottom);
+
+  const room = useChatRoom({
+    bot: peer,
+    bots,
+    view,
+    outgoing: [],
+  });
+
+  const messages = chatPairMessages(room.messages, asker.id);
+  const now = new Date();
+  useChatPendingSync();
+
+  return (
+    <View className="flex-1">
+      <MessageList
+        composerInset={bottomInset}
+        data={messages}
+        footer={(
+          <ChatRuns
+            activity={room.activity}
+            approvals={room.approvals}
+            bot={peer}
+            draft={messages.find((message) => message.id === CHAT.liveMessageId)}
+            failure={room.failure}
+            questions={room.questions}
+          />
+        )}
+        keyExtractor={(message) => message.id}
+        renderItem={(message) => {
+          const index = messages.indexOf(message);
+          const previous = index > 0 ? messages[index - 1] : undefined;
+
+          return (
+            <ChatMessage
+              bot={peer}
+              bots={bots}
+              bubble={botBubble(peer)}
+              isCollapsible={index < messages.length - 1}
+              isLive={message.id === CHAT.liveMessageId}
+              isSending={false}
+              message={message}
+              reactions={[]}
+              session={session}
+              time={message.metadata
+                ? roomsTimeLabel({
+                  createdAt: message.metadata.createdAt,
+                  previous: previous?.metadata?.createdAt,
+                  now,
+                  locale: getLocale(),
+                })
+                : undefined}
+              onLongPress={() => undefined}
+              onReact={() => undefined}
+            />
+          );
+        }}
+        onStartReached={() => {
+          if (room.older.isEnabled && !room.older.isLoading) {
+            room.older.onLoad();
+          }
+        }}
+      />
+      <ChatPairHeader asker={asker} peer={peer} />
+    </View>
+  );
+}

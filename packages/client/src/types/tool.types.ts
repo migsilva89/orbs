@@ -9,6 +9,12 @@ export interface ToolSubagent extends ToolCallSubagent {
   conversationId?: number;
 }
 
+/** A bot this bot messaged, and the conversation the message landed in once known. */
+export interface ToolPeer {
+  peer: Bot;
+  conversationId: number | undefined;
+}
+
 type ToolMessagePart = ChatMessage['parts'][number];
 
 export type ToolTextPart = Extract<ToolMessagePart, { type: 'text' }>;
@@ -55,7 +61,7 @@ export interface ToolIdentity {
 
 export interface ToolBlocksParams {
   parts: ChatMessage['parts'];
-  /** Drops tool calls and thinking, as the owner's hide-verbose setting asks. */
+  /** Drops thinking and tool calls, as the owner's hide-verbose setting asks; messages to other bots stay. */
   hideVerbose?: boolean;
 }
 

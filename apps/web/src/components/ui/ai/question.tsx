@@ -1,6 +1,9 @@
+import { cva } from 'cva';
+import { buttonGlossyEffects } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 import IconLucideCheck from '~icons/lucide/check';
 import IconLucidePencil from '~icons/lucide/pencil';
+import type { VariantProps } from 'cva';
 import type { ComponentProps, ReactNode } from 'react';
 
 export function Question({ className, ...props }: ComponentProps<'section'>) {
@@ -31,7 +34,20 @@ const questionList = 'flex min-w-0 flex-col divide-y overflow-hidden rounded-lg 
 
 const questionRow = 'flex w-full min-w-0 items-center gap-3 px-3 py-2.5 text-left text-sm';
 
-const questionBadge = 'flex-center size-6 shrink-0 rounded-md border text-xs font-medium text-muted-foreground tabular-nums';
+const questionBadge = 'flex-center size-6 shrink-0 rounded-md text-xs font-medium tabular-nums';
+
+const questionBadgeTones = cva({
+  base: [questionBadge, ...buttonGlossyEffects, 'relative'],
+  variants: {
+    tone: {
+      default: 'bg-primary text-primary-foreground shadow-[0_1px_2px_0_rgba(14,18,27,0.24),0_0_0_1px_var(--color-primary)]',
+      success: 'bg-success text-white shadow-[0_1px_2px_0_rgba(14,18,27,0.24),0_0_0_1px_var(--color-success)]',
+      info: 'bg-blue-500 text-white shadow-[0_1px_2px_0_rgba(14,18,27,0.24),0_0_0_1px_var(--color-blue-500)]',
+      muted: 'bg-zinc-500 text-white shadow-[0_1px_2px_0_rgba(14,18,27,0.24),0_0_0_1px_var(--color-zinc-500)]',
+    },
+  },
+  defaultVariants: { tone: 'default' },
+});
 
 export function QuestionOptions({ className, ...props }: ComponentProps<'fieldset'>) {
   return <fieldset className={cn(questionList, className)} data-slot="question-options" {...props} />;
@@ -75,7 +91,7 @@ export function QuestionDetail({ label, children }: { label: string; children: R
 
 const questionFirstLetter = 65;
 
-export function QuestionOption({ index, className, children, ...props }: ComponentProps<'button'> & { index: number }) {
+export function QuestionOption({ index, tone, className, children, ...props }: ComponentProps<'button'> & VariantProps<typeof questionBadgeTones> & { index: number }) {
   return (
     <button
       className={cn(
@@ -91,12 +107,7 @@ export function QuestionOption({ index, className, children, ...props }: Compone
     >
       <span
         aria-hidden="true"
-        className={cn(
-          questionBadge,
-          'transition-colors duration-100',
-          'group-aria-checked/option:border-primary group-aria-checked/option:bg-primary group-aria-checked/option:text-primary-foreground',
-          'group-aria-pressed/option:border-primary group-aria-pressed/option:bg-primary group-aria-pressed/option:text-primary-foreground',
-        )}
+        className={cn(questionBadgeTones({ tone }), 'transition-colors duration-100')}
       >
         {String.fromCodePoint(questionFirstLetter + index)}
       </span>

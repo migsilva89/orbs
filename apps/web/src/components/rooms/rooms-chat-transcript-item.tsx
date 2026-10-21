@@ -10,33 +10,40 @@ import type { Bot } from '@openbots/contracts/universal';
 interface RoomsChatTranscriptItemProps {
   message: ChatMessage
   bot: Bot
-  peer: Bot | undefined
   groups: RoomsReactionGroup[]
   time: string | undefined
   isFocused: boolean
   isLive: boolean
   isSending: boolean
+  isCollapsible: boolean
+  isReadOnly: boolean
   onReply: (message: ChatMessage) => void
 }
 
-export function RoomsChatTranscriptItem({ message, bot, peer, groups, time, isFocused, isLive, isSending, onReply }: RoomsChatTranscriptItemProps) {
+export function RoomsChatTranscriptItem({
+  message,
+  bot,
+  groups,
+  time,
+  isFocused,
+  isLive,
+  isSending,
+  isCollapsible,
+  isReadOnly,
+  onReply,
+}: RoomsChatTranscriptItemProps) {
   return (
     <MessageScrollerItem className={isSending ? 'opacity-60' : undefined} variant={isFocused ? 'highlight' : 'default'}>
       {time ? <p className="my-3 zoom-[0.8] text-center text-xs text-muted-foreground">{time}</p> : null}
       {match(message.role)
-        .with('system', () => (
-          <RoomsChatNotice
-            bot={bot}
-            message={message}
-            peer={peer}
-          />
-        ))
+        .with('system', () => <RoomsChatNotice bot={bot} message={message} />)
         .with('assistant', () => (
           <RoomsChatReply
             bot={bot}
             botId={bot.id}
             groups={groups}
-            hasActions={!isLive}
+            hasActions={!isLive && !isReadOnly}
+            isCollapsible={isCollapsible}
             live={isLive}
             message={message}
             name={message.metadata?.authorName ?? bot.name}
@@ -46,7 +53,8 @@ export function RoomsChatTranscriptItem({ message, bot, peer, groups, time, isFo
         .otherwise(() => (
           <RoomsChatMessage
             botId={bot.id}
-            hasActions={!isSending}
+            hasActions={!isSending && !isReadOnly}
+            isCollapsible={isCollapsible}
             message={message}
             name={message.metadata?.authorName ?? ''}
             reactions={groups.length > 0 ? <RoomsChatReactions groups={groups} /> : undefined}

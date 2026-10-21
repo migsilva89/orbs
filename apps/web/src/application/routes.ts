@@ -9,6 +9,7 @@ export const routes = rootRoute('root.tsx', [
       index('rooms/rooms.index.tsx'),
       route('/direct/$handle', 'rooms/rooms.direct.$handle.tsx', [
         route('/reset', 'rooms/rooms.direct.$handle.reset.tsx'),
+        route('/with/$peer/$conversationId', 'rooms/rooms.direct.$handle.with.$peer.tsx'),
         route('/todos/$todoId/delete', 'rooms/rooms.direct.$handle.todos.$todoId.delete.tsx'),
       ]),
     ]),

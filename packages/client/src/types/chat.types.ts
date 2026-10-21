@@ -2,6 +2,9 @@ import type { RoomsReactionGroup } from './rooms.types';
 import type * as UniversalTypes from '@openbots/contracts/universal';
 import type { UIMessage } from 'ai';
 
+/** How the owner answers a tool approval; `always` also approves the tool for this bot from now on. */
+export type ChatApprovalDecision = 'approve' | 'always' | 'deny';
+
 export type ChatActivity = 'idle' | 'queued' | 'thinking' | 'working' | 'writing' | 'compacting' | 'failed';
 
 export interface ChatUsage {
@@ -32,7 +35,6 @@ export interface ChatMetadata {
 }
 
 interface ChatDataPartShapes {
-  pair: { kind: 'ask' | 'reply' | 'failed'; peerId: string };
   subagent: UniversalTypes.EntrySubagentReport;
   compaction: { status: 'done' };
   reset: Record<string, never>;

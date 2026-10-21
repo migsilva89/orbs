@@ -27,7 +27,15 @@ export const toolApproval = z.object({
 });
 
 export const toolApprovalList = z.array(toolApproval);
-export const toolAnswer = toolPending.extend({ id: z.number().int().positive(), approved: z.boolean() });
+
+export const toolAlwaysAllowed = z.array(z.string().min(1).max(200)).max(200);
+
+export const toolAnswer = toolPending.extend({
+  id: z.number().int().positive(),
+  approved: z.boolean(),
+  always: z.boolean().optional(),
+});
+
 export const toolAnswerResult = z.object({ accepted: z.boolean() });
 
 export const toolSettingsForm = z.object({

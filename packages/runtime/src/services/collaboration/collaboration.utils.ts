@@ -24,3 +24,7 @@ export async function collaborationAnswer(tx: Tx, answerId: EntryId) {
       .otherwise(() => [])))
     .otherwise(() => [])).join('\n');
 }
+
+export function collaborationFailureNote(recipientName: string, reason: string) {
+  return `[Your message to ${recipientName} failed: ${reason}] Tell the user in one short sentence that you could not reach ${recipientName} and will try again, then send it once more. If it already failed twice, tell the user and stop.`;
+}

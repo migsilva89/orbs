@@ -1,4 +1,4 @@
-import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entryPeerReply, entrySubagentReport, REACTION, reactionMessage, REPLY, replyMessage, toolCallJson } from '@openbots/contracts/universal';
+import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entrySubagentReport, REACTION, reactionMessage, REPLY, replyMessage, toolCallJson } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { match, P } from 'ts-pattern';
 import { mentionSubmission } from '../mention/mention.client';
@@ -59,16 +59,12 @@ export function chatMessages({ entries, bot, bots }: ChatTypes.ChatMessagesParam
       .with(ENTRY.assistant, () => chatAssistantEntry(messages, entry, bot, createdAt))
       .with(ENTRY.toolResult, () => chatToolResult(messages, entry))
       .with(ENTRY.peerMessage, () => match(entryPeerMessage.safeParse(entry.data))
-        .with({ success: true }, ({ data }) => messages.push(chatSystemMessage(entry, createdAt, botsById.get(data.fromBotId), [
-          { type: 'data-pair', data: { kind: 'ask', peerId: data.fromBotId } },
-          { type: 'text', text: chatPeerText(chatEntryText(entry)), state: 'done' },
-        ])))
-        .otherwise(() => undefined))
-      .with(ENTRY.peerReply, () => match(entryPeerReply.safeParse(entry.data))
-        .with({ success: true }, ({ data }) => messages.push(chatSystemMessage(entry, createdAt, botsById.get(data.fromBotId), [
-          { type: 'data-pair', data: { kind: data.result.status === 'answered' ? 'reply' : 'failed', peerId: data.fromBotId } },
-          { type: 'text', text: chatPeerText(chatEntryText(entry)), state: 'done' },
-        ])))
+        .with({ success: true }, ({ data }) => messages.push({
+          id: chatMessageId(entry),
+          role: 'user',
+          metadata: chatMetadata(entry.id, createdAt, data.fromBotId, botsById.get(data.fromBotId)?.name ?? ''),
+          parts: [{ type: 'text', text: chatPeerText(chatEntryText(entry)), state: 'done' }],
+        }))
         .otherwise(() => undefined))
       .with(ENTRY.subagentReport, () => match(entrySubagentReport.safeParse(entry.data))
         .with({ success: true }, ({ data }) => messages.push(chatSystemMessage(entry, createdAt, bot, [
@@ -82,6 +78,19 @@ export function chatMessages({ entries, bot, bots }: ChatTypes.ChatMessagesParam
   }
 
   return messages;
+}
+
+/** Only the exchange between two bots: the asker's messages and the replies that follow each one, without the owner's own chat. */
+export function chatPairMessages(messages: ChatTypes.ChatMessage[], askerId: string): ChatTypes.ChatMessage[] {
+  let isPair = false;
+
+  return messages.filter((message) => {
+    if (message.role === 'user') {
+      isPair = message.metadata?.authorId === askerId;
+    }
+
+    return isPair;
+  });
 }
 
 export function chatLive({ state, bot, approvals }: ChatTypes.ChatLiveParams, messages: ChatTypes.ChatMessage[]): ChatTypes.ChatMessage[] {

@@ -9,6 +9,7 @@ import { Message, MessageBubble, MessageQuote } from '@/components/ui/message';
 import { Text } from '@/components/ui/text';
 import { chatMessageSegments } from '@/services/chat/chat.utils';
 import { ChatArtifact } from './chat-artifact';
+import { ChatFailure } from './chat-failure';
 import { ChatFiles } from './chat-files';
 import { ChatHtml } from './chat-html';
 import { ChatNotice } from './chat-notice';
@@ -26,6 +27,7 @@ interface ChatMessageProps {
   bot: Bot;
   bots: Bot[];
   bubble?: BotBubble;
+  isCollapsible?: boolean;
   time?: string;
   reactions: RoomsReactionGroup[];
   isLive: boolean;
@@ -42,6 +44,7 @@ export function ChatMessage({
   bot,
   bots,
   bubble,
+  isCollapsible = false,
   time,
   reactions,
   isLive,
@@ -75,11 +78,7 @@ export function ChatMessage({
     return (
       <>
         {timeLabel}
-        <ChatNotice
-          bot={bot}
-          message={message}
-          peer={bots.find((item) => item.id === message.metadata?.authorId)}
-        />
+        <ChatNotice bot={bot} message={message} />
       </>
     );
   }
@@ -104,6 +103,8 @@ export function ChatMessage({
           bubble={bubble}
           from={from}
           key={text.key}
+          readLessLabel={m.rooms_chat_read_less()}
+          readMoreLabel={isCollapsible ? m.rooms_chat_read_more() : undefined}
         >
           {text === firstText && reply ? <MessageQuote>{m.rooms_chat_reply_quote({ name: reply.authorName, text: reply.text })}</MessageQuote> : null}
           <Markdown isStreaming={text.isStreaming} onLinkPress={openLink}>{mentionMarkdown({ text: text.text, bots })}</Markdown>
@@ -134,14 +135,11 @@ export function ChatMessage({
         />
       ))
       .with({ kind: 'failure' }, (failure) => (
-        <Text
-          className="mx-4"
+        <ChatFailure
+          botName={bot.name}
+          detail={failure.text}
           key={failure.key}
-          tone="destructive"
-          variant="small"
-        >
-          {failure.text}
-        </Text>
+        />
       ))
       .exhaustive();
   }
@@ -155,6 +153,7 @@ export function ChatMessage({
             bots={bots}
             key={tools.key}
             parts={tools.parts}
+            senderId={bot.id}
           />
         ))
         .with({ kind: 'bubbles' }, (bubbles) => (

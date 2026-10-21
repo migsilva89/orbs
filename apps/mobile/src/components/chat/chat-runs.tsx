@@ -1,13 +1,11 @@
 import { BOT_ACTIVITY_LABELS, toolRunning } from '@openbots/client/client';
 import { useChatHideVerbose } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
-import { Bot as BotIcon } from 'lucide-react-native';
 import { View } from 'react-native';
-import { Avatar } from '@/components/ui/avatar';
-import { Text } from '@/components/ui/text';
-import { TraceRow } from '@/components/ui/trace';
 import { ChatApproval } from './chat-approval';
+import { ChatFailure } from './chat-failure';
 import { ChatQuestion } from './chat-question';
+import { ChatTyping } from './chat-typing';
 import type { ChatActivity, ChatMessage } from '@openbots/client/client';
 import type { Bot, ConversationQuestion, ToolApproval } from '@openbots/contracts/universal';
 
@@ -31,16 +29,10 @@ export function ChatRuns({ bot, activity, failure, draft, approvals, questions }
 
   const isActive = activity !== 'idle' && activity !== 'failed' && !isSpeaking;
 
-  const avatar = (
-    <Avatar
-      avatar={bot.avatar}
-      name={bot.name}
-      size="xs"
-    />
-  );
+  const label = isWaiting ? m.rooms_chat_waiting({ bot: bot.name }) : BOT_ACTIVITY_LABELS[activity]();
 
   return (
-    <View className="pb-2">
+    <View>
       {questions.map((question) => (
         <ChatQuestion
           key={question.id}
@@ -54,25 +46,10 @@ export function ChatRuns({ bot, activity, failure, draft, approvals, questions }
           key={approval.id}
         />
       ))}
-      {failure ? (
-        <Text
-          className="mx-5 my-2"
-          tone="destructive"
-          variant="small"
-        >
-          {`${m.rooms_chat_failed({ bot: bot.name })} ${failure}`}
-        </Text>
-      ) : null}
-      {isActive ? (
-        <View className="px-3">
-          <TraceRow
-            avatar={avatar}
-            icon={BotIcon}
-            status="running"
-            title={isWaiting ? m.rooms_chat_waiting({ bot: bot.name }) : m.avatars_bot_label({ bot: bot.name, activity: BOT_ACTIVITY_LABELS[activity]() })}
-          />
-        </View>
-      ) : null}
+      {failure ? <ChatFailure botName={bot.name} detail={failure} /> : null}
+      <View className="h-7 justify-center">
+        {isActive ? <ChatTyping accessibilityLabel={label} label={activity === 'thinking' ? undefined : label} /> : null}
+      </View>
     </View>
   );
 }

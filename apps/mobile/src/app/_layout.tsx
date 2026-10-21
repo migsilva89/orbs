@@ -43,6 +43,7 @@ function RootLayoutStack() {
       <Stack.Protected guard={isConnected}>
         <Stack.Screen name="index" />
         <Stack.Screen name="chat/[botId]/index" />
+        <Stack.Screen name="chat/[botId]/with/[peerId]/index" />
         <Stack.Screen name="chat/[botId]/message" options={SHEET_FIT} />
         <Stack.Screen name="chat/[botId]/react" options={{ ...SHEET, sheetAllowedDetents: [0.6, 1] }} />
         <Stack.Screen name="chat/[botId]/text" options={{ ...SHEET, sheetAllowedDetents: [0.9] }} />

@@ -1,7 +1,7 @@
 import { useKeyboardChatComposerInset } from '@legendapp/list/keyboard';
 import { botBubble, CHAT, roomsMessageText, roomsReactionGroups, roomsTimeLabel } from '@openbots/client/client';
 import { useChatUnread } from '@openbots/client/native';
-import { chatViewOptions, useChatReaction, useChatRoom } from '@openbots/client/react';
+import { chatViewOptions, useChatPendingSync, useChatReaction, useChatRoom } from '@openbots/client/react';
 import { getLocale, m } from '@openbots/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -134,6 +134,7 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
   const replyTo = messages.find((message) => replyToEntryId !== undefined && message.metadata?.entryId === replyToEntryId) ?? null;
 
   const reaction = useChatReaction(bot.id);
+  useChatPendingSync();
   const groups = (message: ChatMessageItem) => roomsReactionGroups({ reaction: room.reactions.get(message.metadata?.entryId ?? 0), bots });
   const unread = useChatUnread(bot.id, list, messages);
   const now = new Date();
@@ -165,6 +166,7 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
             bot={bot}
             bots={bots}
             bubble={bubble}
+            isCollapsible={messages.indexOf(message) < messages.length - 1}
             isLive={message.id === CHAT.liveMessageId}
             isSending={message.id.startsWith(CHAT.outgoingPrefix)}
             message={message}

@@ -44,15 +44,16 @@ export function RoomsChatRuns({ bot, activity, failure, draft, approvals, questi
           <RoomsChatFailure botName={bot.name} detail={failure} />
         </div>
       ) : null}
-      {activity === 'idle' || activity === 'failed' ? null : (
-        <RoomsChatActivity
-          activity={activity}
-          bot={bot}
-          botName={bot.name}
-          draft={draft}
-          waiting={activity === 'queued'}
-        />
-      )}
+      <div className="flex h-8 items-center">
+        {activity === 'idle' || activity === 'failed' ? null : (
+          <RoomsChatActivity
+            activity={activity}
+            botName={bot.name}
+            draft={draft}
+            waiting={activity === 'queued'}
+          />
+        )}
+      </div>
     </MessageScrollerItem>
   );
 }

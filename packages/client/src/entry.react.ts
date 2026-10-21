@@ -8,6 +8,7 @@ export * from './hooks/use-chat-defaults';
 export * from './hooks/use-chat-hide-verbose';
 export * from './hooks/use-chat-list-sync';
 export * from './hooks/use-chat-message-reaction';
+export * from './hooks/use-chat-pending-sync';
 export * from './hooks/use-chat-question';
 export * from './hooks/use-chat-queue';
 export * from './hooks/use-chat-reaction';

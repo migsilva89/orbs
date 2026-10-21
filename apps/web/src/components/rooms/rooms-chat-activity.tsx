@@ -1,19 +1,16 @@
 import { BOT_ACTIVITY_LABELS, toolRunning } from '@openbots/client/client';
 import { useChatHideVerbose } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
-import { BotAvatar } from '@/components/bots/bot-avatar';
 import type { ChatActivity, ChatMessage } from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
 
 interface RoomsChatActivityProps {
   botName: string
-  bot?: Bot
   activity: ChatActivity
   draft?: ChatMessage
   waiting: boolean
 }
 
-export function RoomsChatActivity({ botName, bot, activity, draft, waiting }: RoomsChatActivityProps) {
+export function RoomsChatActivity({ botName, activity, draft, waiting }: RoomsChatActivityProps) {
   const { hideVerbose } = useChatHideVerbose();
   const last = draft?.parts.filter((part) => part.type !== 'step-start').at(-1);
   const textSpeaks = activity === 'writing' && last?.type === 'text' && last.state === 'streaming';
@@ -24,14 +21,16 @@ export function RoomsChatActivity({ botName, bot, activity, draft, waiting }: Ro
     return null;
   }
 
+  const label = waiting ? m.rooms_chat_waiting({ bot: botName }) : BOT_ACTIVITY_LABELS[activity]();
+
   return (
-    <div className="flex items-center gap-2 py-2 text-xs text-muted-foreground">
-      <BotAvatar
-        activity={activity}
-        bot={bot ?? { name: botName }}
-        size={24}
-      />
-      {waiting ? m.rooms_chat_waiting({ bot: botName }) : m.avatars_bot_label({ bot: botName, activity: BOT_ACTIVITY_LABELS[activity]() })}
-    </div>
+    <output aria-label={label} className="flex items-center gap-3">
+      <span aria-hidden className="flex h-7 items-center gap-1 rounded-full bg-secondary px-3">
+        <span className="size-1.5 animate-typing-dot rounded-full bg-muted-foreground motion-reduce:animate-none" />
+        <span className="size-1.5 animate-typing-dot-2 rounded-full bg-muted-foreground motion-reduce:animate-none" />
+        <span className="size-1.5 animate-typing-dot-3 rounded-full bg-muted-foreground motion-reduce:animate-none" />
+      </span>
+      {activity === 'thinking' ? null : <span aria-hidden className="shimmer truncate text-sm text-muted-foreground motion-reduce:shimmer-none">{label}</span>}
+    </output>
   );
 }

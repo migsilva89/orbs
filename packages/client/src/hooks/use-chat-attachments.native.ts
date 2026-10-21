@@ -18,14 +18,7 @@ export function useChatAttachmentsNative({ botId, onProblem }: ChatAttachmentsPl
     onProblem,
   });
 
-  const pickPhotos = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsMultipleSelection: true,
-      selectionLimit: files.remaining,
-      preferredAssetRepresentationMode: ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible,
-    });
-
+  const addPhotos = (result: ImagePicker.ImagePickerResult) => {
     if (!result.canceled) {
       files.add(result.assets.map((asset) => {
         const name = asset.fileName ?? asset.uri.split('/').at(-1) ?? '';
@@ -40,6 +33,15 @@ export function useChatAttachmentsNative({ botId, onProblem }: ChatAttachmentsPl
     }
   };
 
+  const pickPhotos = async () => addPhotos(await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ['images'],
+    allowsMultipleSelection: true,
+    selectionLimit: files.remaining,
+    preferredAssetRepresentationMode: ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible,
+  }));
+
+  const takePhoto = async () => addPhotos(await ImagePicker.launchCameraAsync({ mediaTypes: ['images'] }));
+
   const pickFiles = async () => {
     const result = await DocumentPicker.getDocumentAsync({ type: [...ATTACHMENT.mediaTypes], multiple: true });
 
@@ -53,7 +55,7 @@ export function useChatAttachmentsNative({ botId, onProblem }: ChatAttachmentsPl
     }
   };
 
-  return { ...files, pickPhotos, pickFiles };
+  return { ...files, pickPhotos, takePhoto, pickFiles };
 }
 
 function readPicked({ uri, name }: ChatPicked): Promise<File> {

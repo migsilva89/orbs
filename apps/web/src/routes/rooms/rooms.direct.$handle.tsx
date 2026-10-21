@@ -1,5 +1,5 @@
 import { chatInitialViewOptions } from '@openbots/client/react';
-import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { createFileRoute, Outlet, useMatch } from '@tanstack/react-router';
 import { RoomsPage } from '@/components/rooms/rooms-page';
 import { roomsDirectBot } from '@/services/rooms/rooms.client';
 import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
@@ -17,9 +17,12 @@ export const Route = createFileRoute('/_chat/rooms/direct/$handle')({
 });
 
 function DirectRoomRoute() {
+  const { botId } = Route.useLoaderData();
+  const pair = useMatch({ from: '/_chat/rooms/direct/$handle/with/$peer/$conversationId', shouldThrow: false });
+
   return (
     <>
-      <RoomsPage botId={Route.useLoaderData().botId} />
+      {pair ? null : <RoomsPage botId={botId} />}
       <Outlet />
     </>
   );

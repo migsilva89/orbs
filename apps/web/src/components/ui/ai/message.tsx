@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { cn } from '@/lib/cn';
 import type { UIMessage } from 'ai';
-import type { HTMLAttributes } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 
 export type MessageProps = HTMLAttributes<HTMLDivElement> & {
   from: UIMessage['role']
@@ -40,5 +41,48 @@ export function MessageContent({ children, className, ...props }: HTMLAttributes
         {children}
       </div>
     </div>
+  );
+}
+
+const MESSAGE_CLAMP_HEIGHT = 320;
+
+const MESSAGE_CLAMP_FADE = 'linear-gradient(to bottom, black calc(100% - 1.75rem), transparent)';
+
+/** Caps a long bubble at a fixed height, fading its last lines, with a toggle that shows the rest. */
+export function MessageClamp({ expandLabel, collapseLabel, children }: { expandLabel: string, collapseLabel: string, children: ReactNode }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLong, setIsLong] = useState(false);
+  const isFaded = isLong && !isOpen;
+
+  const measure = (content: HTMLDivElement | null) => {
+    if (!content) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => setIsLong(content.offsetHeight > MESSAGE_CLAMP_HEIGHT));
+    observer.observe(content);
+
+    return () => observer.disconnect();
+  };
+
+  return (
+    <>
+      <div
+        className={cn(!isOpen && 'overflow-hidden')}
+        style={isOpen ? undefined : { maxHeight: MESSAGE_CLAMP_HEIGHT, maskImage: isFaded ? MESSAGE_CLAMP_FADE : undefined }}
+      >
+        <div className="flex flex-col gap-2" ref={measure}>{children}</div>
+      </div>
+      {isLong ? (
+        <button
+          aria-expanded={isOpen}
+          className="self-start text-xs font-medium opacity-60 transition-opacity hover:opacity-100"
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? collapseLabel : expandLabel}
+        </button>
+      ) : null}
+    </>
   );
 }

@@ -32,7 +32,7 @@ export interface RuntimeToolPolicy {
   authorize(call: RuntimeToolCall, context: Context): Promise<RuntimeToolDecision>;
 }
 
-export interface RuntimeToolsDeps extends Pick<RuntimeServiceDeps, 'harness' | 'readOnlyTools'> {
+export interface RuntimeToolsDeps extends Pick<RuntimeServiceDeps, 'harness' | 'readOnlyTools' | 'ownTools'> {
   permissions: RuntimeToolPolicy;
 }
 
@@ -42,6 +42,7 @@ export interface RuntimeToolCall {
   name: string;
   arguments: ToolCall['arguments'];
   isReadOnly: boolean;
+  isOwn: boolean;
   getRequest: () => Promise<string>;
   approved?: boolean;
 }
@@ -58,6 +59,8 @@ export interface RuntimeSharedDeps extends RuntimeModelsDeps {
   permissions: RuntimeToolPolicy;
   extensions: PiDurableTypes.Extension[];
   readOnlyTools: PiDurableTypes.ToolRegistration[];
+  /** Openbots' own bot tools (messaging, todos, routines, artifacts…); they run without asking the owner. */
+  ownTools: PiDurableTypes.ToolRegistration[];
   directory: CollaborationDirectory;
 }
 
@@ -73,6 +76,7 @@ export interface RuntimeServiceDeps extends RuntimeModelsDeps {
   index: ConversationIndexService;
   registry: PiDurableTypes.Registry;
   readOnlyTools: PiDurableTypes.ToolRegistration[];
+  ownTools: PiDurableTypes.ToolRegistration[];
   extensions: PiDurableTypes.Extension[];
 }
 

@@ -32,6 +32,7 @@ import { Route as botsBotsDotbotIdDotroutinesDotroutineIdDotdeleteRouteImport } 
 import { Route as botsBotsDotbotIdDotroutinesDotroutineIdDoteditRouteImport } from "./../routes/bots/bots.$botId.routines.$routineId.edit";
 import { Route as botsBotsDotbotIdDottodosDottodoIdDotdeleteRouteImport } from "./../routes/bots/bots.$botId.todos.$todoId.delete";
 import { Route as roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRouteImport } from "./../routes/rooms/rooms.direct.$handle.todos.$todoId.delete";
+import { Route as roomsRoomsDotdirectDothandleDotwithDotpeerRouteImport } from "./../routes/rooms/rooms.direct.$handle.with.$peer";
 
 const indexRoute = indexRouteImport.update({
   id: "/",
@@ -161,6 +162,12 @@ const roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute =
     path: "/todos/$todoId/delete",
     getParentRoute: () => roomsRoomsDotdirectDothandleRoute,
   } as any);
+const roomsRoomsDotdirectDothandleDotwithDotpeerRoute =
+  roomsRoomsDotdirectDothandleDotwithDotpeerRouteImport.update({
+    id: "/with/$peer/$conversationId",
+    path: "/with/$peer/$conversationId",
+    getParentRoute: () => roomsRoomsDotdirectDothandleRoute,
+  } as any);
 
 export interface FileRoutesByFullPath {
   "/": typeof indexRoute;
@@ -185,6 +192,7 @@ export interface FileRoutesByFullPath {
   "/bots/$botId/routines/$routineId/edit": typeof botsBotsDotbotIdDotroutinesDotroutineIdDoteditRoute;
   "/bots/$botId/todos/$todoId/delete": typeof botsBotsDotbotIdDottodosDottodoIdDotdeleteRoute;
   "/rooms/direct/$handle/todos/$todoId/delete": typeof roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute;
+  "/rooms/direct/$handle/with/$peer/$conversationId": typeof roomsRoomsDotdirectDothandleDotwithDotpeerRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof indexRoute;
@@ -207,6 +215,7 @@ export interface FileRoutesByTo {
   "/bots/$botId/routines/$routineId/edit": typeof botsBotsDotbotIdDotroutinesDotroutineIdDoteditRoute;
   "/bots/$botId/todos/$todoId/delete": typeof botsBotsDotbotIdDottodosDottodoIdDotdeleteRoute;
   "/rooms/direct/$handle/todos/$todoId/delete": typeof roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute;
+  "/rooms/direct/$handle/with/$peer/$conversationId": typeof roomsRoomsDotdirectDothandleDotwithDotpeerRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
@@ -233,6 +242,7 @@ export interface FileRoutesById {
   "/_chat/bots/$botId/routines/$routineId/edit": typeof botsBotsDotbotIdDotroutinesDotroutineIdDoteditRoute;
   "/_chat/bots/$botId/todos/$todoId/delete": typeof botsBotsDotbotIdDottodosDottodoIdDotdeleteRoute;
   "/_chat/rooms/direct/$handle/todos/$todoId/delete": typeof roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute;
+  "/_chat/rooms/direct/$handle/with/$peer/$conversationId": typeof roomsRoomsDotdirectDothandleDotwithDotpeerRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
@@ -258,7 +268,8 @@ export interface FileRouteTypes {
     | "/bots/$botId/routines/$routineId/delete"
     | "/bots/$botId/routines/$routineId/edit"
     | "/bots/$botId/todos/$todoId/delete"
-    | "/rooms/direct/$handle/todos/$todoId/delete";
+    | "/rooms/direct/$handle/todos/$todoId/delete"
+    | "/rooms/direct/$handle/with/$peer/$conversationId";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
@@ -280,7 +291,8 @@ export interface FileRouteTypes {
     | "/bots/$botId/routines/$routineId/delete"
     | "/bots/$botId/routines/$routineId/edit"
     | "/bots/$botId/todos/$todoId/delete"
-    | "/rooms/direct/$handle/todos/$todoId/delete";
+    | "/rooms/direct/$handle/todos/$todoId/delete"
+    | "/rooms/direct/$handle/with/$peer/$conversationId";
   id:
     | "__root__"
     | "/"
@@ -305,7 +317,8 @@ export interface FileRouteTypes {
     | "/_chat/bots/$botId/routines/$routineId/delete"
     | "/_chat/bots/$botId/routines/$routineId/edit"
     | "/_chat/bots/$botId/todos/$todoId/delete"
-    | "/_chat/rooms/direct/$handle/todos/$todoId/delete";
+    | "/_chat/rooms/direct/$handle/todos/$todoId/delete"
+    | "/_chat/rooms/direct/$handle/with/$peer/$conversationId";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
@@ -478,6 +491,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRouteImport;
       parentRoute: typeof roomsRoomsDotdirectDothandleRoute;
     };
+    "/_chat/rooms/direct/$handle/with/$peer/$conversationId": {
+      id: "/_chat/rooms/direct/$handle/with/$peer/$conversationId";
+      path: "/with/$peer/$conversationId";
+      fullPath: "/rooms/direct/$handle/with/$peer/$conversationId";
+      preLoaderRoute: typeof roomsRoomsDotdirectDothandleDotwithDotpeerRouteImport;
+      parentRoute: typeof roomsRoomsDotdirectDothandleRoute;
+    };
   }
 }
 
@@ -557,6 +577,7 @@ const settingsSettingsDotlayoutRouteWithChildren =
 interface roomsRoomsDotdirectDothandleRouteChildren {
   roomsRoomsDotdirectDothandleDotresetRoute: typeof roomsRoomsDotdirectDothandleDotresetRoute;
   roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute: typeof roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute;
+  roomsRoomsDotdirectDothandleDotwithDotpeerRoute: typeof roomsRoomsDotdirectDothandleDotwithDotpeerRoute;
 }
 
 const roomsRoomsDotdirectDothandleRouteChildren: roomsRoomsDotdirectDothandleRouteChildren =
@@ -565,6 +586,8 @@ const roomsRoomsDotdirectDothandleRouteChildren: roomsRoomsDotdirectDothandleRou
       roomsRoomsDotdirectDothandleDotresetRoute,
     roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute:
       roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute,
+    roomsRoomsDotdirectDothandleDotwithDotpeerRoute:
+      roomsRoomsDotdirectDothandleDotwithDotpeerRoute,
   };
 
 const roomsRoomsDotdirectDothandleRouteWithChildren =

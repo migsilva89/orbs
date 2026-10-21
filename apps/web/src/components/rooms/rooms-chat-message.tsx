@@ -7,11 +7,12 @@ import { Fragment, useState } from 'react';
 import { match } from 'ts-pattern';
 import { RoomsChatActions } from '@/components/rooms/rooms-chat-actions';
 import { RoomsChatArtifact } from '@/components/rooms/rooms-chat-artifact';
+import { RoomsChatFailure } from '@/components/rooms/rooms-chat-failure';
 import { RoomsChatFiles } from '@/components/rooms/rooms-chat-files';
 import { RoomsChatMention } from '@/components/rooms/rooms-chat-mention';
 import { RoomsChatSubagent } from '@/components/rooms/rooms-chat-subagent';
 import { RoomsChatTools } from '@/components/rooms/rooms-chat-tools';
-import { Message, MessageContent, MessageStack } from '@/components/ui/ai/message';
+import { Message, MessageClamp, MessageContent, MessageStack } from '@/components/ui/ai/message';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
 import { Response } from '@/components/ui/ai/response';
 import { useLongPress } from '@/hooks/use-long-press';
@@ -29,6 +30,7 @@ interface RoomsChatMessageProps {
   name: string
   bot?: ToolBot
   live?: boolean
+  isCollapsible?: boolean
   hasActions?: boolean
   reacting?: boolean
   reactions?: ReactTypes.ReactNode
@@ -42,6 +44,7 @@ export function RoomsChatMessage({
   name,
   bot,
   live = false,
+  isCollapsible = false,
   hasActions = false,
   reacting = false,
   reactions,
@@ -92,7 +95,7 @@ export function RoomsChatMessage({
     <div className="relative flex w-fit max-w-full items-center gap-2 group-data-[role=user]:flex-row-reverse has-[[data-message-wide]]:w-full">
       <div className="relative min-w-0 flex-1">
         {content}
-        {reactions ? <div className="absolute -top-3.5 -right-3 z-10 group-data-[role=user]:right-auto group-data-[role=user]:-left-3">{reactions}</div> : null}
+        {reactions ? <div className="absolute -top-3 -right-2.5 z-10 group-data-[role=user]:right-auto group-data-[role=user]:-left-2.5">{reactions}</div> : null}
       </div>
       <div className="pointer-fine:absolute pointer-fine:top-1/2 pointer-fine:-translate-y-1/2 group-data-[role=assistant]:pointer-fine:left-full group-data-[role=assistant]:pointer-fine:ml-2 group-data-[role=user]:pointer-fine:right-full group-data-[role=user]:pointer-fine:mr-2">
         {actions}
@@ -112,6 +115,7 @@ export function RoomsChatMessage({
           key={`${message.id}-${first.index}`}
           live={live}
           parts={first.parts}
+          senderId={botId}
         />
       );
     }
@@ -131,7 +135,11 @@ export function RoomsChatMessage({
                   <ReasoningContent>{reasoning.parts.map((part) => part.text).join('\n\n')}</ReasoningContent>
                 </Reasoning>
               ))
-              .with({ kind: 'failure' }, (failure) => <p className="px-4 text-xs text-destructive" role="alert">{failure.text}</p>)
+              .with({ kind: 'failure' }, (failure) => (
+                <div className="flex items-center gap-1 px-4">
+                  <RoomsChatFailure botName={name} detail={failure.text} />
+                </div>
+              ))
               .with({ kind: 'artifact' }, (artifact) => <RoomsChatArtifact artifact={artifact.artifact} />)
               .with({ kind: 'subagent' }, (subagent) => (
                 <RoomsChatSubagent
@@ -141,23 +149,35 @@ export function RoomsChatMessage({
                   subagent={subagent.subagent}
                 />
               ))
-              .with({ kind: 'text' }, (text) => (
-                <MessageContent data-quote-id={message.id}>
-                  {block === firstText && reply ? <span className="line-clamp-2 border-l-2 border-current/40 pl-2 text-xs opacity-80">{m.rooms_chat_reply_quote({ name: reply.authorName, text: reply.text })}</span> : null}
-                  {text.parts.map((part, index) => (
-                    <Response
-                      allowedTags={MENTION_ALLOWED_TAGS}
-                      components={mentionComponents}
-                      isAnimating={live ? part.state === 'streaming' : false}
-                      key={`${key}-${index}`}
-                      remarkPlugins={remarkPlugins}
-                      renderHtml={message.role === 'assistant'}
-                    >
-                      {part.text}
-                    </Response>
-                  ))}
-                </MessageContent>
-              ))
+              .with({ kind: 'text' }, (text) => {
+                const textContent = (
+                  <>
+                    {block === firstText && reply ? <span className="line-clamp-2 border-l-2 border-current/40 pl-2 text-xs opacity-80">{m.rooms_chat_reply_quote({ name: reply.authorName, text: reply.text })}</span> : null}
+                    {text.parts.map((part, index) => (
+                      <Response
+                        allowedTags={MENTION_ALLOWED_TAGS}
+                        components={mentionComponents}
+                        isAnimating={live ? part.state === 'streaming' : false}
+                        key={`${key}-${index}`}
+                        remarkPlugins={remarkPlugins}
+                        renderHtml={message.role === 'assistant'}
+                      >
+                        {part.text}
+                      </Response>
+                    ))}
+                  </>
+                );
+
+                return (
+                  <MessageContent data-quote-id={message.id}>
+                    {isCollapsible ? (
+                      <MessageClamp collapseLabel={m.rooms_chat_read_less()} expandLabel={m.rooms_chat_read_more()}>
+                        {textContent}
+                      </MessageClamp>
+                    ) : textContent}
+                  </MessageContent>
+                );
+              })
               .exhaustive();
 
             return (

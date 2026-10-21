@@ -69,17 +69,9 @@ export function chatMessageSegments(message: ChatMessage, hideVerbose: boolean):
   return segments;
 }
 
-export function chatNoticeTitle({ message, bot }: ChatTypes.ChatNoticeTitleParams): string {
+export function chatNoticeTitle(message: ChatMessage): string {
   const name = message.metadata?.authorName ?? '';
   const part = message.parts.at(0);
-
-  if (part?.type === 'data-pair') {
-    return match(part.data.kind)
-      .with('ask', () => m.rooms_pair_asked({ asker: name, bot: bot.name }))
-      .with('reply', () => m.rooms_pair_replied({ bot: name }))
-      .with('failed', () => m.rooms_pair_failed({ bot: name }))
-      .exhaustive();
-  }
 
   if (part?.type === 'data-subagent') {
     return part.data.status === 'answered' ? m.rooms_notice_subagent_answered({ name: part.data.name }) : m.rooms_notice_subagent_failed({ name: part.data.name });
@@ -91,3 +83,4 @@ export function chatNoticeTitle({ message, bot }: ChatTypes.ChatNoticeTitleParam
 
   return part?.type === 'data-reset' ? m.rooms_notice_reset() : name;
 }
+

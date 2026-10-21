@@ -1,20 +1,19 @@
 import { ROOMS } from '@openbots/client/client';
-import { chatNotificationsOptions } from '@openbots/client/react';
+import { useChatPendingSync } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
 import { useEffect, useEffectEvent, useRef } from 'react';
 import { match } from 'ts-pattern';
 import { roomsLink } from '@/services/rooms/rooms.client';
 import { rpc } from '@/services/rpc/rpc.client';
-import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
 import type { NotificationItem } from '@openbots/contracts/universal';
 
 export function useRoomsNotify() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const seen = useRef<Set<string> | null>(null);
-  const { data: notifications } = useQuery(chatNotificationsOptions(RPC_CONTEXT));
+  const notifications = useChatPendingSync();
 
   const show = useEffectEvent((item: NotificationItem) => {
     const chat = queryClient.getQueryData(rpc.conversation.list.queryKey())?.find((candidate) => candidate.botId === item.botId);
@@ -78,9 +77,6 @@ export function useRoomsNotify() {
     if (!notifications) {
       return;
     }
-
-    void queryClient.invalidateQueries({ queryKey: rpc.tools.pending.key() });
-    void queryClient.invalidateQueries({ queryKey: rpc.conversation.questions.key() });
 
     const items = [...notifications.pending, ...notifications.recent];
     const keys = items.map((item) => `${item.kind}:${item.botId}:${item.conversationId}:${item.taskId ?? 0}:${item.entryId ?? 0}`);

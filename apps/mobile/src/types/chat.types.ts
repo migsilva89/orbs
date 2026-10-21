@@ -1,5 +1,5 @@
 import type * as ClientTypes from '@openbots/client/client';
-import type { Bot, ToolCallArtifact } from '@openbots/contracts/universal';
+import type { ToolCallArtifact } from '@openbots/contracts/universal';
 
 type ChatSearchParams = Record<string, string | string[] | undefined>;
 
@@ -9,6 +9,12 @@ export interface ChatRouteParams extends ChatSearchParams {
   quote?: string;
   quoteEntryId?: string;
   prefill?: string;
+}
+
+export interface ChatPairRouteParams extends ChatSearchParams {
+  botId: string;
+  peerId: string;
+  conversationId: string;
 }
 
 export interface ChatReactionRouteParams extends ChatSearchParams {
@@ -42,8 +48,3 @@ export type ChatMessagePart =
 export type ChatMessageSegment =
   | { key: string; kind: 'bubbles'; parts: ChatMessagePart[] }
   | { key: string; kind: 'tools'; parts: ClientTypes.ToolPart[] };
-
-export interface ChatNoticeTitleParams {
-  message: ClientTypes.ChatMessage;
-  bot: Bot;
-}

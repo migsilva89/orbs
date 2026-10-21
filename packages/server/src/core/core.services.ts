@@ -110,6 +110,7 @@ export async function makeServices({
         settings,
         skill,
         attachments,
+        tools,
       }),
     };
   } catch (error) {

@@ -4,7 +4,7 @@ import { cn } from '@/lib/cn';
 import type { VariantProps } from 'cva';
 import type { ComponentProps } from 'react';
 
-const buttonGlossyEffects = [
+export const buttonGlossyEffects = [
   // Top highlight
   'before:pointer-events-none before:absolute before:inset-0 before:z-10 before:rounded-[inherit]',
   'before:bg-linear-to-b before:from-white/12 before:to-transparent before:p-px',

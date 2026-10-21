@@ -11,6 +11,14 @@ export interface ToolServiceDeps {
   settings: SettingsService;
 }
 
+export interface ToolAlwaysAllowedParams {
+  botId: string;
+}
+
+export interface ToolAllowAlwaysParams extends ToolAlwaysAllowedParams {
+  toolName: string;
+}
+
 export interface ToolAuthorizeParams extends RuntimeToolCall {
   context: Context;
 }

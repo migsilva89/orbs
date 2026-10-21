@@ -5,11 +5,12 @@ import { m } from '@openbots/i18n/client';
 import { useRouter } from 'expo-router';
 import { ArrowUp, Plus, Square } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActionSheetIOS, View } from 'react-native';
+import { View } from 'react-native';
 import { match } from 'ts-pattern';
 import { Button } from '@/components/ui/button';
 import { GlassButton } from '@/components/ui/glass-button';
 import { Icon } from '@/components/ui/icon';
+import { Menu } from '@/components/ui/menu';
 import { PromptAttachment, PromptAttachments, PromptDock, PromptDrawer, PromptJump, PromptQuote } from '@/components/ui/prompt-drawer';
 import { PromptField, PromptMention } from '@/components/ui/prompt-field';
 import { useToast } from '@/hooks/use-toast';
@@ -126,16 +127,6 @@ export function ChatComposer({
     setPicked((items) => [...items, item]);
   }
 
-  function attach() {
-    ActionSheetIOS.showActionSheetWithOptions({
-      options: [m.ui_cancel(), m.mobile_chat_attach_photos(), m.mobile_chat_attach_files()],
-      cancelButtonIndex: 0,
-    }, (index) => match(index)
-      .with(1, () => void files.pickPhotos())
-      .with(2, () => void files.pickFiles())
-      .otherwise(() => undefined));
-  }
-
   async function send() {
     const attachmentIds = files.readyIds;
     const replyToEntryId = replyTo?.metadata?.entryId;
@@ -230,13 +221,18 @@ export function ChatComposer({
 
   return (
     <PromptDock drawer={drawer} onLayout={onLayout}>
-      <GlassButton
-        accessibilityLabel={m.rooms_chat_attach()}
-        disabled={files.isFull}
-        onPress={attach}
+      <Menu
+        isDisabled={files.isFull}
+        items={[
+          { label: m.mobile_chat_attach_photos(), systemImage: 'photo', onSelect: () => void files.pickPhotos() },
+          { label: m.mobile_chat_attach_camera(), systemImage: 'camera', onSelect: () => void files.takePhoto() },
+          { label: m.mobile_chat_attach_files(), systemImage: 'folder', onSelect: () => void files.pickFiles() },
+        ]}
       >
-        <Icon icon={Plus} size="action" />
-      </GlassButton>
+        <GlassButton accessibilityLabel={m.rooms_chat_attach()} disabled={files.isFull}>
+          <Icon icon={Plus} size="action" />
+        </GlassButton>
+      </Menu>
       <View className="flex-1">
         <PromptField
           accessibilityLabel={m.rooms_chat_placeholder()}

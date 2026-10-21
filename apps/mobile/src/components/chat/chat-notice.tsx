@@ -9,20 +9,17 @@ import type { Bot } from '@openbots/contracts/universal';
 interface ChatNoticeProps {
   message: ChatMessage;
   bot: Bot;
-  peer?: Bot;
 }
 
-export function ChatNotice({ message, bot, peer }: ChatNoticeProps) {
+export function ChatNotice({ message, bot }: ChatNoticeProps) {
   const [open, setOpen] = useState(false);
   const text = roomsMessageText(message);
-  const who = peer ?? bot;
-
-  const title = chatNoticeTitle({ message, bot });
+  const title = chatNoticeTitle(message);
 
   const avatar = (
     <Avatar
-      avatar={who.avatar}
-      name={who.name}
+      avatar={bot.avatar}
+      name={bot.name}
       size="xs"
     />
   );

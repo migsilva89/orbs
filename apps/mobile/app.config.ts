@@ -42,7 +42,7 @@ export default (): ExpoConfig => ({
   plugins: [
     'expo-router',
     'expo-secure-store',
-    ['expo-image-picker', { photosPermission: m.mobile_photos_permission(), cameraPermission: false, microphonePermission: false }],
+    ['expo-image-picker', { photosPermission: m.mobile_photos_permission(), cameraPermission: m.mobile_camera_permission(), microphonePermission: false }],
     [
       'expo-font',
       {

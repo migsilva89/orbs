@@ -1,6 +1,7 @@
 export const TOOL = {
   jevCredential: 'typesafe.apiKey',
   approvalRulesSetting: 'tools.approvalRules',
+  alwaysAllowSettingPrefix: 'tools.alwaysAllow.',
   judgeTimeoutMs: 5000,
   judgeThreshold: 0.9,
   judgeAskThreshold: 0.1,

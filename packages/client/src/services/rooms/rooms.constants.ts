@@ -50,7 +50,9 @@ export const ROOMS_SEND_MODES = {
   interrupt: m.rooms_send_interrupt,
 } satisfies Record<ConversationWhenBusy, () => string>;
 
+/** Approval choices in order; `tone` tints the option's letter badge on web and mobile. */
 export const ROOMS_APPROVAL_CHOICES = [
-  { approved: true, label: m.rooms_chat_approval_once },
-  { approved: false, label: m.rooms_chat_approval_deny },
+  { decision: 'approve', label: m.rooms_chat_approval_approve, tone: 'success' },
+  { decision: 'always', label: m.rooms_chat_approval_always, tone: 'info' },
+  { decision: 'deny', label: m.rooms_chat_approval_deny, tone: 'muted' },
 ] as const;

@@ -38,12 +38,13 @@ export function ChatQuestion({ question }: ChatQuestionProps) {
       />
       {question.choices.length > 0 ? (
         <QuestionCardOptions>
-          {question.choices.map((choice) => {
+          {question.choices.map((choice, index) => {
             const { label, recommended } = roomsChoice({ choice });
 
             return (
               <QuestionCardOption
                 disabled={card.isAnswered}
+                index={index}
                 key={choice}
                 selected={card.picked.includes(choice)}
                 onPress={() => card.choose(choice)}

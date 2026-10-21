@@ -1,5 +1,6 @@
 import { match, P } from 'ts-pattern';
 import { toolActionJudge } from './tool-action.judge';
+import { toolQueryAlwaysAllowed } from './tool-query.always-allowed';
 import { toolQuerySettings } from './tool-query.settings';
 import type { ToolAuthorizeParams, ToolServiceDeps } from '../../types/tool.types';
 import type { RuntimeToolDecision } from '@openbots/runtime/server';
@@ -7,20 +8,25 @@ import type { RuntimeToolDecision } from '@openbots/runtime/server';
 export async function toolActionAuthorize(deps: ToolServiceDeps, call: ToolAuthorizeParams): Promise<RuntimeToolDecision> {
   call.context.abortSignal?.throwIfAborted();
 
-  const bot = await deps.database.db.selectFrom('bot')
-    .select(['permission', 'instructions'])
-    .where('id', '=', call.botId)
-    .executeTakeFirst();
+  const [bot, alwaysAllowed] = await Promise.all([
+    deps.database.db.selectFrom('bot')
+      .select(['permission', 'instructions'])
+      .where('id', '=', call.botId)
+      .executeTakeFirst(),
+    toolQueryAlwaysAllowed(deps, { botId: call.botId }),
+  ]);
 
   return match({
     bot,
     isReadOnly: call.isReadOnly,
-    approved: call.approved,
+    isOwn: call.isOwn,
+    approved: call.approved === true || alwaysAllowed.includes(call.name),
   })
     .with({ bot: P.nullish }, () => 'deny' as const)
     .with({ isReadOnly: true }, () => 'allow' as const)
     .with({ bot: { permission: 'full' } }, () => 'allow' as const)
     .with({ bot: { permission: 'read-only' } }, () => 'deny' as const)
+    .with({ isOwn: true }, () => 'allow' as const)
     .with({ approved: true }, () => 'allow' as const)
     .with({ bot: { permission: 'auto' } }, async ({ bot: current }) => {
       const settings = await toolQuerySettings(deps);

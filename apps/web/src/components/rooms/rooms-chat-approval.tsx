@@ -33,11 +33,12 @@ export function RoomsChatApproval({ approval, botName, className }: RoomsChatApp
       <QuestionOptions>
         {ROOMS_APPROVAL_CHOICES.map((choice, index) => (
           <QuestionOption
-            aria-pressed={answer.chosen === choice.approved}
+            aria-pressed={answer.chosen === choice.decision}
             disabled={answer.isAnswered}
             index={index}
-            key={choice.label()}
-            onClick={() => answer.answer(choice.approved)}
+            key={choice.decision}
+            tone={choice.tone}
+            onClick={() => answer.answer(choice.decision)}
           >
             {choice.label()}
           </QuestionOption>

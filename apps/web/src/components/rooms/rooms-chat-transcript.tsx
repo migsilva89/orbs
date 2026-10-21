@@ -21,12 +21,24 @@ interface RoomsChatTranscriptProps {
   older: RoomsHistoryLoader
   newer?: RoomsHistoryLoader
   footer?: ReactNode
+  isReadOnly?: boolean
   onReply: (message: ChatMessage) => void
 }
 
-export function RoomsChatTranscript({ bot, bots, messages, reactions, focusedEntryId, unread, older, newer, footer, onReply }: RoomsChatTranscriptProps) {
+export function RoomsChatTranscript({
+  bot,
+  bots,
+  messages,
+  reactions,
+  focusedEntryId,
+  unread,
+  older,
+  newer,
+  footer,
+  isReadOnly = false,
+  onReply,
+}: RoomsChatTranscriptProps) {
   const now = new Date();
-  const botsById = new Map(bots.map((item) => [item.id, item]));
   const focusedId = focusedEntryId === undefined ? undefined : messages.find((message) => message.metadata?.entryIds.includes(focusedEntryId))?.id;
   const firstUnreadId = unread ? messages.find((message) => message.role !== 'user' && (message.metadata?.entryId ?? 0) > unread.throughEntryId)?.id : undefined;
 
@@ -39,12 +51,13 @@ export function RoomsChatTranscript({ bot, bots, messages, reactions, focusedEnt
           {unread && message.id === firstUnreadId ? <RoomsChatUnread seen={unread.isSeen} onSeen={unread.onSeen} /> : null}
           <RoomsChatTranscriptItem
             bot={bot}
-            groups={roomsReactionGroups({ reaction: reactions.get(message.metadata?.entryId ?? 0), bots })}
+            groups={isReadOnly ? [] : roomsReactionGroups({ reaction: reactions.get(message.metadata?.entryId ?? 0), bots })}
+            isCollapsible={index < messages.length - 1}
             isFocused={message.id === focusedId}
             isLive={message.id === CHAT.liveMessageId}
+            isReadOnly={isReadOnly}
             isSending={message.id.startsWith(CHAT.outgoingPrefix)}
             message={message}
-            peer={botsById.get(message.metadata?.authorId ?? '')}
             time={message.metadata
               ? roomsTimeLabel({
                 createdAt: message.metadata.createdAt,

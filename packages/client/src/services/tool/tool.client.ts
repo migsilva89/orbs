@@ -1,9 +1,9 @@
-import { toolCallArtifact, toolCallSubagent, toolCallSubagentDetails } from '@openbots/contracts/universal';
+import { toolCallArtifact, toolCallPeerDetails, toolCallSubagent, toolCallSubagentDetails } from '@openbots/contracts/universal';
 import { match, P } from 'ts-pattern';
-import { TOOL_ARTIFACT_NAMES, TOOL_MCP_NAME, TOOL_PATH_KEYS, TOOL_PRESENTATIONS, TOOL_PREVIEW_KEYS, TOOL_QUESTION, TOOL_SUBAGENT } from './tool.constants';
-import { toolInputTexts, toolReadableName } from './tool.utils';
+import { TOOL_ARTIFACT_NAMES, TOOL_MCP_NAME, TOOL_PATH_KEYS, TOOL_PEER_NAMES, TOOL_PRESENTATIONS, TOOL_PREVIEW_KEYS, TOOL_QUESTION, TOOL_SUBAGENT } from './tool.constants';
+import { toolInputText, toolInputTexts, toolReadableName } from './tool.utils';
 import type * as ToolTypes from '../../types/tool.types';
-import type { ToolCallArtifact } from '@openbots/contracts/universal';
+import type { Bot, ToolCallArtifact } from '@openbots/contracts/universal';
 import type { DynamicToolUIPart } from 'ai';
 
 export function toolBlocks({ parts, hideVerbose = false }: ToolTypes.ToolBlocksParams): ToolTypes.ToolBlock[] {
@@ -30,7 +30,7 @@ export function toolBlocks({ parts, hideVerbose = false }: ToolTypes.ToolBlocksP
     }
 
     if (part.type === 'data-failure') {
-      return [...blocks, { kind: 'failure', index, text: part.data.text }];
+      return [...(last?.kind === 'failure' ? blocks.slice(0, -1) : blocks), { kind: 'failure', index, text: part.data.text }];
     }
 
     if (part.type !== 'dynamic-tool') {
@@ -56,7 +56,30 @@ export function toolBlocks({ parts, hideVerbose = false }: ToolTypes.ToolBlocksP
     return last?.kind === 'tools' ? [...blocks.slice(0, -1), { ...last, parts: [...last.parts, part] }] : [...blocks, { kind: 'tools', index, parts: [part] }];
   }, []);
 
-  return hideVerbose ? all.filter((block) => block.kind !== 'tools' && block.kind !== 'reasoning') : all;
+  if (!hideVerbose) {
+    return all;
+  }
+
+  return all.flatMap((block): ToolTypes.ToolBlock[] => match(block)
+    .with({ kind: 'reasoning' }, () => [])
+    .with({ kind: 'tools' }, (tools) => {
+      const peers = tools.parts.filter((part) => TOOL_PEER_NAMES.has(part.toolName));
+
+      return peers.length > 0 ? [{ ...tools, parts: peers }] : [];
+    })
+    .otherwise((other) => [other]));
+}
+
+/** The distinct bots that `bot_message` and `bot_ask` calls reached, each with its conversation once the daemon accepted the message. */
+export function toolPeers(parts: DynamicToolUIPart[], bots: Bot[]): ToolTypes.ToolPeer[] {
+  const peers = parts.flatMap((part) => {
+    const details = TOOL_PEER_NAMES.has(part.toolName) ? toolCallPeerDetails.safeParse(part.toolMetadata?.details).data : undefined;
+    const peer = bots.find((bot) => bot.id === (details?.recipientId ?? toolInputText({ input: part.input, key: 'botId' })));
+
+    return peer ? [{ peer, conversationId: details?.recipientConversationId }] : [];
+  });
+
+  return [...new Map(peers.map((item) => [item.peer.id, item])).values()];
 }
 
 export function toolIdentity(part: Pick<DynamicToolUIPart, 'toolName'>): ToolTypes.ToolIdentity {

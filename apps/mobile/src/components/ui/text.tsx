@@ -60,6 +60,7 @@ export const textVariants = cva({
       'reaction-emoji': 'text-[10px] leading-3.5',
       'reaction-count': 'text-xxs leading-4 font-medium',
       'chat-status': 'text-xs leading-tight',
+      'option-letter': 'text-xs font-medium',
       'featured-name': 'text-[17px]',
       'avatar-small': 'text-base',
       avatar: 'text-[26px]',

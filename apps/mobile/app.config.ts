@@ -2,13 +2,22 @@ import { m } from '@openbots/i18n/messages';
 import { z } from 'zod';
 import type { ExpoConfig } from 'expo/config';
 
-const appVariantSchema = z.enum(['development', 'preview', 'production']).default('development');
+const appEnv = z.object({
+  APP_VARIANT: z.enum(['development', 'preview', 'production']).default('development'),
+  OPENBOTS_APP_NAME: z.string().trim().min(1).default('Openbots'),
+  OPENBOTS_APP_SLUG: z.string().trim().min(1).default('openbots'),
+  OPENBOTS_APP_SCHEME: z.string().trim().min(1).default('openbots'),
+  OPENBOTS_BUNDLE_ID: z.string().trim().min(1).default('app.openbots.mobile'),
+  OPENBOTS_APPLE_TEAM_ID: z.string().trim().min(1).optional(),
+  OPENBOTS_EAS_OWNER: z.string().trim().min(1).optional(),
+  OPENBOTS_EAS_PROJECT_ID: z.uuid().optional(),
+}).parse(process.env);
 
-const VARIANTS: Record<z.infer<typeof appVariantSchema>, { name: string; scheme: string; bundleIdentifier: string }> = {
-  development: { name: 'Orbs Dev', scheme: 'orbs-dev', bundleIdentifier: 'app.openbots.mobile.dev' },
-  preview: { name: 'Orbs Preview', scheme: 'orbs-preview', bundleIdentifier: 'app.openbots.mobile.preview' },
-  production: { name: 'Orbs', scheme: 'orbs', bundleIdentifier: 'app.openbots.mobile' },
-};
+const VARIANTS = {
+  development: { name: `${appEnv.OPENBOTS_APP_NAME} Dev`, suffix: '-dev', bundleSuffix: '.dev' },
+  preview: { name: `${appEnv.OPENBOTS_APP_NAME} Preview`, suffix: '-preview', bundleSuffix: '.preview' },
+  production: { name: appEnv.OPENBOTS_APP_NAME, suffix: '', bundleSuffix: '' },
+} satisfies Record<typeof appEnv.APP_VARIANT, { name: string; suffix: string; bundleSuffix: string }>;
 
 const INTER_WEIGHTS = [
   { file: '300Light/Inter_300Light.ttf', weight: 300 },
@@ -22,18 +31,19 @@ const INTER_WEIGHTS = [
 
 const interPath = (file: string) => `./node_modules/@expo-google-fonts/inter/${file}`;
 
-const variant = VARIANTS[appVariantSchema.parse(process.env.APP_VARIANT)];
+const variant = VARIANTS[appEnv.APP_VARIANT];
+const bundleIdentifier = `${appEnv.OPENBOTS_BUNDLE_ID}${variant.bundleSuffix}`;
 
 export default (): ExpoConfig => ({
   name: variant.name,
-  slug: 'orbs',
-  scheme: variant.scheme,
+  slug: appEnv.OPENBOTS_APP_SLUG,
+  scheme: `${appEnv.OPENBOTS_APP_SCHEME}${variant.suffix}`,
   version: '0.1.0',
   orientation: 'default',
   userInterfaceStyle: 'automatic',
   ios: {
-    bundleIdentifier: variant.bundleIdentifier,
-    appleTeamId: 'YOURTEAMID',
+    bundleIdentifier,
+    appleTeamId: appEnv.OPENBOTS_APPLE_TEAM_ID,
     supportsTablet: true,
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
@@ -41,11 +51,11 @@ export default (): ExpoConfig => ({
     },
   },
   android: {
-    package: variant.bundleIdentifier,
+    package: bundleIdentifier,
   },
   experiments: { typedRoutes: true },
-  owner: 'nikuscs',
-  extra: { eas: { projectId: '00000000-0000-0000-0000-000000000000' } },
+  owner: appEnv.OPENBOTS_EAS_OWNER,
+  extra: { eas: { projectId: appEnv.OPENBOTS_EAS_PROJECT_ID } },
   plugins: [
     'expo-router',
     'expo-secure-store',

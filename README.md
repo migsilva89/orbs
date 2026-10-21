@@ -203,9 +203,9 @@ Command and skill catalog items include `argumentsSchema` (JSON Schema) and null
 
 Bots use Pi Durable's `read`, `write`, `edit`, and `bash` tools in their working folder. Read-only offers only declared read tools. Ask waits for approval on other calls. Auto uses Jev and falls back to Ask when its key is absent or its decision is uncertain. Full permits calls without approval. Commands run as the daemon's OS user; the working directory is not a sandbox.
 
-Authenticated clients use `tools.pending({ botId })` and `tools.answer({ botId, id, approved })`. The pending list includes child subagent approvals, with a `conversationId` for opening their view. Requests expire after five minutes. Pi stores their state with the tool task and restores pending requests after restart. Custom tool extensions use the same gate, including nested calls. No approval UI is implemented yet.
+Authenticated clients use `tools.pending({ botId })` and `tools.answer({ botId, id, approved })`. The pending list includes child subagent approvals, with a `conversationId` for opening their view. Requests expire after the approval timeout (`approvalTimeoutMinutes`, 1–10, default 5); an unanswered request counts as denied. Pi stores their state with the tool task and restores pending requests after restart. Custom tool extensions use the same gate, including nested calls. No approval UI is implemented yet.
 
-`tools.configure({ jevApiKey })` saves the key; passing `null` removes it, and omitting it leaves it unchanged. `tools.settings()` returns the tool settings object, `{ isJevConfigured, approvalRules }`, and never returns the key. `tools.configure()` returns the updated settings after saving. Application secrets share the encrypted `credentials` table. The native daemon stores the encryption key in `data/credentials.key` with owner-only permissions. Keep that key for recovery; copying the entire data directory also copies the ability to decrypt the database. Pi's provider authentication remains in Pi's own store.
+`tools.configure({ jevApiKey })` saves the key; passing `null` removes it, and omitting it leaves it unchanged. `tools.settings()` returns the tool settings object, `{ isJevConfigured, approvalRules, approvalTimeoutMinutes }`, and never returns the key. `tools.configure({ approvalTimeoutMinutes })` changes the timeout for new requests. `tools.configure()` returns the updated settings after saving. Application secrets share the encrypted `credentials` table. The native daemon stores the encryption key in `data/credentials.key` with owner-only permissions. Keep that key for recovery; copying the entire data directory also copies the ability to decrypt the database. Pi's provider authentication remains in Pi's own store.
 
 Paired devices manage named secrets through `credentials.set({ key, value })`; `value: null` removes a key. `credentials.list()` returns only names and creation/update timestamps. Secret values are never readable through RPC. The same store serves Jev and MCP; Pi provider credentials remain in Pi's auth store.
 
@@ -628,7 +628,7 @@ Before bot routing was added, a disposable WebSocket check with SQLite and Pi's 
 
 ## Configuration
 
-`@openbots/env/client` and `@openbots/env/server` export separate `env` objects using the same `createEnv` pattern. The client schema is empty. Add mobile configuration with the mobile app.
+`@openbots/env/client` and `@openbots/env/server` export separate `env` objects using the same `createEnv` pattern. The client schema is empty. The iOS app reads its name, slug, scheme, bundle ID, Apple team and EAS project from `OPENBOTS_*` variables in `apps/mobile/.env`; see `apps/mobile/.env.example`. Without them it builds as Openbots (`app.openbots.mobile`).
 
 | Server setting | Default | Values |
 | --- | --- | --- |

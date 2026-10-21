@@ -1,4 +1,5 @@
 import { BOT_ACTIVITY_LABELS, toolRunning } from '@openbots/client/client';
+import { useChatHideVerbose } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import type { ChatActivity, ChatMessage } from '@openbots/client/client';
@@ -13,10 +14,11 @@ interface RoomsChatActivityProps {
 }
 
 export function RoomsChatActivity({ botName, bot, activity, draft, waiting }: RoomsChatActivityProps) {
+  const { hideVerbose } = useChatHideVerbose();
   const last = draft?.parts.filter((part) => part.type !== 'step-start').at(-1);
   const textSpeaks = activity === 'writing' && last?.type === 'text' && last.state === 'streaming';
-  const toolRowSpeaks = !waiting && last?.type === 'dynamic-tool' && toolRunning(last);
-  const reasoningSpeaks = !waiting && last?.type === 'reasoning' && last.state === 'streaming';
+  const toolRowSpeaks = !waiting && !hideVerbose && last?.type === 'dynamic-tool' && toolRunning(last);
+  const reasoningSpeaks = !waiting && !hideVerbose && last?.type === 'reasoning' && last.state === 'streaming';
 
   if (textSpeaks || toolRowSpeaks || reasoningSpeaks) {
     return null;

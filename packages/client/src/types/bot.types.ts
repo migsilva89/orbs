@@ -77,3 +77,7 @@ export interface BotDeleteParams {
   /** Leaves the deleted bot's screens once the bot list no longer has it. */
   onDeleted: () => unknown;
 }
+
+export interface BotCreateParams {
+  onCreated: (bot: UniversalTypes.Bot) => void;
+}

@@ -198,6 +198,7 @@ export function RoomsChatComposer({
           botName={bot.name}
           conversationId={conversationId}
           queued={queued}
+          onOutgoingChange={onOutgoingChange}
         />
         <RoomsChatAttachments files={files} />
         {replyTo ? (

@@ -44,16 +44,14 @@ export function RoomsChatTranscriptItem({ message, bot, peer, groups, time, isFo
           />
         ))
         .otherwise(() => (
-          <>
-            <RoomsChatMessage
-              botId={bot.id}
-              hasActions={!isSending}
-              message={message}
-              name={message.metadata?.authorName ?? ''}
-              onReply={() => onReply(message)}
-            />
-            <RoomsChatReactions align="end" groups={groups} />
-          </>
+          <RoomsChatMessage
+            botId={bot.id}
+            hasActions={!isSending}
+            message={message}
+            name={message.metadata?.authorName ?? ''}
+            reactions={groups.length > 0 ? <RoomsChatReactions groups={groups} /> : undefined}
+            onReply={() => onReply(message)}
+          />
         ))}
     </MessageScrollerItem>
   );

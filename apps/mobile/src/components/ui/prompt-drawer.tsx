@@ -8,7 +8,6 @@ import { FloatingBar } from './floating-bar';
 import { GlassSurface } from './glass-surface';
 import { Icon } from './icon';
 import { Text, textContext } from './text';
-import type { LucideIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import type { LayoutChangeEvent, PressableProps, ViewProps } from 'react-native';
 
@@ -48,22 +47,6 @@ export function PromptDrawer({ className, ...props }: ViewProps) {
   return <GlassSurface {...props} className={cn('p-1.5', className)} shape="field" />;
 }
 
-interface PromptDrawerHeaderProps {
-  icon: LucideIcon;
-  children: string;
-}
-
-export function PromptDrawerHeader({ icon, children }: PromptDrawerHeaderProps) {
-  return (
-    <View className="flex-row items-center gap-2 px-2 py-1">
-      <textContext.Provider value={{ tone: 'muted' }}>
-        <Icon icon={icon} size="sm" />
-        <Text variant="small">{children}</Text>
-      </textContext.Provider>
-    </View>
-  );
-}
-
 interface PromptDrawerItemProps extends Omit<PressableProps, 'children'> {
   title: string;
   description?: string;
@@ -84,8 +67,8 @@ export function PromptDrawerItem({ title, description, leading, trailing, tone =
     >
       <textContext.Provider value={{ tone: tone === 'destructive' ? 'destructive' : 'muted' }}>
         {leading}
-        <Text className="max-w-[45%] shrink-0" numberOfLines={1} tone={tone === 'destructive' ? 'destructive' : 'default'} variant="item-title">{title}</Text>
-        {description ? <Text className="flex-1" numberOfLines={1} variant="item-description">{description}</Text> : <View className="flex-1" />}
+        <Text className={description ? 'max-w-[45%] shrink-0' : 'flex-1'} numberOfLines={1} tone={tone === 'destructive' ? 'destructive' : 'default'} variant="item-title">{title}</Text>
+        {description ? <Text className="flex-1" numberOfLines={1} variant="item-description">{description}</Text> : null}
         {trailing}
       </textContext.Provider>
     </Pressable>

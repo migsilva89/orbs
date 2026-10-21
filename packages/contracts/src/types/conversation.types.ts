@@ -66,7 +66,8 @@ export const conversationUpdateSubmission = conversationTarget.extend({
   content: z.string().max(64_000).optional(),
   attachmentIds: attachmentIds.optional(),
   skills: z.array(z.string().trim().min(1).max(128)).max(10).optional(),
-  whenBusy: z.enum(['followUp', 'steer']).optional(),
+  /** `interrupt` sends the queued input now, replacing the running reply. */
+  whenBusy: z.enum(['followUp', 'steer', 'interrupt']).optional(),
 })
   .refine((value) => value.content !== undefined || value.whenBusy !== undefined || value.attachmentIds !== undefined || value.replyToEntryId !== undefined)
   .refine((value) => value.skills === undefined || value.content !== undefined);

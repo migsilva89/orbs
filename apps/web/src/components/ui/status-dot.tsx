@@ -7,6 +7,7 @@ const statusDotVariants = cva({
     variant: {
       default: 'bg-muted-foreground',
       success: 'bg-success',
+      warning: 'bg-warning',
       destructive: 'bg-destructive',
     },
   },

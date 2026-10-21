@@ -45,7 +45,7 @@ export function BotSettingsAccess({ isDisabled }: BotSettingsAccessProps) {
         />
         {BOT_SETTINGS_INHERIT.map(({ resource, icon, label, hint }) => (
           <Item key={resource}>
-            <ItemMedia>
+            <ItemMedia className="mt-1 self-start">
               <Icon icon={icon} tone="muted" />
             </ItemMedia>
             <ItemContent>

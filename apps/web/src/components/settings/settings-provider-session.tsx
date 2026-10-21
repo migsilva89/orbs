@@ -1,12 +1,10 @@
+import { useSettingsProviderSession } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
 import { match } from 'ts-pattern';
 import { Button } from '@/components/ui/button';
 import { FormErrors } from '@/components/ui/forms/form';
 import { Input } from '@/components/ui/input';
-import { rpc } from '@/services/rpc/rpc.client';
-import { SETTINGS } from '@/services/settings/settings.constants';
+import IconX from '~icons/lucide/x';
 import type { ProviderSession } from '@openbots/contracts/universal';
 
 interface SettingsProviderSessionProps {
@@ -15,33 +13,23 @@ interface SettingsProviderSessionProps {
 }
 
 export function SettingsProviderSession({ session: started, onClose }: SettingsProviderSessionProps) {
-  const queryClient = useQueryClient();
-  const [answer, setAnswer] = useState('');
-
-  const { data: session } = useQuery({
-    ...rpc.providers.session.queryOptions({ input: { id: started.id } }),
-    initialData: started,
-    refetchInterval: (query) => (query.state.data?.status === 'pending' ? SETTINGS.providerPollMs : false),
-  });
-
-  const complete = useMutation(rpc.providers.complete.mutationOptions({ onSuccess: () => setAnswer('') }));
-  const cancel = useMutation(rpc.providers.cancel.mutationOptions());
+  const login = useSettingsProviderSession(started);
+  const { session, isPending, answer, setAnswer } = login;
   const { prompt } = session;
-  const isPending = session.status === 'pending';
-
-  useEffect(() => {
-    if (!isPending) {
-      void queryClient.invalidateQueries({ queryKey: rpc.providers.list.key() });
-    }
-  }, [isPending, queryClient]);
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg border p-3 text-sm">
-      {match(session.status)
-        .with('completed', () => <output>{m.settings_providers_login_completed()}</output>)
-        .with('cancelled', () => <output>{m.settings_providers_login_cancelled()}</output>)
-        .with('pending', 'failed', () => null)
-        .exhaustive()}
+    <div className="relative flex flex-col gap-2 rounded-lg border p-3 pr-10 text-sm">
+      <Button
+        aria-label={isPending ? m.ui_cancel() : m.ui_close()}
+        className="absolute top-1.5 right-1.5"
+        disabled={login.isCancelling}
+        size="icon-xs"
+        title={isPending ? m.ui_cancel() : m.ui_close()}
+        variant="ghost"
+        onClick={isPending ? login.cancel : onClose}
+      >
+        <IconX />
+      </Button>
       {isPending ? session.events.map((event, index) => match(event)
         .with({ type: 'auth_url' }, ({ url, instructions }) => (
           <p key={index}>
@@ -76,15 +64,11 @@ export function SettingsProviderSession({ session: started, onClose }: SettingsP
           {prompt.options.map((option) => (
             <Button
               className="justify-start"
-              disabled={complete.isPending}
+              disabled={login.isAnswering}
               key={option.id}
               size="sm"
               variant="outline"
-              onClick={() => complete.mutate({
-                id: session.id,
-                promptId: prompt.id,
-                answer: option.id,
-              })}
+              onClick={() => login.reply(option.id)}
             >
               {option.label}
             </Button>
@@ -96,11 +80,7 @@ export function SettingsProviderSession({ session: started, onClose }: SettingsP
           className="flex flex-col gap-2"
           onSubmit={(event) => {
             event.preventDefault();
-            complete.mutate({
-              id: session.id,
-              promptId: prompt.id,
-              answer,
-            });
+            login.reply(answer);
           }}
         >
           <p>{prompt.message}</p>
@@ -114,34 +94,14 @@ export function SettingsProviderSession({ session: started, onClose }: SettingsP
               onChange={(event) => setAnswer(event.target.value)}
             />
             <Button
-              disabled={complete.isPending || !answer}
+              disabled={login.isAnswering || !answer}
               size="sm"
               type="submit"
             >{m.settings_providers_send()}</Button>
           </div>
         </form>
       ) : null}
-      <FormErrors error={session.error ?? (complete.isError ? m.settings_providers_error() : null)} />
-      {isPending ? (
-        <Button
-          className="self-end"
-          disabled={cancel.isPending}
-          size="sm"
-          variant="ghost"
-          onClick={() => cancel.mutate({ id: session.id })}
-        >
-          {m.ui_cancel()}
-        </Button>
-      ) : (
-        <Button
-          className="self-end"
-          size="sm"
-          variant="ghost"
-          onClick={onClose}
-        >
-          {m.ui_close()}
-        </Button>
-      )}
+      <FormErrors error={login.problem} />
     </div>
   );
 }

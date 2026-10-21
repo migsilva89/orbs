@@ -141,7 +141,7 @@ export interface RuntimeUpdateSubmissionParams extends RuntimeConversationParams
   submissionId: number;
   replyToEntryId?: number | null;
   content?: string;
-  whenBusy?: 'followUp' | 'steer';
+  whenBusy?: 'followUp' | 'steer' | 'interrupt';
   attachments?: Attachment[];
 }
 

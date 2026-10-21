@@ -6,7 +6,7 @@ import type * as ToolTypes from '../../types/tool.types';
 import type { ToolCallArtifact } from '@openbots/contracts/universal';
 import type { DynamicToolUIPart } from 'ai';
 
-export function toolBlocks({ parts }: ToolTypes.ToolBlocksParams): ToolTypes.ToolBlock[] {
+export function toolBlocks({ parts, hideVerbose = false }: ToolTypes.ToolBlocksParams): ToolTypes.ToolBlock[] {
   function toolArtifact(part: DynamicToolUIPart): ToolCallArtifact | undefined {
     return TOOL_ARTIFACT_NAMES.has(part.toolName) && part.state === 'output-available' ? toolCallArtifact.safeParse(part.output).data : undefined;
   }
@@ -18,7 +18,7 @@ export function toolBlocks({ parts }: ToolTypes.ToolBlocksParams): ToolTypes.Too
     return input ? { ...input, conversationId: details?.conversationId } : undefined;
   }
 
-  return parts.reduce<ToolTypes.ToolBlock[]>((blocks, part, index) => {
+  const all = parts.reduce<ToolTypes.ToolBlock[]>((blocks, part, index) => {
     const last = blocks.at(-1);
 
     if (part.type === 'text') {
@@ -55,6 +55,8 @@ export function toolBlocks({ parts }: ToolTypes.ToolBlocksParams): ToolTypes.Too
 
     return last?.kind === 'tools' ? [...blocks.slice(0, -1), { ...last, parts: [...last.parts, part] }] : [...blocks, { kind: 'tools', index, parts: [part] }];
   }, []);
+
+  return hideVerbose ? all.filter((block) => block.kind !== 'tools' && block.kind !== 'reasoning') : all;
 }
 
 export function toolIdentity(part: Pick<DynamicToolUIPart, 'toolName'>): ToolTypes.ToolIdentity {

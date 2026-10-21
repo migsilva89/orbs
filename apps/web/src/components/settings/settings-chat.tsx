@@ -1,7 +1,8 @@
 import { ROOMS_SEND_MODE_HINTS, ROOMS_SEND_MODES } from '@openbots/client/client';
+import { useChatDefaults } from '@openbots/client/react';
 import { conversationWhenBusy, preferencesEnterAction } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/components/ui/panel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -21,12 +22,8 @@ const SETTINGS_ENTER_ACTIONS = { send: m.settings_chat_enter_send, newline: m.se
 
 export function SettingsChat() {
   const { preferences, save } = usePreferences();
-  const queryClient = useQueryClient();
   const { data: settings } = useSuspenseQuery(rpc.conversation.settings.queryOptions());
-
-  const configure = useMutation(rpc.conversation.configure.mutationOptions({
-    onSuccess: (saved) => queryClient.setQueryData(rpc.conversation.settings.queryKey(), saved),
-  }));
+  const configure = useChatDefaults();
 
   return (
     <SettingsPanel
@@ -64,7 +61,7 @@ export function SettingsChat() {
         <Select
           disabled={configure.isPending}
           value={settings.whenBusy}
-          onValueChange={(value) => configure.mutate({ whenBusy: conversationWhenBusy.parse(value) })}
+          onValueChange={(value) => configure.configure({ whenBusy: conversationWhenBusy.parse(value) })}
         >
           <SelectTrigger aria-label={m.rooms_send_mode()} className="w-auto">
             <SelectValue />

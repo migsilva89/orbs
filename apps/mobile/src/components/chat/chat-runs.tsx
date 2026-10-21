@@ -1,4 +1,5 @@
 import { BOT_ACTIVITY_LABELS, toolRunning } from '@openbots/client/client';
+import { useChatHideVerbose } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { Bot as BotIcon } from 'lucide-react-native';
 import { View } from 'react-native';
@@ -20,12 +21,13 @@ interface ChatRunsProps {
 }
 
 export function ChatRuns({ bot, activity, failure, draft, approvals, questions }: ChatRunsProps) {
+  const { hideVerbose } = useChatHideVerbose();
   const last = draft?.parts.filter((part) => part.type !== 'step-start').at(-1);
   const isWaiting = activity === 'queued';
 
   const isSpeaking = (activity === 'writing' && last?.type === 'text' && last.state === 'streaming')
-    || (!isWaiting && last?.type === 'dynamic-tool' && toolRunning(last))
-    || (!isWaiting && last?.type === 'reasoning' && last.state === 'streaming');
+    || (!isWaiting && !hideVerbose && last?.type === 'dynamic-tool' && toolRunning(last))
+    || (!isWaiting && !hideVerbose && last?.type === 'reasoning' && last.state === 'streaming');
 
   const isActive = activity !== 'idle' && activity !== 'failed' && !isSpeaking;
 

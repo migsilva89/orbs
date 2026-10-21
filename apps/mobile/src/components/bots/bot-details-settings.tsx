@@ -1,9 +1,10 @@
-import { BOT_PERMISSION_LABELS, BOT_THINKING_LEVEL_LABELS, ROOMS_SEND_MODES } from '@openbots/client/client';
+import { BOT_PERMISSION_LABELS, BOT_THINKING_LEVEL_LABELS, botModelBrand, ROOMS_SEND_MODES } from '@openbots/client/client';
 import { useBotUpdate, useChatSettings } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { ChevronRight, Cpu, ListOrdered, PencilLine, ShieldCheck } from 'lucide-react-native';
+import { ChevronRight, ListOrdered, PencilLine, ShieldCheck } from 'lucide-react-native';
+import { BotBrandLogo } from '@/components/bots/bot-brand-logo';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { actionSheetShow } from '@/components/ui/action-sheet';
 import { Icon } from '@/components/ui/icon';
@@ -51,7 +52,7 @@ export function BotDetailsSettings({ session, bot, chat }: BotDetailsSettingsPro
       <ItemGroup>
         <Item size="sm">
           <ItemMedia>
-            <Icon icon={Cpu} tone="muted" />
+            <BotBrandLogo brand={botModelBrand({ providerId: bot.modelProvider, modelId: bot.modelId })} />
           </ItemMedia>
           <ItemContent>
             <ItemTitle numberOfLines={1}>{model?.name ?? bot.modelId}</ItemTitle>

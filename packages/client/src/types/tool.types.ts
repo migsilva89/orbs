@@ -55,6 +55,8 @@ export interface ToolIdentity {
 
 export interface ToolBlocksParams {
   parts: ChatMessage['parts'];
+  /** Drops tool calls and thinking, as the owner's hide-verbose setting asks. */
+  hideVerbose?: boolean;
 }
 
 export interface ToolCollapsedParams {

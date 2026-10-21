@@ -1,7 +1,8 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
+import { useSettingsTools } from '@openbots/client/react';
 import { toolSettingsForm } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { SettingsToolsRules } from '@/components/settings/settings-tools-rules';
@@ -9,14 +10,12 @@ import { ButtonLoading } from '@/components/ui/button-loading';
 import { Form, FormErrors } from '@/components/ui/forms/form';
 import { FormInput } from '@/components/ui/forms/form-input';
 import { PanelFooter, PanelRow } from '@/components/ui/panel';
-import { toasty } from '@/components/ui/sonner';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconKeyRound from '~icons/lucide/key-round';
 import IconListChecks from '~icons/lucide/list-checks';
 import IconShieldCheck from '~icons/lucide/shield-check';
 
 export function SettingsTools() {
-  const queryClient = useQueryClient();
   const { data: settings } = useSuspenseQuery(rpc.tools.settings.queryOptions());
 
   const form = useForm({
@@ -25,17 +24,11 @@ export function SettingsTools() {
     values: { approvalRules: settings.approvalRules, jevApiKey: '' },
   });
 
-  const save = useMutation(rpc.tools.configure.mutationOptions({
-    onSuccess: (saved) => {
-      queryClient.setQueryData(rpc.tools.settings.queryKey(), saved);
-      form.reset({ approvalRules: saved.approvalRules, jevApiKey: '' });
-      toasty(m.settings_saved(), '✅');
-    },
-  }));
+  const save = useSettingsTools({ onDone: () => form.reset({ approvalRules: form.getValues('approvalRules'), jevApiKey: '' }) });
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit((values) => save.mutate({ approvalRules: values.approvalRules, jevApiKey: values.jevApiKey || undefined }))}>
+      <form onSubmit={form.handleSubmit(save.save)}>
         <fieldset className="contents" disabled={save.isPending}>
           <SettingsPanel
             description={m.settings_tools_hint()}
@@ -63,7 +56,7 @@ export function SettingsTools() {
               </div>
             </PanelRow>
             <PanelFooter>
-              <FormErrors className="mr-auto" error={save.isError ? m.settings_save_error() : null} />
+              <FormErrors className="mr-auto" error={save.problem} />
               <ButtonLoading
                 disabled={save.isPending}
                 loading={save.isPending}

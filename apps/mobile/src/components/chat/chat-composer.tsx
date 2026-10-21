@@ -199,6 +199,7 @@ export function ChatComposer({
             botName={bot.name}
             conversationId={conversationId}
             queued={queued}
+            onOutgoingChange={onOutgoingChange}
           />
           {replyTo ? (
             <PromptQuote removeLabel={m.rooms_chat_reply_clear()} onRemove={onReplyClear}>

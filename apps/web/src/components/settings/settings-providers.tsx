@@ -1,5 +1,5 @@
+import { useSettingsProviders } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { match } from 'ts-pattern';
@@ -11,38 +11,16 @@ import { Combobox } from '@/components/ui/combobox';
 import { FormErrors } from '@/components/ui/forms/form';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/components/ui/panel';
 import { StatusDot } from '@/components/ui/status-dot';
-import { rpc } from '@/services/rpc/rpc.client';
 import IconKeyRound from '~icons/lucide/key-round';
 import IconLogIn from '~icons/lucide/log-in';
 import IconLogOut from '~icons/lucide/log-out';
 import IconRefreshCw from '~icons/lucide/refresh-cw';
-import type { ProviderSession } from '@openbots/contracts/universal';
 
 export function SettingsProviders() {
-  const queryClient = useQueryClient();
-  const { data } = useSuspenseQuery(rpc.providers.list.queryOptions());
-  const refresh = () => queryClient.invalidateQueries({ queryKey: rpc.providers.list.key() });
-  const [started, setStarted] = useState<ProviderSession | null>(null);
   const [selectedId, setSelectedId] = useState('');
-  const [dismissedSessionId, setDismissedSessionId] = useState<string | null>(null);
-
-  const login = useMutation(rpc.providers.login.mutationOptions({
-    onSuccess: (session) => {
-      setStarted(session);
-      return refresh();
-    },
-  }));
-
-  const latestSession = started ?? data.session;
-  const session = latestSession?.id === dismissedSessionId ? null : latestSession;
-  const isBusy = login.isPending || data.session?.status === 'pending';
-  const providers = data.providers.filter((provider) => provider.id !== 'openai-codex');
-  const available = providers.filter((provider) => !provider.isConfigured && provider.authTypes.length > 0);
+  const { session, status, connected, available, isBusy, problem, login, dismiss } = useSettingsProviders();
   const selected = available.find((provider) => provider.id === selectedId);
-  const connected = providers.filter((provider) => provider.isConfigured);
   const visible = selected ? [...connected, selected] : connected;
-
-  const statusLabel = (isConfigured: boolean) => (isConfigured ? m.settings_providers_connected() : m.settings_providers_disconnected());
 
   return (
     <SettingsPanel
@@ -56,10 +34,7 @@ export function SettingsProviders() {
           <SettingsProviderSession
             key={session.id}
             session={session}
-            onClose={() => {
-              setDismissedSessionId(session.id);
-              setStarted(null);
-            }}
+            onClose={() => dismiss(session.id)}
           />
         </PanelRow>
       ) : null}
@@ -88,9 +63,9 @@ export function SettingsProviders() {
           <SettingsProviderLogo providerId={provider.id} />
           <PanelContent>
             <PanelTitle className="truncate">{provider.name}</PanelTitle>
-            <div className="flex items-center gap-2">
-              <StatusDot label={statusLabel(provider.isConfigured)} variant={provider.isConfigured ? 'success' : 'default'} />
-              <PanelDescription>{provider.label ?? statusLabel(provider.isConfigured)}</PanelDescription>
+            <div className="flex items-center gap-1.5">
+              <StatusDot label={status(provider).label} variant={status(provider).tone} />
+              <span className="text-xxs text-muted-foreground">{provider.label ?? status(provider).label}</span>
             </div>
           </PanelContent>
           <div className="flex shrink-0 flex-wrap justify-end gap-2">
@@ -100,7 +75,7 @@ export function SettingsProviders() {
                 key={authType}
                 size="sm"
                 variant="outline"
-                onClick={() => login.mutate({ providerId: provider.id, authType })}
+                onClick={() => login(provider.id, authType)}
               >
                 {match(authType)
                   .with('oauth', () => provider.isConfigured && provider.credentialType === 'oauth' ? <IconRefreshCw /> : <IconLogIn />)
@@ -131,7 +106,7 @@ export function SettingsProviders() {
           </div>
         </PanelRow>
       ))}
-      <FormErrors error={login.isError ? m.settings_providers_error() : null} />
+      <FormErrors error={problem} />
     </SettingsPanel>
   );
 }

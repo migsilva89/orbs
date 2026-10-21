@@ -21,7 +21,7 @@ export function RoomsChatRuns({ bot, activity, failure, draft, approvals, questi
     <MessageScrollerItem>
       {questions.map((question) => (
         <RoomsChatQuestions
-          className="my-2 ml-10"
+          className="my-2"
           key={question.id}
           question={question}
         />
@@ -30,7 +30,7 @@ export function RoomsChatRuns({ bot, activity, failure, draft, approvals, questi
         <RoomsChatApproval
           approval={approval}
           botName={bot.name}
-          className="my-2 ml-10"
+          className="my-2"
           key={approval.id}
         />
       ))}

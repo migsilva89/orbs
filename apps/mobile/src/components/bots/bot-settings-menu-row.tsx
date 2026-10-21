@@ -17,27 +17,26 @@ interface BotSettingsMenuRowProps {
 
 export function BotSettingsMenuRow({ icon, title, value, description, items, isDisabled = false }: BotSettingsMenuRowProps) {
   return (
-    <Menu
-      isFullWidth
-      isDisabled={isDisabled}
-      items={items}
-      title={title}
-    >
-      <View
-        accessibilityLabel={`${title}: ${value}`}
-        accessibilityRole="button"
-        accessibilityState={{ disabled: isDisabled }}
-        className={isDisabled ? 'opacity-50' : undefined}
-      >
-        <Item>
-          <ItemMedia>
-            <Icon icon={icon} tone="muted" />
-          </ItemMedia>
-          <ItemContent>
-            <ItemTitle>{title}</ItemTitle>
-            {description ? <ItemDescription numberOfLines={0}>{description}</ItemDescription> : null}
-          </ItemContent>
-          <View className="max-w-1/2 flex-row items-center gap-1">
+    <Item className={isDisabled ? 'opacity-50' : undefined}>
+      <ItemMedia>
+        <Icon icon={icon} tone="muted" />
+      </ItemMedia>
+      <ItemContent>
+        <ItemTitle>{title}</ItemTitle>
+        {description ? <ItemDescription numberOfLines={0}>{description}</ItemDescription> : null}
+      </ItemContent>
+      <View className="max-w-1/2">
+        <Menu
+          isDisabled={isDisabled}
+          items={items}
+          title={title}
+        >
+          <View
+            accessibilityLabel={`${title}: ${value}`}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: isDisabled }}
+            className="flex-row items-center gap-1 py-1"
+          >
             <ItemValue>{value}</ItemValue>
             <Icon
               icon={ChevronsUpDown}
@@ -45,8 +44,8 @@ export function BotSettingsMenuRow({ icon, title, value, description, items, isD
               tone="muted"
             />
           </View>
-        </Item>
+        </Menu>
       </View>
-    </Menu>
+    </Item>
   );
 }

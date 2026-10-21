@@ -1,50 +1,34 @@
 import { m } from '@openbots/i18n/client';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 import type { RoomsReactionGroup } from '@openbots/client/client';
 
 interface RoomsChatReactionsProps {
   groups: RoomsReactionGroup[]
   disabled?: boolean
-  failed?: boolean
-  align?: 'start' | 'end'
   onToggle?: (emoji: string) => void
 }
 
-export function RoomsChatReactions({ groups, disabled = false, failed = false, align = 'start', onToggle }: RoomsChatReactionsProps) {
-  if (groups.length === 0 && !failed) {
-    return null;
-  }
-
+export function RoomsChatReactions({ groups, disabled = false, onToggle }: RoomsChatReactionsProps) {
   return (
-    <div className={cn('flex flex-wrap items-center gap-1 px-11 pb-1', align === 'end' && 'justify-end')}>
-      {groups.map((group) => (onToggle ? (
-        <Button
+    <div className="flex items-center gap-1">
+      {groups.map((group) => (
+        <button
           aria-label={m.rooms_reaction_chip({ emoji: group.emoji, names: group.names.join(', ') })}
           aria-pressed={group.isMine}
-          disabled={disabled}
-          key={group.emoji}
-          size="xs"
-          title={group.names.join(', ')}
-          variant={group.isMine ? 'secondary' : 'outline'}
-          onClick={() => onToggle(group.emoji)}
-        >
-          {group.emoji}
-          <span className="tabular-nums">{group.count}</span>
-        </Button>
-      ) : (
-        <Badge
-          aria-label={m.rooms_reaction_chip({ emoji: group.emoji, names: group.names.join(', ') })}
+          className={cn(
+            'flex h-7 min-w-7 items-center justify-center gap-0.5 rounded-full border bg-background px-1.5 text-xs shadow-xs transition-colors enabled:hover:bg-accent disabled:cursor-default',
+            group.isMine && 'border-blue-500/40 bg-blue-500/15',
+          )}
+          disabled={disabled || !onToggle}
           key={group.emoji}
           title={group.names.join(', ')}
-          variant="outline"
+          type="button"
+          onClick={() => onToggle?.(group.emoji)}
         >
           {group.emoji}
-          <span className="tabular-nums">{group.count}</span>
-        </Badge>
-      )))}
-      {failed ? <p className="text-xxs text-destructive" role="alert">{m.rooms_reaction_failed()}</p> : null}
+          {group.count > 1 ? <span className="text-xxs font-medium tabular-nums">{group.count}</span> : null}
+        </button>
+      ))}
     </div>
   );
 }

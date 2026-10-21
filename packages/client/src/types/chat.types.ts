@@ -116,6 +116,11 @@ export interface ChatAnswerProblemParams {
   isError: boolean;
 }
 
+export interface ChatQueueParams extends Required<UniversalTypes.ConversationTarget> {
+  /** Drops a removed message's optimistic bubble; it never reaches the transcript to settle it. */
+  onOutgoingChange: ChatSendParams['onOutgoingChange'];
+}
+
 export interface ChatSendParams {
   botId: string;
   conversationId: number;

@@ -1,8 +1,7 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
-import { botHandle } from '@openbots/client/client';
+import { useBotCreate } from '@openbots/client/react';
 import { botForm } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { BotFormAvatar } from '@/components/bots/bot-form-avatar';
 import { BotFormModel } from '@/components/bots/bot-form-model';
@@ -10,7 +9,6 @@ import { BotFormProfile } from '@/components/bots/bot-form-profile';
 import { ButtonLoading } from '@/components/ui/button-loading';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormErrors } from '@/components/ui/forms/form';
-import { rpc } from '@/services/rpc/rpc.client';
 import type { BotSettings } from '@openbots/client/client';
 import type { Bot } from '@openbots/contracts/universal';
 
@@ -21,8 +19,6 @@ interface BotCreateDialogProps {
 }
 
 export function BotCreateDialog({ settings, onOpenChange, onCreated }: BotCreateDialogProps) {
-  const queryClient = useQueryClient();
-
   const form = useForm({
     resolver: standardSchemaResolver(botForm),
     defaultValues: {
@@ -37,12 +33,7 @@ export function BotCreateDialog({ settings, onOpenChange, onCreated }: BotCreate
     },
   });
 
-  const create = useMutation(rpc.bots.create.mutationOptions({
-    onSuccess: async (bot) => {
-      await queryClient.invalidateQueries({ queryKey: rpc.bots.list.key() });
-      onCreated(bot);
-    },
-  }));
+  const create = useBotCreate({ onCreated });
 
   return (
     <Dialog open onOpenChange={(open) => !create.isPending && onOpenChange(open)}>
@@ -52,12 +43,12 @@ export function BotCreateDialog({ settings, onOpenChange, onCreated }: BotCreate
           <DialogDescription>{m.rooms_bot_description()}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="flex flex-col gap-4" onSubmit={form.handleSubmit((input) => create.mutate({ ...input, handle: input.handle === '' ? botHandle({ name: input.name }) : input.handle }))}>
+          <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(create.create)}>
             <fieldset className="contents" disabled={create.isPending}>
               <BotFormAvatar busy={create.isPending} />
               <BotFormProfile />
               <BotFormModel busy={create.isPending} />
-              <FormErrors error={create.isError ? m.rooms_bot_create_error() : null} />
+              <FormErrors error={create.problem} />
               <DialogFooter>
                 <ButtonLoading
                   disabled={create.isPending}

@@ -1,11 +1,10 @@
 import { toolBlocks } from '@openbots/client/client';
-import { useChatShowTools } from '@openbots/client/web';
+import { useChatHideVerbose } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { isFileUIPart } from 'ai';
 import { Fragment, useState } from 'react';
 import { match } from 'ts-pattern';
-import { BotAvatar } from '@/components/bots/bot-avatar';
 import { RoomsChatActions } from '@/components/rooms/rooms-chat-actions';
 import { RoomsChatArtifact } from '@/components/rooms/rooms-chat-artifact';
 import { RoomsChatFiles } from '@/components/rooms/rooms-chat-files';
@@ -19,7 +18,7 @@ import { useLongPress } from '@/hooks/use-long-press';
 import { MENTION_ALLOWED_TAGS } from '@/services/mention/mention.constants';
 import { mentionRemark } from '@/services/mention/mention.utils';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { ChatActivity, ChatMessage, ToolBot } from '@openbots/client/client';
+import type { ChatMessage, ToolBot } from '@openbots/client/client';
 import type * as ReactTypes from 'react';
 
 const mentionComponents = { mention: RoomsChatMention };
@@ -29,28 +28,38 @@ interface RoomsChatMessageProps {
   botId: string
   name: string
   bot?: ToolBot
-  activity?: ChatActivity
   live?: boolean
   hasActions?: boolean
   reacting?: boolean
+  reactions?: ReactTypes.ReactNode
   onReply?: () => void
   onReact?: (emoji: string) => void
 }
 
-export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle', live = false, hasActions = false, reacting = false, onReply, onReact }: RoomsChatMessageProps) {
+export function RoomsChatMessage({
+  message,
+  botId,
+  name,
+  bot,
+  live = false,
+  hasActions = false,
+  reacting = false,
+  reactions,
+  onReply,
+  onReact,
+}: RoomsChatMessageProps) {
   const reply = message.metadata?.replyTo;
   const [sheet, setSheet] = useState(false);
   const press = useLongPress(() => setSheet(true));
   const { data: bots } = useSuspenseQuery(rpc.bots.list.queryOptions());
   const remarkPlugins = [mentionRemark({ bots })];
 
-  const { shown: showTools } = useChatShowTools();
-  const blocks = toolBlocks({ parts: message.parts }).filter((block) => showTools || block.kind !== 'tools');
+  const { hideVerbose } = useChatHideVerbose();
+  const blocks = toolBlocks({ parts: message.parts, hideVerbose });
   const files = message.parts.filter(isFileUIPart);
   const standalone = (block: typeof blocks[number] | undefined) => block?.kind === 'tools';
   const bubbleBlocks = blocks.filter((block) => !standalone(block));
   const firstText = blocks.find((block) => block.kind === 'text');
-  const namedBlock = message.role === 'assistant' ? bubbleBlocks.find((block) => block.kind !== 'reasoning') : undefined;
   const actionsBlock = blocks.filter((block) => block.kind === 'text').at(-1) ?? bubbleBlocks.filter((block) => block.kind !== 'reasoning').at(-1);
 
   const segments: typeof blocks[] = files.length > 0 && bubbleBlocks.length === 0 ? [[]] : [];
@@ -66,7 +75,6 @@ export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle',
   }
 
   const bubbles = segments.filter((segment) => !standalone(segment[0]));
-  const lastBubble = bubbles.at(-1);
 
   const actions = hasActions ? (
     <RoomsChatActions
@@ -82,23 +90,18 @@ export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle',
 
   const withActions = (content: ReactTypes.ReactNode) => (
     <div className="relative flex w-fit max-w-full items-center gap-2 group-data-[role=user]:flex-row-reverse has-[[data-message-wide]]:w-full">
-      <div className="min-w-0 flex-1">{content}</div>
+      <div className="relative min-w-0 flex-1">
+        {content}
+        {reactions ? <div className="absolute -top-3.5 -right-3 z-10 group-data-[role=user]:right-auto group-data-[role=user]:-left-3">{reactions}</div> : null}
+      </div>
       <div className="pointer-fine:absolute pointer-fine:top-1/2 pointer-fine:-translate-y-1/2 group-data-[role=assistant]:pointer-fine:left-full group-data-[role=assistant]:pointer-fine:ml-2 group-data-[role=user]:pointer-fine:right-full group-data-[role=user]:pointer-fine:mr-2">
         {actions}
       </div>
     </div>
   );
 
-  const avatar = message.role === 'user' ? null : (
-    <BotAvatar
-      activity={activity}
-      animate={live}
-      bot={bot ?? { name }}
-    />
-  );
-
   const filesView = files.length > 0 ? <RoomsChatFiles botId={botId} files={files} /> : null;
-  const filesContent = filesView && !actionsBlock && actions ? withActions(filesView) : filesView;
+  const filesContent = filesView && !actionsBlock && (actions || reactions) ? withActions(filesView) : filesView;
 
   return segments.map((segment) => {
     const first = segment.at(0);
@@ -139,7 +142,7 @@ export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle',
                 />
               ))
               .with({ kind: 'text' }, (text) => (
-                <MessageContent data-quote-id={message.id} tail={block === lastBubble?.at(-1)}>
+                <MessageContent data-quote-id={message.id}>
                   {block === firstText && reply ? <span className="line-clamp-2 border-l-2 border-current/40 pl-2 text-xs opacity-80">{m.rooms_chat_reply_quote({ name: reply.authorName, text: reply.text })}</span> : null}
                   {text.parts.map((part, index) => (
                     <Response
@@ -159,15 +162,11 @@ export function RoomsChatMessage({ message, botId, name, bot, activity = 'idle',
 
             return (
               <Fragment key={key}>
-                {block === namedBlock ? (
-                  <span className="flex items-center gap-1 px-4 text-xs font-medium text-muted-foreground">{name}</span>
-                ) : null}
-                {block === actionsBlock && actions ? withActions(content) : content}
+                {block === actionsBlock && (actions || reactions) ? withActions(content) : content}
               </Fragment>
             );
           })}
         </MessageStack>
-        {segment === lastBubble ? avatar : <span aria-hidden="true" className="size-8 shrink-0" />}
       </Message>
     );
   });

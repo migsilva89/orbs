@@ -26,7 +26,6 @@ export const ROOMS = {
   mediaRecentMs: 7 * 24 * 60 * 60 * 1000,
   routinesRefreshMs: 60_000,
   todosRefreshMs: 15_000,
-  showToolsKey: 'openbots.show-tools',
   draftKeyPrefix: 'openbots.draft.',
   prefillEvent: 'openbots.prefill',
   notifyIcon: '/img/favicon/web-app-manifest-192x192.png',

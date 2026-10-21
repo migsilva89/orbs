@@ -1,6 +1,6 @@
+import { useSettingsDevices } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { getLocale } from '@openbots/i18n/runtime';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useHydrated } from '@tanstack/react-router';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,6 @@ import { FormErrors } from '@/components/ui/forms/form';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/components/ui/panel';
 import { toasty } from '@/components/ui/sonner';
 import { clipboardCopy } from '@/lib/clipboard';
-import { rpc } from '@/services/rpc/rpc.client';
 import IconCopy from '~icons/lucide/copy';
 import IconLaptop from '~icons/lucide/laptop';
 import IconQrCode from '~icons/lucide/qr-code';
@@ -20,10 +19,10 @@ interface SettingsDevicesProps {
 }
 
 export function SettingsDevices({ connection }: SettingsDevicesProps) {
-  const { data: devices } = useSuspenseQuery(rpc.devices.list.queryOptions());
+  const settings = useSettingsDevices();
+  const devices = settings.devices.data ?? [];
   const hydrated = useHydrated();
   const date = new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium' });
-  const pair = useMutation(rpc.pairing.create.mutationOptions());
   const hostname = new URL(connection.serverUrl).hostname;
   const isLoopback = hostname === 'localhost' || hostname === '[::1]' || hostname.startsWith('127.') || hostname.endsWith('.localhost');
 
@@ -67,17 +66,17 @@ export function SettingsDevices({ connection }: SettingsDevicesProps) {
             <PanelTitle>{m.settings_devices_pair()}</PanelTitle>
             <PanelDescription>{m.settings_devices_pair_hint()}</PanelDescription>
           </PanelContent>
-          {pair.data ? (
+          {settings.pairing ? (
             <div className="flex flex-col items-start gap-2">
               <img
                 alt={m.settings_devices_pair_qr()}
                 className="size-48 rounded-lg bg-white p-2"
-                src={`data:image/svg+xml;utf8,${encodeURIComponent(pair.data.qr.svg)}`}
+                src={`data:image/svg+xml;utf8,${encodeURIComponent(settings.pairing.qr.svg)}`}
               />
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => void clipboardCopy(pair.data.qr.payload)
+                onClick={() => void clipboardCopy(settings.pairing?.qr.payload ?? '')
                   .then(() => toasty(m.settings_devices_pair_copied(), '📋'))
                   .catch(() => toasty(m.ui_copy_failed(), '🔴'))}
               >
@@ -87,15 +86,15 @@ export function SettingsDevices({ connection }: SettingsDevicesProps) {
             </div>
           ) : null}
           {isLoopback ? <PanelDescription>{m.settings_devices_pair_loopback()}</PanelDescription> : null}
-          <FormErrors error={pair.isError ? m.settings_devices_pair_error() : null} />
+          <FormErrors error={settings.pairProblem} />
           <ButtonLoading
             className="self-start"
-            loading={pair.isPending}
+            loading={settings.isPairing}
             size="sm"
             variant="outline"
-            onClick={() => pair.mutate({ serverUrl: connection.serverUrl })}
+            onClick={() => settings.pair(connection.serverUrl)}
           >
-            {pair.data ? m.settings_devices_pair_again() : m.settings_devices_pair_create()}
+            {settings.pairing ? m.settings_devices_pair_again() : m.settings_devices_pair_create()}
           </ButtonLoading>
         </div>
       </PanelRow>

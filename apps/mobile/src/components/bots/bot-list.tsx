@@ -1,6 +1,7 @@
 import { watchConversations } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { experimental_streamedQuery as streamedQuery, useQuery } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import { Bot, Plus, QrCode, Star, UserRound } from 'lucide-react-native';
 import { useState } from 'react';
 import { SectionList, View } from 'react-native';
@@ -41,6 +42,7 @@ interface BotListContentProps {
 function BotListContent({ session }: BotListContentProps) {
   const [search, setSearch] = useState('');
   const [collapsed, setCollapsed] = useState<BotHomeGroup[]>(['hidden']);
+  const router = useRouter();
 
   const query = useQuery({
     ...session.rpc.conversation.list.queryOptions(),
@@ -177,18 +179,10 @@ function BotListContent({ session }: BotListContentProps) {
           ))
           .exhaustive()}
         <FloatingBar edge="top">
-          <GlassButton
-            disabled
-            accessibilityHint={m.mobile_home_unavailable()}
-            accessibilityLabel={m.mobile_home_owner()}
-          >
+          <GlassButton accessibilityLabel={m.settings_title()} onPress={() => router.push('/settings')}>
             <Icon icon={UserRound} size="action" />
           </GlassButton>
-          <GlassButton
-            disabled
-            accessibilityHint={m.mobile_home_unavailable()}
-            accessibilityLabel={m.rooms_bot_title()}
-          >
+          <GlassButton accessibilityLabel={m.rooms_bot_title()} onPress={() => router.push('/bots/create')}>
             <Icon icon={Plus} size="action" />
           </GlassButton>
         </FloatingBar>

@@ -37,7 +37,7 @@ const MARKDOWN_SYNTAX = {
   },
 } as const;
 
-const MARKDOWN_TEXT = { fontFamily: 'Inter', fontSize: 16, lineHeight: 23, marginTop: 0, marginBottom: 8 };
+const MARKDOWN_TEXT = { fontFamily: 'Inter', fontSize: 16, lineHeight: 21, marginTop: 0, marginBottom: 8 };
 
 interface MarkdownProps {
   children: string;

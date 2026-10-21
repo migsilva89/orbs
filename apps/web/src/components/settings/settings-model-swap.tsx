@@ -1,7 +1,7 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
+import { useSettingsModelSwap } from '@openbots/client/react';
 import { botSwapModels } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 import { BotAvatar } from '@/components/bots/bot-avatar';
@@ -11,7 +11,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormErrors, FormErrorsAndHint, FormField, FormItem, FormLabel } from '@/components/ui/forms/form';
 import { Item, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
-import { rpc } from '@/services/rpc/rpc.client';
 import type { BotModelUsage } from '@openbots/client/client';
 
 interface SettingsModelSwapProps {
@@ -20,8 +19,6 @@ interface SettingsModelSwapProps {
 }
 
 export function SettingsModelSwap({ usage, onClose }: SettingsModelSwapProps) {
-  const queryClient = useQueryClient();
-
   const form = useForm({
     resolver: standardSchemaResolver(botSwapModels),
     defaultValues: {
@@ -36,13 +33,12 @@ export function SettingsModelSwap({ usage, onClose }: SettingsModelSwapProps) {
   const target = useWatch({ control: form.control, name: 'to' });
   const affected = [...new Map([...usage.primary, ...(includeFallbacks ? usage.fallbacks : [])].map((bot) => [bot.id, bot])).values()];
 
-  const swap = useMutation(rpc.bots.swapModels.mutationOptions({
-    onSuccess: async (result) => {
-      await queryClient.invalidateQueries({ queryKey: rpc.bots.list.key() });
-      toast.success(m.settings_models_saved({ primary: result.primary, fallbacks: result.fallbacks }));
+  const swap = useSettingsModelSwap({
+    onDone: (message) => {
+      toast.success(message);
       onClose();
     },
-  }));
+  });
 
   return (
     <Dialog open onOpenChange={(open) => !open && !swap.isPending && onClose()}>
@@ -52,7 +48,7 @@ export function SettingsModelSwap({ usage, onClose }: SettingsModelSwapProps) {
           <DialogDescription>{m.settings_models_replace_hint()}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="flex flex-col gap-4" onSubmit={form.handleSubmit((input) => swap.mutate({ ...input, botIds: affected.map((bot) => bot.id) }))}>
+          <form className="flex flex-col gap-4" onSubmit={form.handleSubmit((input) => swap.swap({ ...input, botIds: affected.map((bot) => bot.id) }))}>
             <FormField
               control={form.control}
               name="to"
@@ -107,7 +103,7 @@ export function SettingsModelSwap({ usage, onClose }: SettingsModelSwapProps) {
                 })}
               </ItemGroup>
             </div>
-            <FormErrors error={swap.isError ? m.settings_models_save_error() : null} />
+            <FormErrors error={swap.problem} />
             <DialogFooter>
               <ButtonLoading
                 disabled={affected.length === 0 || !target.modelId}

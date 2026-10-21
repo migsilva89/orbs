@@ -1,4 +1,4 @@
-import { useChatShowTools } from '@openbots/client/web';
+import { useChatHideVerbose } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { ClientOnly } from '@tanstack/react-router';
 import { useId, useState } from 'react';
@@ -41,8 +41,8 @@ function SettingsGeneralNotifications() {
 }
 
 export function SettingsGeneral() {
-  const tools = useChatShowTools();
-  const toolsId = useId();
+  const verbose = useChatHideVerbose();
+  const verboseId = useId();
 
   return (
     <SettingsPanel
@@ -54,13 +54,14 @@ export function SettingsGeneral() {
       <PanelRow>
         <IconWrench />
         <PanelContent>
-          <Label htmlFor={toolsId}>{m.settings_general_tools()}</Label>
-          <PanelDescription>{m.settings_general_tools_hint()}</PanelDescription>
+          <Label htmlFor={verboseId}>{m.settings_general_verbose()}</Label>
+          <PanelDescription>{m.settings_general_verbose_hint()}</PanelDescription>
         </PanelContent>
         <Switch
-          checked={tools.shown}
-          id={toolsId}
-          onCheckedChange={tools.toggle}
+          checked={verbose.hideVerbose}
+          disabled={verbose.isPending}
+          id={verboseId}
+          onCheckedChange={verbose.setHideVerbose}
         />
       </PanelRow>
       <ClientOnly>

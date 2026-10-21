@@ -2,6 +2,7 @@ import { InboxDoc } from '@earendil-works/pi-durable';
 import { REPLY } from '@openbots/contracts/universal';
 import { Errors } from '@openbots/errors/universal';
 import { match, P } from 'ts-pattern';
+import { runtimeActionInterrupt } from './runtime-action.interrupt';
 import { RUNTIME_ATTACHMENT_ENTRY } from './runtime-attachment.constants';
 import { runtimeMessageData, runtimeMessageInput } from './runtime-message.utils';
 import { runtimeQueryConversation } from './runtime-query.conversation';
@@ -9,7 +10,7 @@ import { runtimeQueryQuote } from './runtime-query.quote';
 import type { RuntimeQueuedInput } from '../../types/attachment.types';
 import type { RuntimeServiceDeps, RuntimeUpdateSubmissionParams } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
-import type { SubmissionId } from '@earendil-works/pi-durable';
+import type { ConversationId, SubmissionId } from '@earendil-works/pi-durable';
 import type { MessageQuote } from '@openbots/contracts/universal';
 
 export async function runtimeActionUpdateSubmission(
@@ -19,6 +20,10 @@ export async function runtimeActionUpdateSubmission(
 ) {
   const conversation = await runtimeQueryConversation(deps, params, context);
   const submissionId = params.submissionId as SubmissionId;
+
+  if (params.whenBusy === 'interrupt') {
+    return runtimeSubmissionInterrupt(deps, conversation.id, submissionId, context);
+  }
 
   const replyTo = await runtimeQueryQuote(deps, conversation.id, params.replyToEntryId, context);
 
@@ -44,6 +49,29 @@ export async function runtimeActionUpdateSubmission(
       })
       .exhaustive();
   }, context);
+}
+
+/** Sends a queued input now: Pi withdraws it from the inbox, then the same content and entry replace the running reply. */
+async function runtimeSubmissionInterrupt(deps: RuntimeServiceDeps, conversationId: ConversationId, submissionId: SubmissionId, context: Context) {
+  const inbox = await deps.harness.snapshot(InboxDoc, conversationId, context);
+
+  const queued = match(inbox?.items.find((item) => item.id === submissionId))
+    .with({ mode: P.union('followUp', 'steer') }, (item) => ({ content: item.content, entry: item.entry }))
+    .with(P.nullish, () => {
+      throw new Errors.NOT_FOUND({ resource: 'submission', resourceId: submissionId });
+    })
+    .otherwise(() => {
+      throw new Errors.CONFLICT();
+    });
+
+  await match(await deps.harness.abortSubmission(submissionId, context, conversationId))
+    .with('aborted', () => runtimeActionInterrupt(deps, conversationId, { requestId: `send-now-${submissionId}`, ...queued }, context))
+    .with('not_found', () => {
+      throw new Errors.NOT_FOUND({ resource: 'submission', resourceId: submissionId });
+    })
+    .otherwise(() => {
+      throw new Errors.CONFLICT();
+    });
 }
 
 function runtimeMessagePatch(

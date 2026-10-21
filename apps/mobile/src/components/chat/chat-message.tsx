@@ -1,11 +1,11 @@
 import { mentionMarkdown, mentionTarget } from '@openbots/client/client';
+import { useChatHideVerbose } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { useRouter } from 'expo-router';
 import { Linking } from 'react-native';
 import { match } from 'ts-pattern';
-import { Avatar } from '@/components/ui/avatar';
 import { Markdown } from '@/components/ui/markdown';
-import { Message, MessageBubble, MessageName, MessageQuote } from '@/components/ui/message';
+import { Message, MessageBubble, MessageQuote } from '@/components/ui/message';
 import { Text } from '@/components/ui/text';
 import { chatMessageSegments } from '@/services/chat/chat.utils';
 import { ChatArtifact } from './chat-artifact';
@@ -56,12 +56,10 @@ export function ChatMessage({
   const canReact = from === 'assistant' && entryId > 0;
   const name = message.metadata?.authorName ?? bot.name;
   const router = useRouter();
-  const segments = chatMessageSegments(message);
+  const { hideVerbose } = useChatHideVerbose();
+  const segments = chatMessageSegments(message, hideVerbose);
   const reply = message.metadata?.replyTo;
   const firstText = segments.flatMap((segment) => (segment.kind === 'bubbles' ? segment.parts : [])).find((part) => part.kind === 'markdown');
-  const bubbleSegments = segments.filter((segment) => segment.kind === 'bubbles');
-  const firstBubbles = bubbleSegments.at(0);
-  const lastBubbles = bubbleSegments.at(-1);
 
   const timeLabel = time ? (
     <Text
@@ -90,14 +88,6 @@ export function ChatMessage({
     return null;
   }
 
-  const avatar = (
-    <Avatar
-      avatar={bot.avatar}
-      name={name}
-      size="sm"
-    />
-  );
-
   function openLink(url: string) {
     const target = mentionTarget({ href: url });
 
@@ -107,14 +97,13 @@ export function ChatMessage({
       .otherwise(() => void Linking.openURL(url));
   }
 
-  function renderPart(part: ChatMessagePart, isLast: boolean) {
+  function renderPart(part: ChatMessagePart) {
     return match(part)
       .with({ kind: 'markdown' }, (text) => (
         <MessageBubble
           bubble={bubble}
           from={from}
           key={text.key}
-          tail={isLast}
         >
           {text === firstText && reply ? <MessageQuote>{m.rooms_chat_reply_quote({ name: reply.authorName, text: reply.text })}</MessageQuote> : null}
           <Markdown isStreaming={text.isStreaming} onLinkPress={openLink}>{mentionMarkdown({ text: text.text, bots })}</Markdown>
@@ -170,14 +159,12 @@ export function ChatMessage({
         ))
         .with({ kind: 'bubbles' }, (bubbles) => (
           <Message
-            avatar={bubbles === lastBubbles ? avatar : null}
             className={isSending ? 'opacity-60' : undefined}
             from={from}
             key={bubbles.key}
             onLongPress={isLive || isSending ? undefined : onLongPress}
           >
-            {from === 'assistant' && bubbles === firstBubbles ? <MessageName>{name}</MessageName> : null}
-            {bubbles.parts.map((part) => renderPart(part, bubbles === lastBubbles && part === bubbles.parts.at(-1)))}
+            {bubbles.parts.map(renderPart)}
           </Message>
         ))
         .exhaustive())}

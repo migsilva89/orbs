@@ -1,20 +1,33 @@
+import { m } from '@openbots/i18n/client';
 import { useMutation } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
-import type { ConversationTarget } from '@openbots/contracts/universal';
+import type { ChatQueueParams } from '../types/chat.types';
 
-/** Moves a queued follow-up into the running reply as a steer. */
-export function useChatQueue({ botId, conversationId }: Required<ConversationTarget>) {
+/** Queued inputs: send one now in place of the running reply, or remove one before the bot reads it. */
+export function useChatQueue({ botId, conversationId, onOutgoingChange }: ChatQueueParams) {
   const { rpc } = useRpc();
-  const promote = useMutation(rpc.conversation.updateSubmission.mutationOptions());
+  const interrupt = useMutation(rpc.conversation.updateSubmission.mutationOptions());
+  const cancel = useMutation(rpc.commands.execute.mutationOptions());
 
   return {
-    isPending: promote.isPending,
-    isFailed: (submissionId: number) => promote.isError && promote.variables.submissionId === submissionId,
-    steer: (submissionId: number) => promote.mutate({
+    isPending: interrupt.isPending || cancel.isPending,
+    problem: (submissionId: number) => {
+      if (interrupt.isError && interrupt.variables.submissionId === submissionId) {
+        return m.rooms_chat_queue_send_failed();
+      }
+
+      return cancel.isError && cancel.variables.arguments === String(submissionId) ? m.rooms_chat_queue_remove_failed() : null;
+    },
+    sendNow: (submissionId: number) => interrupt.mutate({
       botId,
       conversationId,
       submissionId,
-      whenBusy: 'steer',
+      whenBusy: 'interrupt',
     }),
+    remove: (submissionId: number) => cancel.mutate({
+      botId,
+      name: 'cancel',
+      arguments: String(submissionId),
+    }, { onSuccess: () => onOutgoingChange((items) => items.filter((item) => item.submissionId !== submissionId)) }),
   };
 }

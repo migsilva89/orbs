@@ -1,6 +1,7 @@
 import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entryPeerReply, entrySubagentReport, REACTION, reactionMessage, REPLY, replyMessage, toolCallJson } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { match, P } from 'ts-pattern';
+import { mentionSubmission } from '../mention/mention.client';
 import { CHAT } from './chat.constants';
 import type * as ChatTypes from '../../types/chat.types';
 import type * as UniversalTypes from '@openbots/contracts/universal';
@@ -391,4 +392,11 @@ export function chatAnswerProblem({ isGone, isError }: ChatTypes.ChatAnswerProbl
     .with({ isGone: true }, () => m.rooms_chat_approval_gone())
     .with({ isError: true }, () => m.rooms_chat_approval_error())
     .otherwise(() => null);
+}
+
+/** The `/reset` command in composer text, so an app can open its confirmation before clearing the input. */
+export function chatResetCommand(text: string): ChatTypes.ChatResetCommand | null {
+  const { command } = mentionSubmission({ text });
+
+  return command?.name === 'reset' ? { handoff: command.arguments || undefined } : null;
 }

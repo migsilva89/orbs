@@ -1,9 +1,9 @@
-import { mentionHref, mentionSegments, mentionSubmission, ROOMS, roomsMessageText } from '@openbots/client/client';
+import { chatResetCommand, mentionHref, mentionSegments, ROOMS, roomsMessageText } from '@openbots/client/client';
+import { useChatSend } from '@openbots/client/react';
 import { ATTACHMENT } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useMutationState, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { generateId } from 'ai';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { match, P } from 'ts-pattern';
 import { RoomsChatAttachments } from '@/components/rooms/rooms-chat-attachments';
@@ -13,7 +13,6 @@ import { RoomsMentionOption } from '@/components/rooms/rooms-mention-option';
 import { PromptInput, PromptInputActionMenu, PromptInputActionMenuContent, PromptInputActionMenuItem, PromptInputActionMenuTrigger, PromptInputQuote, PromptInputSubmit } from '@/components/ui/ai/prompt-input';
 import { InputGroupAddon } from '@/components/ui/input-group';
 import { useMessageScroller } from '@/components/ui/message-scroller';
-import { toasty } from '@/components/ui/sonner';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { useIsTouch } from '@/hooks/use-is-touch';
 import { usePreferences } from '@/hooks/use-preferences';
@@ -24,8 +23,7 @@ import IconPaperclip from '~icons/lucide/paperclip';
 import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
 import type { RoomsPrefill } from '@/types/rooms.types';
 import type { ChatMessage, ChatOutgoing, ChatQueued } from '@openbots/client/client';
-import type { Bot, CommandExecuteInput } from '@openbots/contracts/universal';
-import type { MutationState } from '@tanstack/react-query';
+import type { Bot } from '@openbots/contracts/universal';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 
 const PromptInputEditor = lazy(() => import('@/components/ui/ai/prompt-input-editor').then((module) => ({ default: module.PromptInputEditor })));
@@ -68,7 +66,6 @@ export function RoomsChatComposer({
   const { preferences } = usePreferences();
   const files = useRoomAttachments(bot.id);
   const fileInput = useRef<HTMLInputElement>(null);
-  const pendingRequest = useRef<{ key: string, id: string } | null>(null);
   const [text, setText] = useState('');
   const [skillsRequested, setSkillsRequested] = useState(false);
   const [commandsRequested, setCommandsRequested] = useState(false);
@@ -87,30 +84,19 @@ export function RoomsChatComposer({
     return () => window.removeEventListener(ROOMS.prefillEvent, restore);
   }, [bot.id, editor]);
 
-  const submit = useMutation(rpc.conversation.submit.mutationOptions());
   const navigate = useNavigate();
-  const execute = useMutation(rpc.commands.execute.mutationOptions());
-  const stop = useMutation(rpc.conversation.stop.mutationOptions({ onError: () => toasty(m.rooms_chat_stop_failed(), '⚠️') }));
 
-  const executed = useMutationState<MutationState<void, Error, CommandExecuteInput>>({
-    filters: { mutationKey: rpc.commands.execute.mutationKey(), status: 'success' },
+  const chat = useChatSend({
+    botId: bot.id,
+    conversationId,
+    latestEntryId,
+    onOutgoingChange,
+    onResetDone: () => {
+      editor.current?.restore([]);
+      draft.save('');
+    },
   });
 
-  const resetAt = Math.max(0, ...executed
-    .filter((command) => command.variables?.botId === bot.id && command.variables.name === 'reset')
-    .map((command) => command.submittedAt));
-
-  const clearedAt = useRef(resetAt);
-
-  useEffect(() => {
-    if (resetAt <= clearedAt.current) {
-      return;
-    }
-
-    clearedAt.current = resetAt;
-    editor.current?.restore([]);
-    draft.save('');
-  }, [resetAt, editor, draft]);
   const skillsOptions = rpc.skills.discover.queryOptions({ input: { botId: bot.id } });
   const commandsOptions = rpc.commands.list.queryOptions({ input: { botId: bot.id } });
 
@@ -127,11 +113,11 @@ export function RoomsChatComposer({
   });
 
   const isStopping = isBusy && !text.trim() && files.attachments.length === 0;
-  const isSendingFiles = submit.isPending && files.readyIds.length > 0;
+  const isSendingFiles = chat.isSending && files.readyIds.length > 0;
 
-  const submitStatus = match({ isStopping, submit })
+  const submitStatus = match({ isStopping, isSendFailed: chat.isSendFailed })
     .with({ isStopping: true }, () => 'streaming' as const)
-    .with({ submit: { isError: true } }, () => 'error' as const)
+    .with({ isSendFailed: true }, () => 'error' as const)
     .otherwise(() => 'ready' as const);
 
   const skillsEmpty = match(skills)
@@ -150,67 +136,6 @@ export function RoomsChatComposer({
     return sent ? mentionSegments({ text: roomsMessageText(sent) }) : null;
   };
 
-  async function send(value: string) {
-    const { content, skills: chosen, command } = mentionSubmission({ text: value });
-
-    if (command) {
-      await execute.mutateAsync({
-        botId: bot.id,
-        conversationId,
-        name: command.name,
-        arguments: command.arguments || undefined,
-      });
-
-      return;
-    }
-
-    const attachmentIds = files.readyIds;
-    const replyToEntryId = replyTo?.metadata?.entryId;
-
-    const key = JSON.stringify({
-      content,
-      chosen,
-      attachmentIds,
-      replyToEntryId,
-    });
-
-    const pending = pendingRequest.current?.key === key ? pendingRequest.current : { key, id: generateId() };
-    pendingRequest.current = null;
-
-    const outgoing: ChatOutgoing = {
-      requestId: pending.id,
-      botId: bot.id,
-      text: content,
-      afterEntryId: latestEntryId,
-      createdAt: Date.now(),
-    };
-
-    if (content) {
-      onOutgoingChange((items) => [...items.filter((item) => item.requestId !== pending.id), outgoing]);
-    }
-
-    try {
-      const { submissionId } = await submit.mutateAsync({
-        botId: bot.id,
-        conversationId,
-        requestId: pending.id,
-        content,
-        attachmentIds,
-        replyToEntryId,
-        skills: chosen.length > 0 ? chosen : undefined,
-      });
-
-      onOutgoingChange((items) => items.map((item) => (item.requestId === pending.id ? { ...item, submissionId } : item)));
-    } catch (error) {
-      pendingRequest.current = pending;
-      onOutgoingChange((items) => items.filter((item) => item.requestId !== pending.id));
-      throw error;
-    }
-
-    files.clear(attachmentIds);
-    onReplyChange((current) => (current?.metadata?.entryId === replyToEntryId ? null : current));
-  }
-
   return (
     <div className="mx-auto w-full max-w-3xl shrink-0 px-4 pb-4 keyboard:pb-1">
       <PromptInput
@@ -225,7 +150,7 @@ export function RoomsChatComposer({
 
           if (!value.trim() && files.readyIds.length === 0) {
             if (isBusy) {
-              stop.mutate({ botId: bot.id, conversationId });
+              chat.stop();
             }
 
             return false;
@@ -235,13 +160,13 @@ export function RoomsChatComposer({
             void Notification.requestPermission();
           }
 
-          const { command } = mentionSubmission({ text: value });
+          const reset = chatResetCommand(value);
 
-          if (command?.name === 'reset') {
+          if (reset) {
             void navigate({
               to: '/rooms/direct/$handle/reset',
               params: { handle: bot.handle },
-              search: { handoff: command.arguments || undefined },
+              search: reset,
             });
 
             return false;
@@ -251,10 +176,20 @@ export function RoomsChatComposer({
           scroller.scrollToEnd({ behavior: 'smooth' });
           draft.save('');
 
-          void send(value).catch(() => {
-            editor.current?.restore(mentionSegments({ text: value }));
-            toasty(m.rooms_chat_send_failed(), '⚠️');
-          });
+          const attachmentIds = files.readyIds;
+          const replyToEntryId = replyTo?.metadata?.entryId;
+          const restore = () => editor.current?.restore(mentionSegments({ text: value }));
+
+          void chat.send({
+            text: value,
+            attachmentIds,
+            replyToEntryId,
+          }).then((result) => match(result)
+            .with({ kind: 'sent' }, () => {
+              files.clear(attachmentIds);
+              onReplyChange((current) => (current?.metadata?.entryId === replyToEntryId ? null : current));
+            })
+            .otherwise(() => undefined), restore);
 
           return true;
         }}

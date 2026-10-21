@@ -1,6 +1,6 @@
-import { mentionLinks, mentionQuery, mentionSegments, mentionSubmission, roomsMessageText } from '@openbots/client/client';
+import { chatResetCommand, mentionLinks, mentionQuery, mentionSegments, roomsMessageText } from '@openbots/client/client';
+import { useChatSend } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useMutationState } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { ArrowUp, Plus, Square } from 'lucide-react-native';
 import { useState } from 'react';
@@ -12,13 +12,11 @@ import { Icon } from '@/components/ui/icon';
 import { PromptAttachment, PromptAttachments, PromptDock, PromptDrawer, PromptJump, PromptQuote } from '@/components/ui/prompt-drawer';
 import { PromptField, PromptMention } from '@/components/ui/prompt-field';
 import { useChatAttachments } from '@/hooks/use-chat-attachments';
-import { useToast } from '@/hooks/use-toast';
 import { ChatMentions } from './chat-mentions';
 import { ChatQueue } from './chat-queue';
 import type { RpcSession } from '@/types/rpc.types';
 import type * as ClientTypes from '@openbots/client/client';
-import type { Bot, CommandExecuteInput } from '@openbots/contracts/universal';
-import type { MutationState } from '@tanstack/react-query';
+import type { Bot } from '@openbots/contracts/universal';
 import type { Dispatch, SetStateAction } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 
@@ -60,7 +58,6 @@ export function ChatComposer({
   onLayout,
 }: ChatComposerProps) {
   const router = useRouter();
-  const toast = useToast();
   const [text, setText] = useState('');
   const [cursor, setCursor] = useState(0);
   const [picked, setPicked] = useState<ClientTypes.MentionItem[]>([]);
@@ -68,19 +65,17 @@ export function ChatComposer({
   const [quotedKey, setQuotedKey] = useState<string>();
   const [prefilled, setPrefilled] = useState<string>();
   const files = useChatAttachments(session, bot.id);
-  const submit = useMutation(session.rpc.conversation.submit.mutationOptions());
-  const execute = useMutation(session.rpc.commands.execute.mutationOptions());
-  const stop = useMutation(session.rpc.conversation.stop.mutationOptions({ onError: () => toast.show({ message: m.rooms_chat_stop_failed() }) }));
 
-  const executed = useMutationState<MutationState<void, Error, CommandExecuteInput>>({
-    filters: { mutationKey: session.rpc.commands.execute.mutationKey(), status: 'success' },
+  const chat = useChatSend({
+    botId: bot.id,
+    conversationId,
+    latestEntryId,
+    onOutgoingChange,
+    onResetDone: () => {
+      setText('');
+      setPicked([]);
+    },
   });
-
-  const resetAt = Math.max(0, ...executed
-    .filter((command) => command.variables?.botId === bot.id && command.variables.name === 'reset')
-    .map((command) => command.submittedAt));
-
-  const [clearedAt, setClearedAt] = useState(resetAt);
 
   if (quoteKey !== quotedKey) {
     setQuotedKey(quoteKey);
@@ -89,12 +84,6 @@ export function ChatComposer({
       setText(`${text.trimEnd()}${text.trim() ? ' ' : ''}${quote.label} `);
       setPicked([...picked, quote]);
     }
-  }
-
-  if (resetAt > clearedAt) {
-    setClearedAt(resetAt);
-    setText('');
-    setPicked([]);
   }
 
   if (prefill !== prefilled) {
@@ -110,7 +99,7 @@ export function ChatComposer({
   const query = mentionQuery({ text, cursor });
   const hasFiles = files.readyIds.length > 0;
   const isStopping = isBusy && !content && files.attachments.length === 0;
-  const isSendingFiles = submit.isPending && hasFiles;
+  const isSendingFiles = chat.isSending && hasFiles;
   const canSend = (content !== '' || hasFiles) && !files.uploading && !isSendingFiles;
 
   const stopIcon = (
@@ -146,13 +135,20 @@ export function ChatComposer({
   }
 
   async function send() {
-    const { content: message, skills, command } = mentionSubmission({ text: mentionLinks({ text: content, items: picked }) });
     const attachmentIds = files.readyIds;
     const replyToEntryId = replyTo?.metadata?.entryId;
     const draft = { text, picked };
 
-    if (command?.name === 'reset') {
-      router.push({ pathname: '/chat/[botId]/reset', params: { botId: bot.id, handoff: command.arguments || undefined } });
+    const restore = () => {
+      setText((current) => current || draft.text);
+      setPicked((items) => (items.length > 0 ? items : draft.picked));
+    };
+
+    const linked = mentionLinks({ text: content, items: picked });
+    const reset = chatResetCommand(linked);
+
+    if (reset) {
+      router.push({ pathname: '/chat/[botId]/reset', params: { botId: bot.id, ...reset } });
 
       return;
     }
@@ -160,53 +156,22 @@ export function ChatComposer({
     setText('');
     setPicked([]);
 
-    if (command) {
-      await execute.mutateAsync({
-        botId: bot.id,
-        conversationId,
-        name: command.name,
-        arguments: command.arguments || undefined,
-      }).catch(() => {
-        setText((current) => current || draft.text);
-        setPicked((items) => (items.length > 0 ? items : draft.picked));
-        toast.show({ message: m.rooms_chat_send_failed() });
-      });
-
-      return;
-    }
-
-    const requestId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
-    onReplyClear();
-    onSend();
-
-    if (message) {
-      onOutgoingChange((items) => [...items, { requestId, botId: bot.id, text: message, afterEntryId: latestEntryId, createdAt: Date.now() }]);
-    }
-
-    try {
-      const { submissionId } = await submit.mutateAsync({
-        botId: bot.id,
-        conversationId,
-        requestId,
-        content: message,
-        attachmentIds,
-        replyToEntryId,
-        skills: skills.length > 0 ? skills : undefined,
-      });
-
-      files.clear(attachmentIds);
-      onOutgoingChange((items) => items.map((item) => (item.requestId === requestId ? { ...item, submissionId } : item)));
-    } catch {
-      onOutgoingChange((items) => items.filter((item) => item.requestId !== requestId));
-      setText((current) => current || draft.text);
-      setPicked((items) => (items.length > 0 ? items : draft.picked));
-      toast.show({ message: m.rooms_chat_send_failed() });
-    }
+    await chat.send({
+      text: mentionLinks({ text: content, items: picked }),
+      attachmentIds,
+      replyToEntryId,
+    }).then((result) => match(result)
+      .with({ kind: 'sent' }, () => {
+        files.clear(attachmentIds);
+        onReplyClear();
+        onSend();
+      })
+      .otherwise(() => undefined), restore);
   }
 
   function handlePress() {
     match({ isStopping, canSend })
-      .with({ isStopping: true }, () => stop.mutate({ botId: bot.id, conversationId }))
+      .with({ isStopping: true }, chat.stop)
       .with({ canSend: false }, () => undefined)
       .otherwise(() => void send());
   }

@@ -115,3 +115,26 @@ export interface ChatAnswerProblemParams {
   isGone: boolean;
   isError: boolean;
 }
+
+export interface ChatSendParams {
+  botId: string;
+  conversationId: number;
+  latestEntryId: number;
+  /** Adds and settles the optimistic outgoing messages the transcript shows until the server echoes them. */
+  onOutgoingChange: (change: (items: ChatOutgoing[]) => ChatOutgoing[]) => void;
+  /** Clears the platform's input once a confirmed `/reset` succeeds; the draft stays while its confirmation is open. */
+  onResetDone: () => void;
+}
+
+export interface ChatSendInput {
+  /** Composer text with mentions as markdown links, as `mentionSubmission` expects. */
+  text: string;
+  attachmentIds: string[];
+  replyToEntryId?: number;
+}
+
+export type ChatSendResult = { kind: 'sent' } | { kind: 'command' } | { kind: 'reset'; handoff?: string };
+
+export interface ChatResetCommand {
+  handoff?: string;
+}

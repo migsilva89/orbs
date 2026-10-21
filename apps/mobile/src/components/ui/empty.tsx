@@ -80,7 +80,7 @@ export function EmptyLink({ className, ...props }: EmptyLinkProps) {
 }
 
 export function EmptyDescription({ className, ...props }: EmptyDescriptionProps) {
-  return <Text {...props} className={cn('max-w-md text-center', className)} tone="muted" variant="empty-description" />;
+  return <Text {...props} className={cn('max-w-xs text-center text-muted-foreground/70', className)} tone="muted" variant="empty-description" />;
 }
 
 interface EmptyContentProps extends ViewProps {

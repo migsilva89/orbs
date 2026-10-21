@@ -30,6 +30,8 @@ export interface RuntimeServiceParams {
 
 export interface RuntimeToolPolicy {
   authorize(call: RuntimeToolCall, context: Context): Promise<RuntimeToolDecision>;
+  /** How long an approval waits for an answer before it counts as denied. */
+  approvalTimeoutMs(): Promise<number>;
 }
 
 export interface RuntimeToolsDeps extends Pick<RuntimeServiceDeps, 'harness' | 'readOnlyTools' | 'ownTools'> {
@@ -192,6 +194,7 @@ export interface RuntimeApproval extends PiDurableTypes.JsonObject {
 export interface RuntimeApprovalRequest {
   call: RuntimeToolCall;
   taskId: PiDurableTypes.TaskId;
+  timeoutMs: number;
   context: Context;
 }
 

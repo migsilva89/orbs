@@ -4,7 +4,7 @@ import { useRpc } from './use-rpc';
 import type { SettingsDoneParams } from '../types/settings.types';
 import type { ToolSettingsForm } from '@openbots/contracts/universal';
 
-/** Tool approval rules and the JEV key; an empty key keeps the saved one. */
+/** Tool approval rules, the approval timeout and the JEV key; an empty key keeps the saved one. */
 export function useSettingsTools({ onDone }: SettingsDoneParams) {
   const queryClient = useQueryClient();
   const { rpc } = useRpc();
@@ -22,6 +22,6 @@ export function useSettingsTools({ onDone }: SettingsDoneParams) {
     settings,
     isPending: save.isPending,
     problem: save.isError ? m.settings_save_error() : null,
-    save: ({ approvalRules, jevApiKey }: ToolSettingsForm) => save.mutate({ approvalRules, jevApiKey: jevApiKey || undefined }),
+    save: ({ jevApiKey, ...form }: ToolSettingsForm) => save.mutate({ ...form, jevApiKey: jevApiKey || undefined }),
   };
 }

@@ -1,19 +1,21 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
 import { useSettingsTools } from '@openbots/client/react';
-import { toolSettingsForm } from '@openbots/contracts/universal';
+import { TOOL_APPROVAL, toolSettingsForm } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { SettingsToolsRules } from '@/components/settings/settings-tools-rules';
 import { ButtonLoading } from '@/components/ui/button-loading';
 import { Form, FormErrors } from '@/components/ui/forms/form';
 import { FormInput } from '@/components/ui/forms/form-input';
-import { PanelFooter, PanelRow } from '@/components/ui/panel';
+import { PanelContent, PanelDescription, PanelFooter, PanelRow, PanelTitle } from '@/components/ui/panel';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconKeyRound from '~icons/lucide/key-round';
 import IconListChecks from '~icons/lucide/list-checks';
 import IconShieldCheck from '~icons/lucide/shield-check';
+import IconTimer from '~icons/lucide/timer';
 
 export function SettingsTools() {
   const { data: settings } = useSuspenseQuery(rpc.tools.settings.queryOptions());
@@ -21,10 +23,14 @@ export function SettingsTools() {
   const form = useForm({
     resolver: standardSchemaResolver(toolSettingsForm),
     resetOptions: { keepDirtyValues: true },
-    values: { approvalRules: settings.approvalRules, jevApiKey: '' },
+    values: {
+      approvalRules: settings.approvalRules,
+      approvalTimeoutMinutes: settings.approvalTimeoutMinutes,
+      jevApiKey: '',
+    },
   });
 
-  const save = useSettingsTools({ onDone: () => form.reset({ approvalRules: form.getValues('approvalRules'), jevApiKey: '' }) });
+  const save = useSettingsTools({ onDone: () => form.reset({ ...form.getValues(), jevApiKey: '' }) });
 
   return (
     <Form {...form}>
@@ -40,6 +46,33 @@ export function SettingsTools() {
               <div className="min-w-0 flex-1">
                 <SettingsToolsRules disabled={save.isPending} />
               </div>
+            </PanelRow>
+            <PanelRow>
+              <IconTimer />
+              <PanelContent>
+                <PanelTitle>{m.settings_tools_timeout()}</PanelTitle>
+                <PanelDescription>{m.settings_tools_timeout_hint()}</PanelDescription>
+              </PanelContent>
+              <Controller
+                control={form.control}
+                name="approvalTimeoutMinutes"
+                render={({ field }) => (
+                  <Select
+                    disabled={save.isPending}
+                    value={String(field.value)}
+                    onValueChange={(value) => field.onChange(Number(value))}
+                  >
+                    <SelectTrigger aria-label={m.settings_tools_timeout()} className="w-auto">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {TOOL_APPROVAL.timeoutMinutes.map((minutes) => (
+                        <SelectItem key={minutes} value={String(minutes)}>{m.settings_tools_timeout_minutes({ count: minutes })}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </PanelRow>
             <PanelRow className="items-start">
               <IconKeyRound />

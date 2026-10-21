@@ -6,7 +6,11 @@ const target = path.join(root, 'apps/desktop/dist/openbots');
 
 rmSync(target, { recursive: true, force: true });
 
-const web = Bun.spawnSync(['bun', 'run', 'build'], { cwd: path.join(root, 'apps/web'), stdout: 'inherit', stderr: 'inherit' });
+const web = Bun.spawnSync(['bun', 'run', 'build'], {
+  cwd: path.join(root, 'apps/web'),
+  stdout: 'inherit',
+  stderr: 'inherit'
+});
 
 if (!web.success) {
   process.exit(1);

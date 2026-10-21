@@ -1,5 +1,5 @@
 import { useSettingsTools } from '@openbots/client/react';
-import { toolApprovalRules } from '@openbots/contracts/universal';
+import { TOOL_APPROVAL, toolApprovalRules } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { Pencil, ShieldCheck, Trash2 } from 'lucide-react-native';
 import { useState } from 'react';
@@ -49,6 +49,7 @@ function SettingsToolsForm({ settings, tools }: SettingsToolsFormProps) {
   const [draft, setDraft] = useState<ToolApprovalRule>({ when: '', behavior: 'allow' });
   const [editing, setEditing] = useState<number | null>(null);
   const [jevApiKey, setJevApiKey] = useState('');
+  const [approvalTimeoutMinutes, setApprovalTimeoutMinutes] = useState(settings.approvalTimeoutMinutes);
   const isValid = toolApprovalRules.element.safeParse(draft).success;
 
   const submitRule = () => {
@@ -125,6 +126,22 @@ function SettingsToolsForm({ settings, tools }: SettingsToolsFormProps) {
           ))}
         </ItemGroup>
       ) : null}
+      <View className="flex-row items-center justify-between gap-2">
+        <View className="flex-1">
+          <Text variant="label">{m.settings_tools_timeout()}</Text>
+          <LabelDescription>{m.settings_tools_timeout_hint()}</LabelDescription>
+        </View>
+        <Menu
+          items={TOOL_APPROVAL.timeoutMinutes.map((minutes) => ({
+            label: m.settings_tools_timeout_minutes({ count: minutes }),
+            systemImage: minutes === approvalTimeoutMinutes ? 'checkmark' : undefined,
+            onSelect: () => setApprovalTimeoutMinutes(minutes),
+          }))}
+          title={m.settings_tools_timeout()}
+        >
+          <Button size="sm" variant="outline">{m.settings_tools_timeout_minutes({ count: approvalTimeoutMinutes })}</Button>
+        </Menu>
+      </View>
       <Text variant="label">{m.settings_tools_jev()}</Text>
       <Input
         secureTextEntry
@@ -140,7 +157,11 @@ function SettingsToolsForm({ settings, tools }: SettingsToolsFormProps) {
       <Button
         loading={tools.isPending}
         size="sm"
-        onPress={() => tools.save({ approvalRules: rules, jevApiKey })}
+        onPress={() => tools.save({
+          approvalRules: rules,
+          approvalTimeoutMinutes,
+          jevApiKey,
+        })}
       >
         {m.settings_save()}
       </Button>

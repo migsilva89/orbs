@@ -8,8 +8,6 @@ export const runtimeToolApproval = defineDoc({
   initial: (): { approval: RuntimeApproval | null } => ({ approval: null }),
 });
 
-export const RUNTIME_APPROVAL_TIMEOUT_MS = 300_000;
-
 export const runtimeBot = defineDoc({
   kind: 'openbots.bot',
   version: 1,

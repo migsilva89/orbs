@@ -5,12 +5,20 @@ export const toolApprovalRules = z.array(z.object({
   behavior: z.enum(['allow', 'ask']),
 })).max(50);
 
+export const TOOL_APPROVAL = {
+  timeoutMinutes: [1, 2, 3, 5, 10],
+  defaultTimeoutMinutes: 5,
+} as const;
+
+export const toolApprovalTimeout = z.number().int().min(1).max(10);
+
 export const toolSettings = z.object({
   isJevConfigured: z.boolean(),
   approvalRules: toolApprovalRules,
+  approvalTimeoutMinutes: toolApprovalTimeout,
 });
 
-export const toolConfigure = toolSettings.pick({ approvalRules: true }).extend({
+export const toolConfigure = toolSettings.pick({ approvalRules: true, approvalTimeoutMinutes: true }).extend({
   jevApiKey: z.string().trim().min(1).max(8192).nullable(),
 }).partial();
 
@@ -40,6 +48,7 @@ export const toolAnswerResult = z.object({ accepted: z.boolean() });
 
 export const toolSettingsForm = z.object({
   approvalRules: toolApprovalRules,
+  approvalTimeoutMinutes: toolApprovalTimeout,
   jevApiKey: z.string().trim().max(8192),
 });
 

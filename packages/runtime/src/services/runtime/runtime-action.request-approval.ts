@@ -1,13 +1,13 @@
 import { copyJson } from '@earendil-works/chord';
 import { awaitWithContext } from '@earendil-works/chord/context';
 import { match } from 'ts-pattern';
-import { RUNTIME_APPROVAL_TIMEOUT_MS, runtimeToolApproval } from './runtime.constants';
+import { runtimeToolApproval } from './runtime.constants';
 import type { RuntimeApprovalRequest, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { JsonObject } from '@earendil-works/pi-durable';
 
 export async function runtimeActionRequestApproval(
   { harness }: Pick<RuntimeServiceDeps, 'harness'>,
-  { call, taskId, context }: RuntimeApprovalRequest,
+  { call, taskId, timeoutMs, context }: RuntimeApprovalRequest,
 ): Promise<boolean> {
   const input = copyJson(call.arguments, { omitUndefinedProperties: true }) as JsonObject;
 
@@ -19,7 +19,7 @@ export async function runtimeActionRequestApproval(
       toolName: call.name,
       arguments: input,
       createdAt: Date.now(),
-      expiresAt: Date.now() + RUNTIME_APPROVAL_TIMEOUT_MS,
+      expiresAt: Date.now() + timeoutMs,
       status: 'pending',
       answeredAt: null,
       answeredBy: null,

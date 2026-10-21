@@ -41,6 +41,7 @@ export function runtimeToolsExtension({ harness, readOnlyTools, ownTools, permis
                 const approved = await runtimeActionRequestApproval({ harness }, {
                   call: input,
                   taskId: api.taskId,
+                  timeoutMs: await permissions.approvalTimeoutMs(),
                   context,
                 });
 

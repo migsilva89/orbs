@@ -1,7 +1,7 @@
 import { mentionHref, mentionSegments, mentionSubmission, ROOMS, roomsMessageText } from '@openbots/client/client';
 import { ATTACHMENT } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useMutationState, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { generateId } from 'ai';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
@@ -24,7 +24,8 @@ import IconPaperclip from '~icons/lucide/paperclip';
 import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
 import type { RoomsPrefill } from '@/types/rooms.types';
 import type { ChatMessage, ChatOutgoing, ChatQueued } from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot, CommandExecuteInput } from '@openbots/contracts/universal';
+import type { MutationState } from '@tanstack/react-query';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 
 const PromptInputEditor = lazy(() => import('@/components/ui/ai/prompt-input-editor').then((module) => ({ default: module.PromptInputEditor })));
@@ -90,6 +91,26 @@ export function RoomsChatComposer({
   const navigate = useNavigate();
   const execute = useMutation(rpc.commands.execute.mutationOptions());
   const stop = useMutation(rpc.conversation.stop.mutationOptions());
+
+  const executed = useMutationState<MutationState<void, Error, CommandExecuteInput>>({
+    filters: { mutationKey: rpc.commands.execute.mutationKey(), status: 'success' },
+  });
+
+  const resetAt = Math.max(0, ...executed
+    .filter((command) => command.variables?.botId === bot.id && command.variables.name === 'reset')
+    .map((command) => command.submittedAt));
+
+  const clearedAt = useRef(resetAt);
+
+  useEffect(() => {
+    if (resetAt <= clearedAt.current) {
+      return;
+    }
+
+    clearedAt.current = resetAt;
+    editor.current?.restore([]);
+    draft.save('');
+  }, [resetAt, editor, draft]);
   const skillsOptions = rpc.skills.discover.queryOptions({ input: { botId: bot.id } });
   const commandsOptions = rpc.commands.list.queryOptions({ input: { botId: bot.id } });
 
@@ -131,16 +152,6 @@ export function RoomsChatComposer({
 
   async function send(value: string) {
     const { content, skills: chosen, command } = mentionSubmission({ text: value });
-
-    if (command?.name === 'reset') {
-      await navigate({
-        to: '/rooms/direct/$handle/reset',
-        params: { handle: bot.handle },
-        search: { handoff: command.arguments || undefined },
-      });
-
-      return;
-    }
 
     if (command) {
       await execute.mutateAsync({
@@ -222,6 +233,18 @@ export function RoomsChatComposer({
 
           if (Object.hasOwn(globalThis, 'Notification') && Notification.permission === 'default' && !window.__electrobunSendToHost) {
             void Notification.requestPermission();
+          }
+
+          const { command } = mentionSubmission({ text: value });
+
+          if (command?.name === 'reset') {
+            void navigate({
+              to: '/rooms/direct/$handle/reset',
+              params: { handle: bot.handle },
+              search: { handoff: command.arguments || undefined },
+            });
+
+            return false;
           }
 
           onSend?.();

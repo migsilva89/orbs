@@ -190,7 +190,7 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
           </BotDetailsSection>
           {isDeletable ? (
             <Button
-              disabled={isBusy}
+              disabled={isBusy || isDirty}
               size="sm"
               variant="link-destructive"
               onPress={() => router.push({ pathname: '/bots/[botId]/delete', params: { botId: bot.id } })}

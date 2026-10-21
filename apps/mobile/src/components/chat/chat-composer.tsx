@@ -1,6 +1,6 @@
 import { mentionLinks, mentionQuery, mentionSegments, mentionSubmission, roomsMessageText } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useMutationState } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { ArrowUp, Plus, Square } from 'lucide-react-native';
 import { useState } from 'react';
@@ -17,7 +17,8 @@ import { ChatMentions } from './chat-mentions';
 import { ChatQueue } from './chat-queue';
 import type { RpcSession } from '@/types/rpc.types';
 import type * as ClientTypes from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot, CommandExecuteInput } from '@openbots/contracts/universal';
+import type { MutationState } from '@tanstack/react-query';
 import type { Dispatch, SetStateAction } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 
@@ -71,6 +72,16 @@ export function ChatComposer({
   const execute = useMutation(session.rpc.commands.execute.mutationOptions());
   const stop = useMutation(session.rpc.conversation.stop.mutationOptions());
 
+  const executed = useMutationState<MutationState<void, Error, CommandExecuteInput>>({
+    filters: { mutationKey: session.rpc.commands.execute.mutationKey(), status: 'success' },
+  });
+
+  const resetAt = Math.max(0, ...executed
+    .filter((command) => command.variables?.botId === bot.id && command.variables.name === 'reset')
+    .map((command) => command.submittedAt));
+
+  const [clearedAt, setClearedAt] = useState(resetAt);
+
   if (quoteKey !== quotedKey) {
     setQuotedKey(quoteKey);
 
@@ -78,6 +89,12 @@ export function ChatComposer({
       setText(`${text.trimEnd()}${text.trim() ? ' ' : ''}${quote.label} `);
       setPicked([...picked, quote]);
     }
+  }
+
+  if (resetAt > clearedAt) {
+    setClearedAt(resetAt);
+    setText('');
+    setPicked([]);
   }
 
   if (prefill !== prefilled) {
@@ -133,14 +150,14 @@ export function ChatComposer({
     const replyToEntryId = replyTo?.metadata?.entryId;
     const draft = { text, picked };
 
-    setText('');
-    setPicked([]);
-
     if (command?.name === 'reset') {
       router.push({ pathname: '/chat/[botId]/reset', params: { botId: bot.id, handoff: command.arguments || undefined } });
 
       return;
     }
+
+    setText('');
+    setPicked([]);
 
     if (command) {
       await execute.mutateAsync({

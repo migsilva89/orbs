@@ -14,7 +14,3 @@ export function useConnection() {
 export function useConnectionIsConnected() {
   return useConnection().session !== null;
 }
-
-export function useConnectionIsDisconnected() {
-  return !useConnectionIsConnected();
-}

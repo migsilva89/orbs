@@ -266,7 +266,7 @@
   "rooms_todos_drag": "Reorder {title}",
   "rooms_todos_remove": "Delete {title}",
   "rooms_todos_prompt": "Create a todo to ",
-  "rooms_routines_prompt": "Create a routine to ",
+  "rooms_routines_prefill": "Create a routine to ",
   "rooms_prefill_create": "Create one",
   "rooms_prefill_create_inline": "create one",
   "rooms_prefill_by_asking": "by asking {bot}.",
@@ -301,5 +301,8 @@
   "rooms_notice_subagent_answered": "{name} finished",
   "rooms_notice_subagent_failed": "{name} failed",
   "rooms_notice_compacted": "Earlier messages were summarized",
-  "rooms_notice_reset": "New session started"
+  "rooms_notice_reset": "New session started",
+  "mobile_bot_discard_title": "Discard your changes?",
+  "mobile_bot_discard": "Discard changes",
+  "mobile_bot_keep_editing": "Keep editing"
 }

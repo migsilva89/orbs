@@ -10,13 +10,15 @@ interface FormInputProps extends ComponentProps<typeof Input> {
   hint?: string;
   error?: string | null;
   required?: boolean;
+  /** Keeps the label for screen readers only, when a section title already names the field. */
+  isLabelHidden?: boolean;
 }
 
-export function FormInput({ label, hint, error, required, editable = true, ...props }: FormInputProps) {
+export function FormInput({ label, hint, error, required, isLabelHidden = false, editable = true, ...props }: FormInputProps) {
   const id = useId();
   return (
     <View className="min-w-0 gap-2">
-      <Label disabled={!editable} invalid={Boolean(error)} nativeID={id} required={required}>{label}</Label>
+      {isLabelHidden ? null : <Label disabled={!editable} invalid={Boolean(error)} nativeID={id} required={required}>{label}</Label>}
       <Input {...props} accessibilityLabel={label} accessibilityLabelledBy={id} editable={editable} invalid={Boolean(error)} />
       {match(error)
         .with(P.string, (message) => <LabelDescription accessibilityRole="alert" variant="error">{message}</LabelDescription>)

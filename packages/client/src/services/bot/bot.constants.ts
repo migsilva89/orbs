@@ -32,6 +32,13 @@ export const BOT_PERMISSION_LABELS = {
   full: m.rooms_bot_permission_full,
 } satisfies Record<BotTypes.BotPermission, () => string>;
 
+export const BOT_PERMISSION_HINTS = {
+  'read-only': m.rooms_bot_permission_read_only_hint,
+  ask: m.rooms_bot_permission_ask_hint,
+  auto: m.rooms_bot_permission_auto_hint,
+  full: m.rooms_bot_permission_full_hint,
+} satisfies Record<BotTypes.BotPermission, () => string>;
+
 export const BOT_THINKING_LEVEL_LABELS = {
   off: m.rooms_bot_thinking_level_off,
   minimal: m.rooms_bot_thinking_level_minimal,

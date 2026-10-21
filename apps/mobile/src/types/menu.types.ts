@@ -17,4 +17,5 @@ export interface MenuProps {
   items: MenuItem[];
   children: ReactElement;
   isFullWidth?: boolean;
+  isDisabled?: boolean;
 }

@@ -1,6 +1,6 @@
 import { BOT_ACTIVITY_LABELS } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { ChevronLeft, Ellipsis } from 'lucide-react-native';
 import { View } from 'react-native';
 import { BotActionsMenu } from '@/components/bots/bot-actions-menu';
@@ -10,7 +10,6 @@ import { GlassButton } from '@/components/ui/glass-button';
 import { GlassSurface } from '@/components/ui/glass-surface';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import type { NavigationRoot } from '@/types/navigation.types';
 import type { ChatActivity } from '@openbots/client/client';
 import type { Bot } from '@openbots/contracts/universal';
 
@@ -20,11 +19,11 @@ interface ChatHeaderProps {
 }
 
 export function ChatHeader({ bot, activity }: ChatHeaderProps) {
-  const navigation = useNavigation<NavigationRoot>();
+  const router = useRouter();
 
   return (
     <FloatingBar edge="top">
-      <GlassButton accessibilityLabel={m.mobile_chat_back()} onPress={() => navigation.goBack()}>
+      <GlassButton accessibilityLabel={m.mobile_chat_back()} onPress={() => router.back()}>
         <Icon icon={ChevronLeft} size="action" />
       </GlassButton>
       <BotActionsMenu botId={bot.id} mode="longPress">
@@ -48,7 +47,7 @@ export function ChatHeader({ bot, activity }: ChatHeaderProps) {
           </View>
         </GlassSurface>
       </BotActionsMenu>
-      <GlassButton accessibilityLabel={m.rooms_details_more()} onPress={() => navigation.navigate('BotDetails', { botId: bot.id })}>
+      <GlassButton accessibilityLabel={m.rooms_details_more()} onPress={() => router.push({ pathname: '/bots/[botId]/details', params: { botId: bot.id } })}>
         <Icon icon={Ellipsis} size="action" />
       </GlassButton>
     </FloatingBar>

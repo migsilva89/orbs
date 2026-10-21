@@ -1,7 +1,9 @@
 import { m } from '@openbots/i18n/client';
 import { AlertDialog as AlertDialogPrimitive } from 'radix-ui';
+import { useState } from 'react';
 import { cn } from '@/lib/cn';
 import { Button } from './button';
+import { Input } from './input';
 import type { ComponentProps, ReactNode } from 'react';
 
 function AlertDialog({ ...props }: ComponentProps<typeof AlertDialogPrimitive.Root>) {
@@ -159,20 +161,46 @@ interface ConfirmationDialogProps extends Omit<ComponentProps<typeof AlertDialog
   onConfirm: () => void
   onOpenChange: (open: boolean) => void
   variant?: ComponentProps<typeof AlertDialogAction>['variant']
+  /** Text the user must type before the confirm button is enabled, such as the bot name. */
+  confirmText?: string
+  error?: string | null
   children: ReactNode
 }
 
-function ConfirmationDialog({ title, confirmLabel, pending, onConfirm, onOpenChange, variant, children, ...props }: ConfirmationDialogProps) {
+function ConfirmationDialog(props: ConfirmationDialogProps) {
+  const { title, confirmLabel, pending, onConfirm, onOpenChange, variant, confirmText, error, children, ...rootProps } = props;
+  const [typed, setTyped] = useState('');
+  const isConfirmed = !confirmText || typed.trim() === confirmText;
+
   return (
-    <AlertDialog open onOpenChange={onOpenChange} {...props}>
-      <AlertDialogContent>
+    <AlertDialog open onOpenChange={(open) => !pending && onOpenChange(open)} {...rootProps}>
+      <AlertDialogContent size="sm">
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{children}</AlertDialogDescription>
         </AlertDialogHeader>
+        {confirmText ? (
+          <Input
+            aria-label={m.ui_confirm_type_name({ name: confirmText })}
+            autoComplete="off"
+            disabled={pending}
+            placeholder={m.ui_confirm_type_name({ name: confirmText })}
+            spellCheck={false}
+            value={typed}
+            onChange={(event) => setTyped(event.target.value)}
+          />
+        ) : null}
+        {error ? <p className="text-center text-xs text-destructive" role="alert">{error}</p> : null}
         <AlertDialogFooter>
           <AlertDialogCancel disabled={pending}>{m.ui_cancel()}</AlertDialogCancel>
-          <AlertDialogAction disabled={pending} variant={variant} onClick={onConfirm}>
+          <AlertDialogAction
+            disabled={pending || !isConfirmed}
+            variant={variant}
+            onClick={(event) => {
+              event.preventDefault();
+              onConfirm();
+            }}
+          >
             {confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>

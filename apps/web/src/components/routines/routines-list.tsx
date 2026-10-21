@@ -48,7 +48,7 @@ export function RoutinesList({ bot }: RoutinesListProps) {
             <>
               {m.rooms_routines_empty_hint({ bot: bot.name })}
               {' '}
-              <RoomsPrefillLink bot={bot} prompt={m.rooms_routines_prompt()}>{m.rooms_prefill_create_inline()}</RoomsPrefillLink>
+              <RoomsPrefillLink bot={bot} prompt={m.rooms_routines_prefill()}>{m.rooms_prefill_create_inline()}</RoomsPrefillLink>
               {' '}
               {m.rooms_prefill_by_asking({ bot: bot.name })}
             </>
@@ -59,7 +59,7 @@ export function RoutinesList({ bot }: RoutinesListProps) {
       ) : null}
       {(list.data ?? []).length > 0 ? (
         <p className="text-xs text-muted-foreground [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary">
-          <RoomsPrefillLink bot={bot} prompt={m.rooms_routines_prompt()}>{m.rooms_prefill_create()}</RoomsPrefillLink>
+          <RoomsPrefillLink bot={bot} prompt={m.rooms_routines_prefill()}>{m.rooms_prefill_create()}</RoomsPrefillLink>
         </p>
       ) : null}
     </div>

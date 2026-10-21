@@ -1,17 +1,16 @@
 import { ROOMS_MUTE_DURATIONS, ROOMS_SEND_MODES } from '@openbots/client/client';
 import { conversationWhenBusy } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
-import { useNavigation } from '@react-navigation/native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import { useToast } from '@/hooks/use-toast';
 import type { MenuItem } from '@/types/menu.types';
-import type { NavigationRoot } from '@/types/navigation.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type { ConversationListItem } from '@openbots/contracts/universal';
 
 export function useBotActions(session: RpcSession, chat: ConversationListItem): MenuItem[] {
   const queryClient = useQueryClient();
-  const navigation = useNavigation<NavigationRoot>();
+  const router = useRouter();
   const toast = useToast();
   const { data: settings } = useQuery(session.rpc.conversation.settings.queryOptions());
   const { botId } = chat;
@@ -66,6 +65,7 @@ export function useBotActions(session: RpcSession, chat: ConversationListItem): 
   };
 
   return [
+    { label: m.rooms_action_edit_bot(), systemImage: 'pencil.line', onSelect: () => router.push({ pathname: '/bots/[botId]/edit', params: { botId } }) },
     ...pinItems,
     {
       label: chat.isHidden ? m.rooms_action_unhide() : m.rooms_action_hide(),
@@ -78,13 +78,13 @@ export function useBotActions(session: RpcSession, chat: ConversationListItem): 
       label: m.rooms_member_reset(),
       systemImage: 'arrow.counterclockwise',
       hasDividerBefore: true,
-      onSelect: () => navigation.navigate('ChatReset', { botId }),
+      onSelect: () => router.push({ pathname: '/chat/[botId]/reset', params: { botId } }),
     },
     {
       label: m.rooms_bot_delete(),
       systemImage: 'trash',
       isDestructive: true,
-      onSelect: () => navigation.navigate('BotDelete', { botId }),
+      onSelect: () => router.push({ pathname: '/bots/[botId]/delete', params: { botId } }),
     },
   ];
 }

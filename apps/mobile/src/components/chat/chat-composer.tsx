@@ -1,6 +1,7 @@
 import { mentionLinks, mentionQuery, mentionSegments, mentionSubmission, roomsMessageText } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import { ArrowUp, Plus, Square } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActionSheetIOS, View } from 'react-native';
@@ -14,7 +15,6 @@ import { useChatAttachments } from '@/hooks/use-chat-attachments';
 import { useToast } from '@/hooks/use-toast';
 import { ChatMentions } from './chat-mentions';
 import { ChatQueue } from './chat-queue';
-import type { ChatPrefill } from '@/types/chat.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type * as ClientTypes from '@openbots/client/client';
 import type { Bot } from '@openbots/contracts/universal';
@@ -29,7 +29,7 @@ interface ChatComposerProps {
   latestEntryId: number;
   queued: ClientTypes.ChatQueued[];
   quote?: ClientTypes.MentionItem;
-  prefill?: ChatPrefill;
+  prefill?: string;
   isBusy: boolean;
   replyTo: ClientTypes.ChatMessage | null;
   unread: number;
@@ -58,19 +58,21 @@ export function ChatComposer({
   onSend,
   onLayout,
 }: ChatComposerProps) {
+  const router = useRouter();
   const toast = useToast();
   const [text, setText] = useState('');
   const [cursor, setCursor] = useState(0);
   const [picked, setPicked] = useState<ClientTypes.MentionItem[]>([]);
-  const [quoted, setQuoted] = useState(quote);
-  const [prefilled, setPrefilled] = useState(prefill);
+  const quoteKey = quote ? `${quote.href} ${quote.label}` : undefined;
+  const [quotedKey, setQuotedKey] = useState<string>();
+  const [prefilled, setPrefilled] = useState<string>();
   const files = useChatAttachments(session, bot.id);
   const submit = useMutation(session.rpc.conversation.submit.mutationOptions());
   const execute = useMutation(session.rpc.commands.execute.mutationOptions());
   const stop = useMutation(session.rpc.conversation.stop.mutationOptions());
 
-  if (quote !== quoted) {
-    setQuoted(quote);
+  if (quoteKey !== quotedKey) {
+    setQuotedKey(quoteKey);
 
     if (quote) {
       setText(`${text.trimEnd()}${text.trim() ? ' ' : ''}${quote.label} `);
@@ -82,8 +84,8 @@ export function ChatComposer({
     setPrefilled(prefill);
 
     if (prefill && !text.trim()) {
-      setText(prefill.text);
-      setCursor(prefill.text.length);
+      setText(prefill);
+      setCursor(prefill.length);
     }
   }
 
@@ -133,6 +135,12 @@ export function ChatComposer({
 
     setText('');
     setPicked([]);
+
+    if (command?.name === 'reset') {
+      router.push({ pathname: '/chat/[botId]/reset', params: { botId: bot.id, handoff: command.arguments || undefined } });
+
+      return;
+    }
 
     if (command) {
       await execute.mutateAsync({

@@ -1,5 +1,5 @@
-export interface TodosDeleteRouteParams {
+export interface TodosDeleteRouteParams extends Record<string, string | string[] | undefined> {
   botId: string;
-  todoId: number;
+  todoId: string;
   title: string;
 }

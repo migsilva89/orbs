@@ -1,7 +1,6 @@
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ConfirmationDialog } from '@/components/ui/alert-dialog';
-import { FormErrors } from '@/components/ui/forms/form';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { Device } from '@openbots/contracts/universal';
 
@@ -23,6 +22,7 @@ export function SettingsDeviceRevokeDialog({ device, onOpenChange }: SettingsDev
   return (
     <ConfirmationDialog
       confirmLabel={m.settings_devices_revoke()}
+      error={revoke.isError ? m.settings_devices_revoke_error() : null}
       pending={revoke.isPending}
       title={m.settings_devices_revoke_title({ name: device.name })}
       variant="destructive"
@@ -30,7 +30,6 @@ export function SettingsDeviceRevokeDialog({ device, onOpenChange }: SettingsDev
       onOpenChange={onOpenChange}
     >
       {m.settings_devices_revoke_description()}
-      <FormErrors error={revoke.isError ? m.settings_devices_revoke_error() : null} />
     </ConfirmationDialog>
   );
 }

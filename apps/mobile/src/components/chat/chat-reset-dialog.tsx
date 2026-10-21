@@ -1,33 +1,41 @@
 import { m } from '@openbots/i18n/client';
-import { useNavigation } from '@react-navigation/native';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import { match, P } from 'ts-pattern';
-import { ConfirmSheet } from '@/components/ui/confirm-sheet';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { useChatReturn } from '@/hooks/use-chat-return';
 import { useConnection } from '@/hooks/use-connection';
 import { useToast } from '@/hooks/use-toast';
-import type { BotDetailsRouteParams } from '@/types/bot-details.types';
-import type { NavigationRoot } from '@/types/navigation.types';
 import type { RpcSession } from '@/types/rpc.types';
 
-interface ChatResetSheetProps {
-  route: { params: BotDetailsRouteParams };
+interface ChatResetDialogProps {
+  botId: string;
+  handoff?: string;
 }
 
-export function ChatResetSheet({ route }: ChatResetSheetProps) {
+export function ChatResetDialog({ botId, handoff }: ChatResetDialogProps) {
   const { session } = useConnection();
 
   return match(session)
-    .with(P.nonNullable, (current) => <ChatResetSheetContent botId={route.params.botId} session={current} />)
+    .with(P.nonNullable, (current) => (
+      <ChatResetDialogContent
+        botId={botId}
+        handoff={handoff}
+        session={current}
+      />
+    ))
     .otherwise(() => null);
 }
 
-interface ChatResetSheetContentProps {
+interface ChatResetDialogContentProps {
   session: RpcSession;
   botId: string;
+  handoff?: string;
 }
 
-function ChatResetSheetContent({ session, botId }: ChatResetSheetContentProps) {
-  const navigation = useNavigation<NavigationRoot>();
+function ChatResetDialogContent({ session, botId, handoff }: ChatResetDialogContentProps) {
+  const router = useRouter();
+  const returnToChat = useChatReturn();
   const toast = useToast();
   const bots = useQuery(session.rpc.bots.list.queryOptions());
   const name = bots.data?.find((item) => item.id === botId)?.name ?? '';
@@ -35,19 +43,25 @@ function ChatResetSheetContent({ session, botId }: ChatResetSheetContentProps) {
   const reset = useMutation(session.rpc.commands.execute.mutationOptions({
     onSuccess: () => {
       toast.show({ message: m.rooms_fresh_done(), variant: 'default' });
-      navigation.popTo('Chat', { botId }, { merge: true });
+      returnToChat({ botId });
     },
   }));
 
   return (
-    <ConfirmSheet
+    <ConfirmDialog
+      isDestructive
       confirmLabel={m.rooms_member_reset()}
+      confirmText={name}
       description={m.rooms_reset_description({ bot: name })}
       error={reset.isError ? m.rooms_fresh_failed() : null}
       isPending={reset.isPending}
       title={m.rooms_reset_title({ bot: name })}
-      onCancel={() => navigation.goBack()}
-      onConfirm={() => reset.mutate({ botId, name: 'reset' })}
+      onCancel={() => router.back()}
+      onConfirm={() => reset.mutate({
+        botId,
+        name: 'reset',
+        arguments: handoff,
+      })}
     />
   );
 }

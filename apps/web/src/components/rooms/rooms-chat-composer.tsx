@@ -2,6 +2,7 @@ import { mentionHref, mentionSegments, mentionSubmission, ROOMS, roomsMessageTex
 import { ATTACHMENT } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { generateId } from 'ai';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { match, P } from 'ts-pattern';
@@ -86,6 +87,7 @@ export function RoomsChatComposer({
   }, [bot.id, editor]);
 
   const submit = useMutation(rpc.conversation.submit.mutationOptions());
+  const navigate = useNavigate();
   const execute = useMutation(rpc.commands.execute.mutationOptions());
   const stop = useMutation(rpc.conversation.stop.mutationOptions());
   const skillsOptions = rpc.skills.discover.queryOptions({ input: { botId: bot.id } });
@@ -129,6 +131,16 @@ export function RoomsChatComposer({
 
   async function send(value: string) {
     const { content, skills: chosen, command } = mentionSubmission({ text: value });
+
+    if (command?.name === 'reset') {
+      await navigate({
+        to: '/rooms/direct/$handle/reset',
+        params: { handle: bot.handle },
+        search: { handoff: command.arguments || undefined },
+      });
+
+      return;
+    }
 
     if (command) {
       await execute.mutateAsync({

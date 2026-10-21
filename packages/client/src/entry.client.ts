@@ -3,6 +3,7 @@ export * from './conversation';
 export * from './conversations';
 export * from './contexts';
 export * from './notifications';
+export * from './services/avatar/avatar.constants';
 export * from './services/bot/bot.constants';
 export * from './services/bot/bot.utils';
 export * from './services/chat/chat.constants';

@@ -1,49 +1,49 @@
 import { m } from '@openbots/i18n/client';
-import { useNavigation } from '@react-navigation/native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import { match, P } from 'ts-pattern';
-import { ConfirmSheet } from '@/components/ui/confirm-sheet';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useConnection } from '@/hooks/use-connection';
-import type { NavigationRoot } from '@/types/navigation.types';
 import type { RpcSession } from '@/types/rpc.types';
-import type { TodosDeleteRouteParams } from '@/types/todos.types';
 
-interface TodosDeleteSheetProps {
-  route: { params: TodosDeleteRouteParams };
+interface TodosDeleteDialogProps {
+  botId: string;
+  todoId: number;
+  title: string;
 }
 
-export function TodosDeleteSheet({ route }: TodosDeleteSheetProps) {
+export function TodosDeleteDialog(params: TodosDeleteDialogProps) {
   const { session } = useConnection();
 
   return match(session)
-    .with(P.nonNullable, (current) => <TodosDeleteSheetContent params={route.params} session={current} />)
+    .with(P.nonNullable, (current) => <TodosDeleteDialogContent params={params} session={current} />)
     .otherwise(() => null);
 }
 
-interface TodosDeleteSheetContentProps {
+interface TodosDeleteDialogContentProps {
   session: RpcSession;
-  params: TodosDeleteRouteParams;
+  params: TodosDeleteDialogProps;
 }
 
-function TodosDeleteSheetContent({ session, params: { botId, todoId, title } }: TodosDeleteSheetContentProps) {
+function TodosDeleteDialogContent({ session, params: { botId, todoId, title } }: TodosDeleteDialogContentProps) {
   const queryClient = useQueryClient();
-  const navigation = useNavigation<NavigationRoot>();
+  const router = useRouter();
 
   const remove = useMutation(session.rpc.todos.remove.mutationOptions({
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: session.rpc.todos.key() });
-      navigation.goBack();
+      router.back();
     },
   }));
 
   return (
-    <ConfirmSheet
+    <ConfirmDialog
       isDestructive
       confirmLabel={m.rooms_todos_delete()}
       error={remove.isError ? m.rooms_todos_action_failed() : null}
       isPending={remove.isPending}
       title={m.rooms_todos_delete_title({ title })}
-      onCancel={() => navigation.goBack()}
+      onCancel={() => router.back()}
       onConfirm={() => remove.mutate({ botId, todoId })}
     />
   );

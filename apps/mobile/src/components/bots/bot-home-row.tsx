@@ -1,5 +1,5 @@
 import { m } from '@openbots/i18n/client';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { match, P } from 'ts-pattern';
 import { BotActionsMenu } from '@/components/bots/bot-actions-menu';
@@ -8,7 +8,6 @@ import { Badge } from '@/components/ui/badge';
 import { Item, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
 import { Text } from '@/components/ui/text';
 import { botHomeTime } from '@/services/bot/bot-home.utils';
-import type { NavigationRoot } from '@/types/navigation.types';
 import type { ConversationListItem } from '@openbots/contracts/universal';
 
 interface BotHomeRowProps {
@@ -16,7 +15,7 @@ interface BotHomeRowProps {
 }
 
 export function BotHomeRow({ chat }: BotHomeRowProps) {
-  const navigation = useNavigation<NavigationRoot>();
+  const router = useRouter();
 
   return (
     <View className="py-4">
@@ -25,7 +24,7 @@ export function BotHomeRow({ chat }: BotHomeRowProps) {
         botId={chat.botId}
         mode="longPress"
       >
-        <Pressable accessibilityRole="button" onPress={() => navigation.navigate('Chat', { botId: chat.botId })}>
+        <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/chat/[botId]', params: { botId: chat.botId } })}>
           <Item size="row">
             <Avatar avatar={chat.avatar} name={chat.name} />
             <ItemContent>

@@ -1,6 +1,7 @@
 import { DEFAULT_EXPRESSION, EXPRESSIONS } from '@openbots/avatar-blobs/expressions';
 import { BODIES, COLORS, DEFAULT_BODY, DEFAULT_COLOR } from '@openbots/avatar-blobs/skins';
 import { SEQUENCE, stateDef } from '@openbots/avatar-blobs/states';
+import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useEffect, useState } from 'react';
 import { AvatarBlob } from '@/components/avatars/avatar-blob';
@@ -8,7 +9,6 @@ import { LayoutPageHeader } from '@/components/layout/layout-page-header';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label, LabelDescription } from '@/components/ui/label';
-import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS } from '@/services/avatar/avatar.constants';
 import type { ExpressionId } from '@openbots/avatar-blobs/expressions';
 import type { BodyId, ColorId } from '@openbots/avatar-blobs/skins';
 import type { StateId } from '@openbots/avatar-blobs/states';

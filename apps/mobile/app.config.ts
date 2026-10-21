@@ -37,7 +37,9 @@ export default (): ExpoConfig => ({
   android: {
     package: variant.bundleIdentifier,
   },
+  experiments: { typedRoutes: true },
   plugins: [
+    'expo-router',
     'expo-secure-store',
     ['expo-image-picker', { photosPermission: 'Openbots shares the photos you pick with your bots.', cameraPermission: false, microphonePermission: false }],
     [

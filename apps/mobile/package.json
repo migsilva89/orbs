@@ -2,7 +2,7 @@
   "name": "@openbots/mobile",
   "version": "1.0.0",
   "private": true,
-  "main": "index.ts",
+  "main": "expo-router/entry",
   "expo": {
     "install": {
       "exclude": [
@@ -20,12 +20,13 @@
     "eas:prod": "eas build --profile production",
     "codegen": "uniwind generate-artifacts --css ./src/application/styles.css --dts ./src/uniwind-types.d.ts",
     "check": "bun run codegen && tsc --noEmit",
-    "lint": "bun run codegen && oxlint src/ index.ts app.config.ts -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
-    "lint:fix": "bun run codegen && oxlint src/ index.ts app.config.ts -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
+    "lint": "bun run codegen && oxlint src/ app.config.ts -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
+    "lint:fix": "bun run codegen && oxlint src/ app.config.ts -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "catalog:mobile",
     "@expo/ui": "catalog:mobile",
+    "@hookform/resolvers": "catalog:",
     "@legendapp/list": "catalog:mobile",
     "@openbots/avatar-blobs": "workspace:*",
     "@openbots/client": "workspace:*",
@@ -34,8 +35,6 @@
     "@openbots/i18n": "workspace:*",
     "@orpc/client": "catalog:",
     "@orpc/tanstack-query": "catalog:",
-    "@react-navigation/native": "catalog:mobile",
-    "@react-navigation/native-stack": "catalog:mobile",
     "@tanstack/react-query": "catalog:",
     "cn": "catalog:",
     "cva": "catalog:",
@@ -47,11 +46,14 @@
     "expo-glass-effect": "catalog:mobile",
     "expo-image-picker": "catalog:mobile",
     "expo-linear-gradient": "catalog:mobile",
+    "expo-linking": "catalog:mobile",
+    "expo-router": "catalog:mobile",
     "expo-secure-store": "catalog:mobile",
     "expo-system-ui": "catalog:mobile",
     "katex": "catalog:mobile",
     "lucide-react-native": "catalog:mobile",
     "react": "catalog:mobile",
+    "react-hook-form": "catalog:",
     "react-native": "catalog:mobile",
     "react-native-enriched-markdown": "catalog:mobile",
     "react-native-keyboard-controller": "catalog:mobile",

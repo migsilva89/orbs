@@ -1,5 +1,4 @@
 import { m } from '@openbots/i18n/client';
-import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
@@ -14,21 +13,21 @@ import { TodosList } from '@/components/todos/todos-list';
 import { Avatar } from '@/components/ui/avatar';
 import { Tabs } from '@/components/ui/tabs';
 import { Text } from '@/components/ui/text';
+import { useChatReturn } from '@/hooks/use-chat-return';
 import { useConnection } from '@/hooks/use-connection';
-import type { BotDetailsRouteParams, BotDetailsTab } from '@/types/bot-details.types';
-import type { NavigationRoot } from '@/types/navigation.types';
+import type { BotDetailsTab } from '@/types/bot-details.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type { Bot, ConversationListItem } from '@openbots/contracts/universal';
 
 interface BotDetailsSheetProps {
-  route: { params: BotDetailsRouteParams };
+  botId: string;
 }
 
-export function BotDetailsSheet({ route }: BotDetailsSheetProps) {
+export function BotDetailsSheet({ botId }: BotDetailsSheetProps) {
   const { session } = useConnection();
 
   return match(session)
-    .with(P.nonNullable, (current) => <BotDetailsSheetLoader botId={route.params.botId} session={current} />)
+    .with(P.nonNullable, (current) => <BotDetailsSheetLoader botId={botId} session={current} />)
     .otherwise(() => null);
 }
 
@@ -59,9 +58,9 @@ interface BotDetailsSheetContentProps {
 }
 
 function BotDetailsSheetContent({ session, bot, chat }: BotDetailsSheetContentProps) {
-  const navigation = useNavigation<NavigationRoot>();
+  const returnToChat = useChatReturn();
   const [tab, setTab] = useState<BotDetailsTab>('details');
-  const prefill = (text: string) => navigation.popTo('Chat', { botId: bot.id, prefill: { text } }, { merge: true });
+  const prefill = (text: string) => returnToChat({ botId: bot.id, prefill: text });
 
   return (
     <ScrollView contentContainerClassName="gap-4 px-4 pt-8 pb-10">

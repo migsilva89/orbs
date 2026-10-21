@@ -1,6 +1,6 @@
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { ConfirmationDialog } from '@/components/ui/alert-dialog';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { Bot } from '@openbots/contracts/universal';
 
@@ -26,27 +26,17 @@ export function BotDeleteDialog({ bot, onOpenChange, onDeleted }: BotDeleteDialo
   }));
 
   return (
-    <AlertDialog open onOpenChange={(open) => !remove.isPending && onOpenChange(open)}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{m.rooms_bot_delete_title({ bot: bot.name })}</AlertDialogTitle>
-          <AlertDialogDescription>{m.rooms_bot_delete_description()}</AlertDialogDescription>
-        </AlertDialogHeader>
-        {remove.isError ? <p className="text-sm text-destructive" role="alert">{m.rooms_bot_delete_error()}</p> : null}
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={remove.isPending}>{m.ui_cancel()}</AlertDialogCancel>
-          <AlertDialogAction
-            disabled={remove.isPending}
-            variant="destructive"
-            onClick={(event) => {
-              event.preventDefault();
-              remove.mutate({ botId: bot.id });
-            }}
-          >
-            {m.rooms_bot_delete()}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmationDialog
+      confirmLabel={m.rooms_bot_delete()}
+      confirmText={bot.name}
+      error={remove.isError ? m.rooms_bot_delete_error() : null}
+      pending={remove.isPending}
+      title={m.rooms_bot_delete_title({ bot: bot.name })}
+      variant="destructive"
+      onConfirm={() => remove.mutate({ botId: bot.id })}
+      onOpenChange={onOpenChange}
+    >
+      {m.rooms_bot_delete_description()}
+    </ConfirmationDialog>
   );
 }

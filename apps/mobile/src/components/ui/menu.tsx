@@ -1,5 +1,5 @@
 import { Button, Divider, Host, RNHostView, Section, ContextMenu as SwiftContextMenu, Menu as SwiftMenu } from '@expo/ui/swift-ui';
-import { buttonStyle, menuIndicator, menuStyle } from '@expo/ui/swift-ui/modifiers';
+import { buttonStyle, disabled, menuIndicator, menuStyle } from '@expo/ui/swift-ui/modifiers';
 import { Fragment, useState } from 'react';
 import { View } from 'react-native';
 import { match, P } from 'ts-pattern';
@@ -7,36 +7,59 @@ import type { MenuItem, MenuProps } from '@/types/menu.types';
 import type { ReactElement } from 'react';
 
 /** A native iOS pull-down menu that opens on tap, like the web dropdown menu. */
-export function Menu({ title, items, children }: MenuProps) {
+export function Menu({ title, items, children, isFullWidth = false, isDisabled = false }: MenuProps) {
   return (
-    <Host matchContents>
-      <SwiftMenu label={<RNHostView matchContents>{children}</RNHostView>} modifiers={[menuStyle('button'), buttonStyle('plain'), menuIndicator('hidden')]}>
-        <MenuContent items={items} title={title} />
-      </SwiftMenu>
-    </Host>
+    <MenuTrigger
+      isFullWidth={isFullWidth}
+      render={(trigger) => (
+        <Host matchContents>
+          <SwiftMenu label={<RNHostView matchContents>{trigger}</RNHostView>} modifiers={[menuStyle('button'), buttonStyle('plain'), menuIndicator('hidden'), disabled(isDisabled)]}>
+            <MenuContent items={items} title={title} />
+          </SwiftMenu>
+        </Host>
+      )}
+    >
+      {children}
+    </MenuTrigger>
   );
 }
 
 /** The same menu opened by a long press: the view lifts as a preview and the menu shows under it. */
 export function ContextMenu({ title, items, children, isFullWidth = false }: MenuProps) {
+  return (
+    <MenuTrigger
+      isFullWidth={isFullWidth}
+      render={(trigger) => (
+        <Host matchContents>
+          <SwiftContextMenu>
+            <SwiftContextMenu.Items>
+              <MenuContent items={items} title={title} />
+            </SwiftContextMenu.Items>
+            <SwiftContextMenu.Trigger>
+              <RNHostView matchContents>{trigger}</RNHostView>
+            </SwiftContextMenu.Trigger>
+          </SwiftContextMenu>
+        </Host>
+      )}
+    >
+      {children}
+    </MenuTrigger>
+  );
+}
+
+interface MenuTriggerProps {
+  isFullWidth: boolean;
+  children: ReactElement;
+  render: (trigger: ReactElement) => ReactElement;
+}
+
+/** A hosted SwiftUI view sizes to its content, so a full-width trigger is measured first and then pinned to that width. */
+function MenuTrigger({ isFullWidth, children, render }: MenuTriggerProps) {
   const [width, setWidth] = useState<number>();
 
-  const menu = (trigger: ReactElement) => (
-    <Host matchContents>
-      <SwiftContextMenu>
-        <SwiftContextMenu.Items>
-          <MenuContent items={items} title={title} />
-        </SwiftContextMenu.Items>
-        <SwiftContextMenu.Trigger>
-          <RNHostView matchContents>{trigger}</RNHostView>
-        </SwiftContextMenu.Trigger>
-      </SwiftContextMenu>
-    </Host>
-  );
-
   return match({ isFullWidth, width })
-    .with({ isFullWidth: false }, () => menu(children))
-    .with({ width: P.number }, ({ width: rowWidth }) => menu(<View style={{ width: rowWidth }}>{children}</View>))
+    .with({ isFullWidth: false }, () => render(children))
+    .with({ width: P.number }, ({ width: rowWidth }) => render(<View style={{ width: rowWidth }}>{children}</View>))
     .otherwise(() => <View onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>{children}</View>);
 }
 

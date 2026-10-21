@@ -1,6 +1,6 @@
-import { DarkTheme, DefaultTheme } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme } from 'expo-router';
 import { useCSSVariable, useUniwind } from 'uniwind';
-import type { Theme } from '@react-navigation/native';
+import type { Theme } from 'expo-router';
 
 export function useNavigationTheme(): Theme {
   const { theme } = useUniwind();

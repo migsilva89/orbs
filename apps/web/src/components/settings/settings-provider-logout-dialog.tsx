@@ -1,7 +1,6 @@
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ConfirmationDialog } from '@/components/ui/alert-dialog';
-import { FormErrors } from '@/components/ui/forms/form';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { Provider } from '@openbots/contracts/universal';
 
@@ -23,6 +22,7 @@ export function SettingsProviderLogoutDialog({ provider, onOpenChange }: Setting
   return (
     <ConfirmationDialog
       confirmLabel={m.settings_providers_sign_out()}
+      error={logout.isError ? m.settings_providers_error() : null}
       pending={logout.isPending}
       title={m.settings_providers_sign_out_title({ provider: provider.name })}
       variant="destructive"
@@ -30,7 +30,6 @@ export function SettingsProviderLogoutDialog({ provider, onOpenChange }: Setting
       onOpenChange={onOpenChange}
     >
       {m.settings_providers_sign_out_description({ provider: provider.name })}
-      <FormErrors error={logout.isError ? m.settings_providers_error() : null} />
     </ConfirmationDialog>
   );
 }

@@ -1,8 +1,8 @@
 import { useKeyboardChatComposerInset } from '@legendapp/list/keyboard';
 import { botBubble, CHAT, chatActivity, chatFailure, chatLive, chatMessages, chatOutgoingMessages, chatQueued, roomsMessageText, roomsTimeLabel } from '@openbots/client/client';
 import { getLocale, m } from '@openbots/i18n/client';
-import { useNavigation } from '@react-navigation/native';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { match, P } from 'ts-pattern';
@@ -21,27 +21,28 @@ import { ChatComposer } from './chat-composer';
 import { ChatHeader } from './chat-header';
 import { ChatMessage } from './chat-message';
 import { ChatRuns } from './chat-runs';
-import type { ChatPrefill, ChatRouteParams } from '@/types/chat.types';
-import type { NavigationRoot } from '@/types/navigation.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type { LegendListRef } from '@legendapp/list/react-native';
 import type { ChatOutgoing, MentionItem } from '@openbots/client/client';
 import type { Bot, ConversationView } from '@openbots/contracts/universal';
 
 interface ChatRoomProps {
-  route: { params: ChatRouteParams };
+  botId: string;
+  replyToEntryId?: number;
+  quote?: MentionItem;
+  prefill?: string;
 }
 
-export function ChatRoom({ route }: ChatRoomProps) {
+export function ChatRoom({ botId, replyToEntryId, quote, prefill }: ChatRoomProps) {
   const { session } = useConnection();
 
   return match(session)
     .with(P.nonNullable, (current) => (
       <ChatRoomContent
-        botId={route.params.botId}
-        prefill={route.params.prefill}
-        quote={route.params.quote}
-        replyToEntryId={route.params.replyToEntryId}
+        botId={botId}
+        prefill={prefill}
+        quote={quote}
+        replyToEntryId={replyToEntryId}
         session={current}
       />
     ))
@@ -53,7 +54,7 @@ interface ChatRoomContentProps {
   botId: string;
   replyToEntryId?: number;
   quote?: MentionItem;
-  prefill?: ChatPrefill;
+  prefill?: string;
 }
 
 function ChatRoomContent({ session, botId, replyToEntryId, quote, prefill }: ChatRoomContentProps) {
@@ -109,11 +110,11 @@ interface ChatRoomViewProps {
   view: ConversationView;
   replyToEntryId?: number;
   quote?: MentionItem;
-  prefill?: ChatPrefill;
+  prefill?: string;
 }
 
 function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill }: ChatRoomViewProps) {
-  const navigation = useNavigation<NavigationRoot>();
+  const router = useRouter();
   const list = useRef<LegendListRef>(null);
   const composer = useRef(null);
   const [outgoing, setOutgoing] = useState<ChatOutgoing[]>([]);
@@ -201,13 +202,16 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
                 locale: getLocale(),
               })
               : undefined}
-            onLongPress={() => navigation.navigate('MessageActions', {
-              botId: bot.id,
-              conversationId,
-              entryId: message.metadata?.entryId ?? 0,
-              from: message.role === 'user' ? 'user' : 'assistant',
-              text: roomsMessageText(message),
-              details: chatMessageDetails(message),
+            onLongPress={() => router.push({
+              pathname: '/chat/[botId]/message',
+              params: {
+                botId: bot.id,
+                conversationId,
+                entryId: message.metadata?.entryId ?? 0,
+                from: message.role === 'user' ? 'user' : 'assistant',
+                text: roomsMessageText(message),
+                details: chatMessageDetails(message).join('\n'),
+              },
             })}
             onReact={(emoji) => reactions.react(message, emoji)}
           />
@@ -234,7 +238,7 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
           unread={unread.count}
           onLayout={onComposerLayout}
           onOutgoingChange={setOutgoing}
-          onReplyClear={() => navigation.setParams({ replyToEntryId: undefined })}
+          onReplyClear={() => router.setParams({ replyToEntryId: undefined })}
           onSend={() => void list.current?.scrollToEnd({ animated: true })}
           onUnreadPress={unread.seeAll}
         />

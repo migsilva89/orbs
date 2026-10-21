@@ -35,7 +35,7 @@ export function RoutinesList({ session, bot, onPrefill }: RoutinesListProps) {
           description={(
             <>
               {`${m.rooms_routines_empty_hint({ bot: bot.name })} `}
-              <EmptyLink onPress={() => onPrefill(m.rooms_routines_prompt())}>{m.rooms_prefill_create_inline()}</EmptyLink>
+              <EmptyLink onPress={() => onPrefill(m.rooms_routines_prefill())}>{m.rooms_prefill_create_inline()}</EmptyLink>
               {` ${m.rooms_prefill_by_asking({ bot: bot.name })}`}
             </>
           )}
@@ -75,7 +75,7 @@ export function RoutinesList({ session, bot, onPrefill }: RoutinesListProps) {
       ) : null}
       {routines.length > 0 ? (
         <Text tone="muted" variant="small">
-          <EmptyLink onPress={() => onPrefill(m.rooms_routines_prompt())}>{m.rooms_prefill_create()}</EmptyLink>
+          <EmptyLink onPress={() => onPrefill(m.rooms_routines_prefill())}>{m.rooms_prefill_create()}</EmptyLink>
         </Text>
       ) : null}
     </View>

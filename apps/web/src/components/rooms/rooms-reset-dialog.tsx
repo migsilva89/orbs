@@ -7,10 +7,11 @@ import type { Bot } from '@openbots/contracts/universal';
 
 interface RoomsResetDialogProps {
   bot: Bot
+  handoff?: string
   onOpenChange: (open: boolean) => void
 }
 
-export function RoomsResetDialog({ bot, onOpenChange }: RoomsResetDialogProps) {
+export function RoomsResetDialog({ bot, handoff, onOpenChange }: RoomsResetDialogProps) {
   const reset = useMutation(rpc.commands.execute.mutationOptions({
     onSuccess: () => {
       toasty(m.rooms_fresh_done(), '✨');
@@ -22,9 +23,15 @@ export function RoomsResetDialog({ bot, onOpenChange }: RoomsResetDialogProps) {
   return (
     <ConfirmationDialog
       confirmLabel={m.rooms_member_reset()}
+      confirmText={bot.name}
       pending={reset.isPending}
       title={m.rooms_reset_title({ bot: bot.name })}
-      onConfirm={() => reset.mutate({ botId: bot.id, name: 'reset' })}
+      variant="destructive"
+      onConfirm={() => reset.mutate({
+        botId: bot.id,
+        name: 'reset',
+        arguments: handoff,
+      })}
       onOpenChange={onOpenChange}
     >
       {m.rooms_reset_description({ bot: bot.name })}

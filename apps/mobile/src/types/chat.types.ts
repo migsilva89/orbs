@@ -1,14 +1,36 @@
 import type * as ClientTypes from '@openbots/client/client';
 import type { Bot, ToolCallArtifact } from '@openbots/contracts/universal';
 
-export interface ChatRouteParams {
+type ChatSearchParams = Record<string, string | string[] | undefined>;
+
+export interface ChatRouteParams extends ChatSearchParams {
   botId: string;
-  replyToEntryId?: number;
-  quote?: ClientTypes.MentionItem;
-  prefill?: ChatPrefill;
+  replyToEntryId?: string;
+  quote?: string;
+  quoteEntryId?: string;
+  prefill?: string;
 }
 
-export interface ChatPrefill {
+export interface ChatReactionRouteParams extends ChatSearchParams {
+  botId: string;
+  conversationId: string;
+  entryId: string;
+}
+
+export interface ChatActionsRouteParams extends ChatReactionRouteParams {
+  from: 'user' | 'assistant';
+  text: string;
+  details?: string;
+}
+
+export interface ChatResetRouteParams extends ChatSearchParams {
+  botId: string;
+  handoff?: string;
+}
+
+export interface ChatTextRouteParams extends ChatSearchParams {
+  botId: string;
+  entryId: string;
   text: string;
 }
 
@@ -16,12 +38,6 @@ export interface ChatReactionParams {
   botId: string;
   conversationId: number;
   entryId: number;
-}
-
-export interface ChatActionsRouteParams extends ChatReactionParams {
-  from: 'user' | 'assistant';
-  text: string;
-  details: string[];
 }
 
 export type ChatMessagePart =
@@ -32,12 +48,6 @@ export type ChatMessagePart =
 export type ChatMessageSegment =
   | { key: string; kind: 'bubbles'; parts: ChatMessagePart[] }
   | { key: string; kind: 'tools'; parts: ClientTypes.ToolPart[] };
-
-export interface ChatTextRouteParams {
-  text: string;
-  botId: string;
-  entryId: number;
-}
 
 export interface ChatNoticeTitleParams {
   message: ClientTypes.ChatMessage;

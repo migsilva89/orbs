@@ -29,7 +29,7 @@ export const botInherit = z.array(z.enum(['skills', 'agentsFile', 'mcp', 'plugin
 export const botFields = z.object({
   avatar: botAvatar.nullable(),
   name: z.string().trim().min(1).max(64),
-  handle: z.string().trim().toLowerCase().min(1).max(48).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  handle: z.string().trim().toLowerCase().min(1).max(48).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { error: 'validation_handle' }),
   instructions: z.string().max(16000),
   ...modelSelection.shape,
   fallbackModel: modelSelection.nullable(),

@@ -1,6 +1,6 @@
 import { m } from '@openbots/i18n/client';
-import { useNavigation } from '@react-navigation/native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import { Circle, CircleCheck, ListTodo, X } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
@@ -12,7 +12,6 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { Text } from '@/components/ui/text';
 import { useToast } from '@/hooks/use-toast';
 import type { BotDetailsSectionProps } from '@/types/bot-details.types';
-import type { NavigationRoot } from '@/types/navigation.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type { Todo } from '@openbots/contracts/universal';
 
@@ -22,7 +21,7 @@ interface TodosListProps extends BotDetailsSectionProps {
 
 export function TodosList({ session, bot, onPrefill }: TodosListProps) {
   const queryClient = useQueryClient();
-  const navigation = useNavigation<NavigationRoot>();
+  const router = useRouter();
   const toast = useToast();
   const [isDoneShown, setIsDoneShown] = useState(false);
   const list = useQuery(session.rpc.todos.list.queryOptions({ input: { botId: bot.id } }));
@@ -42,10 +41,9 @@ export function TodosList({ session, bot, onPrefill }: TodosListProps) {
     isDone: !todo.isDone,
   });
 
-  const remove = (todo: Todo) => navigation.navigate('TodosDelete', {
-    botId: bot.id,
-    todoId: todo.id,
-    title: todo.title,
+  const remove = (todo: Todo) => router.push({
+    pathname: '/bots/[botId]/todos/[todoId]/delete',
+    params: { botId: bot.id, todoId: todo.id, title: todo.title },
   });
 
   return (

@@ -27,7 +27,7 @@ export function TextField({ className, size, tone, placeholderTone = 'muted-fore
       selectionColor={selectionColor}
       {...props}
       className={cn(textFieldVariants({ size, tone: tone ?? inherited.tone }), className)}
-      style={[style, { paddingVertical: 0, textAlignVertical: 'center' }]}
+      style={[{ paddingVertical: 0, textAlignVertical: 'center' }, style]}
     />
   );
 }

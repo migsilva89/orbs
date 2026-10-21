@@ -1,7 +1,6 @@
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ConfirmationDialog } from '@/components/ui/alert-dialog';
-import { FormErrors } from '@/components/ui/forms/form';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { Bot, Routine } from '@openbots/contracts/universal';
 
@@ -24,6 +23,7 @@ export function RoutinesDeleteDialog({ bot, routine, onOpenChange }: RoutinesDel
   return (
     <ConfirmationDialog
       confirmLabel={m.rooms_routines_delete()}
+      error={remove.isError ? m.rooms_routines_action_failed() : null}
       pending={remove.isPending}
       title={m.rooms_routines_delete_title({ name: routine.name })}
       variant="destructive"
@@ -31,7 +31,6 @@ export function RoutinesDeleteDialog({ bot, routine, onOpenChange }: RoutinesDel
       onOpenChange={onOpenChange}
     >
       {m.rooms_routines_delete_description({ bot: bot.name })}
-      <FormErrors error={remove.isError ? m.rooms_routines_action_failed() : null} />
     </ConfirmationDialog>
   );
 }

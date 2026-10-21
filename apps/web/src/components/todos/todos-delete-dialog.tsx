@@ -1,7 +1,6 @@
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ConfirmationDialog } from '@/components/ui/alert-dialog';
-import { FormErrors } from '@/components/ui/forms/form';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { Bot, Todo } from '@openbots/contracts/universal';
 
@@ -24,6 +23,7 @@ export function TodosDeleteDialog({ bot, todo, onOpenChange }: TodosDeleteDialog
   return (
     <ConfirmationDialog
       confirmLabel={m.rooms_todos_delete()}
+      error={remove.isError ? m.rooms_todos_action_failed() : null}
       pending={remove.isPending}
       title={m.rooms_todos_delete_title({ title: todo.title })}
       variant="destructive"
@@ -31,7 +31,6 @@ export function TodosDeleteDialog({ bot, todo, onOpenChange }: TodosDeleteDialog
       onOpenChange={onOpenChange}
     >
       {m.rooms_todos_delete_description({ bot: bot.name })}
-      <FormErrors error={remove.isError ? m.rooms_todos_action_failed() : null} />
     </ConfirmationDialog>
   );
 }

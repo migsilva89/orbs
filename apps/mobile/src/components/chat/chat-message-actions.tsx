@@ -1,45 +1,48 @@
 import { ROOMS } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
-import { useNavigation } from '@react-navigation/native';
 import { setStringAsync } from 'expo-clipboard';
+import { useRouter } from 'expo-router';
 import { Copy, Reply, SmilePlus, TextSelect } from 'lucide-react-native';
 import { match, P } from 'ts-pattern';
 import { ActionSheet, ActionSheetChoice, ActionSheetChoices, ActionSheetGroup, ActionSheetItem } from '@/components/ui/action-sheet';
 import { Text } from '@/components/ui/text';
+import { useChatReturn } from '@/hooks/use-chat-return';
 import { useConnection } from '@/hooks/use-connection';
 import { useMessageReaction } from '@/hooks/use-message-reaction';
 import { useToast } from '@/hooks/use-toast';
-import type { ChatActionsRouteParams } from '@/types/chat.types';
-import type { NavigationRoot } from '@/types/navigation.types';
+import type { ChatReactionParams } from '@/types/chat.types';
 import type { RpcSession } from '@/types/rpc.types';
 
-interface ChatMessageActionsProps {
-  route: { params: ChatActionsRouteParams };
+interface ChatMessageActionsProps extends ChatReactionParams {
+  from: 'user' | 'assistant';
+  text: string;
+  details: string[];
 }
 
-export function ChatMessageActions({ route }: ChatMessageActionsProps) {
+export function ChatMessageActions(params: ChatMessageActionsProps) {
   const { session } = useConnection();
 
   return match(session)
-    .with(P.nonNullable, (current) => <ChatMessageActionsContent params={route.params} session={current} />)
+    .with(P.nonNullable, (current) => <ChatMessageActionsContent params={params} session={current} />)
     .otherwise(() => null);
 }
 
 interface ChatMessageActionsContentProps {
   session: RpcSession;
-  params: ChatActionsRouteParams;
+  params: ChatMessageActionsProps;
 }
 
 function ChatMessageActionsContent({ session, params }: ChatMessageActionsContentProps) {
   const toast = useToast();
-  const navigation = useNavigation<NavigationRoot>();
+  const router = useRouter();
+  const returnToChat = useChatReturn();
   const { botId, conversationId, entryId, from, text, details } = params;
   const target = { botId, conversationId, entryId };
   const reaction = useMessageReaction(session, target);
 
   function react(emoji: string) {
     reaction.react(emoji);
-    navigation.goBack();
+    router.back();
   }
 
   return (
@@ -60,12 +63,12 @@ function ChatMessageActionsContent({ session, params }: ChatMessageActionsConten
           <ActionSheetChoice
             accessibilityLabel={m.rooms_reaction_more()}
             icon={SmilePlus}
-            onPress={() => navigation.replace('ReactionPicker', target)}
+            onPress={() => router.replace({ pathname: '/chat/[botId]/react', params: target })}
           />
         </ActionSheetChoices>
       ) : null}
       <ActionSheetGroup>
-        <ActionSheetItem icon={Reply} onPress={() => navigation.popTo('Chat', { botId, replyToEntryId: entryId }, { merge: true })}>
+        <ActionSheetItem icon={Reply} onPress={() => returnToChat({ botId, replyToEntryId: String(entryId) })}>
           {m.rooms_chat_reply()}
         </ActionSheetItem>
       </ActionSheetGroup>
@@ -77,18 +80,14 @@ function ChatMessageActionsContent({ session, params }: ChatMessageActionsConten
               () => toast.show({ message: m.rooms_chat_copied(), variant: 'default' }),
               () => toast.show({ message: m.ui_copy_failed() }),
             );
-            navigation.goBack();
+            router.back();
           }}
         >
           {m.rooms_chat_copy()}
         </ActionSheetItem>
         <ActionSheetItem
           icon={TextSelect}
-          onPress={() => navigation.replace('MessageText', {
-            text,
-            botId,
-            entryId,
-          })}
+          onPress={() => router.replace({ pathname: '/chat/[botId]/text', params: { botId, entryId, text } })}
         >
           {m.rooms_chat_select_text()}
         </ActionSheetItem>

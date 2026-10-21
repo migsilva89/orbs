@@ -2,7 +2,8 @@ import { BOT_PERMISSION_LABELS, BOT_THINKING_LEVEL_LABELS, ROOMS_SEND_MODES } fr
 import { botFields, conversationWhenBusy } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Cpu, ListOrdered, ShieldCheck } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { ChevronRight, Cpu, ListOrdered, PencilLine, ShieldCheck } from 'lucide-react-native';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { actionSheetShow } from '@/components/ui/action-sheet';
 import { Icon } from '@/components/ui/icon';
@@ -19,6 +20,7 @@ interface BotDetailsSettingsProps {
 
 export function BotDetailsSettings({ session, bot, chat }: BotDetailsSettingsProps) {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const toast = useToast();
   const { data: models = [] } = useQuery({ ...session.rpc.models.list.queryOptions(), retry: false });
   const { data: settings } = useQuery(session.rpc.conversation.settings.queryOptions());
@@ -97,6 +99,26 @@ export function BotDetailsSettings({ session, bot, chat }: BotDetailsSettingsPro
             <ItemTitle>{m.rooms_bot_permission()}</ItemTitle>
           </ItemContent>
           <ItemValue>{BOT_PERMISSION_LABELS[bot.permission]()}</ItemValue>
+        </ItemButton>
+        <ItemButton
+          accessibilityLabel={m.rooms_action_edit_bot()}
+          size="sm"
+          onPress={() => {
+            router.dismiss();
+            router.push({ pathname: '/bots/[botId]/edit', params: { botId: bot.id } });
+          }}
+        >
+          <ItemMedia>
+            <Icon icon={PencilLine} tone="muted" />
+          </ItemMedia>
+          <ItemContent>
+            <ItemTitle>{m.rooms_action_edit_bot()}</ItemTitle>
+          </ItemContent>
+          <Icon
+            icon={ChevronRight}
+            size="sm"
+            tone="muted"
+          />
         </ItemButton>
       </ItemGroup>
     </BotDetailsSection>

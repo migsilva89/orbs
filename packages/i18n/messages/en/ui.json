@@ -123,5 +123,6 @@
   "tool_label_artifact_get": "Read artifact",
   "tool_label_artifact_blocks": "List artifact blocks",
   "tool_label_artifact_create": "Create artifact",
-  "tool_label_artifact_update": "Update artifact"
+  "tool_label_artifact_update": "Update artifact",
+  "ui_confirm_type_name": "Type {name} to confirm"
 }

@@ -42,7 +42,7 @@ const blocksAlive = new Map<Buffer, JSCallback>();
 
 blockDescriptor.writeBigUInt64LE(32n, 8);
 
-export function desktopCString(text: string): Buffer {
+function desktopCString(text: string): Buffer {
   return Buffer.from(`${text}\0`);
 }
 

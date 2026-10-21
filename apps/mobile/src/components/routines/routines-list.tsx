@@ -1,11 +1,13 @@
 import { routinesScheduleText } from '@openbots/client/client';
 import { getLocale, m } from '@openbots/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarClock } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { CalendarClock, Ellipsis } from 'lucide-react-native';
 import { Switch, View } from 'react-native';
 import { Empty, EmptyLink } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Item, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
+import { Menu } from '@/components/ui/menu';
 import { Text } from '@/components/ui/text';
 import { useToast } from '@/hooks/use-toast';
 import type { BotDetailsSectionProps } from '@/types/bot-details.types';
@@ -18,6 +20,7 @@ interface RoutinesListProps extends BotDetailsSectionProps {
 export function RoutinesList({ session, bot, onPrefill }: RoutinesListProps) {
   const queryClient = useQueryClient();
   const toast = useToast();
+  const router = useRouter();
   const list = useQuery(session.rpc.routines.list.queryOptions({ input: { botId: bot.id } }));
 
   const update = useMutation(session.rpc.routines.update.mutationOptions({
@@ -25,7 +28,13 @@ export function RoutinesList({ session, bot, onPrefill }: RoutinesListProps) {
     onSettled: () => queryClient.invalidateQueries({ queryKey: session.rpc.routines.key() }),
   }));
 
+  const run = useMutation(session.rpc.routines.run.mutationOptions({
+    onError: () => toast.show({ message: m.rooms_routines_action_failed() }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: session.rpc.routines.key() }),
+  }));
+
   const routines = list.data ?? [];
+  const isBusy = update.isPending || run.isPending;
 
   return (
     <View className="gap-2">
@@ -61,7 +70,7 @@ export function RoutinesList({ session, bot, onPrefill }: RoutinesListProps) {
               </ItemContent>
               <Switch
                 accessibilityLabel={m.rooms_routines_toggle({ name: routine.name })}
-                disabled={update.isPending}
+                disabled={isBusy}
                 value={routine.isEnabled}
                 onValueChange={(isEnabled) => update.mutate({
                   botId: bot.id,
@@ -69,6 +78,38 @@ export function RoutinesList({ session, bot, onPrefill }: RoutinesListProps) {
                   isEnabled,
                 })}
               />
+              <Menu
+                isDisabled={isBusy}
+                items={[
+                  {
+                    label: m.rooms_routines_run(),
+                    systemImage: 'arrow.clockwise',
+                    onSelect: () => run.mutate({ botId: bot.id, routineId: routine.id }, {
+                      onSuccess: () => toast.show({ message: m.rooms_routines_started({ name: routine.name }) }),
+                    }),
+                  },
+                  {
+                    label: m.rooms_routines_edit(),
+                    systemImage: 'pencil',
+                    onSelect: () => router.push({ pathname: '/bots/[botId]/routines/[routineId]/edit', params: { botId: bot.id, routineId: routine.id } }),
+                  },
+                  {
+                    label: m.rooms_routines_delete(),
+                    systemImage: 'trash',
+                    isDestructive: true,
+                    hasDividerBefore: true,
+                    onSelect: () => router.push({ pathname: '/bots/[botId]/routines/[routineId]/delete', params: { botId: bot.id, routineId: routine.id } }),
+                  },
+                ]}
+              >
+                <View
+                  accessibilityLabel={m.rooms_routines_actions()}
+                  accessibilityRole="button"
+                  className="size-8 items-center justify-center"
+                >
+                  <Icon icon={Ellipsis} tone="muted" />
+                </View>
+              </Menu>
             </Item>
           ))}
         </View>

@@ -112,6 +112,7 @@ async function coreNativeServices(resources: AsyncDisposableStack) {
   });
 
   resources.defer(() => services.runtime.close());
+  resources.defer(await services.push.actions.watch());
 
   return { paths, services };
 }

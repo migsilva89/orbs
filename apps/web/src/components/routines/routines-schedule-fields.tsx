@@ -1,4 +1,4 @@
-import { ROUTINES } from '@openbots/client/client';
+import { ROUTINES_SCHEDULE_KINDS, routinesScheduleDefault } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useFormContext } from 'react-hook-form';
 import { match } from 'ts-pattern';
@@ -6,12 +6,6 @@ import { FormControl, FormErrorsAndHint, FormField, FormItem, FormLabel } from '
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { RoutineEditForm, RoutineSchedule } from '@openbots/contracts/universal';
-
-const ROUTINES_SCHEDULE_KINDS = {
-  once: m.rooms_routines_kind_once,
-  interval: m.rooms_routines_kind_interval,
-  cron: m.rooms_routines_kind_cron,
-} satisfies Record<RoutineSchedule['kind'], () => string>;
 
 export function RoutinesScheduleFields() {
   const form = useFormContext<RoutineEditForm>();
@@ -26,10 +20,7 @@ export function RoutinesScheduleFields() {
           <div className="grid gap-2 sm:grid-cols-[8rem_minmax(0,1fr)]">
             <Select
               value={field.value.kind}
-              onValueChange={(kind) => field.onChange(match(kind)
-                .with('once', () => ({ kind: 'once', runAt: Date.now() + ROUTINES.minutesPerHour * 60_000 }))
-                .with('interval', () => ({ kind: 'interval', minutes: ROUTINES.minutesPerHour }))
-                .otherwise(() => ({ kind: 'cron', expression: '0 9 * * *', timezone: Intl.DateTimeFormat().resolvedOptions().timeZone })))}
+              onValueChange={(kind) => field.onChange(routinesScheduleDefault(kind))}
             >
               <SelectTrigger aria-label={m.rooms_routines_schedule()}>
                 <SelectValue />

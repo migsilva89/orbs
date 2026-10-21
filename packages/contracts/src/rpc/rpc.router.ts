@@ -55,7 +55,7 @@ import {
   conversationUpdateSubmissionResult,
 } from '../types/conversation.types';
 import { credentialsList, credentialsSet, credentialsSetResult } from '../types/credentials.types';
-import { deviceList, deviceRevoke, deviceRevokeResult } from '../types/device.types';
+import { deviceList, devicePush, devicePushResult, deviceRevoke, deviceRevokeResult } from '../types/device.types';
 import { conversationSearch, conversationSearchResult } from '../types/history.types';
 import { instructionCatalog, instructionConfigure, instructionDiscover, instructionSettings } from '../types/instruction.types';
 import { limitConfigure, limitSettings } from '../types/limit.types';
@@ -743,5 +743,10 @@ export const contract = {
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
       .input(deviceRevoke)
       .output(deviceRevokeResult),
+
+    push: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(devicePush)
+      .output(devicePushResult),
   },
 };

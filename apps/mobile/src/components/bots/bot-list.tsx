@@ -1,4 +1,5 @@
 import { watchConversations } from '@openbots/client/client';
+import { useChatSearch } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { experimental_streamedQuery as streamedQuery, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -6,6 +7,7 @@ import { Bot, Plus, QrCode, Star, UserRound } from 'lucide-react-native';
 import { useState } from 'react';
 import { SectionList, View } from 'react-native';
 import { match, P } from 'ts-pattern';
+import { ChatSearchResults } from '@/components/chat/chat-search-results';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -56,6 +58,8 @@ function BotListContent({ session }: BotListContentProps) {
 
   const { featured, sections } = botHomeSections({ chats: query.data ?? [], search });
   const isSearching = search.trim().length > 0;
+  const messages = useChatSearch(search, isSearching);
+  const hasHits = isSearching && (messages.isPending || messages.results.groups.length > 0);
   const hasMultipleGroups = sections.length > 1;
 
   const emptyCopy = match(isSearching)
@@ -77,7 +81,7 @@ function BotListContent({ session }: BotListContentProps) {
       .exhaustive();
   }
 
-  const emptyContent = match(Boolean(featured) || sections.length > 0)
+  const emptyContent = match(Boolean(featured) || sections.length > 0 || hasHits)
     .with(true, () => undefined)
     .with(false, () => (
       <Empty>
@@ -160,6 +164,13 @@ function BotListContent({ session }: BotListContentProps) {
               keyboardShouldPersistTaps="handled"
               keyExtractor={(chat) => chat.botId}
               ListEmptyComponent={emptyContent}
+              ListFooterComponent={isSearching ? (
+                <ChatSearchResults
+                  isPending={messages.isPending}
+                  query={messages.typed}
+                  results={messages.results}
+                />
+              ) : undefined}
               ListHeaderComponent={header}
               renderItem={({ item }) => <BotHomeRow chat={item} />}
               renderSectionHeader={({ section }) => match(hasMultipleGroups).with(true, () => (

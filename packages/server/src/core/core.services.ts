@@ -9,6 +9,7 @@ import { makeInstructionService } from '../services/instruction/instruction.serv
 import { makeLimitService } from '../services/limit/limit.service';
 import { makeMcpAuthService } from '../services/mcp/mcp-auth.service';
 import { makePluginService } from '../services/plugin/plugin.service';
+import { makePushService } from '../services/push/push.service';
 import { makeRoutineService } from '../services/routine/routine.service';
 import { makeServerService } from '../services/server/server.service';
 import { makeSkillService } from '../services/skill/skill.service';
@@ -83,6 +84,11 @@ export async function makeServices({
       routines: makeRoutineService({ bots, runtime }),
       todos: makeTodoService({ bots, runtime }),
       artifacts: makeArtifactService({ bots, runtime }),
+      push: makePushService({
+        database,
+        runtime,
+        bots,
+      }),
       server,
       limits,
       providers,

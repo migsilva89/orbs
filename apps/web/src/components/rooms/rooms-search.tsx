@@ -1,48 +1,24 @@
-import { ROOMS, roomsSearchResults, roomsSearchSnippet } from '@openbots/client/client';
+import { ROOMS, roomsSearchSnippet } from '@openbots/client/client';
+import { useChatSearch } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
 import { getLocale } from '@openbots/i18n/runtime';
-import { keepPreviousData, useQueries, useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Kbd } from '@/components/ui/kbd';
 import { Skeleton } from '@/components/ui/skeleton';
 import { roomsLink } from '@/services/rooms/rooms.client';
-import { rpc } from '@/services/rpc/rpc.client';
 import type { RoomsSearchEntry } from '@openbots/client/client';
 
 export function RoomsSearch() {
   const navigate = useNavigate();
   const { find } = useSearch({ from: '/_chat' });
-  const { data: chats } = useSuspenseQuery(rpc.conversation.list.queryOptions());
   const [query, setQuery] = useState('');
-  const [debounced, setDebounced] = useState('');
-  const typed = debounced.trim();
-
-  const searches = useQueries({
-    queries: chats.map((chat) => ({
-      ...rpc.conversation.search.queryOptions({ input: { botId: chat.botId, query: typed } }),
-      enabled: find === true && typed !== '',
-      placeholderData: keepPreviousData,
-    })),
-    combine: (results) => ({
-      hits: results.flatMap((result, index) => (result.data?.messages ?? []).map((message) => ({ ...message, botId: chats[index]?.botId ?? '' }))),
-      isFetching: results.some((result) => result.isFetching),
-    }),
-  });
-
-  const pending = query.trim() !== '' && (query !== debounced || searches.isFetching);
-
-  const results = roomsSearchResults({
-    chats,
-    hits: typed ? searches.hits : [],
-    query: typed,
-  });
+  const { typed, isPending: pending, results } = useChatSearch(query, find === true);
 
   function close() {
     setQuery('');
-    setDebounced('');
     void navigate({
       to: '.',
       search: (previous) => ({ ...previous, find: undefined }),
@@ -52,15 +28,8 @@ export function RoomsSearch() {
 
   function openChat(entry: RoomsSearchEntry, entryId?: number) {
     setQuery('');
-    setDebounced('');
     void navigate({ ...roomsLink({ handle: entry.chat.handle }), search: { message: entryId } });
   }
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebounced(query), ROOMS.searchDebounceMs);
-
-    return () => clearTimeout(timer);
-  }, [query]);
 
   return (
     <CommandDialog

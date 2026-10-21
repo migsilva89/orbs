@@ -1,3 +1,4 @@
+import { artifactsStore } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { getLocale } from '@openbots/i18n/runtime';
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
@@ -7,7 +8,6 @@ import { LayoutPageHeader } from '@/components/layout/layout-page-header';
 import { Button } from '@/components/ui/button';
 import * as DropdownMenu from '@/components/ui/dropdown-menu';
 import { toasty } from '@/components/ui/sonner';
-import { artifactsStore } from '@/services/artifacts/artifacts.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCheck from '~icons/lucide/check';
 import IconChevronDown from '~icons/lucide/chevron-down';
@@ -35,6 +35,7 @@ export function ArtifactPage({ botId, conversationId, artifactId }: ArtifactPage
   }));
 
   const store = artifactsStore({
+    rpc,
     queryClient,
     botId,
     conversationId,

@@ -1,14 +1,10 @@
-import { toolRunning } from '@openbots/client/client';
-import { chatContextsWatchOptions } from '@openbots/client/react';
+import { useChatSubagent } from '@openbots/client/react';
 import { m } from '@openbots/i18n/client';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { match } from 'ts-pattern';
 import { RoomsSubagentDialog } from '@/components/rooms/rooms-subagent-dialog';
 import { Question, QuestionDescription, QuestionHeader, QuestionHeading, QuestionIcon, QuestionItem, QuestionList, QuestionTitle } from '@/components/ui/ai/question';
 import { Button } from '@/components/ui/button';
-import { rpc } from '@/services/rpc/rpc.client';
-import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
 import IconLucideCheck from '~icons/lucide/check';
 import IconLucideLoaderCircle from '~icons/lucide/loader-circle';
 import IconLucideSquare from '~icons/lucide/square';
@@ -25,23 +21,17 @@ interface RoomsChatSubagentProps {
 }
 
 export function RoomsChatSubagent({ botId, bot, part, subagent }: RoomsChatSubagentProps) {
-  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
-  const isBackground = subagent.operation !== 'run';
-  const watch = useQuery({ ...chatContextsWatchOptions(RPC_CONTEXT, { botId }), enabled: isBackground });
-  const contexts = useQuery({ ...rpc.conversation.contexts.queryOptions({ input: { botId, kind: 'subagent' } }), enabled: isBackground });
-  const stop = useMutation(rpc.conversation.stop.mutationOptions());
-  const context = contexts.data?.items.find((item) => item.conversationId === subagent.conversationId);
-  const isRunning = isBackground ? context?.isRunning ?? toolRunning(part) : toolRunning(part);
-  const revision = watch.data?.revision;
 
-  useEffect(() => {
-    if (revision !== undefined) {
-      void queryClient.invalidateQueries({ queryKey: rpc.conversation.contexts.key({ input: { botId } }) });
-    }
-  }, [botId, queryClient, revision]);
+  const live = useChatSubagent({
+    botId,
+    part,
+    subagent,
+  });
 
-  const icon = match({ isFailed: part.state === 'output-error', isRunning })
+  const { isRunning } = live;
+
+  const icon = match({ isFailed: live.isFailed, isRunning })
     .with({ isFailed: true }, () => <IconLucideX className="text-destructive" />)
     .with({ isRunning: true }, () => <IconLucideLoaderCircle className="animate-spin motion-reduce:animate-none" />)
     .otherwise(() => <IconLucideCheck />);
@@ -62,11 +52,11 @@ export function RoomsChatSubagent({ botId, bot, part, subagent }: RoomsChatSubag
           action={isRunning && subagent.conversationId ? (
             <Button
               aria-label={m.rooms_subagents_stop()}
-              disabled={stop.isPending}
+              disabled={live.isStopping}
               size="icon-xs"
               title={m.rooms_subagents_stop()}
               variant="quiet"
-              onClick={() => stop.mutate({ botId, conversationId: subagent.conversationId })}
+              onClick={live.stop}
             >
               <IconLucideSquare />
             </Button>
@@ -77,7 +67,7 @@ export function RoomsChatSubagent({ botId, bot, part, subagent }: RoomsChatSubag
           {subagent.message}
         </QuestionItem>
       </QuestionList>
-      {stop.isError ? <p className="px-1 text-xs text-destructive" role="alert">{m.rooms_subagents_stop_error()}</p> : null}
+      {live.stopFailed ? <p className="px-1 text-xs text-destructive" role="alert">{m.rooms_subagents_stop_error()}</p> : null}
       {isOpen && subagent.conversationId ? (
         <RoomsSubagentDialog
           bot={bot}

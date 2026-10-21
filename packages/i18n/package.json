@@ -33,7 +33,7 @@
   },
   "scripts": {
     "i18n:compile": "node ./scripts/compile.js",
-    "check": "tsc --noEmit",
+    "check": "tsrs --noEmit",
     "lint": "oxlint src/ scripts/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
     "lint:fix": "oxlint src/ scripts/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
   },

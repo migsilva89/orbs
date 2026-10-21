@@ -41,6 +41,7 @@ export interface DatabaseSchema {
     name: string;
     tokenHash: string;
     createdAt: number;
+    pushToken: string | null;
   };
   pairingGrant: {
     tokenHash: string;

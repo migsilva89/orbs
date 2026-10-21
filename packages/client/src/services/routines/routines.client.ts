@@ -2,6 +2,7 @@ import { m } from '@openbots/i18n/client';
 import { match } from 'ts-pattern';
 import { ROUTINES } from './routines.constants';
 import type { RoutinesScheduleTextParams } from '../../types/routines.types';
+import type { RoutineSchedule } from '@openbots/contracts/universal';
 
 export function routinesScheduleText({ schedule, locale }: RoutinesScheduleTextParams): string {
   function routinesCronText(expression: string): string {
@@ -48,4 +49,13 @@ export function routinesScheduleText({ schedule, locale }: RoutinesScheduleTextP
     })
     .with({ kind: 'cron' }, ({ expression }) => routinesCronText(expression))
     .exhaustive();
+}
+
+/** A starting schedule when the owner switches a routine to another kind: in an hour, hourly, or daily at 9. */
+export function routinesScheduleDefault(kind: string): RoutineSchedule {
+  return match(kind)
+    .returnType<RoutineSchedule>()
+    .with('once', () => ({ kind: 'once', runAt: Date.now() + ROUTINES.minutesPerHour * 60_000 }))
+    .with('interval', () => ({ kind: 'interval', minutes: ROUTINES.minutesPerHour }))
+    .otherwise(() => ({ kind: 'cron', expression: '0 9 * * *', timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }));
 }

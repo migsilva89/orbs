@@ -22,7 +22,7 @@
     }
   },
   "scripts": {
-    "check": "tsc --noEmit",
+    "check": "tsrs --noEmit",
     "lint": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
     "lint:fix": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
   },
@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "@earendil-works/chord": "catalog:",
+    "@json-render/core": "catalog:",
     "@openbots/avatar-blobs": "workspace:*",
     "@openbots/contracts": "workspace:*",
     "@openbots/errors": "workspace:*",

@@ -1,3 +1,4 @@
+import { artifactsStore } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
@@ -9,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toasty } from '@/components/ui/sonner';
-import { artifactsStore } from '@/services/artifacts/artifacts.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconExternalLink from '~icons/lucide/external-link';
 import IconLayoutDashboard from '~icons/lucide/layout-dashboard';
@@ -27,6 +27,7 @@ export function RoomsChatArtifact({ artifact }: RoomsChatArtifactProps) {
   const { data: saved } = useQuery(rpc.artifacts.get.queryOptions({ input: ref }));
 
   const store = artifactsStore({
+    rpc,
     queryClient,
     botId: artifact.botId,
     conversationId: artifact.conversationId,

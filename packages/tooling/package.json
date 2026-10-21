@@ -12,7 +12,7 @@
   "scripts": {
     "lint": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
     "lint:fix": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix",
-    "check": "tsc --noEmit"
+    "check": "tsrs --noEmit"
   },
   "dependencies": {
     "oxc-parser": "catalog:"

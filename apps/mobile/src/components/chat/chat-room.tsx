@@ -16,6 +16,7 @@ import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
 import { chatMessageDetails } from '@/services/chat/chat.utils';
+import { ChatAround } from './chat-around';
 import { ChatComposer } from './chat-composer';
 import { ChatHeader } from './chat-header';
 import { ChatMessage } from './chat-message';
@@ -23,22 +24,24 @@ import { ChatRuns } from './chat-runs';
 import type { RpcSession } from '@/types/rpc.types';
 import type { LegendListRef } from '@legendapp/list/react-native';
 import type { ChatMessage as ChatMessageItem, ChatOutgoing, MentionItem } from '@openbots/client/client';
-import type { Bot, ConversationView } from '@openbots/contracts/universal';
+import type { Bot, ConversationReaction, ConversationView } from '@openbots/contracts/universal';
 
 interface ChatRoomProps {
   botId: string;
+  focusEntryId?: number;
   replyToEntryId?: number;
   quote?: MentionItem;
   prefill?: string;
 }
 
-export function ChatRoom({ botId, replyToEntryId, quote, prefill }: ChatRoomProps) {
+export function ChatRoom({ botId, focusEntryId, replyToEntryId, quote, prefill }: ChatRoomProps) {
   const { session } = useConnection();
 
   return match(session)
     .with(P.nonNullable, (current) => (
       <ChatRoomContent
         botId={botId}
+        focusEntryId={focusEntryId}
         prefill={prefill}
         quote={quote}
         replyToEntryId={replyToEntryId}
@@ -51,12 +54,13 @@ export function ChatRoom({ botId, replyToEntryId, quote, prefill }: ChatRoomProp
 interface ChatRoomContentProps {
   session: RpcSession;
   botId: string;
+  focusEntryId?: number;
   replyToEntryId?: number;
   quote?: MentionItem;
   prefill?: string;
 }
 
-function ChatRoomContent({ session, botId, replyToEntryId, quote, prefill }: ChatRoomContentProps) {
+function ChatRoomContent({ session, botId, focusEntryId, replyToEntryId, quote, prefill }: ChatRoomContentProps) {
   const bots = useQuery(session.rpc.bots.list.queryOptions());
   const view = useQuery(chatViewOptions(session, { botId }));
   const bot = bots.data?.find((item) => item.id === botId);
@@ -72,6 +76,7 @@ function ChatRoomContent({ session, botId, replyToEntryId, quote, prefill }: Cha
           <ChatRoomView
             bot={ready.bot}
             bots={bots.data ?? []}
+            focusEntryId={focusEntryId}
             prefill={prefill}
             quote={quote}
             replyToEntryId={replyToEntryId}
@@ -107,12 +112,13 @@ interface ChatRoomViewProps {
   bot: Bot;
   bots: Bot[];
   view: ConversationView;
+  focusEntryId?: number;
   replyToEntryId?: number;
   quote?: MentionItem;
   prefill?: string;
 }
 
-function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill }: ChatRoomViewProps) {
+function ChatRoomView({ session, bot, bots, view, focusEntryId, replyToEntryId, quote, prefill }: ChatRoomViewProps) {
   const router = useRouter();
   const list = useRef<LegendListRef>(null);
   const composer = useRef(null);
@@ -135,9 +141,53 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
 
   const reaction = useChatReaction(bot.id);
   useChatPendingSync();
-  const groups = (message: ChatMessageItem) => roomsReactionGroups({ reaction: room.reactions.get(message.metadata?.entryId ?? 0), bots });
   const unread = useChatUnread(bot.id, list, messages);
   const now = new Date();
+
+  const groups = (message: ChatMessageItem, reactions: Map<number, ConversationReaction>) => roomsReactionGroups({
+    reaction: reactions.get(message.metadata?.entryId ?? 0),
+    bots,
+  });
+
+  const renderMessage = (message: ChatMessageItem, shown: ChatMessageItem[], reactions: Map<number, ConversationReaction>) => (
+    <ChatMessage
+      bot={bot}
+      bots={bots}
+      bubble={bubble}
+      isCollapsible={shown.indexOf(message) < shown.length - 1}
+      isLive={message.id === CHAT.liveMessageId}
+      isSending={message.id.startsWith(CHAT.outgoingPrefix)}
+      message={message}
+      reacting={reaction.isPending}
+      reactionFailed={reaction.isError}
+      reactions={groups(message, reactions)}
+      session={session}
+      time={message.metadata
+        ? roomsTimeLabel({
+          createdAt: message.metadata.createdAt,
+          previous: shown[shown.indexOf(message) - 1]?.metadata?.createdAt,
+          now,
+          locale: getLocale(),
+        })
+        : undefined}
+      onLongPress={() => router.push({
+        pathname: '/chat/[botId]/message',
+        params: {
+          botId: bot.id,
+          conversationId,
+          entryId: message.metadata?.entryId ?? 0,
+          from: message.role === 'user' ? 'user' : 'assistant',
+          text: roomsMessageText(message),
+          details: chatMessageDetails(message).join('\n'),
+        },
+      })}
+      onReact={(emoji) => reaction.react({
+        entryId: message.metadata?.entryId ?? 0,
+        emoji,
+        groups: groups(message, reactions),
+      })}
+    />
+  );
 
   const empty = match(messages.length)
     .with(0, () => <Text className="mx-5 mt-8 text-center" tone="muted">{m.mobile_chat_empty({ name: bot.name })}</Text>)
@@ -145,67 +195,41 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
 
   return (
     <View className="flex-1">
-      <MessageList
-        composerInset={contentInsetEndAdjustment}
-        data={messages}
-        footer={(
-          <ChatRuns
-            activity={activity}
-            approvals={room.approvals}
-            bot={bot}
-            draft={messages.find((message) => message.id === CHAT.liveMessageId)}
-            failure={room.failure}
-            questions={room.questions}
-          />
-        )}
-        header={empty}
-        keyExtractor={(message) => message.id}
-        ref={list}
-        renderItem={(message) => (
-          <ChatMessage
-            bot={bot}
-            bots={bots}
-            bubble={bubble}
-            isCollapsible={messages.indexOf(message) < messages.length - 1}
-            isLive={message.id === CHAT.liveMessageId}
-            isSending={message.id.startsWith(CHAT.outgoingPrefix)}
-            message={message}
-            reacting={reaction.isPending}
-            reactionFailed={reaction.isError}
-            reactions={groups(message)}
-            session={session}
-            time={message.metadata
-              ? roomsTimeLabel({
-                createdAt: message.metadata.createdAt,
-                previous: messages[messages.indexOf(message) - 1]?.metadata?.createdAt,
-                now,
-                locale: getLocale(),
-              })
-              : undefined}
-            onLongPress={() => router.push({
-              pathname: '/chat/[botId]/message',
-              params: {
-                botId: bot.id,
-                conversationId,
-                entryId: message.metadata?.entryId ?? 0,
-                from: message.role === 'user' ? 'user' : 'assistant',
-                text: roomsMessageText(message),
-                details: chatMessageDetails(message).join('\n'),
-              },
-            })}
-            onReact={(emoji) => reaction.react({
-              entryId: message.metadata?.entryId ?? 0,
-              emoji,
-              groups: groups(message),
-            })}
-          />
-        )}
-        onStartReached={() => {
-          if (room.older.isEnabled && !room.older.isLoading) {
-            room.older.onLoad();
-          }
-        }}
-      />
+      {focusEntryId === undefined ? (
+        <MessageList
+          composerInset={contentInsetEndAdjustment}
+          data={messages}
+          footer={(
+            <ChatRuns
+              activity={activity}
+              approvals={room.approvals}
+              bot={bot}
+              draft={messages.find((message) => message.id === CHAT.liveMessageId)}
+              failure={room.failure}
+              questions={room.questions}
+            />
+          )}
+          header={empty}
+          keyExtractor={(message) => message.id}
+          ref={list}
+          renderItem={(message) => renderMessage(message, messages, room.reactions)}
+          onStartReached={() => {
+            if (room.older.isEnabled && !room.older.isLoading) {
+              room.older.onLoad();
+            }
+          }}
+        />
+      ) : (
+        <ChatAround
+          bot={bot}
+          bots={bots}
+          composerInset={contentInsetEndAdjustment}
+          entryId={focusEntryId}
+          renderMessage={renderMessage}
+          view={view}
+          onLatest={() => router.setParams({ entryId: undefined })}
+        />
+      )}
       <ChatHeader activity={activity} bot={bot} />
       <KeyboardSticky>
         <ChatComposer
@@ -223,7 +247,10 @@ function ChatRoomView({ session, bot, bots, view, replyToEntryId, quote, prefill
           onLayout={onComposerLayout}
           onOutgoingChange={setOutgoing}
           onReplyClear={() => router.setParams({ replyToEntryId: undefined })}
-          onSend={() => void list.current?.scrollToEnd({ animated: true })}
+          onSend={() => {
+            router.setParams({ entryId: undefined });
+            void list.current?.scrollToEnd({ animated: true });
+          }}
           onUnreadPress={unread.seeAll}
         />
       </KeyboardSticky>

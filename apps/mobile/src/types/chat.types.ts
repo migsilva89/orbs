@@ -9,6 +9,14 @@ export interface ChatRouteParams extends ChatSearchParams {
   quote?: string;
   quoteEntryId?: string;
   prefill?: string;
+  entryId?: string;
+}
+
+export interface ChatSubagentRouteParams extends ChatSearchParams {
+  botId: string;
+  conversationId: string;
+  name: string;
+  task: string;
 }
 
 export interface ChatPairRouteParams extends ChatSearchParams {
@@ -47,4 +55,5 @@ export type ChatMessagePart =
 
 export type ChatMessageSegment =
   | { key: string; kind: 'bubbles'; parts: ChatMessagePart[] }
-  | { key: string; kind: 'tools'; parts: ClientTypes.ToolPart[] };
+  | { key: string; kind: 'tools'; parts: ClientTypes.ToolPart[] }
+  | { key: string; kind: 'subagent'; part: ClientTypes.ToolPart; subagent: ClientTypes.ToolSubagent };

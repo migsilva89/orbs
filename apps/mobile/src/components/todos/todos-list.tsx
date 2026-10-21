@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Empty, EmptyLink } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Item, ItemContent, ItemTitle } from '@/components/ui/item';
+import { ContextMenu } from '@/components/ui/menu';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { Text } from '@/components/ui/text';
 import { useToast } from '@/hooks/use-toast';
@@ -24,9 +25,15 @@ export function TodosList({ session, bot, onPrefill }: TodosListProps) {
   const router = useRouter();
   const toast = useToast();
   const [isDoneShown, setIsDoneShown] = useState(false);
-  const list = useQuery(session.rpc.todos.list.queryOptions({ input: { botId: bot.id } }));
+  const options = session.rpc.todos.list.queryOptions({ input: { botId: bot.id } });
+  const list = useQuery(options);
 
   const update = useMutation(session.rpc.todos.update.mutationOptions({
+    onError: () => toast.show({ message: m.rooms_todos_action_failed() }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: session.rpc.todos.key() }),
+  }));
+
+  const reorder = useMutation(session.rpc.todos.reorder.mutationOptions({
     onError: () => toast.show({ message: m.rooms_todos_action_failed() }),
     onSettled: () => queryClient.invalidateQueries({ queryKey: session.rpc.todos.key() }),
   }));
@@ -34,6 +41,15 @@ export function TodosList({ session, bot, onPrefill }: TodosListProps) {
   const todos = list.data ?? [];
   const open = todos.filter((todo) => !todo.isDone);
   const done = todos.filter((todo) => todo.isDone);
+
+  const move = (todo: Todo, index: number) => {
+    const others = open.filter((item) => item.id !== todo.id);
+    const ordered = [...others.slice(0, index), todo, ...others.slice(index)];
+
+    void queryClient.cancelQueries({ queryKey: options.queryKey });
+    queryClient.setQueryData(options.queryKey, [...ordered, ...done]);
+    reorder.mutate({ botId: bot.id, todoIds: ordered.map((item) => item.id) });
+  };
 
   const toggle = (todo: Todo) => update.mutate({
     botId: bot.id,
@@ -71,14 +87,26 @@ export function TodosList({ session, bot, onPrefill }: TodosListProps) {
       ) : null}
       {open.length > 0 ? (
         <View className="overflow-hidden rounded-lg border border-border bg-card">
-          {open.map((todo) => (
-            <TodosListItem
-              disabled={update.isPending}
+          {open.map((todo, index) => (
+            <ContextMenu
+              isFullWidth
+              items={[
+                ...(index > 0 ? [
+                  { label: m.rooms_todos_move_top(), systemImage: 'arrow.up.to.line' as const, onSelect: () => move(todo, 0) },
+                  { label: m.rooms_todos_move_up(), systemImage: 'arrow.up' as const, onSelect: () => move(todo, index - 1) },
+                ] : []),
+                ...(index < open.length - 1 ? [{ label: m.rooms_todos_move_down(), systemImage: 'arrow.down' as const, onSelect: () => move(todo, index + 1) }] : []),
+                { label: m.rooms_todos_delete(), systemImage: 'trash' as const, isDestructive: true, hasDividerBefore: true, onSelect: () => remove(todo) },
+              ]}
               key={todo.id}
-              todo={todo}
-              onRemove={remove}
-              onToggle={toggle}
-            />
+            >
+              <TodosListItem
+                disabled={update.isPending || reorder.isPending}
+                todo={todo}
+                onRemove={remove}
+                onToggle={toggle}
+              />
+            </ContextMenu>
           ))}
         </View>
       ) : null}

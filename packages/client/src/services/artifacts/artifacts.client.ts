@@ -1,11 +1,11 @@
 import { createStoreAdapter } from '@json-render/core/store-utils';
 import { artifactSaveState } from '@openbots/contracts/universal';
 import { hashKey } from '@tanstack/react-query';
-import { rpc } from '@/services/rpc/rpc.client';
-import type { ArtifactsStoreParams } from '@/types/artifacts.types';
+import type { ArtifactsStoreParams } from '../../types/artifacts.types';
 import type { StateStore } from '@json-render/core';
 
-export function artifactsStore({ queryClient, botId, conversationId, artifactId, onError }: ArtifactsStoreParams): StateStore {
+/** The artifact's interactive state as a json-render store: edits apply at once and save to the daemon in order. */
+export function artifactsStore({ rpc, queryClient, botId, conversationId, artifactId, onError }: ArtifactsStoreParams): StateStore {
   const queryKey = rpc.artifacts.get.queryKey({ input: { botId, conversationId, artifactId } });
   const empty = {};
   let saving = Promise.resolve();

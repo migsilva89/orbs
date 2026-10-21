@@ -1,4 +1,5 @@
 import type { RoomsReactionGroup } from './rooms.types';
+import type * as ToolTypes from './tool.types';
 import type * as UniversalTypes from '@openbots/contracts/universal';
 import type { UIMessage } from 'ai';
 
@@ -144,6 +145,19 @@ export type ChatSendResult = { kind: 'sent' } | { kind: 'command' } | { kind: 'r
 
 export interface ChatResetCommand {
   handoff?: string;
+}
+
+export interface ChatSubagentParams {
+  botId: string;
+  part: ToolTypes.ToolPart;
+  subagent: ToolTypes.ToolSubagent;
+}
+
+export interface ChatAroundParams {
+  bot: UniversalTypes.Bot;
+  bots: UniversalTypes.Bot[];
+  view: UniversalTypes.ConversationView;
+  entryId: number;
 }
 
 export interface ChatRoomParams {

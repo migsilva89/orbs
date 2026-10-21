@@ -9,6 +9,7 @@ import type { LimitService } from '../services/limit/limit.service';
 import type { McpAuthService } from '../services/mcp/mcp-auth.service';
 import type { McpService } from '../services/mcp/mcp.service';
 import type { PluginService } from '../services/plugin/plugin.service';
+import type { PushService } from '../services/push/push.service';
 import type { RoutineService } from '../services/routine/routine.service';
 import type { ServerService } from '../services/server/server.service';
 import type { SkillService } from '../services/skill/skill.service';
@@ -25,6 +26,7 @@ export interface RpcContext extends RequestHeadersPluginContext {
   routines: RoutineService;
   todos: TodoService;
   artifacts: ArtifactService;
+  push: PushService;
   attachments: AttachmentService;
   auth: AuthService;
   credentials: CredentialsService;

@@ -20,8 +20,17 @@ export function chatMessageSegments(message: ChatMessage, hideVerbose: boolean):
   for (const block of toolBlocks({ parts: message.parts, hideVerbose })) {
     const tools = match(block)
       .with({ kind: 'tools' }, ({ parts }) => parts)
-      .with({ kind: 'subagent' }, ({ part }) => [part])
       .otherwise(() => undefined);
+
+    if (block.kind === 'subagent') {
+      segments.push({
+        key: `subagent-${block.index}`,
+        kind: 'subagent',
+        part: block.part,
+        subagent: block.subagent,
+      });
+      continue;
+    }
 
     const parts = match(block)
       .returnType<ChatTypes.ChatMessagePart[]>()

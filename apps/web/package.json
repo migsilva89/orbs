@@ -7,7 +7,7 @@
     "dev": "OPENBOTS_DAEMON_URL=http://127.0.0.1:47191 vite dev --port 47190 --strictPort",
     "build": "vite build",
     "start": "bun src/application/server.bun.ts",
-    "check": "tsc --noEmit",
+    "check": "tsrs --noEmit",
     "lint": "oxlint src/ vite/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
     "lint:fix": "oxlint src/ vite/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
   },

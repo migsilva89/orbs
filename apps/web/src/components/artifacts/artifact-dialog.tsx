@@ -1,3 +1,4 @@
+import { artifactsStore } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
@@ -6,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toasty } from '@/components/ui/sonner';
-import { artifactsStore } from '@/services/artifacts/artifacts.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconExternalLink from '~icons/lucide/external-link';
 import type { ArtifactsRef } from '@/types/artifacts.types';
@@ -21,6 +21,7 @@ export function ArtifactDialog({ botId, conversationId, artifactId, title, onOpe
   const { data: artifact, isPending } = useQuery(rpc.artifacts.get.queryOptions({ input: { botId, conversationId, artifactId } }));
 
   const store = artifactsStore({
+    rpc,
     queryClient,
     botId,
     conversationId,

@@ -39,9 +39,11 @@ export default (): ExpoConfig => ({
     package: variant.bundleIdentifier,
   },
   experiments: { typedRoutes: true },
+  extra: { eas: { projectId: process.env.EAS_PROJECT_ID } },
   plugins: [
     'expo-router',
     'expo-secure-store',
+    'expo-notifications',
     ['expo-image-picker', { photosPermission: m.mobile_photos_permission(), cameraPermission: m.mobile_camera_permission(), microphonePermission: false }],
     [
       'expo-font',

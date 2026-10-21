@@ -7,6 +7,7 @@ import { ContextConnection } from '@/components/context/context-connection';
 import { ContextToast } from '@/components/context/context-toast';
 import { useConnectionIsConnected } from '@/hooks/use-connection';
 import { useNavigationTheme } from '@/hooks/use-navigation-theme';
+import { usePush } from '@/hooks/use-push';
 import { appearanceRead } from '@/services/appearance/appearance.client';
 import '@/application/styles.css';
 
@@ -37,6 +38,7 @@ export default function RootLayout() {
 
 function RootLayoutStack() {
   const isConnected = useConnectionIsConnected();
+  usePush();
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
@@ -44,6 +46,7 @@ function RootLayoutStack() {
         <Stack.Screen name="index" />
         <Stack.Screen name="chat/[botId]/index" />
         <Stack.Screen name="chat/[botId]/with/[peerId]/index" />
+        <Stack.Screen name="chat/[botId]/subagent/[conversationId]/index" />
         <Stack.Screen name="chat/[botId]/message" options={SHEET_FIT} />
         <Stack.Screen name="chat/[botId]/react" options={{ ...SHEET, sheetAllowedDetents: [0.6, 1] }} />
         <Stack.Screen name="chat/[botId]/text" options={{ ...SHEET, sheetAllowedDetents: [0.9] }} />
@@ -57,6 +60,9 @@ function RootLayoutStack() {
         <Stack.Screen name="bots/[botId]/edit" options={{ headerShown: true, title: m.rooms_action_edit_bot(), headerBackButtonDisplayMode: 'minimal' }} />
         <Stack.Screen name="bots/[botId]/delete" options={DIALOG} />
         <Stack.Screen name="bots/[botId]/todos/[todoId]/delete" options={DIALOG} />
+        <Stack.Screen name="bots/[botId]/routines/[routineId]/edit" options={{ headerShown: true, title: m.rooms_routines_edit(), headerBackButtonDisplayMode: 'minimal' }} />
+        <Stack.Screen name="bots/[botId]/routines/[routineId]/delete" options={DIALOG} />
+        <Stack.Screen name="bots/[botId]/artifacts/[artifactId]/index" options={{ headerShown: true, title: m.artifacts_title(), headerBackButtonDisplayMode: 'minimal' }} />
       </Stack.Protected>
       <Stack.Protected guard={!isConnected}>
         <Stack.Screen name="connect" />

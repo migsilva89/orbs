@@ -15,6 +15,7 @@ import { ChatHtml } from './chat-html';
 import { ChatNotice } from './chat-notice';
 import { ChatReactions } from './chat-reactions';
 import { ChatReasoning } from './chat-reasoning';
+import { ChatSubagent } from './chat-subagent';
 import { ChatTools } from './chat-tools';
 import type { ChatMessagePart } from '@/types/chat.types';
 import type { RpcSession } from '@/types/rpc.types';
@@ -154,6 +155,14 @@ export function ChatMessage({
             key={tools.key}
             parts={tools.parts}
             senderId={bot.id}
+          />
+        ))
+        .with({ kind: 'subagent' }, (block) => (
+          <ChatSubagent
+            botId={bot.id}
+            key={block.key}
+            part={block.part}
+            subagent={block.subagent}
           />
         ))
         .with({ kind: 'bubbles' }, (bubbles) => (

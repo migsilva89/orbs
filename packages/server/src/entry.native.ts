@@ -6,3 +6,4 @@ export { credentialsKeyNative } from './services/credentials/credentials-key.uti
 export { workspacePathsNative, workspacePathsRootNative } from './services/workspace/workspace-paths.utils';
 
 export { makeAttachmentStorageService } from './services/attachment/attachment-storage.service';
+export { makeAvatarImageService } from './services/avatar/avatar-image.service';

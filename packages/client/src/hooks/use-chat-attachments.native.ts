@@ -1,8 +1,8 @@
 import { ATTACHMENT } from '@openbots/contracts/universal';
-import { Errors } from '@openbots/errors/universal';
 import { m } from '@openbots/i18n/client';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
+import { chatReadPicked } from '../services/chat/chat.native';
 import { chatFileType } from '../services/chat/chat.utils';
 import { useChatUploads } from './use-chat-uploads';
 import type { ChatAttachmentsPlatformParams, ChatPicked } from '../types/chat.types';
@@ -13,7 +13,7 @@ export function useChatAttachmentsNative({ botId, onProblem }: ChatAttachmentsPl
     botId,
     describe: (picked) => picked,
     preview: (picked) => (picked.mediaType.startsWith('image/') ? picked.uri : ''),
-    read: readPicked,
+    read: chatReadPicked,
     onFailed: (item) => onProblem(m.mobile_chat_attach_failed({ name: item.name })),
     onProblem,
   });
@@ -56,19 +56,4 @@ export function useChatAttachmentsNative({ botId, onProblem }: ChatAttachmentsPl
   };
 
   return { ...files, pickPhotos, takePhoto, pickFiles };
-}
-
-function readPicked({ uri, name }: ChatPicked): Promise<File> {
-  return new Promise((resolve, reject) => {
-    const request = new XMLHttpRequest();
-
-    request.responseType = 'blob';
-    request.onload = () => {
-      // SAFETY: a 'blob' XHR response is a native Blob; an own writable `name` survives Expo's FormData, unlike `File.name`.
-      resolve(Object.defineProperty(request.response as Blob, 'name', { value: name, writable: true }) as File);
-    };
-    request.onerror = () => reject(new Errors.INTERNAL_ERROR({ internal: `Could not read ${uri}` }));
-    request.open('GET', uri);
-    request.send();
-  });
 }

@@ -47,8 +47,9 @@ export function coreRpcNative(
       plugins: services.plugins,
       mcp: services.mcp,
       attachments: services.attachments,
+      avatars: services.avatars,
       artifacts: services.artifacts,
-      push: services.push,
+      notifications: services.notifications,
     },
     http: new FetchRPCHandler(router, {
       plugins: [...plugins, new CORSPlugin({ origin: env.OPENBOTS_ALLOWED_ORIGINS })],

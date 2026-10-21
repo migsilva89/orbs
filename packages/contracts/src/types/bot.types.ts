@@ -7,6 +7,8 @@ import { modelSelection, modelThinkingLevel } from './model.types';
 import { pluginCatalog } from './plugin.types';
 import { skill } from './skill.types';
 
+export const botAvatarImage = z.object({ kind: z.literal('image'), src: z.string().regex(/^\/avatars\/[\da-f-]{36}\.webp$/) });
+
 export const botAvatar = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('blob'),
@@ -14,7 +16,7 @@ export const botAvatar = z.discriminatedUnion('kind', [
     color: z.enum(COLORS.map((color) => color.id)),
     expression: z.enum(EXPRESSIONS.map((expression) => expression.id)),
   }),
-  z.object({ kind: z.literal('image'), src: z.string().max(8000).regex(/^data:image\/webp;base64,[A-Za-z0-9+/]+={0,2}$/) }),
+  botAvatarImage,
   z.object({ kind: z.literal('color'), color: z.string().regex(/^#[\da-f]{6}$/i) }),
   z.object({
     kind: z.literal('emoji'),
@@ -82,6 +84,7 @@ export const botSwapModelsResult = z.object({
 export const botForm = botCreate.extend({ handle: botFields.shape.handle.or(z.literal('')) });
 
 export type Bot = z.infer<typeof bot>;
+export type BotAvatarImage = z.infer<typeof botAvatarImage>;
 export type BotCreateInput = z.infer<typeof botCreate>;
 export type BotUpdateInput = z.infer<typeof botUpdate>;
 export type BotGetInput = z.infer<typeof botGet>;

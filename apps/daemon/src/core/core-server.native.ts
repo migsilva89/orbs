@@ -3,7 +3,10 @@ import { isIP } from 'node:net';
 import { match, P } from 'ts-pattern';
 import { coreHandler } from '@openbots/server/server';
 import { coreRpcNative } from './core-rpc.native';
+import type { CoreServerAvatarParams } from '../types/core.types';
 import type { makeServices } from '@openbots/server/server';
+
+const CORE_SERVER_AVATAR = /^\/avatars\/(bots\/)?([\da-f-]{36})\.(png|webp)$/u;
 
 export function coreServerNative(services: Awaited<ReturnType<typeof makeServices>>) {
   const rpc = coreRpcNative(services);
@@ -48,6 +51,11 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
           })
           .with({ matched: false }, () => new Response(null, { status: 404 }))
           .exhaustive()))
+        .with({ path: P.string.regex(CORE_SERVER_AVATAR), method: 'GET' }, () => coreServerAvatar({
+          services,
+          path: url.pathname,
+          peer: server.requestIP(request)?.address ?? null,
+        }))
         .with({ path: '/rpc', method: 'GET' }, () => match(server.upgrade(request, { data: undefined }))
           .with(true, () => undefined)
           .with(false, () => new Response(null, { status: 426 }))
@@ -83,4 +91,31 @@ function coreServerAllowedOrigin(request: Request): boolean {
         || hostname === 'localhost'
         || hostname.endsWith('.localhost');
     });
+}
+
+async function coreServerAvatar({ services, path, peer }: CoreServerAvatarParams): Promise<Response> {
+  const [, folder, id, extension] = CORE_SERVER_AVATAR.exec(path) ?? [];
+
+  try {
+    await services.limits.throttle({ kind: 'public', peer });
+
+    const bytes = await match({ folder, extension })
+      .with({ folder: 'bots/', extension: 'png' }, () => services.avatars.queries.bot({ botId: id }))
+      .otherwise(() => services.avatars.queries.image({ imageId: id }));
+
+    return new Response(new Uint8Array(bytes), {
+      headers: {
+        'Content-Type': extension === 'png' ? 'image/png' : 'image/webp',
+        'Cache-Control': folder ? 'no-cache' : 'public, max-age=31536000, immutable',
+        'X-Content-Type-Options': 'nosniff',
+      },
+    });
+  } catch (error) {
+    return match(error)
+      .with({ code: 'NOT_FOUND' }, () => new Response(null, { status: 404 }))
+      .with({ code: 'RATE_LIMITED' }, () => new Response(null, { status: 429 }))
+      .otherwise(() => {
+        throw error;
+      });
+  }
 }

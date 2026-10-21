@@ -28,7 +28,6 @@ export const ROOMS = {
   todosRefreshMs: 15_000,
   draftKeyPrefix: 'openbots.draft.',
   prefillEvent: 'openbots.prefill',
-  notifyIcon: '/img/favicon/web-app-manifest-192x192.png',
   chime: { notesHz: [660, 880], noteSeconds: 0.12, volume: 0.12, fadeTo: 0.0001, closeMs: 1000 },
   recommendedChoice: '(Recommended)',
   timeGapMs: 60 * 60 * 1000,

@@ -104,6 +104,13 @@ export function avatarSvg(frame: BotFrame, ink: string, uid: string): AvatarSvgN
   ];
 }
 
+/** One SVG node as markup, for renderers that take an SVG string instead of DOM nodes. */
+export function avatarMarkup(node: AvatarSvgNode): string {
+  const attrs = Object.entries(node.attrs).map(([key, value]) => `${key}="${value}"`).join(' ');
+
+  return `<${node.tag} ${attrs}>${node.children.map(avatarMarkup).join('')}</${node.tag}>`;
+}
+
 /** The readable pose of a look, as reduced motion and the first paint show it. */
 export function avatarStill(look: Pick<AvatarLook, 'state' | 'radii' | 'expression'>): BotFrame {
   return new BotEngine(RADIUS, look.state, look.radii, look.expression).sample(POSES[look.state]);

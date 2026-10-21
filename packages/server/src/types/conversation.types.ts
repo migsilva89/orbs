@@ -1,6 +1,7 @@
 import type { AttachmentService } from '../services/attachment/attachment.service';
 import type { AuthService } from '../services/auth/auth.service';
 import type { BotService } from '../services/bot/bot.service';
+import type { NotificationService } from '../services/notification/notification.service';
 import type { SettingsService } from '../services/settings/settings.service';
 import type { SkillService } from '../services/skill/skill.service';
 import type { ToolService } from '../services/tool/tool.service';
@@ -12,6 +13,7 @@ import type { RuntimeService } from '@openbots/runtime/server';
 
 export interface ConversationServiceDeps {
   auth: AuthService;
+  notifications: NotificationService;
   attachments: AttachmentService;
   bots: BotService;
   runtime: RuntimeService;

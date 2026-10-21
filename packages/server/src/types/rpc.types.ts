@@ -1,6 +1,7 @@
 import type { ArtifactService } from '../services/artifact/artifact.service';
 import type { AttachmentService } from '../services/attachment/attachment.service';
 import type { AuthService } from '../services/auth/auth.service';
+import type { AvatarService } from '../services/avatar/avatar.service';
 import type { BotService } from '../services/bot/bot.service';
 import type { ConversationService } from '../services/conversation/conversation.service';
 import type { CredentialsService } from '../services/credentials/credentials.service';
@@ -8,8 +9,8 @@ import type { InstructionService } from '../services/instruction/instruction.ser
 import type { LimitService } from '../services/limit/limit.service';
 import type { McpAuthService } from '../services/mcp/mcp-auth.service';
 import type { McpService } from '../services/mcp/mcp.service';
+import type { NotificationService } from '../services/notification/notification.service';
 import type { PluginService } from '../services/plugin/plugin.service';
-import type { PushService } from '../services/push/push.service';
 import type { RoutineService } from '../services/routine/routine.service';
 import type { ServerService } from '../services/server/server.service';
 import type { SkillService } from '../services/skill/skill.service';
@@ -26,8 +27,9 @@ export interface RpcContext extends RequestHeadersPluginContext {
   routines: RoutineService;
   todos: TodoService;
   artifacts: ArtifactService;
-  push: PushService;
+  notifications: NotificationService;
   attachments: AttachmentService;
+  avatars: AvatarService;
   auth: AuthService;
   credentials: CredentialsService;
   isLocal: boolean;

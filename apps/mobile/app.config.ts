@@ -33,6 +33,7 @@ export default (): ExpoConfig => ({
   userInterfaceStyle: 'automatic',
   ios: {
     bundleIdentifier: variant.bundleIdentifier,
+    appleTeamId: 'YOURTEAMID',
     supportsTablet: true,
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
@@ -49,6 +50,7 @@ export default (): ExpoConfig => ({
     'expo-router',
     'expo-secure-store',
     'expo-notifications',
+    '@pierrecapo/expo-notification-service-extension',
     ['expo-image-picker', { photosPermission: m.mobile_photos_permission(), cameraPermission: m.mobile_camera_permission(), microphonePermission: false }],
     [
       'expo-font',

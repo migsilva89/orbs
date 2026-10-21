@@ -14,7 +14,7 @@ import {
   runtimeEnvNative,
 } from '@openbots/runtime/native';
 import { join } from 'node:path';
-import { credentialsKeyNative, makeAttachmentStorageService, makeDatabaseService, makeMcpService, makeWorkspaceService, workspacePathsNative } from '@openbots/server/native';
+import { credentialsKeyNative, makeAttachmentStorageService, makeAvatarImageService, makeDatabaseService, makeMcpService, makeWorkspaceService, workspacePathsNative } from '@openbots/server/native';
 import { makeCredentialsService, makeServices, makeSettingsService } from '@openbots/server/server';
 import { coreLocalNative } from './core-local.native';
 import { corePairingNative } from './core-pairing.native';
@@ -88,6 +88,7 @@ async function coreNativeServices(resources: AsyncDisposableStack) {
   const services = await makeServices({
     database,
     attachmentStorage: makeAttachmentStorageService({ root: paths.root }),
+    avatarImages: makeAvatarImageService({ root: join(paths.data, 'avatars') }),
     credentials,
     settings,
     workspace: makeWorkspaceService({ root: paths.root }),
@@ -112,7 +113,7 @@ async function coreNativeServices(resources: AsyncDisposableStack) {
   });
 
   resources.defer(() => services.runtime.close());
-  resources.defer(await services.push.actions.watch());
+  resources.defer(await services.notifications.actions.watch());
 
   return { paths, services };
 }

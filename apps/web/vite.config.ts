@@ -18,6 +18,7 @@ export default defineConfig({
     proxy: {
       '/rpc': { target: env.OPENBOTS_DAEMON_URL, ws: true },
       '/files': { target: env.OPENBOTS_DAEMON_URL },
+      '/avatars': { target: env.OPENBOTS_DAEMON_URL },
     },
   },
   preview: {

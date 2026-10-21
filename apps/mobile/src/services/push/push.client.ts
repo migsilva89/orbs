@@ -1,6 +1,9 @@
-import { devicePushData } from '@openbots/contracts/universal';
+import { notificationPushData } from '@openbots/contracts/universal';
+import { configureNotificationExtension } from '@pierrecapo/expo-notification-service-extension';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
+import { Platform } from 'react-native';
+import { PUSH_EXTENSION } from './push.constants';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -12,6 +15,10 @@ Notifications.setNotificationHandler({
 });
 
 export async function pushToken() {
+  if (Platform.OS === 'ios') {
+    configureNotificationExtension(PUSH_EXTENSION);
+  }
+
   const projectId = Constants.easConfig?.projectId ?? Constants.expoConfig?.extra?.eas?.projectId;
   const { granted } = await Notifications.requestPermissionsAsync();
 
@@ -25,5 +32,5 @@ export async function pushToken() {
 }
 
 export function pushBotId(response: Notifications.NotificationResponse) {
-  return devicePushData.safeParse(response.notification.request.content.data).data?.botId;
+  return notificationPushData.safeParse(response.notification.request.content.data).data?.botId;
 }

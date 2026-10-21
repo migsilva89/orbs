@@ -1,15 +1,24 @@
-import { useChatHideVerbose } from '@openbots/client/react';
+import { useChatHideVerbose, useNotificationSettings } from '@openbots/client/react';
+import { notificationPlatform } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { ClientOnly } from '@tanstack/react-router';
 import { useId, useState } from 'react';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { PanelContent, PanelDescription, PanelRow } from '@/components/ui/panel';
+import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/components/ui/panel';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import IconBellRing from '~icons/lucide/bell-ring';
 import IconSettings from '~icons/lucide/settings';
+import IconSmartphone from '~icons/lucide/smartphone';
 import IconWrench from '~icons/lucide/wrench';
+import type { NotificationPlatform } from '@openbots/contracts/universal';
+
+const SETTINGS_NOTIFY_PREFER = {
+  phone: m.settings_notify_prefer_phone,
+  computer: m.settings_notify_prefer_computer,
+} satisfies Record<NotificationPlatform, () => string>;
 
 function SettingsGeneralNotifications() {
   const id = useId();
@@ -40,6 +49,7 @@ function SettingsGeneralNotifications() {
 
 export function SettingsGeneral() {
   const verbose = useChatHideVerbose();
+  const notify = useNotificationSettings();
   const verboseId = useId();
 
   return (
@@ -63,6 +73,24 @@ export function SettingsGeneral() {
       <ClientOnly>
         <SettingsGeneralNotifications />
       </ClientOnly>
+      <PanelRow>
+        <IconSmartphone />
+        <PanelContent>
+          <PanelTitle>{m.settings_notify_prefer()}</PanelTitle>
+        </PanelContent>
+        <Select
+          disabled={notify.isPending || !notify.prefer}
+          value={notify.prefer ?? ''}
+          onValueChange={(value) => notify.setPrefer(notificationPlatform.parse(value))}
+        >
+          <SelectTrigger aria-label={m.settings_notify_prefer()} className="w-auto">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {notificationPlatform.options.map((platform) => <SelectItem key={platform} value={platform}>{SETTINGS_NOTIFY_PREFER[platform]()}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </PanelRow>
     </SettingsPanel>
   );
 }

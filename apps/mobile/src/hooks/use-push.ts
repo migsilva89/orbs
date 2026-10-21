@@ -1,6 +1,8 @@
+import { useNotificationPresence } from '@openbots/client/react';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { AppState } from 'react-native';
 import { pushBotId, pushToken } from '@/services/push/push.client';
 import { useConnection } from './use-connection';
 
@@ -10,7 +12,7 @@ export function usePush() {
 
   useEffect(() => {
     if (session) {
-      void pushToken().then((token) => session.client.devices.push({ token })).catch(() => undefined);
+      void pushToken().then((token) => session.client.notifications.push({ token, url: session.connection.serverUrl })).catch(() => undefined);
     }
   }, [session]);
 
@@ -25,4 +27,20 @@ export function usePush() {
 
     return () => subscription.remove();
   }, [router]);
+}
+
+export function usePushPresence() {
+  const [isOpen, setIsOpen] = useState(AppState.currentState === 'active');
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => setIsOpen(state === 'active'));
+
+    return () => subscription.remove();
+  }, []);
+
+  useNotificationPresence({
+    platform: 'phone',
+    isOpen,
+    idleMs: () => 0,
+  });
 }

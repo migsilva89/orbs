@@ -1,4 +1,5 @@
 export * from './context/rpc';
+export * from './hooks/use-bot-avatar-upload';
 export * from './hooks/use-bot-create';
 export * from './hooks/use-bot-delete';
 export * from './hooks/use-bot-update';
@@ -7,6 +8,8 @@ export * from './hooks/use-chat-around';
 export * from './hooks/use-chat-arrange';
 export * from './hooks/use-chat-defaults';
 export * from './hooks/use-chat-hide-verbose';
+export * from './hooks/use-notification-presence';
+export * from './hooks/use-notification-settings';
 export * from './hooks/use-chat-list-sync';
 export * from './hooks/use-chat-message-reaction';
 export * from './hooks/use-chat-pending-sync';

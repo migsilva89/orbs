@@ -69,7 +69,8 @@
     "tailwindcss": "catalog:",
     "ts-pattern": "catalog:",
     "uniwind": "catalog:mobile",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "@pierrecapo/expo-notification-service-extension": "catalog:mobile"
   },
   "devDependencies": {
     "@types/react": "catalog:",

@@ -1,9 +1,9 @@
 import { ROOMS_SEND_MODES } from '@openbots/client/client';
-import { useChatDefaults, useChatHideVerbose } from '@openbots/client/react';
-import { conversationWhenBusy } from '@openbots/contracts/universal';
+import { useChatDefaults, useChatHideVerbose, useNotificationSettings } from '@openbots/client/react';
+import { conversationWhenBusy, notificationPlatform } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useRouter } from 'expo-router';
-import { EyeOff, ListOrdered, Monitor, Palette, Settings } from 'lucide-react-native';
+import { BellRing, EyeOff, ListOrdered, Monitor, Palette, Settings } from 'lucide-react-native';
 import { useState } from 'react';
 import { Switch } from 'react-native';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { appearanceRead, appearanceSave } from '@/services/appearance/appearance.client';
 import { APPEARANCE_CHOICES } from '@/services/appearance/appearance.constants';
 import type { AppearanceChoice } from '@/types/appearance.types';
+import type { NotificationPlatform } from '@openbots/contracts/universal';
 
 const SETTINGS_APPEARANCE_LABELS = {
   system: m.settings_appearance_system,
@@ -22,9 +23,15 @@ const SETTINGS_APPEARANCE_LABELS = {
   dark: m.settings_appearance_dark,
 } satisfies Record<AppearanceChoice, () => string>;
 
+const SETTINGS_NOTIFY_PREFER = {
+  phone: m.settings_notify_prefer_phone,
+  computer: m.settings_notify_prefer_computer,
+} satisfies Record<NotificationPlatform, () => string>;
+
 export function SettingsGeneral() {
   const defaults = useChatDefaults();
   const verbose = useChatHideVerbose();
+  const notify = useNotificationSettings();
   const router = useRouter();
   const toast = useToast();
   const palettes = useAppearance();
@@ -58,6 +65,17 @@ export function SettingsGeneral() {
           }))}
           title={m.rooms_send_mode()}
           value={whenBusy ? ROOMS_SEND_MODES[whenBusy]() : '…'}
+        />
+        <BotSettingsMenuRow
+          icon={BellRing}
+          isDisabled={!notify.prefer || notify.isPending}
+          items={notificationPlatform.options.map((platform) => ({
+            label: SETTINGS_NOTIFY_PREFER[platform](),
+            systemImage: platform === notify.prefer ? 'checkmark' : undefined,
+            onSelect: () => notify.setPrefer(platform),
+          }))}
+          title={m.settings_notify_prefer()}
+          value={notify.prefer ? SETTINGS_NOTIFY_PREFER[notify.prefer]() : '…'}
         />
         <BotSettingsMenuRow
           icon={Monitor}

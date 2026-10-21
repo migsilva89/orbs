@@ -35,6 +35,8 @@
     "ts-pattern": "catalog:",
     "@typesafe-ai/sdk": "catalog:",
     "@earendil-works/pi-coding-agent": "catalog:",
-    "@openbots/i18n": "workspace:*"
+    "@openbots/i18n": "workspace:*",
+    "takumi-js": "catalog:",
+    "@openbots/avatar-blobs": "workspace:*"
   }
 }

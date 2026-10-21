@@ -7,7 +7,7 @@ import type { ConversationListWatchParams, ConversationServiceDeps } from '../..
 import type { NotificationItem, NotificationState } from '@openbots/contracts/universal';
 
 export async function conversationQueryWatchNotifications(
-  { auth, runtime, bots }: ConversationServiceDeps,
+  { auth, runtime, bots, notifications }: ConversationServiceDeps,
   { deviceId, authorization, signal }: ConversationListWatchParams,
 ) {
   const revoked = new AbortController();
@@ -51,9 +51,14 @@ export async function conversationQueryWatchNotifications(
       const preferences = await bots.queries.preferences();
       const conversationIsAudible = (item: NotificationItem) => preferences.get(item.botId)?.isMuted === false;
 
+      const conversationDeliver = (items: NotificationItem[]) => Promise.all(items.filter(conversationIsAudible).map(async (item) => ({
+        ...item,
+        deliverHere: await notifications.queries.target({ item }) === deviceId,
+      })));
+
       return {
-        pending: value.notifications.pending.filter(conversationIsAudible),
-        recent: value.notifications.recent.filter(conversationIsAudible),
+        pending: await conversationDeliver(value.notifications.pending),
+        recent: await conversationDeliver(value.notifications.recent),
       };
     });
   } catch (error) {

@@ -1,8 +1,9 @@
 import { EXPRESSIONS } from '@openbots/avatar-blobs/expressions';
 import { BODIES, COLORS } from '@openbots/avatar-blobs/skins';
 import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS, BOT } from '@openbots/client/client';
+import { useBotAvatarPick } from '@openbots/client/native';
 import { m } from '@openbots/i18n/client';
-import { ChevronLeft, ChevronRight } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, ImageUp } from 'lucide-react-native';
 import { AccessibilityInfo, Pressable, View } from 'react-native';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ export function BotAvatarPicker({ name, value, isDisabled = false, onChange }: B
   }
 
   const blob = value?.kind === 'blob' ? value : BOT.defaultAvatar;
+  const photo = useBotAvatarPick();
 
   const change = (label: string, next: BotAvatar) => {
     AccessibilityInfo.announceForAccessibility(label);
@@ -80,8 +82,8 @@ export function BotAvatarPicker({ name, value, isDisabled = false, onChange }: B
           <Pressable
             accessibilityLabel={AVATAR_COLOR_LABELS[id]()}
             accessibilityRole="radio"
-            accessibilityState={{ selected: blob.color === id, disabled: isDisabled }}
-            className={blob.color === id ? 'size-6.5 items-center justify-center rounded-full border-2 border-foreground' : 'size-6.5 items-center justify-center'}
+            accessibilityState={{ selected: value?.kind !== 'image' && blob.color === id, disabled: isDisabled }}
+            className={value?.kind !== 'image' && blob.color === id ? 'size-6.5 items-center justify-center rounded-full border-2 border-foreground' : 'size-6.5 items-center justify-center'}
             disabled={isDisabled}
             key={id}
             onPress={() => change(AVATAR_COLOR_LABELS[id](), { ...blob, color: id })}
@@ -90,6 +92,15 @@ export function BotAvatarPicker({ name, value, isDisabled = false, onChange }: B
           </Pressable>
         ))}
       </View>
+      <Button
+        disabled={isDisabled || photo.isPending}
+        size="sm"
+        variant="ghost"
+        onPress={() => void photo.pick().then((avatar) => avatar && onChange(avatar), () => undefined)}
+      >
+        <Icon icon={ImageUp} size="sm" />
+        {m.avatars_upload()}
+      </Button>
     </View>
   );
 }

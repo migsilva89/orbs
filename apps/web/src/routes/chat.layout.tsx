@@ -7,6 +7,7 @@ import { RoomsDetails } from '@/components/rooms/rooms-details';
 import { RoomsSearch } from '@/components/rooms/rooms-search';
 import { useLayoutShortcuts } from '@/hooks/use-layout-shortcuts';
 import { useRoomsNotify } from '@/hooks/use-rooms-notify';
+import { useRoomsPresence } from '@/hooks/use-rooms-presence';
 import { layoutSidebarsOpen } from '@/services/layout/layout.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import { seoHead } from '@/services/seo/seo.utils';
@@ -37,6 +38,7 @@ export const Route = createFileRoute('/_chat')({
 function RoomsLayout() {
   useChatListSync();
   useRoomsNotify();
+  useRoomsPresence();
   useLayoutShortcuts();
   const { sidebars, connection } = Route.useLoaderData();
 

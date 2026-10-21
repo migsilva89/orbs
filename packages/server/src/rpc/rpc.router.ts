@@ -1,5 +1,6 @@
 import { artifacts } from './rpc.artifacts';
 import { attachments } from './rpc.attachments';
+import { avatars } from './rpc.avatars';
 import { bots } from './rpc.bots';
 import { commands } from './rpc.commands';
 import { conversation } from './rpc.conversation';
@@ -10,6 +11,7 @@ import { limits } from './rpc.limits';
 import { mcp } from './rpc.mcp';
 import { mcpAuth } from './rpc.mcp-auth';
 import { models } from './rpc.models';
+import { notifications } from './rpc.notifications';
 import { pairing } from './rpc.pairing';
 import { plugins } from './rpc.plugins';
 import { rpcRouter } from './rpc.procedures';
@@ -28,10 +30,12 @@ export const router = rpcRouter.router({
   routines,
   todos,
   attachments,
+  avatars,
   artifacts,
   bots,
   commands,
   devices,
+  notifications,
   conversation,
   credentials,
   pairing,

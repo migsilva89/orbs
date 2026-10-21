@@ -1,5 +1,6 @@
 import { ROOMS } from '@openbots/client/client';
 import { useChatPendingSync } from '@openbots/client/react';
+import { AVATAR } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
@@ -44,7 +45,7 @@ export function useRoomsNotify() {
 
     const notification = new Notification(chat.name, {
       body,
-      icon: ROOMS.notifyIcon,
+      icon: `${AVATAR.pathPrefix}bots/${chat.botId}.png`,
       silent: true,
       tag: chat.botId,
     });
@@ -83,7 +84,7 @@ export function useRoomsNotify() {
 
     if (seen.current) {
       for (const [index, item] of items.entries()) {
-        if (!seen.current.has(keys[index] ?? '')) {
+        if (item.deliverHere && !seen.current.has(keys[index] ?? '')) {
           show(item);
         }
       }

@@ -113,5 +113,8 @@
   "settings_providers_link": "Open sign-in page",
   "settings_providers_device_code": "Enter code {code} at",
   "settings_providers_send": "Send",
-  "settings_devices_pair_loopback": "This code works only on this computer. To pair a phone or another computer, open Openbots through its network or Tailscale address first."
+  "settings_devices_pair_loopback": "This code works only on this computer. To pair a phone or another computer, open Openbots through its network or Tailscale address first.",
+  "settings_notify_prefer": "Send notifications to",
+  "settings_notify_prefer_phone": "Phone",
+  "settings_notify_prefer_computer": "Computer"
 }

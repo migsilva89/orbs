@@ -24,7 +24,8 @@ import {
   authRedeem,
   authRedeemResult,
 } from '../types/auth.types';
-import { bot, botCatalog, botCreate, botDeleteResult, botGet, botList, botSwapModels, botSwapModelsResult, botUpdate } from '../types/bot.types';
+import { avatarUpload } from '../types/avatar.types';
+import { bot, botAvatarImage, botCatalog, botCreate, botDeleteResult, botGet, botList, botSwapModels, botSwapModelsResult, botUpdate } from '../types/bot.types';
 import { commandCatalog, commandExecute, commandExecuteResult, commandList } from '../types/command.types';
 import { conversationContextUsage } from '../types/context-usage.types';
 import {
@@ -55,7 +56,7 @@ import {
   conversationUpdateSubmissionResult,
 } from '../types/conversation.types';
 import { credentialsList, credentialsSet, credentialsSetResult } from '../types/credentials.types';
-import { deviceList, devicePush, devicePushResult, deviceRevoke, deviceRevokeResult } from '../types/device.types';
+import { deviceList, deviceRevoke, deviceRevokeResult } from '../types/device.types';
 import { conversationSearch, conversationSearchResult } from '../types/history.types';
 import { instructionCatalog, instructionConfigure, instructionDiscover, instructionSettings } from '../types/instruction.types';
 import { limitConfigure, limitSettings } from '../types/limit.types';
@@ -71,6 +72,7 @@ import {
 } from '../types/mcp-auth.types';
 import { mcpCatalog, mcpConfigure, mcpDiscover, mcpSettings } from '../types/mcp.types';
 import { modelList } from '../types/model.types';
+import { notificationConfigure, notificationPresence, notificationPush, notificationSettings, notificationVoid } from '../types/notification.types';
 import { pluginCatalog, pluginConfigure, pluginDiscover, pluginSettings } from '../types/plugin.types';
 import { providerCancelResult, providerComplete, providerList, providerLogin, providerLogout, providerLogoutResult, providerSession, providerSessionId } from '../types/provider.types';
 import { conversationAnswerQuestion, conversationAnswerQuestionResult, conversationQuestionList } from '../types/question.types';
@@ -318,6 +320,12 @@ export const contract = {
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
       .input(todoTarget)
       .output(todoRemoveResult),
+  },
+  avatars: {
+    upload: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(avatarUpload)
+      .output(botAvatarImage),
   },
   attachments: {
     upload: oc
@@ -743,10 +751,26 @@ export const contract = {
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
       .input(deviceRevoke)
       .output(deviceRevokeResult),
+  },
+
+  notifications: {
+    settings: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(notificationSettings),
+
+    configure: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(notificationConfigure)
+      .output(notificationSettings),
+
+    presence: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(notificationPresence)
+      .output(notificationVoid),
 
     push: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(devicePush)
-      .output(devicePushResult),
+      .input(notificationPush)
+      .output(notificationVoid),
   },
 };

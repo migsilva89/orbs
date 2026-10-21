@@ -56,5 +56,6 @@ export function databaseDriverLoadMigrations() {
     '0009_bot_preference': readFileSync(new URL('./migrations/0009_bot_preference.sql', import.meta.url), 'utf8'),
     '0010_bot_preference_when_busy': readFileSync(new URL('./migrations/0010_bot_preference_when_busy.sql', import.meta.url), 'utf8'),
     '0011_device_push_token': readFileSync(new URL('./migrations/0011_device_push_token.sql', import.meta.url), 'utf8'),
+    '0012_device_push_url': readFileSync(new URL('./migrations/0012_device_push_url.sql', import.meta.url), 'utf8'),
   };
 }

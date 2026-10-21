@@ -2,14 +2,15 @@ import { makeRuntimeService } from '@openbots/runtime/server';
 import { makeArtifactService } from '../services/artifact/artifact.service';
 import { makeAttachmentService } from '../services/attachment/attachment.service';
 import { makeAuthService } from '../services/auth/auth.service';
+import { makeAvatarService } from '../services/avatar/avatar.service';
 import { makeBotService } from '../services/bot/bot.service';
 import { makeCollaborationService } from '../services/collaboration/collaboration.service';
 import { makeConversationService } from '../services/conversation/conversation.service';
 import { makeInstructionService } from '../services/instruction/instruction.service';
 import { makeLimitService } from '../services/limit/limit.service';
 import { makeMcpAuthService } from '../services/mcp/mcp-auth.service';
+import { makeNotificationService } from '../services/notification/notification.service';
 import { makePluginService } from '../services/plugin/plugin.service';
-import { makePushService } from '../services/push/push.service';
 import { makeRoutineService } from '../services/routine/routine.service';
 import { makeServerService } from '../services/server/server.service';
 import { makeSkillService } from '../services/skill/skill.service';
@@ -20,6 +21,7 @@ import type { CoreServicesParams } from '../types/core.types';
 export async function makeServices({
   database,
   attachmentStorage,
+  avatarImages,
   credentials,
   settings,
   workspace,
@@ -77,6 +79,13 @@ export async function makeServices({
 
     runtime.actions.registerBotTools({ bots });
 
+    const notifications = makeNotificationService({
+      database,
+      runtime,
+      bots,
+      settings,
+    });
+
     await bots.actions.restore();
     runtime.resume();
 
@@ -84,11 +93,7 @@ export async function makeServices({
       routines: makeRoutineService({ bots, runtime }),
       todos: makeTodoService({ bots, runtime }),
       artifacts: makeArtifactService({ bots, runtime }),
-      push: makePushService({
-        database,
-        runtime,
-        bots,
-      }),
+      notifications,
       server,
       limits,
       providers,
@@ -99,6 +104,7 @@ export async function makeServices({
         auth,
       }),
       attachments,
+      avatars: makeAvatarService({ bots, images: avatarImages }),
       database,
       auth,
       credentials,
@@ -110,6 +116,7 @@ export async function makeServices({
       plugins: plugin,
       mcp,
       conversation: makeConversationService({
+        notifications,
         runtime,
         auth,
         bots,

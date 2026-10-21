@@ -3,7 +3,7 @@ import { connectionStored, SERVER_PROTOCOL } from '@openbots/contracts/universal
 import * as SecureStore from 'expo-secure-store';
 import { match } from 'ts-pattern';
 import { CONNECTION_STORAGE_KEY } from './connection.constants';
-import type { ConnectionFileParams, ConnectionPairParams } from '@/types/connection.types';
+import type { ConnectionAvatarParams, ConnectionFileParams, ConnectionPairParams } from '@/types/connection.types';
 import type { ConnectionSaved } from '@openbots/contracts/universal';
 import type { ImageURISource } from 'react-native';
 
@@ -64,4 +64,8 @@ export function connectionFileSource(connection: ConnectionSaved, { botId, attac
         .otherwise((id) => ({ [SERVER_PROTOCOL.serverIdHeader]: id })),
     },
   };
+}
+
+export function connectionAvatarUri({ connection, src }: ConnectionAvatarParams): string {
+  return connection ? new URL(src, connection.serverUrl).toString() : src;
 }

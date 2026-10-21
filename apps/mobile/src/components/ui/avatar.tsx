@@ -1,5 +1,5 @@
 import { DEFAULT_EXPRESSION, EXPRESSION_BY_ID } from '@openbots/avatar-blobs/expressions';
-import { avatarStill, avatarSvg } from '@openbots/avatar-blobs/player';
+import { avatarMarkup, avatarStill, avatarSvg } from '@openbots/avatar-blobs/player';
 import { BODY_BY_ID, COLOR_BY_ID, DEFAULT_BODY, DEFAULT_COLOR, INVERT_ON_DARK, INVERT_ON_LIGHT } from '@openbots/avatar-blobs/skins';
 import { HALF_VIEWBOX } from '@openbots/avatar-blobs/viewbox';
 import { cva } from 'cva';
@@ -8,9 +8,10 @@ import { Image, View } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { match } from 'ts-pattern';
 import { useUniwind } from 'uniwind';
+import { useConnection } from '@/hooks/use-connection';
 import { cn } from '@/lib/cn';
+import { connectionAvatarUri } from '@/services/connection/connection.client';
 import { Text } from './text';
-import type { AvatarSvgNode } from '@openbots/avatar-blobs/player';
 import type { Bot } from '@openbots/contracts/universal';
 import type { VariantProps } from 'cva';
 
@@ -28,13 +29,9 @@ interface AvatarProps extends Pick<Bot, 'avatar' | 'name'>, VariantProps<typeof 
   className?: string;
 }
 
-function avatarMarkup(node: AvatarSvgNode): string {
-  const attrs = Object.entries(node.attrs).map(([key, value]) => `${key}="${value}"`).join(' ');
-  return `<${node.tag} ${attrs}>${node.children.map(avatarMarkup).join('')}</${node.tag}>`;
-}
-
 export function Avatar({ avatar, name, size = 'default', className }: AvatarProps) {
   const { theme } = useUniwind();
+  const { session } = useConnection();
   const uid = `avatar-${useId().replaceAll(/[^\w-]/g, '')}`;
   const look = match(avatar).with({ kind: 'blob' }, (value) => value).otherwise(() => ({ body: DEFAULT_BODY, color: DEFAULT_COLOR, expression: DEFAULT_EXPRESSION }));
   const inverted = match(theme).with('dark', () => INVERT_ON_DARK.includes(look.color)).otherwise(() => INVERT_ON_LIGHT.includes(look.color));
@@ -57,7 +54,7 @@ export function Avatar({ avatar, name, size = 'default', className }: AvatarProp
   return (
     <View accessible accessibilityLabel={name} className={cn(avatarVariants({ size }), className)}>
       {match(avatar)
-        .with({ kind: 'image' }, ({ src }) => <Image className="size-full" resizeMode="cover" source={{ uri: src }} />)
+        .with({ kind: 'image' }, ({ src }) => <Image className="size-full" resizeMode="cover" source={{ uri: connectionAvatarUri({ connection: session?.connection, src }) }} />)
         .with({ kind: 'color' }, ({ color }) => <View className="size-full" style={{ backgroundColor: color }} />)
         .with({ kind: 'emoji' }, ({ emoji, color }) => (
           <View className="size-full items-center justify-center" style={{ backgroundColor: color }}>

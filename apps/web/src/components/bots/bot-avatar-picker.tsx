@@ -1,12 +1,16 @@
 import { EXPRESSIONS } from '@openbots/avatar-blobs/expressions';
 import { BODIES, COLORS } from '@openbots/avatar-blobs/skins';
 import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS, BOT } from '@openbots/client/client';
+import { useBotAvatarUpload } from '@openbots/client/react';
+import { AVATAR } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
+import { useRef } from 'react';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { Button } from '@/components/ui/button';
 import { useBotAvatarFlash } from '@/hooks/use-bot-avatar-flash';
 import IconChevronLeft from '~icons/lucide/chevron-left';
 import IconChevronRight from '~icons/lucide/chevron-right';
+import IconImageUp from '~icons/lucide/image-up';
 import type { BotAvatar as BotAvatarValue } from '@openbots/client/client';
 import type { MouseEvent } from 'react';
 
@@ -28,6 +32,8 @@ export function BotAvatarPicker({ name, value, onChange, disabled = false }: Bot
 
   const blob = value?.kind === 'blob' ? value : BOT.defaultAvatar;
   const { moving, label, flash } = useBotAvatarFlash();
+  const upload = useBotAvatarUpload();
+  const fileInput = useRef<HTMLInputElement>(null);
 
   function shiftBody(step: number) {
     const body = cycle(BODIES, blob.body, step);
@@ -91,7 +97,7 @@ export function BotAvatarPicker({ name, value, onChange, disabled = false }: Bot
         {COLORS.map(({ id, hex }) => (
           <button
             aria-label={AVATAR_COLOR_LABELS[id]()}
-            aria-pressed={blob.color === id}
+            aria-pressed={value?.kind !== 'image' && blob.color === id}
             className="relative -ml-1 size-5 rounded-full ring-2 ring-background transition-transform outline-none first:ml-0 hover:z-10 hover:scale-125 focus-visible:z-10 focus-visible:ring-ring aria-pressed:z-10 aria-pressed:scale-125 aria-pressed:shadow-sm"
             key={id}
             style={{ backgroundColor: hex }}
@@ -101,6 +107,31 @@ export function BotAvatarPicker({ name, value, onChange, disabled = false }: Bot
           />
         ))}
       </fieldset>
+      <Button
+        className="mt-3"
+        disabled={disabled || upload.isPending}
+        size="sm"
+        type="button"
+        variant="ghost"
+        onClick={() => fileInput.current?.click()}
+      >
+        <IconImageUp />
+        {m.avatars_upload()}
+      </Button>
+      <input
+        hidden
+        accept={AVATAR.mediaTypes.join(',')}
+        ref={fileInput}
+        type="file"
+        onChange={(event) => {
+          const file = event.currentTarget.files?.[0];
+          event.currentTarget.value = '';
+
+          if (file) {
+            upload.mutate({ file }, { onSuccess: onChange });
+          }
+        }}
+      />
     </div>
   );
 }

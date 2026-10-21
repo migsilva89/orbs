@@ -16,6 +16,7 @@
   "connect_code_hint": "On a paired device, open Settings, then Devices, then Add device.",
   "connect_device_name": "Device name",
   "connect_device_name_default": "Web browser",
+  "connect_device_name_desktop": "Desktop app",
   "connect_submit": "Connect",
   "connect_failed": "Could not pair with this code. Ask for a new code and try again.",
   "connect_code_invalid": "This is not a valid pairing code.",

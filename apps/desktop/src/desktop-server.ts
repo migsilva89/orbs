@@ -1,7 +1,7 @@
 import { PATHS } from 'electrobun/main';
 import { closeSync, mkdirSync, openSync } from 'node:fs';
-import { join } from 'node:path';
-import { desktopNetworkAdvertise, desktopNetworkOrigins, desktopNetworkUrl } from './desktop-network';
+import { join, resolve } from 'node:path';
+import { desktopNetworkAdvertise, desktopNetworkOrigins, desktopNetworkProbe, desktopNetworkUrl } from './desktop-network';
 import { desktopHome, desktopStateRead, desktopStateWrite } from './desktop-settings';
 import { DESKTOP } from './desktop.constants';
 import type { DesktopServer, DesktopSettings } from './types/desktop.types';
@@ -36,21 +36,36 @@ async function desktopWaitFor(ready: () => boolean | Promise<boolean>, timeoutMs
   return desktopAttempt();
 }
 
-const webDev = process.env.ORBS_WEB_DEV;
+const webDev = process.env.OPENBOTS_WEB_DEV;
+
+function desktopDaemonEntry(): string[] {
+  return webDev
+    ? [process.execPath, resolve(webDev, DESKTOP.dev.daemon)]
+    : [process.execPath, join(PATHS.VIEWS_FOLDER, DESKTOP.bundle.daemon)];
+}
+
+function desktopLeftovers(pids: number[]): number[] {
+  return pids.filter((pid) => DESKTOP.markers.some((marker) => desktopProcessRuns(pid, marker)));
+}
 
 export async function desktopServerLeftovers(): Promise<void> {
-  const { serverPid } = desktopStateRead();
-  const leftover = () => [DESKTOP.serverEntry, DESKTOP.devMarker].some((marker) => desktopProcessRuns(serverPid, marker));
+  const { serverPids = [] } = desktopStateRead();
 
-  if (!serverPid || !leftover()) {
+  if (desktopLeftovers(serverPids).length === 0) {
     return;
   }
 
-  process.kill(serverPid, 'SIGTERM');
-
-  if (!await desktopWaitFor(() => !leftover(), DESKTOP.leftoverTimeoutMs)) {
-    process.kill(serverPid, 'SIGKILL');
+  for (const pid of desktopLeftovers(serverPids)) {
+    process.kill(pid, 'SIGTERM');
   }
+
+  if (!await desktopWaitFor(() => desktopLeftovers(serverPids).length === 0, DESKTOP.leftoverTimeoutMs)) {
+    for (const pid of desktopLeftovers(serverPids)) {
+      process.kill(pid, 'SIGKILL');
+    }
+  }
+
+  desktopStateWrite({ serverPids: undefined });
 }
 
 async function desktopPortAnswers(hostname: string, port: number): Promise<boolean> {
@@ -69,10 +84,41 @@ async function desktopPortAnswers(hostname: string, port: number): Promise<boole
   }
 }
 
+/** Openbots already running on this Mac, such as dev servers or a daemon started from the CLI. The app uses it and never stops it. */
+async function desktopServerAdopt(): Promise<DesktopServer | null> {
+  const urls = DESKTOP.ports.map((port) => desktopNetworkUrl(DESKTOP.localHost, port));
+  const probes = await Promise.all(urls.map((url) => desktopNetworkProbe(url, DESKTOP.healthIntervalMs * 10)));
+  const port = DESKTOP.ports.find((_, index) => probes[index]?.status === 'ok');
+
+  if (port === undefined) {
+    return null;
+  }
+
+  const url = desktopNetworkUrl(DESKTOP.localHost, port);
+  const origins = await desktopNetworkOrigins(port);
+
+  return {
+    url,
+    port,
+    portFallback: false,
+    tailscale: origins.tailscale,
+    urls: [url, ...origins.urls],
+    daemonEntry: desktopDaemonEntry(),
+    exited: Promise.withResolvers<number>().promise,
+    stop: async () => undefined,
+  };
+}
+
 export async function desktopServerStart(settings: DesktopSettings): Promise<DesktopServer> {
   await desktopServerLeftovers();
 
-  const host = process.env.HOST ?? { all: DESKTOP.allHost, local: DESKTOP.localHost, custom: settings.host ?? DESKTOP.allHost }[settings.network];
+  const adopted = await desktopServerAdopt();
+
+  if (adopted) {
+    return adopted;
+  }
+
+  const host = { all: DESKTOP.allHost, local: DESKTOP.localHost, custom: settings.host ?? DESKTOP.allHost }[settings.network];
   const windowHost = host === DESKTOP.allHost ? DESKTOP.localHost : host;
   const logs = join(desktopHome.root, DESKTOP.logsFolder);
   const logPath = join(logs, DESKTOP.serverLog);
@@ -80,10 +126,12 @@ export async function desktopServerStart(settings: DesktopSettings): Promise<Des
   mkdirSync(logs, { recursive: true });
 
   async function desktopServerLaunch(port: number): Promise<DesktopServer | null> {
-    const busy = await Promise.all([
-      desktopPortAnswers(DESKTOP.localHost, port),
-      desktopPortAnswers('::1', port),
-    ]);
+    const daemonPort = port + DESKTOP.daemonPortOffset;
+
+    const busy = await Promise.all([port, daemonPort].flatMap((candidate) => [
+      desktopPortAnswers(DESKTOP.localHost, candidate),
+      desktopPortAnswers('::1', candidate),
+    ]));
 
     if (busy.some(Boolean)) {
       return null;
@@ -94,36 +142,57 @@ export async function desktopServerStart(settings: DesktopSettings): Promise<Des
     const remote = host === DESKTOP.localHost ? [] : origins.urls;
     const log = openSync(logPath, 'a');
 
-    const command = webDev
-      ? [process.execPath, ...DESKTOP.devServer, '--host', host, '--port', String(port)]
-      : [process.execPath, join(PATHS.VIEWS_FOLDER, DESKTOP.serverEntry), '--port', String(port)];
+    const shared = {
+      PATH: process.env.PATH,
+      HOME: process.env.HOME,
+      OPENBOTS_DATA_DIR: process.env.OPENBOTS_DATA_DIR,
+    };
 
-    const child = Bun.spawn(command, {
+    const daemon = Bun.spawn(desktopDaemonEntry(), {
+      cwd: desktopHome.root,
+      stdout: log,
+      stderr: log,
+      env: {
+        ...shared,
+        OPENBOTS_HOST: DESKTOP.localHost,
+        OPENBOTS_PORT: String(daemonPort),
+        OPENBOTS_PUBLIC_URL: url,
+      },
+    });
+
+    const web = Bun.spawn(webDev
+      ? [process.execPath, ...DESKTOP.dev.web, '--host', host, '--port', String(port)]
+      : [process.execPath, join(PATHS.VIEWS_FOLDER, DESKTOP.bundle.web)], {
       cwd: webDev ?? desktopHome.root,
       stdout: log,
       stderr: log,
       env: {
-        PATH: process.env.PATH,
-        HOME: process.env.HOME,
-        HOST: host,
-        APP_URL: url,
-        XDG_CONFIG_HOME: process.env.XDG_CONFIG_HOME,
-        ORBS_HOME: process.env.ORBS_HOME,
+        ...shared,
+        OPENBOTS_WEB_HOST: host,
+        OPENBOTS_WEB_PORT: String(port),
+        OPENBOTS_DAEMON_URL: desktopNetworkUrl(DESKTOP.localHost, daemonPort),
       },
     });
 
     closeSync(log);
 
-    const answered = await desktopWaitFor(async () => child.exitCode !== null || (await fetch(`${url}/api/health`).catch(() => null))?.ok === true, DESKTOP.healthTimeoutMs);
+    const children = [daemon, web];
+    const failed = () => children.some((child) => child.exitCode !== null);
+    const answered = await desktopWaitFor(async () => failed() || (await desktopNetworkProbe(url, DESKTOP.probeTimeoutMs)).status === 'ok', DESKTOP.healthTimeoutMs);
 
-    if (!answered || child.exitCode !== null) {
-      child.kill('SIGKILL');
+    if (!answered || failed()) {
+      for (const child of children) {
+        child.kill('SIGKILL');
+      }
+
       return null;
     }
 
-    desktopStateWrite({ serverPid: child.pid });
+    desktopStateWrite({ serverPids: children.map((child) => child.pid) });
 
-    void child.exited.then(host === DESKTOP.localHost ? undefined : desktopNetworkAdvertise(port));
+    const exited = Promise.race(children.map((child) => child.exited));
+
+    void exited.then(host === DESKTOP.localHost ? undefined : desktopNetworkAdvertise(port));
 
     return {
       url,
@@ -131,11 +200,18 @@ export async function desktopServerStart(settings: DesktopSettings): Promise<Des
       portFallback: port !== DESKTOP.ports[0],
       tailscale: origins.tailscale,
       urls: [url, ...remote],
-      exited: child.exited,
+      daemonEntry: desktopDaemonEntry(),
+      exited,
       stop: async () => {
-        child.kill('SIGTERM');
-        await Promise.race([child.exited, Bun.sleep(DESKTOP.stopTimeoutMs).then(() => child.kill('SIGKILL'))]);
-        desktopStateWrite({ serverPid: undefined });
+        for (const child of children) {
+          child.kill('SIGTERM');
+        }
+
+        await Promise.race([
+          Promise.all(children.map((child) => child.exited)),
+          Bun.sleep(DESKTOP.stopTimeoutMs).then(() => children.forEach((child) => child.kill('SIGKILL'))),
+        ]);
+        desktopStateWrite({ serverPids: undefined });
       },
     };
   }
@@ -151,4 +227,21 @@ export async function desktopServerStart(settings: DesktopSettings): Promise<Des
   }
 
   return desktopServerTry(DESKTOP.ports);
+}
+
+/** A one-time pairing link for this Mac's own daemon, through its owner-only CLI socket. */
+export async function desktopServerPairLink(server: DesktopServer): Promise<string | null> {
+  const child = Bun.spawn([...server.daemonEntry, 'pair', '--url', server.url], {
+    stdout: 'pipe',
+    stderr: 'ignore',
+    env: {
+      PATH: process.env.PATH,
+      HOME: process.env.HOME,
+      OPENBOTS_DATA_DIR: process.env.OPENBOTS_DATA_DIR,
+    },
+  });
+
+  const output = await new Response(child.stdout).text();
+
+  return DESKTOP.pairLink.exec(output)?.[0] ?? null;
 }

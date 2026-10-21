@@ -80,7 +80,7 @@ export async function desktopNetworkProbe(address: string, timeoutMs: number = D
 
   const health = desktopHealth.safeParse(await response.json().catch(() => null));
 
-  return { status: health.success ? 'ok' : 'not-orbs', url };
+  return { status: health.success ? 'ok' : 'not-openbots', url };
 }
 
 export async function desktopNetworkSelf(url: string, server: DesktopTypes.DesktopServer): Promise<boolean> {
@@ -113,7 +113,7 @@ export async function desktopNetworkSelf(url: string, server: DesktopTypes.Deskt
 }
 
 export function desktopNetworkAdvertise(port: number): () => void {
-  const name = `Orbs on ${hostname().replace(/\.local$/u, '')}`;
+  const name = `Openbots on ${hostname().replace(/\.local$/u, '')}`;
   const child = Bun.spawn([DESKTOP.find.dnsSd, '-R', name, DESKTOP.find.service, 'local', String(port)], { stdout: 'ignore', stderr: 'ignore' });
 
   return () => child.kill();

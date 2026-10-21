@@ -42,6 +42,20 @@
         "typescript": "catalog:",
       },
     },
+    "apps/desktop": {
+      "name": "@openbots/desktop",
+      "version": "0.1.0",
+      "dependencies": {
+        "@openbots/env": "workspace:*",
+        "@openbots/i18n": "workspace:*",
+        "zod": "catalog:",
+      },
+      "devDependencies": {
+        "@openbots/typescript-config": "workspace:*",
+        "@types/bun": "catalog:",
+        "electrobun": "2.0.2",
+      },
+    },
     "apps/mobile": {
       "name": "@openbots/mobile",
       "version": "1.0.0",
@@ -1031,6 +1045,8 @@
     "@openbots/contracts": ["@openbots/contracts@workspace:packages/contracts"],
 
     "@openbots/daemon": ["@openbots/daemon@workspace:apps/daemon"],
+
+    "@openbots/desktop": ["@openbots/desktop@workspace:apps/desktop"],
 
     "@openbots/env": ["@openbots/env@workspace:packages/env"],
 
@@ -2115,6 +2131,8 @@
     "ecdsa-sig-formatter": ["ecdsa-sig-formatter@1.0.11", "", { "dependencies": { "safe-buffer": "^5.0.1" } }, "sha512-nagl3RYrbNv6kQkeJIpt6NJZy8twLB/2vtz6yN9Z4vRKHN4/QZJIEbqohALSgwKdnksuY3k5Addp5lg8sVoVcQ=="],
 
     "ee-first": ["ee-first@1.1.1", "", {}, "sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow=="],
+
+    "electrobun": ["electrobun@2.0.2", "", { "bin": { "electrobun": "bin/electrobun.cjs" } }, "sha512-UDs2iTNs6qYCzdWiFch/0DtxrsijNDr1WFDQfRmSA3Iouv0iEzyCF5mh4uDxkwNnAbuwFyow36EiVTYP4DRzig=="],
 
     "electron-to-chromium": ["electron-to-chromium@1.5.459", "", {}, "sha512-4SC9HHSFjO/liAhifpdOL5hG9b4BP7/5G3y3UPZVO8trlAXr1CaUEEJL0gWK3kOcYcZrOA5rkwG45Gra/lTIgg=="],
 

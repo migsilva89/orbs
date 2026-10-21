@@ -9,7 +9,7 @@ interface ImportMetaEnv {
 interface Window {
   __electrobunWindowId?: number;
   __openbotsAddresses?: string[];
-  __electrobunSendToHost?: (message: { theme: 'light' | 'dark' } | { notify: { title: string; body: string } } | { connection: true }) => void;
+  __electrobunSendToHost?: (message: { theme: 'light' | 'dark' } | { notify: { title: string; body: string; botId?: string } } | { connection: true } | { pair: true }) => void;
 }
 
 interface Navigator {

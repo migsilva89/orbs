@@ -6,20 +6,18 @@
   "scripts": {
     "dev:macos": "bun ../../scripts/desktop-bundle.ts && OPENBOTS_DATA_DIR=$HOME/.config/openbots-dev OPENBOTS_WEB_DEV=$(cd ../web && pwd) electrobun dev",
     "build:macos": "bun ../../scripts/desktop-bundle.ts && electrobun build --env=stable",
-    "check": "electrobun prepare && tsc --noEmit",
+    "check": "electrobun prepare && tsrs --noEmit",
     "lint": "electrobun prepare && oxlint src/ electrobun.config.ts -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
-    "lint:fix": "electrobun prepare && oxlint src/ electrobun.config.ts -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix",
-    "release:macos": "bun ../../scripts/desktop-release.ts"
+    "lint:fix": "electrobun prepare && oxlint src/ electrobun.config.ts -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
   },
   "dependencies": {
     "@openbots/env": "workspace:*",
     "@openbots/i18n": "workspace:*",
-    "zod": "^4.6.7"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@openbots/typescript-config": "workspace:*",
-    "@types/bun": "1.4.2",
-    "electrobun": "2.0.2",
-    "typescript": "^7.0.2"
+    "@types/bun": "catalog:",
+    "electrobun": "2.0.2"
   }
 }

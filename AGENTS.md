@@ -1,6 +1,6 @@
 # Openbots
 
-Bot backend with a native daemon, device pairing, bot configuration, and authenticated submit, stop, and live views of persistent per-bot Pi Durable conversations. Pi supplies shared provider authentication. Explicit skills, peer messaging, native subagents and attachment APIs are implemented. A web client (chat, bots, artifacts, routines, settings, provider login and device pairing) lives in `apps/web`. An iOS client (chat, bots, bot settings, todos, routines and device pairing) lives in `apps/mobile`. Desktop is not implemented.
+Bot backend with a native daemon, device pairing, bot configuration, and authenticated submit, stop, and live views of persistent per-bot Pi Durable conversations. Pi supplies shared provider authentication. Explicit skills, peer messaging, native subagents and attachment APIs are implemented. A web client (chat, bots, artifacts, routines, settings, provider login and device pairing) lives in `apps/web`. An iOS client (chat, bots, bot settings, todos, routines and device pairing) lives in `apps/mobile`. A macOS desktop app (Electrobun webview that starts or finds the local daemon and web server, pairs itself, or connects to another Mac) lives in `apps/desktop`.
 
 ## Read first
 

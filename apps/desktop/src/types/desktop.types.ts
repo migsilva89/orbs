@@ -12,7 +12,15 @@ export const desktopConnectionMessage = z.object({ data: z.object({ detail: z.ob
 
 export const desktopThemeMessage = z.object({ data: z.object({ detail: z.object({ theme: desktopTheme }) }) });
 
-export const desktopNotifyMessage = z.object({ data: z.object({ detail: z.object({ notify: z.object({ title: z.string(), body: z.string() }) }) }) });
+const desktopNotify = z.object({
+  title: z.string(),
+  body: z.string(),
+  botId: z.uuid().optional(),
+});
+
+export const desktopNotifyMessage = z.object({ data: z.object({ detail: z.object({ notify: desktopNotify }) }) });
+
+export const desktopPairMessage = z.object({ data: z.object({ detail: z.object({ pair: z.literal(true) }) }) });
 
 export const desktopCopyMessage = z.object({ data: z.object({ detail: z.object({ copy: z.string() }) }) });
 
@@ -38,7 +46,9 @@ export type DesktopFrame = z.infer<typeof desktopFrame>;
 
 export const desktopState = z.object({
   appPid: z.number().int().optional(),
-  serverPid: z.number().int().optional(),
+  serverPids: z.array(z.number().int()).optional(),
+  network: desktopNetwork.optional(),
+  host: z.string().trim().min(1).optional(),
   window: desktopFrame.optional(),
   connection: z.union([z.literal('local'), z.url()]).optional(),
 });
@@ -55,11 +65,11 @@ export const desktopTailscaleStatus = z.object({
   })).optional(),
 });
 
-export const desktopHealth = z.object({ status: z.literal('ok'), app: z.literal('orbs') });
+export const desktopHealth = z.object({ status: z.literal('ok'), app: z.literal('openbots') });
 
 export type DesktopTailscale = 'running' | 'stopped' | 'missing';
 
-export type DesktopProbe = { status: 'invalid' } | { status: 'ok' | 'self' | 'not-orbs' | 'unreachable'; url: string };
+export type DesktopProbe = { status: 'invalid' } | { status: 'ok' | 'self' | 'not-openbots' | 'unreachable'; url: string };
 
 export interface DesktopOrigins {
   tailscale: DesktopTailscale;
@@ -68,6 +78,7 @@ export interface DesktopOrigins {
 
 export interface DesktopServer extends DesktopOrigins {
   url: string;
+  daemonEntry: string[];
   port: number;
   portFallback: boolean;
   exited: Promise<number>;

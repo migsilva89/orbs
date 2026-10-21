@@ -39,7 +39,7 @@ export function useRoomsNotify() {
       .exhaustive();
 
     if (desktop) {
-      desktop({ notify: { title: chat.name, body } });
+      desktop({ notify: { title: chat.name, body, botId: chat.botId } });
       return;
     }
 

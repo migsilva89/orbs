@@ -4,6 +4,6 @@ export function coreHandler(request: Request): Response {
   const url = new URL(request.url);
 
   return match({ method: request.method, path: url.pathname })
-    .with({ method: 'GET', path: '/health' }, () => Response.json({ status: 'ok' }))
+    .with({ method: 'GET', path: '/health' }, () => Response.json({ status: 'ok', app: 'openbots' }))
     .otherwise(() => new Response(null, { status: 404 }));
 }

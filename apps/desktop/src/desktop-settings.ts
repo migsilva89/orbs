@@ -1,24 +1,24 @@
-import { envHome, envHomeRead, envHomeWrite } from '@orbs/env/home';
-import { m } from '@orbs/i18n/client';
+import { m } from '@openbots/i18n/client';
 import { BuildConfig, PATHS } from 'electrobun/main';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { DESKTOP } from './desktop.constants';
 import { desktopSettings, desktopState } from './types/desktop.types';
 import type { DesktopSettings, DesktopState } from './types/desktop.types';
 
-export const desktopHome = envHome(process.env);
+const desktopDataDir = process.env.OPENBOTS_DATA_DIR ?? DESKTOP.dataDir;
+
+export const desktopHome = { root: resolve(desktopDataDir.replace(/^~(?=\/|$)/u, homedir())) };
 
 export function desktopSettingsRead(): DesktopSettings {
-  const host = envHomeRead(desktopHome).HOST ?? DESKTOP.allHost;
-  const network = new Map([[DESKTOP.allHost, 'all'], [DESKTOP.localHost, 'local']]).get(host) ?? 'custom';
+  const { network = 'all', host } = desktopStateRead();
 
-  return desktopSettings.parse({ network, host: network === 'custom' ? host : undefined });
+  return desktopSettings.safeParse({ network, host }).data ?? { network: 'all' };
 }
 
 export function desktopSettingsWrite(settings: DesktopSettings): void {
-  envHomeWrite(desktopHome, { HOST: { all: undefined, local: DESKTOP.localHost, custom: settings.host }[settings.network] });
+  desktopStateWrite({ network: settings.network, host: settings.network === 'custom' ? settings.host : undefined });
 }
 
 export async function desktopSettingsPrompt(host: string): Promise<string | null> {
@@ -26,7 +26,7 @@ export async function desktopSettingsPrompt(host: string): Promise<string | null
     '/usr/bin/osascript', '-e', `on run argv
       try
         activate
-        set answer to display dialog (item 1 of argv) with title "Orbs" default answer (item 2 of argv) buttons {item 3 of argv, item 4 of argv} default button 2 cancel button 1
+        set answer to display dialog (item 1 of argv) with title "Openbots" default answer (item 2 of argv) buttons {item 3 of argv, item 4 of argv} default button 2 cancel button 1
         return text returned of answer
       on error number -128
         return

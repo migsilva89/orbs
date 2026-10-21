@@ -1,4 +1,4 @@
-import { m } from '@orbs/i18n/client';
+import { m } from '@openbots/i18n/client';
 import { Electroview } from 'electrobun/view';
 import { DESKTOP } from '../../desktop.constants';
 import type { DesktopConnectView, DesktopRPC } from '../../types/desktop.types';

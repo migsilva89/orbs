@@ -2,7 +2,7 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
 import { authPairCode, connectionPairForm } from '@openbots/contracts/universal';
 import { m } from '@openbots/i18n/client';
 import { useRouter } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useEffect, useEffectEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { ButtonLoading } from '@/components/ui/button-loading';
@@ -23,13 +23,27 @@ export function ConnectForm() {
     },
   });
 
-  useEffect(() => {
+  const readCode = useEffectEvent(() => {
     const code = new URLSearchParams(location.hash.slice(1)).get('code');
 
     if (code) {
       form.setValue('code', code, { shouldValidate: true });
     }
 
+    if (code && document.documentElement.dataset.shell === 'desktop') {
+      form.setValue('name', m.connect_device_name_desktop());
+      void form.handleSubmit(handleSubmit)();
+    }
+  });
+
+  useEffect(() => {
+    readCode();
+    window.addEventListener('hashchange', readCode);
+
+    return () => window.removeEventListener('hashchange', readCode);
+  }, []);
+
+  useEffect(() => {
     void connectionRead()
       .then((connection) => connection ? router.invalidate() : undefined)
       .catch(() => toasty(m.connect_failed(), '🔴', { id: 'connect' }));

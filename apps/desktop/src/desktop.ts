@@ -1,11 +1,11 @@
-import { m } from '@orbs/i18n/client';
+import { m } from '@openbots/i18n/client';
 import Electrobun, { ApplicationMenu, BrowserView, BrowserWindow, PATHS, Screen, Tray, Utils } from 'electrobun/main';
 import { desktopNetworkFind, desktopNetworkProbe, desktopNetworkSelf, desktopNetworkTailscale } from './desktop-network';
-import { desktopProcessRuns, desktopServerLeftovers, desktopServerStart } from './desktop-server';
+import { desktopProcessRuns, desktopServerLeftovers, desktopServerPairLink, desktopServerStart } from './desktop-server';
 import { desktopLoginEnabled, desktopLoginSet, desktopSettingsPrompt, desktopSettingsRead, desktopSettingsWrite, desktopStateRead, desktopStateWrite } from './desktop-settings';
 import { desktopWindowAppearance, desktopWindowTitleBarDoubleClick, desktopWindowToolbar } from './desktop-window';
 import { DESKTOP } from './desktop.constants';
-import { desktopConnectionMessage, desktopConnectParams, desktopCopyMessage, desktopMenuClick, desktopNetwork, desktopNewWindow, desktopNotifyMessage, desktopSettings, desktopThemeMessage, desktopTitleBarMessage } from './types/desktop.types';
+import { desktopConnectionMessage, desktopConnectParams, desktopCopyMessage, desktopMenuClick, desktopNetwork, desktopNewWindow, desktopNotifyMessage, desktopPairMessage, desktopSettings, desktopThemeMessage, desktopTitleBarMessage } from './types/desktop.types';
 import type * as DesktopTypes from './types/desktop.types';
 import type { ElectrobunEvent } from 'electrobun/main';
 
@@ -22,10 +22,12 @@ let tray: Tray | null = null;
 const headless = process.env[DESKTOP.headless.env] === '1';
 const atLogin = process.env[DESKTOP.login.env] === '1';
 // Electrobun always enables the WebKit inspector, so release builds hide the native menu that offers "Inspect Element".
-const nativeMenuBlock = process.env.ORBS_WEB_DEV ? '' : "window.addEventListener('contextmenu', (event) => event.preventDefault());";
+const nativeMenuBlock = process.env.OPENBOTS_WEB_DEV ? '' : "window.addEventListener('contextmenu', (event) => event.preventDefault());";
 // CEF never settles navigator.clipboard.writeText, so copies always go through the host.
 const clipboardBridge = "{ const copy = (text) => { window.__electrobunSendToHost({ copy: String(text) }); return Promise.resolve(); }; if (navigator.clipboard) navigator.clipboard.writeText = copy; else Object.defineProperty(navigator, 'clipboard', { value: { writeText: copy } }); }";
 // Electrobun drags the window from JS, so macOS never sees a title bar double-click; forward it to the host.
+// This Mac's own daemon pairs the app without a code: the connect page asks the host for a one-time link.
+const pairBridge = "if (location.pathname === '/connect' && !location.hash.includes('code=')) window.__electrobunSendToHost({ pair: true });";
 const titleBarBridge = "window.addEventListener('dblclick', (event) => { const target = event.target instanceof Element ? event.target : null; if (target?.closest('.electrobun-webkit-app-region-drag') && !target.closest('.electrobun-webkit-app-region-no-drag')) window.__electrobunSendToHost({ titleBar: 'double-click' }); });";
 
 function desktopDockSync(): void {
@@ -124,9 +126,9 @@ function desktopMainOpen(url: string): void {
   const saved = desktopStateRead().window;
 
   const window = new BrowserWindow({
-    title: 'Orbs',
+    title: 'Openbots',
     url,
-    preload: `document.documentElement.dataset.shell = 'desktop'; window.__orbsAddresses = ${JSON.stringify(server?.urls.filter((address) => address !== server?.url) ?? [])}; ${clipboardBridge} ${titleBarBridge} ${nativeMenuBlock}`,
+    preload: `document.documentElement.dataset.shell = 'desktop'; window.__openbotsAddresses = ${JSON.stringify(server?.urls.filter((address) => address !== server?.url) ?? [])}; ${clipboardBridge} ${titleBarBridge} ${server && url.startsWith(server.url) ? pairBridge : ''} ${nativeMenuBlock}`,
     frame: saved && desktopFrameVisible(saved) ? saved : desktopFrameDefault(),
     titleBarStyle: 'hiddenInset',
     trafficLightOffset: DESKTOP.mainWindow.trafficLights,
@@ -162,6 +164,10 @@ function desktopMainOpen(url: string): void {
 
     if (desktopConnectionMessage.safeParse(event).success) {
       desktopConnectOpen('choose');
+    }
+
+    if (server && desktopPairMessage.safeParse(event).success) {
+      void desktopServerPairLink(server).then((link) => link && window.webview.loadURL(link));
     }
   });
 
@@ -216,7 +222,7 @@ async function desktopServerRun(settings: DesktopTypes.DesktopSettings, open = t
 async function desktopError(message: string): Promise<void> {
   await Utils.showMessageBox({
     type: 'error',
-    title: 'Orbs',
+    title: 'Openbots',
     message,
   });
 }
@@ -286,7 +292,7 @@ function desktopProbeMessage(probe: DesktopTypes.DesktopProbe): string {
     return m.desktop_error_remote_self();
   }
 
-  return probe.status === 'not-orbs' ? m.desktop_error_remote_not_orbs({ url: probe.url }) : m.desktop_error_remote_unreachable({ url: probe.url });
+  return probe.status === 'not-openbots' ? m.desktop_error_remote_not_openbots({ url: probe.url }) : m.desktop_error_remote_unreachable({ url: probe.url });
 }
 
 async function desktopLocked(task: () => Promise<DesktopTypes.DesktopSaveResult>): Promise<DesktopTypes.DesktopSaveResult> {
@@ -413,7 +419,7 @@ function desktopConnectOpen(screen: DesktopTypes.DesktopConnectScreen): void {
   const { workArea } = Screen.getPrimaryDisplay();
 
   const window = new BrowserWindow({
-    title: 'Orbs',
+    title: 'Openbots',
     url: DESKTOP.connectUrl,
     frame: {
       ...DESKTOP.connectWindow,
@@ -597,7 +603,7 @@ await desktopExclusive(async () => {
 
   const { response } = await Utils.showMessageBox({
     type: 'error',
-    title: 'Orbs',
+    title: 'Openbots',
     message: result.error,
     detail: m.desktop_tray_recovery(),
     buttons: [m.desktop_tray_keep_running(), m.desktop_quit()],

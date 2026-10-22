@@ -87,5 +87,3 @@ export function subagentExtension() {
   });
 }
 
-// fallow-ignore-next-line unused-type
-export type SubagentExtension = ReturnType<typeof subagentExtension>;

@@ -1,4 +1,4 @@
-import { defineExtension, defineTask } from '@earendil-works/pi-durable';
+import { defineTask } from '@earendil-works/pi-durable';
 import { REACTION } from '@openbots/contracts/universal';
 import { Errors } from '@openbots/errors/universal';
 import { match, P } from 'ts-pattern';
@@ -45,5 +45,3 @@ export const runtimeReactionTask = defineTask<RuntimeReactionTaskInput, RuntimeR
   },
   abort: (_task, api, context) => api.commit(() => ({ status: 'terminal', outcome: { status: 'aborted' } }), context),
 });
-
-export const runtimeReactionExtension = defineExtension({ name: 'openbots.reactions', tasks: [runtimeReactionTask] });

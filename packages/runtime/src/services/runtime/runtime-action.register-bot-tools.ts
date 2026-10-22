@@ -1,6 +1,6 @@
 import { Errors } from '@openbots/errors/universal';
 import { match } from 'ts-pattern';
-import { runtimeBotToolsExtension } from './runtime-bot-tools.utils';
+import { runtimeBotToolsExtension } from './runtime-bot-tools.extension';
 import type { RuntimeRegisterBotToolsDeps, RuntimeRegisterBotToolsParams } from '../../types/runtime-bot-tools.types';
 
 /** Shared bot-management tools; every bot store installs them when it opens, so register before restoring bots. */

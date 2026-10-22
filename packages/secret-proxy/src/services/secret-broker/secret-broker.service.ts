@@ -9,6 +9,7 @@ export function makeSecretBrokerService(deps: SecretBrokerTypes.SecretBrokerServ
       prepare: (execution: SecretBrokerTypes.SecretExecution) => secretBrokerActionPrepare(deps, { execution }),
     },
     queries: {
+      rules: () => deps.source.queries.rules(),
       redact: (params: SecretBrokerTypes.SecretRedactParams) => secretBrokerQueryRedact(deps, params),
     },
   };

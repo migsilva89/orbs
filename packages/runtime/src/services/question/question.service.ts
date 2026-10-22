@@ -1,10 +1,7 @@
 import { questionActionAnswer } from './question-action.answer';
 import { questionQueryPending } from './question-query.pending';
-import { questionExtension } from './question.extension';
 import type { QuestionAnswerParams, QuestionPendingParams, QuestionServiceDeps } from '../../types/question.types';
 import type { Context } from '@earendil-works/chord/context';
-
-export { questionExtension };
 
 export function makeQuestionService(deps: QuestionServiceDeps) {
   return {

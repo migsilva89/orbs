@@ -31,17 +31,11 @@ const askSecret = defineTool({
   name: QUESTION.secretTool,
   description: m.ui_tool_bot_secret_description(),
   parameters: Type.Object({
-    text: Type.String({
-      minLength: 1,
-      maxLength: QUESTION_BOUNDS.maxText,
-      pattern: '\\S',
-      description: m.ui_tool_bot_secret_text_description(),
-    }),
     name: Type.String({ description: m.ui_tool_bot_secret_name_description() }),
     hosts: Type.Array(Type.String(), { description: m.ui_tool_bot_secret_hosts_description() }),
   }),
   replay: 'safe',
-  execute: ({ text, name, hosts }, api, context) => questionActionAsk({ text, secret: { name, hosts } }, api, context),
+  execute: ({ name, hosts }, api, context) => questionActionAsk({ text: m.ui_tool_bot_secret_question({ name }), secret: { name, hosts } }, api, context),
 });
 
 export function questionExtension() {

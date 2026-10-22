@@ -8,11 +8,11 @@ import { makeNotificationService } from '../notification/notification.service';
 import { makeQuestionService } from '../question/question.service';
 import { makeRoutineService } from '../routine/routine.service';
 import { makeTodoService } from '../todo/todo.service';
-import { runtimeArtifactToolsExtension } from './runtime-artifact-tools.utils';
+import { runtimeArtifactToolsExtension } from './runtime-artifact-tools.extension';
 import { runtimeQueryNextDeadline } from './runtime-query.next-deadline';
-import { runtimeRoutineToolsExtension } from './runtime-routine-tools.utils';
-import { runtimeTodoToolsExtension } from './runtime-todo-tools.utils';
-import { runtimeToolsExtension } from './runtime-tools.utils';
+import { runtimeRoutineToolsExtension } from './runtime-routine-tools.extension';
+import { runtimeTodoToolsExtension } from './runtime-todo-tools.extension';
+import { runtimeToolsExtension } from './runtime-tools.extension';
 import { RUNTIME_ALARM_DEBOUNCE_MS } from './runtime.constants';
 import type { RuntimeBot, RuntimeServiceDeps, RuntimeSharedDeps } from '../../types/runtime.types';
 

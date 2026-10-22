@@ -49,6 +49,7 @@ src/
     <domain>.utils.ts
     <domain>.constants.ts
     <domain>.driver.ts
+    <domain>.extension.ts
   types/<domain>[-<part>].types.ts
   rpc/rpc.<area>.ts
   entry.<runtime>.ts
@@ -58,6 +59,7 @@ Create only the files an operation needs. Folders are flat; files and exports us
 
 - Each service has a concrete responsibility. Skill settings/discovery belong to skill; MCP settings/discovery belong to MCP. A combined composer catalog is a response shape, not a `resource` domain.
 - Factories receive whole owning services with explicit dependency types, never detached methods or callback bags. Export the factory and its inferred service type.
+- Pi extensions live in `<domain>.extension.ts`; runtime adapters that wrap a domain service for the model use `runtime-<name>.extension.ts`. Never rename a shipped extension: Pi stores its name in conversation settings.
 - Library callbacks remain callbacks: Pi execution environments, oRPC connections and lazy request context do not need invented services.
 - Actions and queries take `(deps, params)`. Actions write; queries read without mutations, model calls or starting connections/processes.
 - RPC validates input and calls one service operation. Services own policy and database work. URL dispatch belongs to transport/RPC, not auth or other domain services.

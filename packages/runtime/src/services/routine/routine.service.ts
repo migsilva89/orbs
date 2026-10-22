@@ -1,14 +1,10 @@
-import { defineExtension } from '@earendil-works/pi-durable';
 import { routineActionCreate } from './routine-action.create';
 import { routineActionRemove } from './routine-action.remove';
 import { routineActionRun } from './routine-action.run';
 import { routineActionUpdate } from './routine-action.update';
 import { routineQueryList } from './routine-query.list';
-import { routineTask } from './routine.task';
 import type * as RoutineTypes from '../../types/routine.types';
 import type { Context } from '@earendil-works/chord/context';
-
-export const routineExtension = defineExtension({ name: 'openbots.routines', tasks: [routineTask] });
 
 export function makeRoutineService(deps: RoutineTypes.RoutineServiceDeps) {
   return {

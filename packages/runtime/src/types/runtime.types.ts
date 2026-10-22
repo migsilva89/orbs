@@ -14,7 +14,7 @@ import type { ToolCall } from '@earendil-works/pi-ai';
 import type { Models } from '@earendil-works/pi-ai/models';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
 import type { ImageProcessor } from '@earendil-works/pi-durable/tools';
-import type { Attachment, ModelSelection, QuestionAnswer } from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@openbots/contracts/universal';
 
 export interface RuntimeServiceParams {
   storage: StorageService;
@@ -35,6 +35,7 @@ export interface RuntimeSecrets {
     prepare: (execution: RuntimeSecretExecution) => Promise<void>;
   };
   queries: {
+    rules: () => Promise<UniversalTypes.SecretRule[]>;
     redact: (params: RuntimeSecretRedactParams) => Promise<string>;
   };
 }
@@ -136,9 +137,9 @@ export interface RuntimeDirectory extends CollaborationDirectory {
   onChange(listener: (change: RuntimeBotChange) => void): () => void;
 }
 
-export interface RuntimeBotParams extends ModelSelection {
+export interface RuntimeBotParams extends UniversalTypes.ModelSelection {
   id: string;
-  fallbackModel?: ModelSelection | null;
+  fallbackModel?: UniversalTypes.ModelSelection | null;
   instructions: string;
   skillsPrompt: string;
   instructionFiles: { path: string; content: string }[];
@@ -178,12 +179,12 @@ export interface RuntimeUpdateSubmissionParams extends RuntimeConversationParams
   replyToEntryId?: number | null;
   content?: string;
   whenBusy?: 'followUp' | 'steer' | 'interrupt';
-  attachments?: Attachment[];
+  attachments?: UniversalTypes.Attachment[];
 }
 
 type RuntimeSubmitBase = Omit<PiDurableTypes.InputSubmissionDraft, 'type' | 'requestId' | 'whenBusy' | 'entry'>
   & RuntimeConversationParams
-  & { requestId: string; attachments?: Attachment[]; replyToEntryId?: number };
+  & { requestId: string; attachments?: UniversalTypes.Attachment[]; replyToEntryId?: number };
 
 export type RuntimeSubmitParams =
   | (RuntimeSubmitBase & { whenBusy: 'interrupt'; entry?: never })
@@ -230,7 +231,7 @@ export interface RuntimeApprovalRequest {
 
 export interface RuntimeQuestionAnswer extends RuntimeConversationParams {
   id: number;
-  answer: QuestionAnswer;
+  answer: UniversalTypes.QuestionAnswer;
   answeredBy: string;
 }
 

@@ -6,7 +6,7 @@ import { coreRpcNative } from './core-rpc.native';
 import type { CoreServerAvatarParams } from '../types/core.types';
 import type { makeServices } from '@openbots/server/server';
 
-const CORE_SERVER_AVATAR = /^\/avatars\/(bots\/)?([\da-f-]{36})\.(png|webp)$/u;
+const CORE_SERVER_AVATAR = /^\/avatars\/(?:bots\/(?<botId>[\da-f-]{36})\.png|(?<imageId>[\da-f-]{36})\.webp)$/u;
 
 export function coreServerNative(services: Awaited<ReturnType<typeof makeServices>>) {
   const rpc = coreRpcNative(services);
@@ -94,19 +94,17 @@ function coreServerAllowedOrigin(request: Request): boolean {
 }
 
 async function coreServerAvatar({ services, path, peer }: CoreServerAvatarParams): Promise<Response> {
-  const [, folder, id, extension] = CORE_SERVER_AVATAR.exec(path) ?? [];
+  const { botId, imageId = '' } = CORE_SERVER_AVATAR.exec(path)?.groups ?? {};
 
   try {
     await services.limits.throttle({ kind: 'public', peer });
 
-    const bytes = await match({ folder, extension })
-      .with({ folder: 'bots/', extension: 'png' }, () => services.avatars.queries.bot({ botId: id }))
-      .otherwise(() => services.avatars.queries.image({ imageId: id }));
+    const bytes = await (botId ? services.avatars.queries.bot({ botId }) : services.avatars.queries.image({ imageId }));
 
     return new Response(new Uint8Array(bytes), {
       headers: {
-        'Content-Type': extension === 'png' ? 'image/png' : 'image/webp',
-        'Cache-Control': folder ? 'no-cache' : 'public, max-age=31536000, immutable',
+        'Content-Type': botId ? 'image/png' : 'image/webp',
+        'Cache-Control': botId ? 'no-cache' : 'public, max-age=31536000, immutable',
         'X-Content-Type-Options': 'nosniff',
       },
     });

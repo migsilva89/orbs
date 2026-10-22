@@ -9,7 +9,7 @@ rmSync(target, { recursive: true, force: true });
 const web = Bun.spawnSync(['bun', 'run', 'build'], {
   cwd: path.join(root, 'apps/web'),
   stdout: 'inherit',
-  stderr: 'inherit'
+  stderr: 'inherit',
 });
 
 if (!web.success) {

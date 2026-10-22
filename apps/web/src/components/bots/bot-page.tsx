@@ -10,6 +10,7 @@ import { BotFormAvatar } from '@/components/bots/bot-form-avatar';
 import { BotFormInstructions } from '@/components/bots/bot-form-instructions';
 import { BotFormModel } from '@/components/bots/bot-form-model';
 import { BotFormProfile } from '@/components/bots/bot-form-profile';
+import { BotMcpPanel } from '@/components/bots/bot-mcp-panel';
 import { LayoutPageHeader } from '@/components/layout/layout-page-header';
 import { RoutinesPanel } from '@/components/routines/routines-panel';
 import { SettingsPanel } from '@/components/settings/settings-panel';
@@ -134,6 +135,7 @@ function BotPageForm({ bot, deletable }: BotPageFormProps) {
           </SettingsPanel>
         </fieldset>
       </form>
+      <BotMcpPanel bot={bot} />
       <TodosPanel bot={bot} />
       <RoutinesPanel bot={bot} />
       {deletable ? (

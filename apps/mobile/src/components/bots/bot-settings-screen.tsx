@@ -12,6 +12,7 @@ import { useCSSVariable } from 'uniwind';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { BotLoadState } from '@/components/bots/bot-load-state';
 import { BotSettingsAccess } from '@/components/bots/bot-settings-access';
+import { BotSettingsMcp } from '@/components/bots/bot-settings-mcp';
 import { BotSettingsModel } from '@/components/bots/bot-settings-model';
 import { BotSettingsProfile } from '@/components/bots/bot-settings-profile';
 import { RoutinesList } from '@/components/routines/routines-list';
@@ -165,6 +166,7 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
           </BotDetailsSection>
           <BotSettingsModel isDisabled={isBusy} session={session} />
           <BotSettingsAccess isDisabled={isBusy} />
+          <BotSettingsMcp bot={bot} session={session} />
           <BotDetailsSection
             icon={ListTodo}
             title={m.rooms_todos()}

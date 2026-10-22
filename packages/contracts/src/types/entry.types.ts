@@ -16,6 +16,8 @@ export const entryPeerMessage = z.object({
   fromBotId: z.uuid(),
   toBotId: z.uuid(),
   deliveryId: z.number().int().positive(),
+  /** How many bots this request has passed through, starting at 1 for the first peer message. Messages saved before hops were counted have none. */
+  hops: z.number().int().positive().optional(),
 });
 
 export const entryPeerReply = entryPeerMessage.extend({

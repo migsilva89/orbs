@@ -12,7 +12,8 @@ export interface CollaborationBotParams {
 
 export interface CollaborationRecipientParams extends CollaborationBotParams {
   recipientId: string;
-  isPeerInput: boolean;
+  /** Hops the current request already took; 0 when the owner wrote last. */
+  hops: number;
 }
 
 export interface CollaborationPolicy {
@@ -22,6 +23,7 @@ export interface CollaborationPolicy {
       sender: CollaborationBot;
       recipient: CollaborationBot;
       maxPending: number;
+      maxHops: number;
       temporaryTtlMs: number;
     }>;
   };
@@ -39,6 +41,8 @@ export interface CollaborationDeps {
 
 export interface CollaborationDeliveryInput extends PiDurableTypes.JsonObject {
   requestId: string;
+  hops: number;
+  maxHops: number;
   senderId: string;
   senderName: string;
   recipientId: string;

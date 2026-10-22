@@ -1,7 +1,7 @@
 import { ConversationBusy, defineTask } from '@earendil-works/pi-durable';
 import { match, P } from 'ts-pattern';
 import { COLLABORATION } from './collaboration.constants';
-import { collaborationAnswer, collaborationFailureNote } from './collaboration.utils';
+import { collaborationAnswer, collaborationFailureNote, collaborationPeerNote } from './collaboration.utils';
 import type * as CollaborationTypes from '../../types/collaboration.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { Harness } from '@earendil-works/pi-durable';
@@ -54,6 +54,7 @@ export function collaborationDeliveryTask({ directory }: Pick<CollaborationTypes
                   fromBotId: task.input.recipientId,
                   toBotId: task.input.senderId,
                   deliveryId: task.id,
+                  hops: task.input.hops,
                   result,
                 } },
             }, context);
@@ -81,7 +82,7 @@ async function collaborationDeliver(
       try {
         const submission = await conversation.submit({
           type: 'input',
-          content: `[Private message from ${input.senderName}. Answer this request; do not delegate it to another bot.]\n\n${input.message}`,
+          content: `${collaborationPeerNote(input)}\n\n${input.message}`,
           requestId: `bots.delivery:${input.requestId}`,
           whenBusy,
           entry: { kind: COLLABORATION.message,
@@ -89,6 +90,7 @@ async function collaborationDeliver(
               fromBotId: input.senderId,
               toBotId: input.recipientId,
               deliveryId: taskId,
+              hops: input.hops,
             } },
         }, context);
 

@@ -21,6 +21,7 @@ export default defineConfig({
       '/files': { target: env.DAEMON_URL },
       '/avatars': { target: env.DAEMON_URL },
       '/health': { target: env.DAEMON_URL },
+      '/mcp/callback': { target: env.DAEMON_URL },
     },
   },
   preview: {

@@ -1,3 +1,4 @@
+import { mcpAuthActionCallback } from './mcp-auth-action.callback';
 import { mcpAuthActionCancel } from './mcp-auth-action.cancel';
 import { mcpAuthActionCancelDevice } from './mcp-auth-action.cancel-device';
 import { mcpAuthActionClose } from './mcp-auth-action.close';
@@ -23,6 +24,7 @@ export function makeMcpAuthService({ credentials, appName }: McpAuthTypes.McpAut
     actions: {
       start: (params: McpAuthTypes.McpAuthStartParams) => mcpAuthActionStart(deps, params),
       complete: (params: McpAuthTypes.McpAuthCompleteParams) => mcpAuthActionComplete(deps, params),
+      callback: (params: McpAuthTypes.McpAuthCallbackParams) => mcpAuthActionCallback(deps, params),
       cancel: (params: McpAuthTypes.McpAuthDeviceParams) => mcpAuthActionCancel(deps, params),
       logout: (params: McpAuthTypes.McpAuthServerParams) => mcpAuthActionLogout(deps, params),
       cancelDevice: (params: McpAuthTypes.McpAuthCancelDeviceParams) => mcpAuthActionCancelDevice(deps, params),

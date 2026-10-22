@@ -1,4 +1,4 @@
-import { adaptOAuthProvider, McpOAuthAuthorizationRequiredError, McpOAuthProvider } from '@earendil-works/pi-mcp/oauth';
+import { adaptOAuthProvider, authorizeMcp, McpOAuthAuthorizationRequiredError, McpOAuthProvider } from '@earendil-works/pi-mcp/oauth';
 import { Errors, isAppError } from '@repo/errors/universal';
 import { createHash } from 'node:crypto';
 import { match, P } from 'ts-pattern';
@@ -351,7 +351,7 @@ function mcpAuthSameRedirect(issued: string, callback: string): boolean {
   }
 }
 
-export function mcpAuthParseCallback(
+function mcpAuthParseCallback(
   redirectUrl: string,
   state: string,
   callbackUrl: string,
@@ -389,4 +389,77 @@ export function mcpAuthParseCallback(
   } catch (error) {
     throw isAppError(error) ? error : mcpAuthInvalid('callbackUrl', error);
   }
+}
+
+/** Trades the authorization code from a callback URL for tokens and ends the pending login. */
+export async function mcpAuthExchange(
+  deps: McpAuthTypes.McpAuthServiceState,
+  url: string,
+  session: McpAuthTypes.McpAuthPending,
+  callbackUrl: string,
+): Promise<McpAuthTypes.McpAuthCompleteResult> {
+  match(session)
+    .when((pending) => pending.isCompleting === true || pending.state === undefined, () => {
+      throw new Errors.CONFLICT();
+    })
+    .otherwise(() => undefined);
+
+  const callback = mcpAuthParseCallback(session.redirectUrl, session.state ?? '', callbackUrl);
+
+  session.isCompleting = true;
+
+  const cached = mcpAuthBind(deps, url, session.redirectUrl);
+
+  try {
+    const result = await authorizeMcp(cached.oauth, {
+      serverUrl: url,
+      authorizationCode: callback.code,
+      iss: callback.iss,
+      signal: mcpAuthNetworkSignal(session.controller),
+    });
+
+    session.controller.signal.throwIfAborted();
+
+    return match(result)
+      .with('AUTHORIZED', () => {
+        mcpAuthDropSession(deps, url, session);
+        return { status: 'authorized' as const };
+      })
+      .with('REDIRECT', () => {
+        throw mcpAuthInvalid('callbackUrl');
+      })
+      .exhaustive();
+  } catch (error) {
+    throw match(session.controller.signal.aborted)
+      .with(true, () => new Errors.CONFLICT({ cause: error }))
+      .with(false, () => (isAppError(error) ? error : mcpAuthInvalid('callbackUrl', error)))
+      .exhaustive();
+  } finally {
+    match(deps.pending.get(url) === session)
+      .with(true, () => {
+        session.isCompleting = false;
+      })
+      .with(false, () => undefined)
+      .exhaustive();
+  }
+}
+
+/** An app link (`scheme://host/…`), or a page on the redirect URL's own origin; never another website, so the callback is not an open redirect. */
+export function mcpAuthReturnUrl(value: string | undefined, redirectUrl: string): string | undefined {
+  return match(value)
+    .with(undefined, () => undefined)
+    .otherwise((link) => {
+      const url = URL.parse(link);
+      const isWeb = url?.protocol === 'http:' || url?.protocol === 'https:';
+
+      return match({
+        isWeb,
+        isSameOrigin: url?.origin === new URL(redirectUrl).origin,
+        hasHost: Boolean(url?.host),
+      })
+        .with({ isWeb: true, isSameOrigin: true }, { isWeb: false, hasHost: true }, () => link)
+        .otherwise(() => {
+          throw mcpAuthInvalid('returnUrl');
+        });
+    });
 }

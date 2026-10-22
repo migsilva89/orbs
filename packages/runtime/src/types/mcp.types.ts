@@ -35,6 +35,8 @@ export interface McpConnection {
   ready: Promise<void>;
   hasToolChanges: boolean;
   error?: string;
+  /** The server answered 401 and no stored token could fix it. */
+  needsLogin?: boolean;
 }
 
 export interface McpConnectParams {

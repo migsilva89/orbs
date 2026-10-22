@@ -2,6 +2,7 @@ import type { AttachmentStorageService } from '../services/attachment/attachment
 import type { AvatarImageService } from '../services/avatar/avatar-image.service';
 import type { CredentialsService } from '../services/credentials/credentials.service';
 import type { DatabaseService } from '../services/database/database.service';
+import type { McpAuthService } from '../services/mcp/mcp-auth.service';
 import type { McpService } from '../services/mcp/mcp.service';
 import type { SecretService } from '../services/secret/secret.service';
 import type { SettingsService } from '../services/settings/settings.service';
@@ -23,4 +24,8 @@ export interface CoreServicesParams {
   mcpAuth: ServerTypes.McpAuthService;
   providers: ServerTypes.ProviderService;
   runtime: Omit<ServerTypes.RuntimeServiceParams, 'permissions' | 'collaboration'>;
+}
+
+export interface CoreHandlerDeps {
+  mcpAuth: McpAuthService;
 }

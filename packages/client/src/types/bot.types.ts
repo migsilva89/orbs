@@ -81,3 +81,18 @@ export interface BotDeleteParams {
 export interface BotCreateParams {
   onCreated: (bot: UniversalTypes.Bot) => void;
 }
+
+export interface BotMcpParams {
+  botId: string;
+  /** Read when a login starts, so browser-only values are never touched while rendering on the server. */
+  login: () => BotMcpLogin;
+}
+
+export interface BotMcpLogin {
+  /** This client's server origin plus `/mcp/callback`, so the daemon receives the authorization code. */
+  redirectUrl: string;
+  /** Where the daemon's callback page sends the browser afterwards; omit when the login runs in a separate browser. */
+  returnUrl?: string;
+  /** Shows the provider's login page; resolves when the platform knows the page closed, or right away. */
+  open: (authorizationUrl: string) => void | Promise<void>;
+}

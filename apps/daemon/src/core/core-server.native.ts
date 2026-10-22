@@ -60,7 +60,7 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
           .with(true, () => undefined)
           .with(false, () => new Response(null, { status: 426 }))
           .exhaustive())
-        .otherwise(() => coreHandler(request));
+        .otherwise(() => coreHandler(request, services));
     },
     websocket: {
       maxPayloadLength: 1024 * 1024,

@@ -20,7 +20,7 @@ export async function collaborationActionSend(
     .with(P.nonNullable, (id) => id)
     .otherwise(async () => {
       const origin = await collaborationQueryOrigin(api, context);
-      const { sender, recipient, maxPending, temporaryTtlMs } = await deps.policy.queries.recipient({ ...origin, recipientId: params.botId });
+      const { sender, recipient, maxPending, maxHops, temporaryTtlMs } = await deps.policy.queries.recipient({ ...origin, recipientId: params.botId });
 
       const senderStoreId = await api.commit(async (tx) => {
         const store = await tx.doc(collaborationStore);
@@ -82,6 +82,8 @@ export async function collaborationActionSend(
 
             call.deliveryId = await tx.createTask(deps.delivery, {
               requestId: `${senderStoreId}:${api.taskId}`,
+              hops: origin.hops + 1,
+              maxHops,
               senderId: sender.id,
               senderName: sender.name,
               recipientId: recipient.id,

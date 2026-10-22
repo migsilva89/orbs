@@ -1,4 +1,4 @@
-import { McpClient, StdioTransport, StreamableHttpTransport } from '@earendil-works/pi-mcp';
+import { McpAuthRequiredError, McpClient, StdioTransport, StreamableHttpTransport } from '@earendil-works/pi-mcp';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { match, P } from 'ts-pattern';
@@ -76,8 +76,9 @@ export async function mcpActionConnect(deps: McpClientServiceDeps, { botId, entr
 
           await client.connect(transport);
           await mcpActionConnectTools(connection, entry.name);
-        } catch {
-          connection.error = 'Cannot connect to MCP server.';
+        } catch (error) {
+          connection.needsLogin = error instanceof McpAuthRequiredError;
+          connection.error = connection.needsLogin ? 'MCP server requires login.' : 'Cannot connect to MCP server.';
           await client.close();
         }
       })();

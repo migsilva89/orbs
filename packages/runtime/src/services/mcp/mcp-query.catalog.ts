@@ -34,6 +34,10 @@ export async function mcpQueryCatalog(deps: McpClientServiceDeps, { botId, confi
       transport: entry.config.command === undefined ? 'http' as const : 'stdio' as const,
       isEnabled,
       status,
+      auth: match(connection)
+        .with({ needsLogin: true }, () => 'required' as const)
+        .with({ authProvider: P.nonNullable }, () => 'authorized' as const)
+        .otherwise(() => 'none' as const),
       tools: status === 'connected' ? connection?.catalog ?? [] : [],
     };
   });

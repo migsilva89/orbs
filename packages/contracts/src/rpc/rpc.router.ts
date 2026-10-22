@@ -472,6 +472,14 @@ export const contract = {
       .input(mcpDiscover)
       .output(mcpCatalog),
 
+    connect: oc
+      .errors({
+        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
+        NOT_FOUND: errorSchemas.NOT_FOUND,
+      })
+      .input(mcpDiscover)
+      .output(mcpCatalog),
+
     settings: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
       .output(mcpSettings),

@@ -93,6 +93,7 @@
         "expo-router": "catalog:mobile",
         "expo-secure-store": "catalog:mobile",
         "expo-system-ui": "catalog:mobile",
+        "expo-web-browser": "catalog:mobile",
         "katex": "catalog:mobile",
         "lucide-react-native": "catalog:mobile",
         "react": "catalog:",
@@ -549,6 +550,7 @@
       "expo-router": "~58.0.24",
       "expo-secure-store": "~58.0.2",
       "expo-system-ui": "~58.0.6",
+      "expo-web-browser": "~58.0.6",
       "katex": "^0.16.22",
       "lucide-react-native": "^1.60.0",
       "react-native": "0.88.0",
@@ -2389,6 +2391,8 @@
     "expo-server": ["expo-server@58.0.5", "", {}, "sha512-FHYecxfGOuAhacHcanR6qCN8Cln9S+FFulcYetLu3ddDg55ohuCsMZ9U4Egzwdm+A2o6N+MdSoJKquBC5F9NIg=="],
 
     "expo-system-ui": ["expo-system-ui@58.0.6", "", { "dependencies": { "@react-native/normalize-colors": "0.88.0", "debug": "^4.3.2" }, "peerDependencies": { "expo": "*", "react-native": "*", "react-native-web": "*" }, "optionalPeers": ["react-native-web"] }, "sha512-K1+GIYhNDc4J0lJAL0m8giesP1dgfavhN+joA6FQ45r1FXAWwS1PaueCiCJaq5hB6z5iAYT7b9XqYp76UU65yw=="],
+
+    "expo-web-browser": ["expo-web-browser@58.0.6", "", { "peerDependencies": { "expo": "*", "react-native": "*" } }, "sha512-6/QtDqTOaTqM/ysYYdEZG4XDrWloOo1wVYCn4g3IgayF+1lZWTwMqa5j4kcn2TA1UBer8O7zbMQYLfSMppQ/zg=="],
 
     "exponential-backoff": ["exponential-backoff@3.1.3", "", {}, "sha512-ZgEeZXj30q+I0EN+CbSSpIyPaJ5HVQD18Z1m+u1FXbAeT94mr1zw50q4q6jiiC447Nl/YTcIYSAftiGqetwXCA=="],
 

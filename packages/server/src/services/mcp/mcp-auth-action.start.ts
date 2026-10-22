@@ -7,7 +7,9 @@ export async function mcpAuthActionStart(deps: McpAuthServiceDeps, params: McpAu
 
   return deps.oauth.actions.start({
     deviceId: params.deviceId,
+    botId: params.botId,
     serverUrl,
     redirectUrl: params.redirectUrl,
+    returnUrl: params.returnUrl,
   });
 }

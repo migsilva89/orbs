@@ -10,6 +10,7 @@ export function corePairingNative(services: Awaited<ReturnType<typeof makeServic
     const devices = await services.auth.queries.devices();
 
     if (devices.length > 0) {
+      process.stdout.write(`\n${devices.length} paired device(s). To pair another one, run:\n\nDATA_DIR=${env.DATA_DIR} bun run --cwd apps/daemon start pair --url ${serverUrl}\n\n`);
       return;
     }
 

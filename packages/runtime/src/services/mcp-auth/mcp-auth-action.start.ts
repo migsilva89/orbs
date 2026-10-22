@@ -3,7 +3,9 @@ import { Errors, isAppError } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { MCP_AUTH } from './mcp-auth.constants';
 import {
+  mcpAuthAbort,
   mcpAuthBind,
+  mcpAuthBumpSave,
   mcpAuthDropSession,
   mcpAuthInvalid,
   mcpAuthNetworkSignal,
@@ -11,6 +13,7 @@ import {
   mcpAuthRedirectUrl,
   mcpAuthResetLogin,
   mcpAuthRetryAfter,
+  mcpAuthReturnUrl,
   mcpAuthServerUrl,
 } from './mcp-auth.utils';
 import type * as McpAuthTypes from '../../types/mcp-auth.types';
@@ -23,12 +26,16 @@ export async function mcpAuthActionStart(
   const redirect = mcpAuthRedirectUrl(params.redirectUrl);
   mcpAuthPrune(deps);
 
+  // The same device starting again replaces its own unfinished login, such as one left behind by a reloaded page.
   match(deps.pending.get(url))
-    .with(P.nonNullable, () => {
-      throw new Errors.CONFLICT();
-    })
     .with(undefined, () => undefined)
-    .exhaustive();
+    .with({ deviceId: params.deviceId, isCompleting: P.optional(P.not(true)) }, () => {
+      mcpAuthBumpSave(deps, url);
+      mcpAuthAbort(deps, url);
+    })
+    .otherwise(() => {
+      throw new Errors.CONFLICT();
+    });
 
   match(deps.pending.size >= MCP_AUTH.maxPending)
     .with(true, () => {
@@ -41,6 +48,8 @@ export async function mcpAuthActionStart(
 
   const session: McpAuthTypes.McpAuthPending = {
     deviceId: params.deviceId,
+    botId: params.botId,
+    returnUrl: mcpAuthReturnUrl(params.returnUrl, redirect),
     serverUrl: url,
     redirectUrl: redirect,
     controller,

@@ -49,6 +49,7 @@
     "expo-glass-effect": "catalog:mobile",
     "expo-image-picker": "catalog:mobile",
     "expo-notifications": "catalog:mobile",
+    "expo-web-browser": "catalog:mobile",
     "expo-linear-gradient": "catalog:mobile",
     "expo-linking": "catalog:mobile",
     "expo-router": "catalog:mobile",

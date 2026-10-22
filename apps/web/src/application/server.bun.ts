@@ -76,7 +76,7 @@ try {
     fetch: async (request, bun) => {
       const { pathname, search } = new URL(request.url);
 
-      if (pathname === '/rpc' || pathname === '/health' || pathname.startsWith('/rpc/') || pathname.startsWith('/files/') || pathname.startsWith('/avatars/')) {
+      if (pathname === '/rpc' || pathname === '/health' || pathname === '/mcp/callback' || pathname.startsWith('/rpc/') || pathname.startsWith('/files/') || pathname.startsWith('/avatars/')) {
         const target = new URL(pathname + search, env.DAEMON_URL);
         const headers = new Headers(request.headers);
         headers.delete('host');

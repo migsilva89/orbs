@@ -22,6 +22,8 @@ export const mcpCatalogServer = z.object({
   transport: z.enum(['stdio', 'http']),
   isEnabled: z.boolean(),
   status: z.enum(['disabled', 'disconnected', 'connecting', 'connected', 'error']),
+  /** OAuth login state: `required` when the server rejected the connection for missing or expired login. */
+  auth: z.enum(['none', 'required', 'authorized']),
   tools: z.array(mcpCatalogTool),
 });
 

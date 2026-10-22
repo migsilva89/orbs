@@ -33,6 +33,9 @@ export interface McpAuthServiceDeps {
 
 export interface McpAuthPending {
   deviceId: string;
+  botId: string;
+  /** App link the callback page opens after login, so a native login sheet can close. */
+  returnUrl?: string;
   serverUrl: string;
   redirectUrl: string;
   state?: string;
@@ -67,7 +70,20 @@ export interface McpAuthDeviceParams extends McpAuthServerParams {
 }
 
 export interface McpAuthStartParams extends McpAuthDeviceParams {
+  botId: string;
   redirectUrl: string;
+  returnUrl?: string;
+}
+
+export interface McpAuthCallbackParams {
+  /** Query string the authorization server appended to the redirect URL. */
+  search: string;
+}
+
+export interface McpAuthCallbackResult {
+  botId: string;
+  returnUrl?: string;
+  status: 'connected' | 'failed';
 }
 
 export interface McpAuthCompleteParams extends McpAuthDeviceParams {

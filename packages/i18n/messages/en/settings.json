@@ -134,5 +134,10 @@
   "settings_devices_pair_loopback": "This code works only on this computer. To pair a phone or another computer, open {name} through its network or Tailscale address first.",
   "settings_notify_prefer": "Send notifications to",
   "settings_notify_prefer_phone": "Phone",
-  "settings_notify_prefer_computer": "Computer"
+  "settings_notify_prefer_computer": "Computer",
+  "settings_mcp_callback_connected_title": "Connected",
+  "settings_mcp_callback_connected_body": "You can close this window. The MCP server is ready for your bot.",
+  "settings_mcp_callback_failed_title": "Login did not finish",
+  "settings_mcp_callback_failed_body": "Something went wrong while signing in. Close this window and try again from the app.",
+  "settings_mcp_callback_expired_body": "This login link expired or was already used. Start the login again from the app."
 }

@@ -1,15 +1,23 @@
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
+import { COLLABORATION } from './collaboration.constants';
 import type { CollaborationServiceDeps } from '../../types/collaboration.types';
 import type { CollaborationRecipientParams } from '@repo/runtime/server';
 
 export async function collaborationQueryRecipient(
   { database }: CollaborationServiceDeps,
-  { botId, recipientId, isPeerInput }: CollaborationRecipientParams,
+  { botId, recipientId, hops }: CollaborationRecipientParams,
 ) {
-  match(isPeerInput || botId === recipientId)
+  match(botId === recipientId)
     .with(true, () => {
-      throw new Errors.FORBIDDEN({ internal: 'Peer messages cannot delegate again or target their sender.' });
+      throw new Errors.FORBIDDEN({ internal: 'A bot cannot message itself.' });
+    })
+    .with(false, () => undefined)
+    .exhaustive();
+
+  match(hops >= COLLABORATION.maxHops)
+    .with(true, () => {
+      throw new Errors.FORBIDDEN({ internal: `This request already passed through ${COLLABORATION.maxHops} bots and cannot be forwarded again.` });
     })
     .with(false, () => undefined)
     .exhaustive();
@@ -23,7 +31,12 @@ export async function collaborationQueryRecipient(
   const recipient = bots.find((bot) => bot.id === recipientId);
 
   return match({ sender, recipient })
-    .with({ sender: P.nonNullable, recipient: P.nonNullable }, (pair) => ({ ...pair, maxPending: 8, temporaryTtlMs: 2 * 24 * 60 * 60 * 1000 }))
+    .with({ sender: P.nonNullable, recipient: P.nonNullable }, (pair) => ({
+      ...pair,
+      maxPending: COLLABORATION.maxPending,
+      maxHops: COLLABORATION.maxHops,
+      temporaryTtlMs: COLLABORATION.temporaryTtlMs,
+    }))
     .otherwise(() => {
       throw new Errors.NOT_FOUND({ resource: 'bot', resourceId: recipientId });
     });

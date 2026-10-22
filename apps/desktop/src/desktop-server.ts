@@ -50,12 +50,13 @@ function desktopLeftovers(pids: number[]): number[] {
 
 export async function desktopServerLeftovers(): Promise<void> {
   const { serverPids = [] } = desktopStateRead();
+  const running = desktopLeftovers(serverPids);
 
-  if (desktopLeftovers(serverPids).length === 0) {
+  if (running.length === 0) {
     return;
   }
 
-  for (const pid of desktopLeftovers(serverPids)) {
+  for (const pid of running) {
     process.kill(pid, 'SIGTERM');
   }
 
@@ -92,13 +93,15 @@ async function desktopServerAdopt(): Promise<DesktopServer | null> {
 
   const urls = DESKTOP.ports.map((port) => desktopNetworkUrl(DESKTOP.localHost, port));
   const probes = await Promise.all(urls.map((url) => desktopNetworkProbe(url, DESKTOP.healthIntervalMs * 10)));
-  const port = DESKTOP.ports.find((_, index) => probes[index]?.status === 'ok');
+  const index = probes.findIndex((probe) => probe.status === 'ok');
 
-  if (port === undefined) {
+  if (index === -1) {
     return null;
   }
 
-  const url = desktopNetworkUrl(DESKTOP.localHost, port);
+  const port = DESKTOP.ports[index];
+  const url = urls[index];
+
   const origins = await desktopNetworkOrigins(port);
 
   return {

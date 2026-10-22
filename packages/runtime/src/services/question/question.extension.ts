@@ -27,12 +27,29 @@ const ask = defineTool({
   execute: (params, api, context) => questionActionAsk(params, api, context),
 });
 
+const askSecret = defineTool({
+  name: QUESTION.secretTool,
+  description: m.ui_tool_bot_secret_description(),
+  parameters: Type.Object({
+    text: Type.String({
+      minLength: 1,
+      maxLength: QUESTION_BOUNDS.maxText,
+      pattern: '\\S',
+      description: m.ui_tool_bot_secret_text_description(),
+    }),
+    name: Type.String({ description: m.ui_tool_bot_secret_name_description() }),
+    hosts: Type.Array(Type.String(), { description: m.ui_tool_bot_secret_hosts_description() }),
+  }),
+  replay: 'safe',
+  execute: ({ text, name, hosts }, api, context) => questionActionAsk({ text, secret: { name, hosts } }, api, context),
+});
+
 export function questionExtension() {
   return {
     extension: defineExtension({
       name: QUESTION.extension,
-      tools: [ask],
+      tools: [ask, askSecret],
     }),
-    readOnlyTools: [ask],
+    readOnlyTools: [ask, askSecret],
   };
 }

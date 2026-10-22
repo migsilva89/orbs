@@ -13,9 +13,10 @@ import {
   makeStorageService,
   runtimeEnvNative,
 } from '@openbots/runtime/native';
+import { makeSecretBrokerService, makeSecretProxyService } from '@openbots/secret-proxy/native';
 import { join } from 'node:path';
 import { credentialsKeyNative, makeAttachmentStorageService, makeAvatarImageService, makeDatabaseService, makeMcpService, makeWorkspaceService, workspacePathsNative } from '@openbots/server/native';
-import { makeCredentialsService, makeServices, makeSettingsService } from '@openbots/server/server';
+import { makeCredentialsService, makeSecretService, makeServices, makeSettingsService } from '@openbots/server/server';
 import { coreLocalNative } from './core-local.native';
 import { corePairingNative } from './core-pairing.native';
 import { coreServerNative } from './core-server.native';
@@ -82,6 +83,19 @@ async function coreNativeServices(resources: AsyncDisposableStack) {
   const mcpAuth = makeMcpAuthService({ credentials });
   resources.defer(() => mcpAuth.close());
   const settings = makeSettingsService({ database });
+  const secrets = makeSecretService({ credentials, settings });
+
+  const secretsFolder = join(paths.data, 'secrets');
+  const secretProxy = makeSecretProxyService({ source: secrets, folder: secretsFolder });
+  resources.defer(() => secretProxy.actions.stop());
+
+  const secretBroker = makeSecretBrokerService({
+    source: secrets,
+    proxy: secretProxy,
+    folder: secretsFolder,
+    varlock: Bun.which('varlock'),
+  });
+
   const mcpClients = makeMcpClientService({ root: paths.root, auth: mcpAuth });
   resources.defer(() => mcpClients.close());
 
@@ -90,6 +104,7 @@ async function coreNativeServices(resources: AsyncDisposableStack) {
     attachmentStorage: makeAttachmentStorageService({ root: paths.root }),
     avatarImages: makeAvatarImageService({ root: join(paths.data, 'avatars') }),
     credentials,
+    secrets,
     settings,
     workspace: makeWorkspaceService({ root: paths.root }),
     skillLoader: makeSkillLoaderService({ root: paths.root }),
@@ -109,6 +124,7 @@ async function coreNativeServices(resources: AsyncDisposableStack) {
       models: providers.models,
       env: runtimeEnvNative(paths.root),
       images: await makeImageService(),
+      secrets: secretBroker,
     },
   });
 

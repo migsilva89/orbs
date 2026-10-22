@@ -31,6 +31,7 @@ export * from './hooks/use-settings-provider-logout';
 export * from './hooks/use-settings-provider-session';
 export * from './hooks/use-settings-providers';
 export * from './hooks/use-settings-sources';
+export * from './hooks/use-settings-secrets';
 export * from './hooks/use-settings-tools';
 export * from './services/chat/chat.client';
 export * from './services/query/query.client';

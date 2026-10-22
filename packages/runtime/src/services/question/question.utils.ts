@@ -10,6 +10,7 @@ export function questionCopy(question: QuestionRecord): QuestionRecord {
     text: question.text,
     choices: [...question.choices],
     isMultiSelect: question.isMultiSelect,
+    secret: question.secret ? { name: question.secret.name, hosts: [...question.secret.hosts] } : null,
     createdAt: question.createdAt,
     expiresAt: question.expiresAt,
     status: question.status,
@@ -30,12 +31,20 @@ export function questionPendingView(question: QuestionRecord): QuestionPending {
     text: copied.text,
     choices: copied.choices,
     isMultiSelect: copied.isMultiSelect,
+    secret: copied.secret,
     createdAt: copied.createdAt,
     expiresAt: copied.expiresAt,
   };
 }
 
 export function questionAnswerValidate(question: QuestionRecord, answer: QuestionAnswer): void {
+  // A secret question takes the saved secret or a skip; any other question never takes a secret.
+  const isSecretAnswer = answer.kind === 'secret';
+
+  if (answer.kind !== 'skip' && isSecretAnswer !== Boolean(question.secret)) {
+    throw new Errors.VALIDATION_ERROR({ fields: { answer: { message: 'validation_question_secret' } } });
+  }
+
   match(answer)
     .with({ kind: 'choices' }, ({ choices }) => {
       const isKnown = choices.every((choice) => question.choices.includes(choice));

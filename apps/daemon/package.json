@@ -25,6 +25,7 @@
     "@openbots/errors": "workspace:*",
     "@openbots/server": "workspace:*",
     "@openbots/runtime": "workspace:*",
+    "@openbots/secret-proxy": "workspace:*",
     "@openbots/env": "workspace:*",
     "@openbots/logger": "workspace:*",
     "@orpc/client": "catalog:",

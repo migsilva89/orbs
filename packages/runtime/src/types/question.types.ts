@@ -1,6 +1,6 @@
 import type { Harness } from '@earendil-works/pi-durable';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
-import type { QuestionAnswer } from '@openbots/contracts/universal';
+import type { QuestionAnswer, SecretRule } from '@openbots/contracts/universal';
 
 export interface QuestionServiceDeps {
   harness: Harness;
@@ -20,6 +20,7 @@ export interface QuestionAskParams {
   text: string;
   choices?: string[];
   isMultiSelect?: boolean;
+  secret?: SecretRule;
 }
 
 export interface QuestionPending {
@@ -28,6 +29,7 @@ export interface QuestionPending {
   text: string;
   choices: string[];
   isMultiSelect: boolean;
+  secret: SecretRule | null;
   createdAt: number;
   expiresAt: number;
 }
@@ -38,6 +40,7 @@ export interface QuestionRecord extends PiDurableTypes.JsonObject {
   text: string;
   choices: string[];
   isMultiSelect: boolean;
+  secret: SecretRule | null;
   createdAt: number;
   expiresAt: number;
   status: 'pending' | 'answered' | 'expired';
@@ -50,5 +53,6 @@ export type QuestionDetails = PiDurableTypes.JsonObject & {
   text: string;
   choices: string[];
   isMultiSelect: boolean;
+  secret: SecretRule | null;
   expiresAt: number;
 };

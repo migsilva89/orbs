@@ -75,9 +75,12 @@ export function RoomsChatQuestions({ question, className }: RoomsChatQuestionsPr
               <IconArrowUp />
             </Button>
           )}
-          aria-label={m.rooms_chat_question_other()}
+          aria-label={card.isSecret ? m.rooms_chat_question_secret_placeholder() : m.rooms_chat_question_other()}
+          autoComplete={card.isSecret ? 'off' : undefined}
           disabled={card.isAnswered}
-          placeholder={m.rooms_chat_question_other()}
+          placeholder={card.isSecret ? m.rooms_chat_question_secret_placeholder() : m.rooms_chat_question_other()}
+          spellCheck={!card.isSecret}
+          type={card.isSecret ? 'password' : 'text'}
           value={card.typed}
           onChange={(event) => card.setTyped(event.target.value)}
         />

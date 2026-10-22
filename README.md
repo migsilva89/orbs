@@ -213,6 +213,18 @@ Rules use `{ when, behavior: 'allow' | 'ask' }`. `tools.configure({ approvalRule
 
 Auto sends the owner rules and tool context in one Jev request. Approval needs a safe score of at least 0.9 and an ask-first score at most 0.1. Matching ask-first rules take priority over allow rules; ambiguity and failures request human approval. Explicit allow rules can cover email or other external actions. Natural-language matching is model-based, not a deterministic security guarantee. Trusted read-only tools skip this evaluation. Ask and Read-only modes cannot be overridden by allow rules. Changes to rules, bot instructions, permission mode, or removal of the Jev key are checked after the answer arrives.
 
+### Bot secrets
+
+A bot asks the owner for an API key or token with the `bot_secret` tool (`text`, `name`, `hosts`). Clients show a masked field; `conversation.answerQuestion` with `{ kind: 'secret', value }` stores the value encrypted in `credentials` (`secrets.<NAME>`) and its hosts in `settings`, using the name and hosts from the bot's pending question. The bot only learns that the secret was saved. `secrets.list()` returns names and hosts, never values; `secrets.save({ name, hosts, value })` and `secrets.remove({ name })` manage them directly. All bots share stored secrets.
+
+Every `bash` command reads secrets as `$NAME`. `secrets.configure({ mode })` chooses how (`secrets.settings()` returns it):
+
+- `proxy` (default): the command holds a placeholder. A local HTTPS proxy in the daemon (`packages/secret-proxy`, Mockttp) swaps in the real value only in headers or the query string, only over HTTPS to the secret's hosts, and puts the placeholder back in responses. Other requests stream through unchanged; requests from other machines are refused.
+- `varlock`: the same, through the [Varlock](https://varlock.dev/guides/proxy/) CLI when `varlock` is on the daemon's `PATH`; otherwise the built-in proxy is used.
+- `env`: the real value is in the command's environment.
+
+In every mode, stored values in any tool result are replaced with their placeholders before the model sees them. This is not a sandbox: commands run as the daemon's OS user and could read the data directory.
+
 ## Provider authentication
 
 The daemon uses Pi's `ModelRuntime.create()`, which loads saved provider credentials from `auth.json` and custom model configuration from `models.json` in Pi's agent directory (default `~/.pi/agent`). Existing Pi logins are reused; Pi handles file locking and OAuth refresh. Paired devices can use the provider RPC below; Pi's `/login` command remains compatible. Login UI is not implemented.

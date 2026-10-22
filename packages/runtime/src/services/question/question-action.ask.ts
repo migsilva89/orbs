@@ -1,4 +1,5 @@
 import { awaitWithContext } from '@earendil-works/chord/context';
+import { secretRule } from '@openbots/contracts/universal';
 import * as m from '@openbots/i18n/messages';
 import { match, P } from 'ts-pattern';
 import { QUESTION, questionDocument } from './question.constants';
@@ -6,13 +7,18 @@ import { questionCopy } from './question.utils';
 import type { QuestionAskParams, QuestionDetails, QuestionRecord } from '../../types/question.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ToolExecutionApi, ToolExecutionResult } from '@earendil-works/pi-durable';
-import type { QuestionAnswer } from '@openbots/contracts/universal';
 
 export async function questionActionAsk(
   params: QuestionAskParams,
   api: ToolExecutionApi<QuestionDetails>,
   context: Context,
 ): Promise<ToolExecutionResult<QuestionDetails>> {
+  const secret = params.secret ? secretRule.safeParse(params.secret) : null;
+
+  if (secret?.success === false) {
+    return { isError: true, output: [{ type: 'text', text: m.ui_tool_bot_question_secret_invalid() }] };
+  }
+
   const question = await api.commit(async (tx) => {
     const doc = await tx.doc(questionDocument, api.taskId);
 
@@ -20,8 +26,9 @@ export async function questionActionAsk(
       id: api.taskId,
       conversationId: api.conversationId,
       text: params.text,
-      choices: [...(params.choices ?? [])],
-      isMultiSelect: params.isMultiSelect ?? false,
+      choices: secret ? [] : [...(params.choices ?? [])],
+      isMultiSelect: secret ? false : params.isMultiSelect ?? false,
+      secret: secret?.data ?? null,
       createdAt: Date.now(),
       expiresAt: Date.now() + QUESTION.timeoutMs,
       status: 'pending' as const,
@@ -39,11 +46,12 @@ export async function questionActionAsk(
     text: question.text,
     choices: [...question.choices],
     isMultiSelect: question.isMultiSelect,
+    secret: question.secret,
     expiresAt: question.expiresAt,
   }, context);
 
   return match(question.status)
-    .with('answered', () => questionReply(question.answer))
+    .with('answered', () => questionReply(question))
     .with('expired', () => questionExpired())
     .with('pending', () => questionWait(question, api, context))
     .exhaustive();
@@ -84,7 +92,7 @@ async function questionWait(
           });
           return questionExpired();
         })
-        .with({ status: 'answered' }, (answered) => questionReply(answered.answer))
+        .with({ status: 'answered' }, (answered) => questionReply(answered))
         .otherwise(() => questionExpired());
     }, context);
   } finally {
@@ -93,9 +101,10 @@ async function questionWait(
   }
 }
 
-function questionReply(answer: QuestionAnswer | null): ToolExecutionResult<QuestionDetails> {
+function questionReply({ answer, secret }: QuestionRecord): ToolExecutionResult<QuestionDetails> {
   const text = match(answer)
     .with({ kind: 'text' }, ({ text: value }) => value)
+    .with({ kind: 'secret' }, () => m.ui_tool_bot_question_secret_saved({ name: secret?.name ?? '', hosts: secret?.hosts.join(', ') ?? '' }))
     .with({ kind: 'choices' }, ({ choices }) => m.ui_tool_bot_question_choices({ choices: choices.join(', ') }))
     .with(P.union({ kind: 'skip' }, null), () => m.ui_tool_bot_question_skipped())
     .exhaustive();

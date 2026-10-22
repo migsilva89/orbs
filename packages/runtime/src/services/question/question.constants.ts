@@ -4,6 +4,7 @@ import type { QuestionRecord } from '../../types/question.types';
 export const QUESTION = {
   extension: 'openbots.questions',
   tool: 'bot_question',
+  secretTool: 'bot_secret',
   document: 'openbots.question',
   timeoutMs: 300_000,
 } as const;

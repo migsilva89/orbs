@@ -12,6 +12,7 @@ import type { McpService } from '../services/mcp/mcp.service';
 import type { NotificationService } from '../services/notification/notification.service';
 import type { PluginService } from '../services/plugin/plugin.service';
 import type { RoutineService } from '../services/routine/routine.service';
+import type { SecretService } from '../services/secret/secret.service';
 import type { ServerService } from '../services/server/server.service';
 import type { SkillService } from '../services/skill/skill.service';
 import type { TodoService } from '../services/todo/todo.service';
@@ -32,6 +33,7 @@ export interface RpcContext extends RequestHeadersPluginContext {
   avatars: AvatarService;
   auth: AuthService;
   credentials: CredentialsService;
+  secrets: SecretService;
   isLocal: boolean;
   peerAddress: string | null;
   runtime: RuntimeService;

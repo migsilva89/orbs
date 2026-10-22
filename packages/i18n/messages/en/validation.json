@@ -18,5 +18,6 @@
   "validation_backup_manifest": "The backup manifest is invalid.",
   "validation_backup_checksum": "A backup file does not match its recorded checksum.",
   "validation_question_choices": "Choose only from the listed options, and pick one unless the question allows several.",
+  "validation_question_secret": "Answer a secret request with the secret or skip it.",
   "validation_muted_until": "Choose a mute end time in the future."
 }

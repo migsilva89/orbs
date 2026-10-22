@@ -57,10 +57,13 @@ export function ChatQuestion({ question }: ChatQuestionProps) {
         </QuestionCardOptions>
       ) : null}
       <Input
-        accessibilityLabel={m.rooms_chat_question_other()}
+        accessibilityLabel={card.isSecret ? m.rooms_chat_question_secret_placeholder() : m.rooms_chat_question_other()}
+        autoCapitalize={card.isSecret ? 'none' : undefined}
+        autoCorrect={!card.isSecret}
         editable={!card.isAnswered}
-        placeholder={m.rooms_chat_question_other()}
+        placeholder={card.isSecret ? m.rooms_chat_question_secret_placeholder() : m.rooms_chat_question_other()}
         returnKeyType="send"
+        secureTextEntry={card.isSecret}
         value={card.typed}
         onChangeText={card.setTyped}
         onSubmitEditing={card.send}

@@ -1,0 +1,26 @@
+{
+  "name": "@openbots/secret-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./native": {
+      "types": "./src/entry.native.ts",
+      "default": "./src/entry.native.ts"
+    }
+  },
+  "scripts": {
+    "check": "tsrs --noEmit",
+    "lint": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
+    "lint:fix": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
+  },
+  "dependencies": {
+    "mockttp": "catalog:",
+    "ts-pattern": "catalog:"
+  },
+  "devDependencies": {
+    "@openbots/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -36,6 +36,7 @@ export function coreRpcNative(
       todos: services.todos,
       auth: services.auth,
       credentials: services.credentials,
+      secrets: services.secrets,
       isLocal,
       peerAddress: null,
       runtime: services.runtime,

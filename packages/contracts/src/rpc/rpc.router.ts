@@ -78,6 +78,7 @@ import { providerCancelResult, providerComplete, providerList, providerLogin, pr
 import { conversationAnswerQuestion, conversationAnswerQuestionResult, conversationQuestionList } from '../types/question.types';
 import { conversationReactions, conversationReactionsResult, conversationSetReaction, conversationSetReactionResult } from '../types/reaction.types';
 import { routine, routineCreate, routineList, routineRemoveResult, routineTarget, routineUpdate } from '../types/routine.types';
+import { secretConfigure, secretRemove, secretRules, secretSave, secretSettings, secretVoid } from '../types/secret.types';
 import { serverInfo } from '../types/server.types';
 import { skillCatalog, skillConfigure, skillDiscover, skillSettings } from '../types/skill.types';
 import { todo, todoCreate, todoList, todoRemoveResult, todoReorder, todoTarget, todoUpdate } from '../types/todo.types';
@@ -195,6 +196,26 @@ export const contract = {
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
       .input(credentialsSet)
       .output(credentialsSetResult),
+  },
+  secrets: {
+    list: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(secretRules),
+    save: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(secretSave)
+      .output(secretVoid),
+    remove: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(secretRemove)
+      .output(secretVoid),
+    settings: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(secretSettings),
+    configure: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(secretConfigure)
+      .output(secretSettings),
   },
   artifacts: {
     blocks: oc

@@ -12,7 +12,7 @@ This is the implementation contract. Fix code that conflicts with it; do not rew
 | `packages/runtime` | Pi integration: Harness, conversations, tools, hooks, approvals, tasks, watches, recovery, skill/instruction/plugin loading, MCP clients. |
 | `packages/contracts` | Public schemas, input/output types, oRPC contracts and errors, including the schemas clients validate forms, search params, pairing codes and stored preferences with. No implementations. |
 | `packages/client` | Typed RPC calls, reconnect, applying Pi view updates, and the data and view helpers web and mobile share (`src/services/<domain>`). Chat and bot hooks live here, not in the apps. Data hooks and TanStack Query options (`src/hooks/use-*.ts`, `src/services/<domain>/*.client.ts`) use only RPC, TanStack Query and React and ship from `./react`. Hooks that need DOM or Expo/React Native APIs are named `use-*.web.ts` or `use-*.native.ts` and ship from `./web` or `./native`; never give one the same base name as a shared file, because Metro resolves `.native` first. `./client` stays free of React. No UI components; apps keep route-bound hooks and show their own toasts and navigation. |
-| Shared packages | Env, errors, logging, i18n, avatars and tooling. No application dependencies. |
+| Shared packages | Env, errors, logging, i18n, avatars, the secret proxy and tooling. No application dependencies. |
 
 Native code stays in its owning package behind `/native`. Using files, SQLite or subprocesses does **not** make code daemon logic.
 

@@ -179,6 +179,8 @@
   "rooms_chat_question_one": "Pick one, or type your own answer.",
   "rooms_chat_question_many": "Pick all that apply, or type your own answer.",
   "rooms_chat_question_open": "Type your answer.",
+  "rooms_chat_question_secret": "Stored encrypted as {name} for {hosts}. The bot never sees the value.",
+  "rooms_chat_question_secret_placeholder": "Paste the secret",
   "rooms_chat_question_other": "Type your own answer",
   "rooms_chat_question_send": "Send answer",
   "rooms_chat_question_skip": "Skip",

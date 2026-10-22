@@ -12,6 +12,7 @@ export default preset({
     'packages/contracts': 'packages',
     'packages/client': 'packages',
     'packages/runtime': 'packages',
+    'packages/secret-proxy': 'packages',
     'packages/avatar-blobs': 'packages',
     'packages/env': 'packages',
     'packages/errors': 'packages',

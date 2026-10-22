@@ -28,6 +28,7 @@ export * from './types/question.types';
 export * from './types/reaction.types';
 export * from './types/reply.types';
 export * from './types/routine.types';
+export * from './types/secret.types';
 export * from './types/server.types';
 export * from './types/skill.types';
 export * from './types/theme.types';

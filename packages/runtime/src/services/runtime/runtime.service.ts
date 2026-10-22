@@ -1,6 +1,5 @@
 import { BACKGROUND_CONTEXT } from '@earendil-works/chord/context';
 import { createToolSearchExtension } from '@earendil-works/pi-durable/tool-search';
-import { createCodingTools } from '@earendil-works/pi-durable/tools';
 import { log } from '@openbots/logger/server';
 import { match, P } from 'ts-pattern';
 import { artifactBlocksCatalog } from '../artifact/artifact-blocks.utils';
@@ -37,6 +36,7 @@ import { runtimeActionUpdateSubmission } from './runtime-action.update-submissio
 import { runtimeActionUpdateTodo } from './runtime-action.update-todo';
 import { runtimeBotOpen } from './runtime-bot.utils';
 import { runtimeChatToolsExtension } from './runtime-chat-tools.utils';
+import { runtimeCodingTools } from './runtime-coding-tools.utils';
 import { runtimeDirectory } from './runtime-directory.utils';
 import { runtimeModels } from './runtime-models.utils';
 import { runtimeQueryApprovals } from './runtime-query.approvals';
@@ -66,6 +66,7 @@ import { runtimeQueryValidateModel } from './runtime-query.validate-model';
 import { runtimeQueryWatch } from './runtime-query.watch';
 import { runtimeQueryWatchContexts } from './runtime-query.watch-contexts';
 import { runtimeReactionExtension } from './runtime-reaction.task';
+import { runtimeSecretsExtension } from './runtime-secrets.utils';
 import { runtimeSkills } from './runtime-skills.utils';
 import { runtimeWatchMerge } from './runtime-watch-merge.utils';
 import { RUNTIME_ALARM_HEARTBEAT_MS } from './runtime.constants';
@@ -85,9 +86,10 @@ export async function makeRuntimeService({
   permissions,
   collaboration: policy,
   images,
+  secrets,
   toolExtensions = [],
 }: RuntimeTypes.RuntimeServiceParams) {
-  const codingTools = createCodingTools({ images });
+  const codingTools = runtimeCodingTools({ images, secrets });
   const readOnlyTools = codingTools.tools?.filter((tool) => tool.name === 'read') ?? [];
   const directory = runtimeDirectory({ open: (botId) => runtimeBotOpen(shared, botId) });
   const collaboration = collaborationExtension({ policy, directory });
@@ -115,6 +117,7 @@ export async function makeRuntimeService({
       runtimeReactionExtension,
       todoExtension,
       toolSearch,
+      ...(secrets ? [runtimeSecretsExtension({ secrets })] : []),
       ...toolExtensions,
     ],
     readOnlyTools: [

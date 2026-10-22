@@ -25,7 +25,37 @@ export interface RuntimeServiceParams {
   collaboration: CollaborationPolicy;
   /** Shrinks and converts the images `read` returns, so large photos reach the model. */
   images?: ImageProcessor;
+  /** Gives bash commands stored secrets as placeholders, and keeps real values out of tool results. */
+  secrets?: RuntimeSecrets;
   toolExtensions?: PiDurableTypes.Extension[];
+}
+
+export interface RuntimeSecrets {
+  actions: {
+    prepare: (execution: RuntimeSecretExecution) => Promise<void>;
+  };
+  queries: {
+    redact: (params: RuntimeSecretRedactParams) => Promise<string>;
+  };
+}
+
+/** The part of Pi's bash execution a secret broker may change. */
+export interface RuntimeSecretExecution {
+  command: string;
+  env: Record<string, string>;
+}
+
+export interface RuntimeSecretRedactParams {
+  text: string;
+}
+
+export interface RuntimeCodingToolsParams {
+  images?: ImageProcessor;
+  secrets?: RuntimeSecrets;
+}
+
+export interface RuntimeSecretsParams {
+  secrets: RuntimeSecrets;
 }
 
 export interface RuntimeToolPolicy {

@@ -9,7 +9,7 @@ const LinearGradient = withUniwind(NativeLinearGradient);
 
 const surfaceVariants = cva({
   base: 'absolute inset-0 overflow-hidden',
-  variants: { shape: { default: 'rounded-md', round: 'rounded-full', inline: 'rounded-sm' } },
+  variants: { shape: { default: 'rounded-lg', round: 'rounded-full', inline: 'rounded-sm' } },
   defaultVariants: { shape: 'default' },
 });
 

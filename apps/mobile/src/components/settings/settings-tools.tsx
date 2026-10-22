@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { Item, ItemContent, ItemGroup, ItemTitle, ItemValue } from '@/components/ui/item';
@@ -61,7 +62,7 @@ function SettingsToolsForm({ settings, tools }: SettingsToolsFormProps) {
   };
 
   return (
-    <View className="gap-3 rounded-lg border border-border bg-card p-3">
+    <Card size="sm">
       <Text variant="label">{m.settings_tools_rules()}</Text>
       <Input
         accessibilityLabel={m.settings_tools_rules_when()}
@@ -165,6 +166,6 @@ function SettingsToolsForm({ settings, tools }: SettingsToolsFormProps) {
       >
         {m.settings_save()}
       </Button>
-    </View>
+    </Card>
   );
 }

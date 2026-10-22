@@ -18,6 +18,7 @@ import { RoutinesList } from '@/components/routines/routines-list';
 import { TodosList } from '@/components/todos/todos-list';
 import { actionSheetShow } from '@/components/ui/action-sheet';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { FormField } from '@/components/ui/form-field';
 import { Icon } from '@/components/ui/icon';
 import { useChatReturn } from '@/hooks/use-chat-return';
@@ -149,7 +150,7 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
             icon={ScrollText}
             title={m.rooms_bot_instructions()}
           >
-            <View className="rounded-lg border border-border bg-card p-4">
+            <Card size="lg">
               <FormField
                 isLabelHidden
                 multiline
@@ -160,7 +161,7 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
                 name="instructions"
                 placeholder={m.rooms_bot_instructions_placeholder()}
               />
-            </View>
+            </Card>
           </BotDetailsSection>
           <BotSettingsModel isDisabled={isBusy} session={session} />
           <BotSettingsAccess isDisabled={isBusy} />

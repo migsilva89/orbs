@@ -4,6 +4,7 @@ import { Trash2 } from 'lucide-react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { Item, ItemContent, ItemGroup, ItemTitle } from '@/components/ui/item';
@@ -25,7 +26,7 @@ export function SettingsPathList({ title, placeholder, paths, isPending, isFaile
   const isValid = path.success && !paths.includes(path.data);
 
   return (
-    <View className="gap-2 rounded-lg border border-border bg-card p-3">
+    <Card size="sm">
       <Text variant="label">{title}</Text>
       <View className="flex-row items-center gap-2">
         <Input
@@ -41,7 +42,6 @@ export function SettingsPathList({ title, placeholder, paths, isPending, isFaile
         />
         <Button
           disabled={isPending || !isValid}
-          size="sm"
           variant="outline"
           onPress={() => {
             onChange([...paths, draft.trim()]);
@@ -72,6 +72,6 @@ export function SettingsPathList({ title, placeholder, paths, isPending, isFaile
           ))}
         </ItemGroup>
       ) : null}
-    </View>
+    </Card>
   );
 }

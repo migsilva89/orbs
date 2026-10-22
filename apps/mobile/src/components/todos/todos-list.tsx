@@ -5,6 +5,7 @@ import { Circle, CircleCheck, ListTodo, X } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Empty, EmptyLink } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Item, ItemContent, ItemTitle } from '@/components/ui/item';
@@ -86,7 +87,7 @@ export function TodosList({ session, bot, onPrefill }: TodosListProps) {
         />
       ) : null}
       {open.length > 0 ? (
-        <View className="overflow-hidden rounded-lg border border-border bg-card">
+        <Card className="overflow-hidden">
           {open.map((todo, index) => (
             <ContextMenu
               isFullWidth
@@ -108,7 +109,7 @@ export function TodosList({ session, bot, onPrefill }: TodosListProps) {
               />
             </ContextMenu>
           ))}
-        </View>
+        </Card>
       ) : null}
       {done.length > 0 ? (
         <SectionHeading
@@ -118,7 +119,7 @@ export function TodosList({ session, bot, onPrefill }: TodosListProps) {
         />
       ) : null}
       {isDoneShown ? (
-        <View className="overflow-hidden rounded-lg border border-border bg-card">
+        <Card className="overflow-hidden">
           {done.map((todo) => (
             <TodosListItem
               disabled={update.isPending}
@@ -128,7 +129,7 @@ export function TodosList({ session, bot, onPrefill }: TodosListProps) {
               onToggle={toggle}
             />
           ))}
-        </View>
+        </Card>
       ) : null}
       {todos.length > 0 ? (
         <Text tone="muted" variant="small">

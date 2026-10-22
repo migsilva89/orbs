@@ -77,6 +77,17 @@
   --radius-lg: 10px;
   --radius-xl: 14px;
 
-  --text-xxs: 11px;
-  --text-xxs--line-height: 14px;
+  /* Type scale. Body is 16px; components use these steps, never pixel sizes. */
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-footnote: 13px;
+  --text-footnote--line-height: 18px;
+  --text-subhead: 14px;
+  --text-subhead--line-height: 20px;
+  --text-body: 16px;
+  --text-body--line-height: 22px;
+  --text-title: 20px;
+  --text-title--line-height: 26px;
+  --text-display: 24px;
+  --text-display--line-height: 30px;
 }

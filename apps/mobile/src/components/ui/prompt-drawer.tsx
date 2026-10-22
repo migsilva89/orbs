@@ -178,7 +178,7 @@ export function PromptJump({ children, onPress }: PromptJumpProps) {
       >
         <textContext.Provider value={{ tone: 'on-blue' }}>
           <Icon icon={ChevronDown} strokeWidth={2.75} />
-          <Text className="text-[15px] font-light">{children}</Text>
+          <Text className="text-body font-light">{children}</Text>
         </textContext.Provider>
       </Pressable>
     </Animated.View>

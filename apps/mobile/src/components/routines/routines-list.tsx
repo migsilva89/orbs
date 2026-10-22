@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { CalendarClock, Ellipsis } from 'lucide-react-native';
 import { Switch, View } from 'react-native';
+import { Card } from '@/components/ui/card';
 import { Empty, EmptyLink } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Item, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
@@ -60,7 +61,7 @@ export function RoutinesList({ session, bot, onPrefill }: RoutinesListProps) {
         />
       ) : null}
       {routines.length > 0 ? (
-        <View className="overflow-hidden rounded-lg border border-border bg-card">
+        <Card className="overflow-hidden">
           {routines.map((routine) => (
             <Item key={routine.id} size="sm">
               <ItemContent>
@@ -112,7 +113,7 @@ export function RoutinesList({ session, bot, onPrefill }: RoutinesListProps) {
               </Menu>
             </Item>
           ))}
-        </View>
+        </Card>
       ) : null}
       {routines.length > 0 ? (
         <Text tone="muted" variant="small">

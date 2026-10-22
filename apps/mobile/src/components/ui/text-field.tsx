@@ -9,7 +9,7 @@ import type { TextInputProps } from 'react-native';
 
 const textFieldVariants = cva({
   composes: textBaseVariants,
-  variants: { size: { default: 'text-[16px]', lg: 'text-[18px]' } },
+  variants: { size: { default: 'text-body', lg: 'text-title' } },
   defaultVariants: { size: 'default' },
 });
 

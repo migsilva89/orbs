@@ -8,6 +8,8 @@ A calm, native chat interface. Conversations lead; navigation and controls stay 
 - Support light and dark themes. Keep contrast and focus visible in both.
 - Use Inter for web text and monospace for code, paths, and identifiers. Use sentence case.
 - Use the framework's spacing, radius, and type scales. One parent owns each gap.
+- Mobile type scale: caption 12, footnote 13, subhead 14, body 16, title 20, display 24 (`text-<step>` in the mobile theme). Readable content, row titles, inputs, and buttons use body; secondary text is subhead and muted. Use no pixel font sizes, except emoji and avatar glyphs that scale with their container.
+- Mobile shapes: containers (cards, row groups, alerts, bubbles) use `rounded-2xl`; controls (inputs, buttons, groups nested in a card) use `rounded-lg`; pills and icon buttons are round. Controls in one row share a height: a default `Button` matches `Input` at 40px.
 - Prefer a continuous chat canvas and clear grouping. Avoid nested cards, decorative borders, gradients, and glows.
 
 ## Components

@@ -8,7 +8,7 @@ import type { ComponentProps } from 'react';
 import type { ViewProps } from 'react-native';
 
 const alertVariants = cva({
-  base: 'relative w-full gap-0.5 rounded-lg border border-border bg-card px-4 py-3',
+  base: 'relative w-full gap-0.5 rounded-2xl border border-border bg-card px-4 py-3',
   variants: { variant: { default: '', destructive: '' } },
   defaultVariants: { variant: 'default' },
 });

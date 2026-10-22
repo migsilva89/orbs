@@ -33,7 +33,7 @@ export function RoutinesScheduleField({ isDisabled }: RoutinesScheduleFieldProps
             onSelect: () => field.onChange(routinesScheduleDefault(kind)),
           }))}
         >
-          <View className="h-10 flex-row items-center gap-1 rounded-md border border-input px-3">
+          <View className="h-10 flex-row items-center gap-1 rounded-lg border border-input px-3">
             <Text variant="body">{ROUTINES_SCHEDULE_KINDS[schedule.kind]()}</Text>
             <Icon
               icon={ChevronsUpDown}

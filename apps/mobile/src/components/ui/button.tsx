@@ -10,7 +10,7 @@ import type { ReactNode } from 'react';
 import type { PressableProps } from 'react-native';
 
 const buttonVariants = cva({
-  base: 'relative flex-row items-center justify-center gap-2 rounded-md focus:ring-2 focus:ring-ring disabled:opacity-50',
+  base: 'relative flex-row items-center justify-center gap-2 rounded-lg focus:ring-2 focus:ring-ring disabled:opacity-50',
   variants: {
     variant: {
       default: 'bg-primary',
@@ -28,7 +28,7 @@ const buttonVariants = cva({
     },
     size: {
       default: 'h-10 px-4',
-      xs: 'h-6 gap-1 rounded-md px-2',
+      xs: 'h-6 gap-1 px-2',
       sm: 'h-9 px-3',
       lg: 'h-11 px-8',
       pill: 'h-9 justify-start rounded-full pr-4 pl-1.5',

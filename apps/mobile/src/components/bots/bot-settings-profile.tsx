@@ -2,9 +2,9 @@ import { BOT, botHandle } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { Bot } from 'lucide-react-native';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { View } from 'react-native';
 import { BotAvatarPicker } from '@/components/bots/bot-avatar-picker';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
+import { Card } from '@/components/ui/card';
 import { FormField } from '@/components/ui/form-field';
 import type { BotForm } from '@openbots/contracts/universal';
 
@@ -21,7 +21,7 @@ export function BotSettingsProfile({ isDisabled }: BotSettingsProfileProps) {
       icon={Bot}
       title={m.bots_profile()}
     >
-      <View className="gap-4 rounded-lg border border-border bg-card p-4">
+      <Card size="lg">
         <BotAvatarPicker
           isDisabled={isDisabled}
           name={name || m.rooms_bot_default_name()}
@@ -49,7 +49,7 @@ export function BotSettingsProfile({ isDisabled }: BotSettingsProfileProps) {
           placeholder={botHandle({ name }) || m.rooms_bot_handle_placeholder()}
           returnKeyType="done"
         />
-      </View>
+      </Card>
     </BotDetailsSection>
   );
 }

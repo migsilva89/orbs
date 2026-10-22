@@ -5,7 +5,7 @@ import { TextField } from './text-field';
 import type { ComponentProps } from 'react';
 
 const inputVariants = cva({
-  base: 'w-full min-w-0 rounded-md border border-input bg-transparent px-3 shadow-xs focus:border-ring focus:ring-[3px] focus:ring-ring/50 disabled:opacity-50 dark:bg-input/30',
+  base: 'w-full min-w-0 rounded-lg border border-input bg-transparent px-3 shadow-xs focus:border-ring focus:ring-[3px] focus:ring-ring/50 disabled:opacity-50 dark:bg-input/30',
   variants: {
     multiline: { true: 'min-h-40', false: 'h-10' },
     invalid: { true: 'border-destructive/80 focus:border-destructive/80 focus:ring-destructive/20 dark:focus:ring-destructive/40' },

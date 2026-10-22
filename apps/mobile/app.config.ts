@@ -61,6 +61,7 @@ export default (): ExpoConfig => ({
     'expo-secure-store',
     'expo-notifications',
     '@pierrecapo/expo-notification-service-extension',
+    ['expo-camera', { cameraPermission: m.mobile_camera_permission(), microphonePermission: false, recordAudioAndroid: false }],
     ['expo-image-picker', { photosPermission: m.mobile_photos_permission(), cameraPermission: m.mobile_camera_permission(), microphonePermission: false }],
     [
       'expo-font',

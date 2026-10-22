@@ -3,6 +3,7 @@ import { Children, createContext, Fragment, use } from 'react';
 import { Pressable, View } from 'react-native';
 import { match } from 'ts-pattern';
 import { cn } from '@/lib/cn';
+import { cardContext } from './card';
 import { Text } from './text';
 import type { VariantProps } from 'cva';
 import type { ComponentProps, ReactNode } from 'react';
@@ -75,9 +76,10 @@ interface ItemGroupProps {
 /** An outlined group of rows, separated by hairlines. */
 export function ItemGroup({ children }: ItemGroupProps) {
   const items = Children.toArray(children);
+  const isInCard = use(cardContext);
 
   return (
-    <View className="overflow-hidden rounded-lg border border-border bg-card">
+    <View className={cn('overflow-hidden border border-border bg-card', isInCard ? 'rounded-lg' : 'rounded-2xl')}>
       {items.map((item, index) => (
         <Fragment key={index}>
           {index > 0 ? <View className="h-px bg-border" /> : null}

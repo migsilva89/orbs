@@ -286,7 +286,7 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
             }))}
             title={props.label}
           >
-            <View className="h-10 flex-row items-center justify-between rounded-md border border-input px-3">
+            <View className="h-10 flex-row items-center justify-between rounded-lg border border-input px-3">
               <Text>{props.options.find((option) => option.value === value)?.label ?? ''}</Text>
               <Icon icon={ChevronsUpDown} tone="muted" />
             </View>

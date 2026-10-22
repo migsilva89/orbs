@@ -1,12 +1,21 @@
 import { cva } from 'cva';
+import { createContext } from 'react';
 import { View } from 'react-native';
 import { match } from 'ts-pattern';
 import { cn } from '@/lib/cn';
 import { Text, textContext } from './text';
+import type { VariantProps } from 'cva';
 import type { ComponentProps } from 'react';
 import type { ViewProps } from 'react-native';
 
-const cardVariants = cva({ base: 'relative flex-col rounded-md border border-border bg-card' });
+const cardVariants = cva({
+  base: 'relative flex-col rounded-2xl border border-border bg-card',
+  variants: { size: { default: '', sm: 'gap-3 p-3', lg: 'gap-4 p-4' } },
+  defaultVariants: { size: 'default' },
+});
+
+/** True inside a Card, so nested groups use the smaller control radius instead of a second card shape. */
+export const cardContext = createContext(false);
 
 const cardHeaderVariants = cva({
   base: 'p-6',
@@ -14,14 +23,16 @@ const cardHeaderVariants = cva({
   defaultVariants: { variant: 'default' },
 });
 
-interface CardProps extends ViewProps {
+interface CardProps extends ViewProps, VariantProps<typeof cardVariants> {
   className?: string;
 }
 
-export function Card({ className, children, ...props }: CardProps) {
+export function Card({ size, className, children, ...props }: CardProps) {
   return (
-    <View {...props} className={cn(cardVariants(), className)}>
-      <textContext.Provider value={{ tone: 'card' }}>{children}</textContext.Provider>
+    <View {...props} className={cn(cardVariants({ size }), className)}>
+      <cardContext.Provider value>
+        <textContext.Provider value={{ tone: 'card' }}>{children}</textContext.Provider>
+      </cardContext.Provider>
     </View>
   );
 }

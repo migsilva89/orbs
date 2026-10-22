@@ -19,6 +19,15 @@ export function htmlReplyContent(content: string): string | undefined {
   return undefined;
 }
 
+/** The page's own name, from its `<title>` or first heading, for a preview card. */
+export function htmlTitle(html: string): string | undefined {
+  const heading = /<title[^>]*>([\s\S]*?)<\/title>|<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i.exec(html);
+
+  const title = (heading?.[1] ?? heading?.[2] ?? '').replaceAll(/<[^>]*>/g, '').replaceAll(/\s+/g, ' ').trim();
+
+  return title === '' ? undefined : title;
+}
+
 function htmlBootstrap() {
   // A native WebView has no parent frame; it reports through the React Native bridge instead.
   const htmlPost = (message: unknown) => {

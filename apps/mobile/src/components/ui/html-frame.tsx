@@ -84,6 +84,7 @@ export function HtmlFrame({ html, title, fill = false, isUnderHeader = false }: 
     <WebView<object>
       accessibilityLabel={title}
       bounces={false}
+      containerStyle={fill ? undefined : { flex: 0, height }}
       contentInsetAdjustmentBehavior={isUnderHeader ? 'automatic' : 'never'}
       injectedJavaScriptBeforeContentLoaded={themeScript}
       originWhitelist={['about:blank']}

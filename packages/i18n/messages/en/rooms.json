@@ -282,7 +282,7 @@
   "artifacts_restore_error": "This version could not be restored.",
   "artifacts_restored": "Version restored",
   "artifacts_error": "This artifact could not be shown.",
-  "artifacts_chat_card": "Artifact · version {version}",
+  "artifacts_kind": "Artifact",
   "artifacts_expand": "Expand",
   "artifacts_open": "Open page",
   "artifacts_save_error": "Your change could not be saved.",

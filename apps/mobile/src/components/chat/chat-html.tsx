@@ -1,3 +1,4 @@
+import { htmlTitle } from '@openbots/client/client';
 import { m } from '@openbots/i18n/client';
 import { useRouter } from 'expo-router';
 import { Code } from 'lucide-react-native';
@@ -11,13 +12,15 @@ interface ChatHtmlProps {
 
 export function ChatHtml({ botId, html }: ChatHtmlProps) {
   const router = useRouter();
-  const title = m.ui_html_preview();
+  const title = htmlTitle(html) ?? m.ui_html_preview();
 
   return (
     <PreviewCard
       icon={Code}
+      kind={m.ui_html_page()}
+      label={m.artifacts_expand()}
       title={title}
-      onExpand={() => router.push({ pathname: '/chat/[botId]/html', params: { botId, html } })}
+      onOpen={() => router.push({ pathname: '/chat/[botId]/html', params: { botId, html } })}
     >
       <HtmlFrame html={html} title={title} />
     </PreviewCard>

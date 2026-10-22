@@ -1,35 +1,47 @@
-import { m } from '@openbots/i18n/client';
-import { Maximize2 } from 'lucide-react-native';
-import { View } from 'react-native';
-import { Button } from './button';
+import { Pressable, View } from 'react-native';
 import { Icon } from './icon';
 import { Text } from './text';
 import type { LucideIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 
+const PREVIEW_CARD = { maxHeight: 320, fadeHeight: 80 };
+
 interface PreviewCardProps {
   icon: LucideIcon;
   title: string;
-  description?: string;
+  kind: string;
+  label: string;
   children: ReactNode;
-  onExpand: () => void;
+  onOpen: () => void;
 }
 
-/** A titled live preview inside the transcript, with a button that opens it full screen. */
-export function PreviewCard({ icon, title, description, children, onExpand }: PreviewCardProps) {
+/** A live preview inside the transcript, cut to a fixed height with a fade, named in a footer; the whole card opens it. */
+export function PreviewCard({ icon, title, kind, label, children, onOpen }: PreviewCardProps) {
   return (
-    <View className="w-full overflow-hidden rounded-2xl border border-border bg-card">
-      <View className="flex-row items-center gap-2 border-b border-border px-3 py-2">
-        <Icon icon={icon} tone="muted" />
+    <Pressable
+      accessibilityLabel={label}
+      accessibilityRole="button"
+      className="w-full overflow-hidden rounded-2xl border border-border bg-card active:opacity-80"
+      onPress={onOpen}
+    >
+      <View className="overflow-hidden bg-background" pointerEvents="none" style={{ maxHeight: PREVIEW_CARD.maxHeight }}>
+        {/* Sized by its content, so the outer view clips it instead of shrinking it. */}
+        <View className="shrink-0 p-4">{children}</View>
+        {/* Pinned at a fixed depth, so a preview shorter than the card is clipped clear of the fade. */}
+        <View
+          className="absolute inset-x-0 bg-linear-to-b from-background/0 to-background"
+          style={{ top: PREVIEW_CARD.maxHeight - PREVIEW_CARD.fadeHeight, height: PREVIEW_CARD.fadeHeight }}
+        />
+      </View>
+      <View className="flex-row items-center gap-3 border-t border-border px-4 py-3">
+        <View className="size-10 items-center justify-center rounded-lg bg-muted">
+          <Icon icon={icon} tone="muted" />
+        </View>
         <View className="flex-1">
           <Text numberOfLines={1} variant="item-title">{title}</Text>
-          {description ? <Text tone="muted" variant="small">{description}</Text> : null}
+          <Text tone="muted" variant="small">{kind}</Text>
         </View>
-        <Button accessibilityLabel={m.artifacts_expand()} size="icon-xs" variant="ghost" onPress={onExpand}>
-          <Icon icon={Maximize2} size="sm" />
-        </Button>
       </View>
-      <View className="p-3">{children}</View>
-    </View>
+    </Pressable>
   );
 }

@@ -43,6 +43,7 @@
   "ui_tool_bot_react_prompt": "A reaction can be the whole reply: when a thanks, an ok or feedback needs no words, react with one emoji (bot_react) and end your turn without writing any text. Otherwise react only now and then, when a person would.",
   "ui_html_preview": "HTML preview",
   "ui_html_source": "Source",
+  "ui_html_page": "Page",
   "ui_tool_bot_artifact_list_description": "List artifacts in this conversation without loading their content.",
   "ui_tool_bot_artifact_get_description": "Read an artifact in this conversation.",
   "ui_tool_bot_artifact_create_description": "Create an artifact in this conversation. Use a structured spec from bot_artifact_blocks, or supply self-contained HTML in spec.html. HTML renders inline and fullscreen in a sandbox. Inline CSS and JavaScript work; use data URLs for images. Remote resources, network requests, form submissions, storage and app APIs are unavailable. Follow the HTML pages rules in your instructions so it looks like part of the app. Script state lasts only while the page is mounted. List artifacts before retrying an interrupted call.",

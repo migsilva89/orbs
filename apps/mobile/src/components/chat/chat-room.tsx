@@ -9,6 +9,7 @@ import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { match, P } from 'ts-pattern';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { KeyboardSticky } from '@/components/ui/keyboard-sticky';
 import { MessageList } from '@/components/ui/message-list';
@@ -190,7 +191,17 @@ function ChatRoomView({ session, bot, bots, view, focusEntryId, replyToEntryId, 
   );
 
   const empty = match(messages.length)
-    .with(0, () => <Text className="mx-5 mt-8 text-center" tone="muted">{m.mobile_chat_empty({ name: bot.name })}</Text>)
+    .with(0, () => (
+      <View className="mx-5 mt-8 items-center gap-3">
+        <Avatar
+          animate
+          avatar={bot.avatar}
+          name={bot.name}
+          size="featured"
+        />
+        <Text className="text-center" tone="muted">{m.mobile_chat_empty({ name: bot.name })}</Text>
+      </View>
+    ))
     .otherwise(() => null);
 
   return (

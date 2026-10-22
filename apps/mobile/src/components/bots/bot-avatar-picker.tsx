@@ -62,6 +62,7 @@ export function BotAvatarPicker({ name, value, isDisabled = false, onChange }: B
           onPress={shiftMood}
         >
           <Avatar
+            animate
             avatar={value}
             name={name}
             size="featured"

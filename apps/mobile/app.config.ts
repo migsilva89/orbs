@@ -63,7 +63,26 @@ export default (): ExpoConfig => ({
   },
   experiments: { typedRoutes: true },
   owner: appEnv.MOBILE_EAS_OWNER,
-  extra: { appName: name, eas: { projectId: appEnv.MOBILE_EAS_PROJECT_ID } },
+  extra: {
+    appName: name,
+    eas: {
+      projectId: appEnv.MOBILE_EAS_PROJECT_ID,
+      // EAS signs only targets it knows about; the notification extension plugin does not register its own.
+      build: {
+        experimental: {
+          ios: {
+            appExtensions: [
+              {
+                targetName: 'NotificationServiceExtension',
+                bundleIdentifier: `${bundleIdentifier}.NotificationServiceExtension`,
+                entitlements: { 'com.apple.security.application-groups': [`group.${bundleIdentifier}`] },
+              },
+            ],
+          },
+        },
+      },
+    },
+  },
   plugins: [
     'expo-router',
     'expo-secure-store',

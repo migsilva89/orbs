@@ -1,13 +1,15 @@
+import { BotEngine } from '@repo/avatar-blobs/engine';
 import { DEFAULT_EXPRESSION, EXPRESSION_BY_ID } from '@repo/avatar-blobs/expressions';
 import { avatarMarkup, avatarStill, avatarSvg } from '@repo/avatar-blobs/player';
 import { BODY_BY_ID, COLOR_BY_ID, DEFAULT_BODY, DEFAULT_COLOR, INVERT_ON_DARK, INVERT_ON_LIGHT } from '@repo/avatar-blobs/skins';
-import { HALF_VIEWBOX } from '@repo/avatar-blobs/viewbox';
+import { HALF_VIEWBOX, RADIUS } from '@repo/avatar-blobs/viewbox';
 import { cva } from 'cva';
 import { useId } from 'react';
 import { Image, View } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { match } from 'ts-pattern';
 import { useUniwind } from 'uniwind';
+import { useAvatarClock } from '@/hooks/use-avatar-clock';
 import { useConnection } from '@/hooks/use-connection';
 import { cn } from '@/lib/cn';
 import { connectionAvatarUri } from '@/services/connection/connection.client';
@@ -26,21 +28,28 @@ const avatarVariants = cva({
 });
 
 interface AvatarProps extends Pick<Bot, 'avatar' | 'name'>, VariantProps<typeof avatarVariants> {
+  animate?: boolean;
   className?: string;
 }
 
-export function Avatar({ avatar, name, size = 'default', className }: AvatarProps) {
+export function Avatar({ avatar, name, size = 'default', animate = false, className }: AvatarProps) {
   const { theme } = useUniwind();
   const { session } = useConnection();
   const uid = `avatar-${useId().replaceAll(/[^\w-]/g, '')}`;
   const look = match(avatar).with({ kind: 'blob' }, (value) => value).otherwise(() => ({ body: DEFAULT_BODY, color: DEFAULT_COLOR, expression: DEFAULT_EXPRESSION }));
   const inverted = match(theme).with('dark', () => INVERT_ON_DARK.includes(look.color)).otherwise(() => INVERT_ON_LIGHT.includes(look.color));
 
-  const frame = avatarStill({
-    state: 'idle',
-    radii: BODY_BY_ID.get(look.body)?.radii ?? null,
-    expression: EXPRESSION_BY_ID.get(look.expression) ?? null,
-  });
+  const radii = BODY_BY_ID.get(look.body)?.radii ?? null;
+  const expression = EXPRESSION_BY_ID.get(look.expression) ?? null;
+  const clock = useAvatarClock(animate && (avatar === null || avatar.kind === 'blob'));
+
+  const frame = match(clock)
+    .with(null, () => avatarStill({
+      state: 'idle',
+      radii,
+      expression,
+    }))
+    .otherwise((seconds) => new BotEngine(RADIUS, 'idle', radii, expression).sample(seconds));
 
   const nodes = avatarSvg(frame, COLOR_BY_ID.get(look.color)?.hex ?? '#0a0a0c', uid).map(avatarMarkup).join('');
 

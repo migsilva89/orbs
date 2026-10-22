@@ -21,6 +21,7 @@ export const DESKTOP = {
   dev: { web: ['x', 'vite', 'dev', '--strictPort'], daemon: '../daemon/src/entry.native.ts' },
   markers: ['openbots/web/', 'openbots/daemon/', 'vite dev', 'daemon/src/entry.native.ts'],
   pairLink: /https?:\/\/\S+\/connect#code=\S+/u,
+  daemonSocket: 'data/ipc/rpc.sock',
   stateFile: 'desktop.json',
   logsFolder: 'logs',
   serverLog: 'server.log',

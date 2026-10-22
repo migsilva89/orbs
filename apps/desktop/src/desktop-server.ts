@@ -1,5 +1,5 @@
 import { PATHS } from 'electrobun/main';
-import { closeSync, mkdirSync, openSync } from 'node:fs';
+import { closeSync, existsSync, mkdirSync, openSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { desktopNetworkAdvertise, desktopNetworkOrigins, desktopNetworkProbe, desktopNetworkUrl } from './desktop-network';
 import { desktopHome, desktopStateRead, desktopStateWrite } from './desktop-settings';
@@ -84,8 +84,12 @@ async function desktopPortAnswers(hostname: string, port: number): Promise<boole
   }
 }
 
-/** Openbots already running on this Mac, such as dev servers or a daemon started from the CLI. The app uses it and never stops it. */
+/** Openbots already running for this data folder, such as dev servers or a daemon started from the CLI. The app uses it and never stops it. */
 async function desktopServerAdopt(): Promise<DesktopServer | null> {
+  if (!existsSync(join(desktopHome.root, DESKTOP.daemonSocket))) {
+    return null;
+  }
+
   const urls = DESKTOP.ports.map((port) => desktopNetworkUrl(DESKTOP.localHost, port));
   const probes = await Promise.all(urls.map((url) => desktopNetworkProbe(url, DESKTOP.healthIntervalMs * 10)));
   const port = DESKTOP.ports.find((_, index) => probes[index]?.status === 'ok');

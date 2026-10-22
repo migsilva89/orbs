@@ -1,5 +1,5 @@
-import { ATTACHMENT } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { ATTACHMENT } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { chatReadPicked } from '../services/chat/chat.native';

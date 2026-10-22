@@ -1,6 +1,6 @@
-import { botModelBrand, botModelUsage } from '@openbots/client/client';
-import { useRpc } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { botModelBrand, botModelUsage } from '@repo/client/client';
+import { useRpc } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { Cpu } from 'lucide-react-native';

@@ -2,7 +2,7 @@ import { applyImmutable } from '@earendil-works/chord/delta';
 import { ORPCError } from '@orpc/client';
 import { match } from 'ts-pattern';
 import type { Client } from './types/client.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export async function readConversation(
   client: Client,

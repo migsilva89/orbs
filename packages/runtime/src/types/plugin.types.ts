@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { Extension } from '@earendil-works/pi-durable';
-import type { PluginCatalog } from '@openbots/contracts/universal';
+import type { PluginCatalog } from '@repo/contracts/universal';
 
 const pluginFunction = z.custom((value) => typeof value === 'function');
 const pluginObject = z.object({}).loose();

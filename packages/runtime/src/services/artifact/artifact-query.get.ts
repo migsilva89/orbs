@@ -1,10 +1,10 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { artifactContent, artifactContentKey, artifactDocument } from './artifact.constants';
 import { artifactCopy, artifactGet, artifactPointer } from './artifact.utils';
 import type { ArtifactGetParams, ArtifactServiceDeps } from '../../types/artifact.types';
 import type { Context } from '@earendil-works/chord/context';
-import type { Artifact } from '@openbots/contracts/universal';
+import type { Artifact } from '@repo/contracts/universal';
 
 export async function artifactQueryGet(
   { harness }: ArtifactServiceDeps,

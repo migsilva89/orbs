@@ -1,6 +1,6 @@
-import { chatLive, chatMessages, roomsMessageText } from '@openbots/client/client';
-import { chatViewOptions } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { chatLive, chatMessages, roomsMessageText } from '@repo/client/client';
+import { chatViewOptions } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { RoomsChatApproval } from '@/components/rooms/rooms-chat-approval';
@@ -11,7 +11,7 @@ import { Clamp } from '@/components/ui/clamp';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { rpc } from '@/services/rpc/rpc.client';
 import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
-import type { ToolBot } from '@openbots/client/client';
+import type { ToolBot } from '@repo/client/client';
 
 interface RoomsSubagentDialogProps {
   botId: string

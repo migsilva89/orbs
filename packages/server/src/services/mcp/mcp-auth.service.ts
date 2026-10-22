@@ -4,7 +4,7 @@ import { mcpAuthActionLogout } from './mcp-auth-action.logout';
 import { mcpAuthActionStart } from './mcp-auth-action.start';
 import { mcpAuthQueryStatus } from './mcp-auth-query.status';
 import type * as McpAuthTypes from '../../types/mcp-auth.types';
-import type { McpAuthTarget } from '@openbots/contracts/universal';
+import type { McpAuthTarget } from '@repo/contracts/universal';
 
 export function makeMcpAuthService(deps: McpAuthTypes.McpAuthServiceDeps) {
   return {

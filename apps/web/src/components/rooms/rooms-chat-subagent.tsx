@@ -1,5 +1,5 @@
-import { useChatSubagent } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useChatSubagent } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useState } from 'react';
 import { match } from 'ts-pattern';
 import { RoomsSubagentDialog } from '@/components/rooms/rooms-subagent-dialog';
@@ -10,7 +10,7 @@ import IconLucideLoaderCircle from '~icons/lucide/loader-circle';
 import IconLucideSquare from '~icons/lucide/square';
 import IconLucideWorkflow from '~icons/lucide/workflow';
 import IconLucideX from '~icons/lucide/x';
-import type { ToolBot, ToolSubagent } from '@openbots/client/client';
+import type { ToolBot, ToolSubagent } from '@repo/client/client';
 import type { DynamicToolUIPart } from 'ai';
 
 interface RoomsChatSubagentProps {

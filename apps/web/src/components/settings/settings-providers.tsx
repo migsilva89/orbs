@@ -1,5 +1,5 @@
-import { useSettingsProviders } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useSettingsProviders } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { match } from 'ts-pattern';

@@ -1,8 +1,8 @@
-import { makeClient } from '@openbots/client/client';
-import { queryMutationCache } from '@openbots/client/react';
-import { Errors } from '@openbots/errors/universal';
 import { ORPCError } from '@orpc/client';
 import { createRouterUtils } from '@orpc/tanstack-query';
+import { makeClient } from '@repo/client/client';
+import { queryMutationCache } from '@repo/client/react';
+import { Errors } from '@repo/errors/universal';
 import { QueryCache, QueryClient } from '@tanstack/react-query';
 import { AppState } from 'react-native';
 import { match } from 'ts-pattern';

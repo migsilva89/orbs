@@ -1,8 +1,8 @@
-import { REPLY, replyMessage } from '@openbots/contracts/universal';
+import { REPLY, replyMessage } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeAttachmentInput, runtimeAttachmentMessage } from './runtime-attachment.utils';
 import type { InputEntry, UserInput } from '@earendil-works/pi-durable';
-import type { Attachment, MessageQuote } from '@openbots/contracts/universal';
+import type { Attachment, MessageQuote } from '@repo/contracts/universal';
 
 export function runtimeMessageInput(conversationId: number, content: UserInput, attachments?: Attachment[], replyTo?: MessageQuote) {
   const attachment = runtimeAttachmentInput(conversationId, content, attachments);

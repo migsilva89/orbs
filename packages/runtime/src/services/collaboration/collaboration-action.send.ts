@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { collaborationActionTarget } from './collaboration-action.target';
 import { collaborationQueryOrigin } from './collaboration-query.origin';

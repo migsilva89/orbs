@@ -1,8 +1,8 @@
 import { Type } from '@earendil-works/pi-ai';
-import { conversationSetReaction } from '@openbots/contracts/universal';
+import { conversationSetReaction } from '@repo/contracts/universal';
 import { z } from 'zod';
 import type { JsonObject } from '@earendil-works/pi-durable';
-import type { MessageQuote } from '@openbots/contracts/universal';
+import type { MessageQuote } from '@repo/contracts/universal';
 
 export interface RuntimeBotReaction extends JsonObject {
   botId: string;

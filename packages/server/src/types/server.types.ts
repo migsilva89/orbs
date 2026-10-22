@@ -1,5 +1,5 @@
 import type { SettingsService } from '../services/settings/settings.service';
-import type { ServerInfo } from '@openbots/contracts/universal';
+import type { ServerInfo } from '@repo/contracts/universal';
 
 export interface ServerServiceDeps {
   settings: SettingsService;

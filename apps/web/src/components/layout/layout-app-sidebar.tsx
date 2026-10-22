@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { RoomsSidebar, RoomsSidebarActions } from '@/components/rooms/rooms-sidebar';
 import * as Sidebar from '@/components/ui/sidebar';
-import BrandsOpenbots from '~icons/brands/openbots';
+import BrandsLogo from '~icons/brands/logo';
 import { LayoutBrand } from './layout-brand';
 import { LayoutNavDevice } from './layout-nav-device';
 import type { ConnectionInfo } from '@/types/connection.types';
@@ -17,7 +17,7 @@ export function LayoutAppSidebar({ connection, ...props }: LayoutAppSidebarProps
       <div className="cursor-default electrobun-webkit-app-region-drag">
         <Sidebar.SidebarHeader className="flex-row items-center desktop:h-13">
           <Link className="flex items-center gap-2 overflow-hidden px-2 outline-none group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 md:hidden" to="/rooms">
-            <BrandsOpenbots aria-hidden="true" className="size-5 shrink-0 text-black dark:text-white" />
+            <BrandsLogo aria-hidden="true" className="size-5 shrink-0 text-black dark:text-white" />
             <LayoutBrand className="group-data-[collapsible=icon]:sr-only" />
           </Link>
           <RoomsSidebarActions />

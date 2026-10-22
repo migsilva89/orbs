@@ -1,10 +1,10 @@
-import { ROOMS_SEND_MODE_DEFAULT, ROOMS_SEND_MODES } from '@openbots/client/client';
-import { conversationWhenBusy } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { ROOMS_SEND_MODE_DEFAULT, ROOMS_SEND_MODES } from '@repo/client/client';
+import { conversationWhenBusy } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
 import IconListOrdered from '~icons/lucide/list-ordered';
-import type { RoomsChat } from '@openbots/client/client';
-import type { useChatSettings } from '@openbots/client/react';
+import type { RoomsChat } from '@repo/client/client';
+import type { useChatSettings } from '@repo/client/react';
 
 interface RoomsSendModeMenuProps {
   chat: RoomsChat

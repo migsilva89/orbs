@@ -1,6 +1,6 @@
 import type { Context } from '@earendil-works/chord/context';
 import type { CommitPublication, Harness } from '@earendil-works/pi-durable';
-import type { NotificationItem, NotificationState } from '@openbots/contracts/universal';
+import type { NotificationItem, NotificationState } from '@repo/contracts/universal';
 
 export type { NotificationItem, NotificationState };
 

@@ -1,7 +1,7 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
-import type { NotificationPlatform } from '@openbots/contracts/universal';
+import type { NotificationPlatform } from '@repo/contracts/universal';
 
 /** Where notifications go when no device is in use: the phone or an open computer. */
 export function useNotificationSettings() {

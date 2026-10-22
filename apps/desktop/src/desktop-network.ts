@@ -1,6 +1,7 @@
 import { lookup } from 'node:dns/promises';
 import { existsSync } from 'node:fs';
 import { hostname, networkInterfaces } from 'node:os';
+import { DESKTOP_BUILD } from './desktop-build';
 import { DESKTOP } from './desktop.constants';
 import { desktopHealth, desktopTailscaleStatus } from './types/desktop.types';
 import type * as DesktopTypes from './types/desktop.types';
@@ -80,7 +81,7 @@ export async function desktopNetworkProbe(address: string, timeoutMs: number = D
 
   const health = desktopHealth.safeParse(await response.json().catch(() => null));
 
-  return { status: health.success ? 'ok' : 'not-openbots', url };
+  return { status: health.success ? 'ok' : 'foreign', url };
 }
 
 export async function desktopNetworkSelf(url: string, server: DesktopTypes.DesktopServer): Promise<boolean> {
@@ -113,7 +114,7 @@ export async function desktopNetworkSelf(url: string, server: DesktopTypes.Deskt
 }
 
 export function desktopNetworkAdvertise(port: number): () => void {
-  const name = `Openbots on ${hostname().replace(/\.local$/u, '')}`;
+  const name = `${DESKTOP_BUILD.name} on ${hostname().replace(/\.local$/u, '')}`;
   const child = Bun.spawn([DESKTOP.find.dnsSd, '-R', name, DESKTOP.find.service, 'local', String(port)], { stdout: 'ignore', stderr: 'ignore' });
 
   return () => child.kill();

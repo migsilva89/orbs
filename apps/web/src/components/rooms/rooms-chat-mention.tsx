@@ -1,4 +1,4 @@
-import { mentionTarget } from '@openbots/client/client';
+import { mentionTarget } from '@repo/client/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { RoomsMention } from '@/components/rooms/rooms-mention';
 import { RoomsMentionCard } from '@/components/rooms/rooms-mention-card';

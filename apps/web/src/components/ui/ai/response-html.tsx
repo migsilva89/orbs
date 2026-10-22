@@ -1,5 +1,5 @@
-import { htmlReplyContent, htmlTitle } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { htmlReplyContent, htmlTitle } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useContext, useState } from 'react';
 import { Block, StreamdownContext } from 'streamdown';
 import { Button } from '@/components/ui/button';

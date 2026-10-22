@@ -1,7 +1,7 @@
 import { conversationQuerySettings } from './conversation-query.settings';
 import { CONVERSATION } from './conversation.constants';
 import type { ConversationServiceDeps } from '../../types/conversation.types';
-import type { ConversationConfigureInput } from '@openbots/contracts/universal';
+import type { ConversationConfigureInput } from '@repo/contracts/universal';
 
 export async function conversationActionConfigure(deps: ConversationServiceDeps, { whenBusy, hideVerbose }: ConversationConfigureInput) {
   await deps.settings.actions.set({

@@ -1,9 +1,9 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { botActionConfigure } from './bot-action.configure';
 import { botRecord } from './bot.utils';
 import type { BotServiceDeps } from '../../types/bot.types';
-import type { BotSwapModelsInput, BotSwapModelsResult } from '@openbots/contracts/universal';
+import type { BotSwapModelsInput, BotSwapModelsResult } from '@repo/contracts/universal';
 
 export async function botActionSwapModels(deps: BotServiceDeps, params: BotSwapModelsInput): Promise<BotSwapModelsResult> {
   deps.runtime.queries.validateModel(params.to);

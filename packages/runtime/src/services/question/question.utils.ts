@@ -1,7 +1,7 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match } from 'ts-pattern';
 import type { QuestionPending, QuestionRecord } from '../../types/question.types';
-import type { QuestionAnswer } from '@openbots/contracts/universal';
+import type { QuestionAnswer } from '@repo/contracts/universal';
 
 export function questionCopy(question: QuestionRecord): QuestionRecord {
   return {

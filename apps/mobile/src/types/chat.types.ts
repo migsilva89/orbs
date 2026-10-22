@@ -1,5 +1,5 @@
-import type * as ClientTypes from '@openbots/client/client';
-import type { ToolCallArtifact } from '@openbots/contracts/universal';
+import type * as ClientTypes from '@repo/client/client';
+import type { ToolCallArtifact } from '@repo/contracts/universal';
 
 type ChatSearchParams = Record<string, string | string[] | undefined>;
 

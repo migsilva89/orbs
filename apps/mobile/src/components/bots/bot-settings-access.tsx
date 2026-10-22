@@ -1,5 +1,5 @@
-import { BOT_PERMISSION_HINTS, BOT_PERMISSION_LABELS } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { BOT_PERMISSION_HINTS, BOT_PERMISSION_LABELS } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { Blocks, FileText, Plug, Shield, ShieldCheck, Sparkles } from 'lucide-react-native';
 import { useController, useFormContext } from 'react-hook-form';
 import { Switch } from 'react-native';
@@ -8,8 +8,8 @@ import { BotSettingsMenuRow } from '@/components/bots/bot-settings-menu-row';
 import { Icon } from '@/components/ui/icon';
 import { Item, ItemContent, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { botMenuPermissions } from '@/services/bot/bot-menu.utils';
-import type { BotInherit } from '@openbots/client/client';
-import type { BotForm } from '@openbots/contracts/universal';
+import type { BotInherit } from '@repo/client/client';
+import type { BotForm } from '@repo/contracts/universal';
 import type { LucideIcon } from 'lucide-react-native';
 
 const BOT_SETTINGS_INHERIT = [

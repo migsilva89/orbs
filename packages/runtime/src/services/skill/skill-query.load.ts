@@ -1,6 +1,6 @@
 import { formatSkillsForPrompt } from '@earendil-works/pi-coding-agent';
-import { conversationContent } from '@openbots/contracts/universal';
-import { log } from '@openbots/logger/server';
+import { conversationContent } from '@repo/contracts/universal';
+import { log } from '@repo/logger/server';
 import { z } from 'zod';
 import { skillQueryResolve } from './skill-query.resolve';
 import type { SkillLoaderServiceDeps, SkillLoadParams, SkillLoadResult } from '../../types/skill.types';

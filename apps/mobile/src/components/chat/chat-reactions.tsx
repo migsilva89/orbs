@@ -1,8 +1,8 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/cn';
-import type { RoomsReactionGroup } from '@openbots/client/client';
+import type { RoomsReactionGroup } from '@repo/client/client';
 
 interface ChatReactionsProps {
   groups: RoomsReactionGroup[];

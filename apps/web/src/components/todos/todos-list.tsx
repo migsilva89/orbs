@@ -1,8 +1,8 @@
 import { DndContext, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { ROOMS, ROOMS_DRAG_PRESS } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { ROOMS, ROOMS_DRAG_PRESS } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { RoomsPrefillLink } from '@/components/rooms/rooms-prefill-link';
 import { TodosItem } from '@/components/todos/todos-item';
@@ -14,7 +14,7 @@ import { toasty } from '@/components/ui/sonner';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconListTodo from '~icons/lucide/list-todo';
 import type { DragEndEvent } from '@dnd-kit/core';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot } from '@repo/contracts/universal';
 
 interface TodosListProps {
   bot: Bot

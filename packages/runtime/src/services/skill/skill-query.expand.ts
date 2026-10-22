@@ -1,5 +1,5 @@
 import { stripFrontmatter } from '@earendil-works/pi-coding-agent';
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { readFileSync } from 'node:fs';
 import { match, P } from 'ts-pattern';
 import { skillQueryResolve } from './skill-query.resolve';

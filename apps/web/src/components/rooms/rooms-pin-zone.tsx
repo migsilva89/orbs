@@ -1,5 +1,5 @@
 import { useDroppable } from '@dnd-kit/core';
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { cn } from '@/lib/cn';
 
 interface RoomsPinZoneProps {

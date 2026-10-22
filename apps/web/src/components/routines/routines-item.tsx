@@ -1,6 +1,6 @@
-import { routinesScheduleText } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
-import { getLocale } from '@openbots/i18n/runtime';
+import { routinesScheduleText } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
+import { getLocale } from '@repo/i18n/runtime';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useHydrated } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ import IconEllipsisVertical from '~icons/lucide/ellipsis-vertical';
 import IconPencil from '~icons/lucide/pencil';
 import IconRotateCw from '~icons/lucide/rotate-cw';
 import IconTrash from '~icons/lucide/trash-2';
-import type { Bot, Routine } from '@openbots/contracts/universal';
+import type { Bot, Routine } from '@repo/contracts/universal';
 
 interface RoutinesItemProps {
   bot: Bot

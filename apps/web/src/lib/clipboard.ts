@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 
 export async function clipboardCopy(text: string): Promise<void> {

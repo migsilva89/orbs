@@ -1,10 +1,10 @@
-import { BOT, botHandle } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { BOT, botHandle } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { FormControl, FormErrorsAndHint, FormField, FormItem, FormLabel } from '@/components/ui/forms/form';
 import { FormInput } from '@/components/ui/forms/form-input';
 import { Input } from '@/components/ui/input';
-import type { BotForm } from '@openbots/contracts/universal';
+import type { BotForm } from '@repo/contracts/universal';
 
 export function BotFormProfile() {
   const form = useFormContext<BotForm>();

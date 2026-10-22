@@ -2,7 +2,7 @@ import { defineDoc } from '@earendil-works/pi-durable';
 import type { RoutineDocument } from '../../types/routine.types';
 
 export const routineDocument = defineDoc<RoutineDocument>({
-  kind: 'openbots.routines',
+  kind: 'bots.routines',
   version: 1,
   scope: 'conversation',
   history: 'latest',

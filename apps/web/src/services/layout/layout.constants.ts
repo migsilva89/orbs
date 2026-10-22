@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import IconBot from '~icons/lucide/bot';
 import IconLayoutDashboard from '~icons/lucide/layout-dashboard';
 import IconSettings from '~icons/lucide/settings';
@@ -6,7 +6,7 @@ import type { LayoutMenuItem } from '@/types/layout.types';
 
 export const LAYOUT_MOBILE_BREAKPOINT = 768;
 
-export const LAYOUT_INSTALL_DISMISSED_KEY = 'openbots.install-dismissed';
+export const LAYOUT_INSTALL_DISMISSED_KEY = 'bots.install-dismissed';
 
 export const LAYOUT_PULL_REFRESH = {
   threshold: 96,

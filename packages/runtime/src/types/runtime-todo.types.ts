@@ -1,5 +1,5 @@
 import { Type } from '@earendil-works/pi-ai';
-import { todoCreate, todoTarget, todoUpdate } from '@openbots/contracts/universal';
+import { todoCreate, todoTarget, todoUpdate } from '@repo/contracts/universal';
 import { z } from 'zod';
 import type { RuntimeServiceDeps } from './runtime.types';
 

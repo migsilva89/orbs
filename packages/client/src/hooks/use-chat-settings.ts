@@ -1,8 +1,8 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ROOMS_SEND_MODES } from '../services/rooms/rooms.constants';
 import { useRpc } from './use-rpc';
-import type { ConversationWhenBusy } from '@openbots/contracts/universal';
+import type { ConversationWhenBusy } from '@repo/contracts/universal';
 
 /** Per-chat pin, hide, mute and send-mode changes, each refreshing the chat list. */
 export function useChatSettings(botId: string) {

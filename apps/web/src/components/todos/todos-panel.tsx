@@ -1,9 +1,9 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { TodosList } from '@/components/todos/todos-list';
 import { PanelRow } from '@/components/ui/panel';
 import IconListTodo from '~icons/lucide/list-todo';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot } from '@repo/contracts/universal';
 
 interface TodosPanelProps {
   bot: Bot

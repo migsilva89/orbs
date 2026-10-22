@@ -2,7 +2,7 @@ import { constants } from 'node:fs';
 import { access, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { WorkspaceServiceDeps } from '../../types/workspace.types';
-import type { BotGetInput } from '@openbots/contracts/universal';
+import type { BotGetInput } from '@repo/contracts/universal';
 
 export async function workspaceActionPrepareDirectory({ root }: WorkspaceServiceDeps, { botId }: BotGetInput) {
   const directory = join(root, 'agents', botId);

@@ -1,5 +1,5 @@
-import { useSettingsProviders } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useSettingsProviders } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { KeyRound, LogIn, LogOut, Plus, RefreshCw } from 'lucide-react-native';
 import { View } from 'react-native';
@@ -14,7 +14,7 @@ import { StatusDot } from '@/components/ui/status-dot';
 import { Text } from '@/components/ui/text';
 import { SettingsProviderLogo } from './settings-provider-logo';
 import { SettingsProviderSession } from './settings-provider-session';
-import type { Provider } from '@openbots/contracts/universal';
+import type { Provider } from '@repo/contracts/universal';
 
 export function SettingsProviders() {
   const router = useRouter();

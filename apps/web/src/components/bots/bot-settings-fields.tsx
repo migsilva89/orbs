@@ -1,6 +1,6 @@
-import { BOT_THINKING_LEVEL_LABELS, botChooseModel, botModelBrand, botModelKey } from '@openbots/client/client';
-import { modelThinkingLevel } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { BOT_THINKING_LEVEL_LABELS, botChooseModel, botModelBrand, botModelKey } from '@repo/client/client';
+import { modelThinkingLevel } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { BotBrandLogo } from '@/components/bots/bot-brand-logo';
 import { Combobox } from '@/components/ui/combobox';
@@ -8,8 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { ComboboxGroup } from '@/components/ui/combobox';
-import type { BotSettings } from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type { BotSettings } from '@repo/client/client';
+import type { Bot } from '@repo/contracts/universal';
 
 interface BotSettingsFieldsProps {
   value: BotSettings

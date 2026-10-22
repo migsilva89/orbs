@@ -21,6 +21,7 @@ import { Route as botsBotsDotindexRouteImport } from "./../routes/bots/bots.inde
 import { Route as botsBotsDotbotIdRouteImport } from "./../routes/bots/bots.$botId";
 import { Route as botsBotsDotcreateRouteImport } from "./../routes/bots/bots.create";
 import { Route as roomsRoomsDotindexRouteImport } from "./../routes/rooms/rooms.index";
+import { Route as handlersHandlerDotwebmanifestRouteImport } from "./../routes/handlers/handler.webmanifest";
 import { Route as botsBotsDotbotIdDotdeleteRouteImport } from "./../routes/bots/bots.$botId.delete";
 import { Route as roomsRoomsDotdirectDothandleRouteImport } from "./../routes/rooms/rooms.direct.$handle";
 import { Route as settingsSettingsDotthemesDotcreateRouteImport } from "./../routes/settings/settings.themes.create";
@@ -96,6 +97,12 @@ const roomsRoomsDotindexRoute = roomsRoomsDotindexRouteImport.update({
   path: "/rooms/",
   getParentRoute: () => chatDotlayoutRoute,
 } as any);
+const handlersHandlerDotwebmanifestRoute =
+  handlersHandlerDotwebmanifestRouteImport.update({
+    id: "/img/favicon/site.webmanifest",
+    path: "/img/favicon/site.webmanifest",
+    getParentRoute: () => rootRouteImport,
+  } as any);
 const botsBotsDotbotIdDotdeleteRoute =
   botsBotsDotbotIdDotdeleteRouteImport.update({
     id: "/delete",
@@ -178,6 +185,7 @@ export interface FileRoutesByFullPath {
   "/lab/avatars": typeof labLabDotavatarsRoute;
   "/bots/$botId": typeof botsBotsDotbotIdRouteWithChildren;
   "/bots/create": typeof botsBotsDotcreateRoute;
+  "/img/favicon/site.webmanifest": typeof handlersHandlerDotwebmanifestRoute;
   "/artifacts/": typeof artifactsArtifactsDotindexRoute;
   "/bots/": typeof botsBotsDotindexRoute;
   "/rooms/": typeof roomsRoomsDotindexRoute;
@@ -201,6 +209,7 @@ export interface FileRoutesByTo {
   "/lab/avatars": typeof labLabDotavatarsRoute;
   "/bots/$botId": typeof botsBotsDotbotIdRouteWithChildren;
   "/bots/create": typeof botsBotsDotcreateRoute;
+  "/img/favicon/site.webmanifest": typeof handlersHandlerDotwebmanifestRoute;
   "/artifacts": typeof artifactsArtifactsDotindexRoute;
   "/bots": typeof botsBotsDotindexRoute;
   "/rooms": typeof roomsRoomsDotindexRoute;
@@ -228,6 +237,7 @@ export interface FileRoutesById {
   "/lab/avatars": typeof labLabDotavatarsRoute;
   "/_chat/bots/$botId": typeof botsBotsDotbotIdRouteWithChildren;
   "/_chat/bots/create": typeof botsBotsDotcreateRoute;
+  "/img/favicon/site.webmanifest": typeof handlersHandlerDotwebmanifestRoute;
   "/_chat/artifacts/": typeof artifactsArtifactsDotindexRoute;
   "/_chat/bots/": typeof botsBotsDotindexRoute;
   "/_chat/rooms/": typeof roomsRoomsDotindexRoute;
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | "/lab/avatars"
     | "/bots/$botId"
     | "/bots/create"
+    | "/img/favicon/site.webmanifest"
     | "/artifacts/"
     | "/bots/"
     | "/rooms/"
@@ -278,6 +289,7 @@ export interface FileRouteTypes {
     | "/lab/avatars"
     | "/bots/$botId"
     | "/bots/create"
+    | "/img/favicon/site.webmanifest"
     | "/artifacts"
     | "/bots"
     | "/rooms"
@@ -304,6 +316,7 @@ export interface FileRouteTypes {
     | "/lab/avatars"
     | "/_chat/bots/$botId"
     | "/_chat/bots/create"
+    | "/img/favicon/site.webmanifest"
     | "/_chat/artifacts/"
     | "/_chat/bots/"
     | "/_chat/rooms/"
@@ -326,6 +339,7 @@ export interface RootRouteChildren {
   chatDotlayoutRoute: typeof chatDotlayoutRouteWithChildren;
   connectConnectRoute: typeof connectConnectRoute;
   labLabDotavatarsRoute: typeof labLabDotavatarsRoute;
+  handlersHandlerDotwebmanifestRoute: typeof handlersHandlerDotwebmanifestRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -413,6 +427,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/rooms/";
       preLoaderRoute: typeof roomsRoomsDotindexRouteImport;
       parentRoute: typeof chatDotlayoutRoute;
+    };
+    "/img/favicon/site.webmanifest": {
+      id: "/img/favicon/site.webmanifest";
+      path: "/img/favicon/site.webmanifest";
+      fullPath: "/img/favicon/site.webmanifest";
+      preLoaderRoute: typeof handlersHandlerDotwebmanifestRouteImport;
+      parentRoute: typeof rootRouteImport;
     };
     "/_chat/bots/$botId/delete": {
       id: "/_chat/bots/$botId/delete";
@@ -622,6 +643,7 @@ const rootRouteChildren: RootRouteChildren = {
   chatDotlayoutRoute: chatDotlayoutRouteWithChildren,
   connectConnectRoute: connectConnectRoute,
   labLabDotavatarsRoute: labLabDotavatarsRoute,
+  handlersHandlerDotwebmanifestRoute: handlersHandlerDotwebmanifestRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

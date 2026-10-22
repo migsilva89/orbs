@@ -1,5 +1,5 @@
 import type { ModelRuntime } from '@earendil-works/pi-coding-agent';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export interface ProviderServiceDeps {
   models: ModelRuntime;

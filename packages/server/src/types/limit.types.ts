@@ -1,6 +1,6 @@
 import type { SettingsService } from '../services/settings/settings.service';
-import type { LimitSettings } from '@openbots/contracts/universal';
 import type { RateLimiter } from '@orpc/ratelimit';
+import type { LimitSettings } from '@repo/contracts/universal';
 
 export interface LimitServiceDeps {
   settings: SettingsService;

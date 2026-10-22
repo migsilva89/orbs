@@ -1,5 +1,5 @@
 import type { TodoServiceDeps } from '../../types/todo.types';
-import type { TodoTarget } from '@openbots/contracts/universal';
+import type { TodoTarget } from '@repo/contracts/universal';
 
 export async function todoActionRemove({ bots, runtime }: TodoServiceDeps, params: TodoTarget) {
   await bots.queries.get({ botId: params.botId });

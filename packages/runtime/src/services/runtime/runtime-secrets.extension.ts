@@ -1,11 +1,11 @@
 import { defineExtension, hook, section, ToolTask } from '@earendil-works/pi-durable';
-import * as m from '@openbots/i18n/messages';
+import * as m from '@repo/i18n/messages';
 import type { RuntimeSecretsParams } from '../../types/runtime.types';
 
 /** Lists stored secrets in the system prompt, and replaces their values in every tool result before the model or the transcript sees it. */
 export function runtimeSecretsExtension({ secrets }: RuntimeSecretsParams) {
   return defineExtension({
-    name: 'openbots.secrets',
+    name: 'bots.secrets',
     sections: [section('secrets', async () => {
       const rules = await secrets.queries.rules();
 

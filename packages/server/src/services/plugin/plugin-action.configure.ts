@@ -2,7 +2,7 @@ import { match } from 'ts-pattern';
 import { pluginQuerySettings } from './plugin-query.settings';
 import { PLUGIN } from './plugin.constants';
 import type { PluginServiceDeps } from '../../types/plugin.types';
-import type { PluginConfigureInput } from '@openbots/contracts/universal';
+import type { PluginConfigureInput } from '@repo/contracts/universal';
 
 export async function pluginActionConfigure(deps: PluginServiceDeps, { directories }: PluginConfigureInput) {
   await match(directories)

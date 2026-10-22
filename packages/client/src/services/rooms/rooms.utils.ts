@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { match, P } from 'ts-pattern';
 import { toolInputText } from '../tool/tool.utils';
 import { ROOMS } from './rooms.constants';

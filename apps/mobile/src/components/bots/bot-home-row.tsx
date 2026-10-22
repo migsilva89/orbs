@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { match, P } from 'ts-pattern';
@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Item, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
 import { Text } from '@/components/ui/text';
 import { botHomeTime } from '@/services/bot/bot-home.utils';
-import type { ConversationListItem } from '@openbots/contracts/universal';
+import type { ConversationListItem } from '@repo/contracts/universal';
 
 interface BotHomeRowProps {
   chat: ConversationListItem;

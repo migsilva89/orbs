@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
 import type { BotDeleteParams } from '../types/bot.types';

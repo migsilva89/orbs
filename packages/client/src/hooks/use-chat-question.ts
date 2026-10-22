@@ -1,12 +1,12 @@
-import { m } from '@openbots/i18n/client';
 import { ORPCError } from '@orpc/client';
+import { m } from '@repo/i18n/client';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { match, P } from 'ts-pattern';
 import { chatAnswerProblem } from '../services/chat/chat.utils';
 import { roomsQuestionText } from '../services/rooms/rooms.utils';
 import { useRpc } from './use-rpc';
-import type { ConversationQuestion, QuestionAnswerInput } from '@openbots/contracts/universal';
+import type { ConversationQuestion, QuestionAnswerInput } from '@repo/contracts/universal';
 
 /** The state of a bot question card: picked choices, a typed answer or secret, and sending, skipping or choosing. */
 export function useChatQuestion(question: ConversationQuestion) {

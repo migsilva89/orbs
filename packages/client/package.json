@@ -1,5 +1,5 @@
 {
-  "name": "@openbots/client",
+  "name": "@repo/client",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@legendapp/list": "catalog:mobile",
-    "@openbots/typescript-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@orpc/tanstack-query": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@types/node": "catalog:",
@@ -41,10 +41,10 @@
   "dependencies": {
     "@earendil-works/chord": "catalog:",
     "@json-render/core": "catalog:",
-    "@openbots/avatar-blobs": "workspace:*",
-    "@openbots/contracts": "workspace:*",
-    "@openbots/errors": "workspace:*",
-    "@openbots/i18n": "workspace:*",
+    "@repo/avatar-blobs": "workspace:*",
+    "@repo/contracts": "workspace:*",
+    "@repo/errors": "workspace:*",
+    "@repo/i18n": "workspace:*",
     "@orpc/client": "catalog:",
     "@orpc/contract": "catalog:",
     "ai": "catalog:",

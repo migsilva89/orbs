@@ -1,5 +1,5 @@
-import { m } from '@openbots/i18n/client';
-import { getLocale } from '@openbots/i18n/runtime';
+import { m } from '@repo/i18n/client';
+import { getLocale } from '@repo/i18n/runtime';
 import { RoomsChatEmojiLoading } from '@/components/rooms/rooms-chat-emoji-loading';
 import { EmojiPicker, EmojiPickerContent, EmojiPickerSearch } from '@/components/ui/emoji-picker';
 

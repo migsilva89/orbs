@@ -1,5 +1,5 @@
 import { ConversationBusy } from '@earendil-works/pi-durable';
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeActionInterrupt } from './runtime-action.interrupt';
 import { runtimeMessageInput } from './runtime-message.utils';

@@ -1,6 +1,6 @@
-import { ROOMS } from '@openbots/client/client';
-import { useChatMessageReaction } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { ROOMS } from '@repo/client/client';
+import { useChatMessageReaction } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { setStringAsync } from 'expo-clipboard';
 import { useRouter } from 'expo-router';
 import { Copy, Reply, SmilePlus, TextSelect } from 'lucide-react-native';
@@ -10,7 +10,7 @@ import { Text } from '@/components/ui/text';
 import { useChatReturn } from '@/hooks/use-chat-return';
 import { useConnection } from '@/hooks/use-connection';
 import { useToast } from '@/hooks/use-toast';
-import type { ChatMessageReactionParams } from '@openbots/client/client';
+import type { ChatMessageReactionParams } from '@repo/client/client';
 
 interface ChatMessageActionsProps extends ChatMessageReactionParams {
   from: 'user' | 'assistant';

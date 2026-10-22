@@ -1,6 +1,6 @@
-import { CHAT, chatPairMessages } from '@openbots/client/client';
-import { chatViewOptions, useChatRoom } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { CHAT, chatPairMessages } from '@repo/client/client';
+import { chatViewOptions, useChatRoom } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { RoomsChatRuns } from '@/components/rooms/rooms-chat-runs';
@@ -11,7 +11,7 @@ import { MessageScrollerProvider } from '@/components/ui/message-scroller';
 import { roomsLink } from '@/services/rooms/rooms.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
-import type { Bot, ConversationView } from '@openbots/contracts/universal';
+import type { Bot, ConversationView } from '@repo/contracts/universal';
 
 interface RoomsPairViewProps {
   sender: Bot

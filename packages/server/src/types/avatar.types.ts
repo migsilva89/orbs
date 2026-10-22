@@ -1,6 +1,6 @@
 import type { AvatarImageService } from '../services/avatar/avatar-image.service';
 import type { BotService } from '../services/bot/bot.service';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot } from '@repo/contracts/universal';
 
 export interface AvatarImageDeps {
   root: string;

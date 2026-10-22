@@ -1,5 +1,5 @@
-import { AVATAR } from '@openbots/contracts/universal';
-import { log } from '@openbots/logger/server';
+import { AVATAR } from '@repo/contracts/universal';
+import { log } from '@repo/logger/server';
 import { NOTIFICATION } from './notification.constants';
 import { notificationBody } from './notification.utils';
 import type { NotificationSendParams, NotificationServiceDeps } from '../../types/notification.types';

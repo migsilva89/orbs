@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { ConnectCard } from '@/components/connect/connect-card';
 import { seoHead } from '@/services/seo/seo.utils';

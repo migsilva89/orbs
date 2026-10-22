@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { ClientOnly, Link } from '@tanstack/react-router';
 import { useId, useState } from 'react';
 import { SettingsPanel } from '@/components/settings/settings-panel';

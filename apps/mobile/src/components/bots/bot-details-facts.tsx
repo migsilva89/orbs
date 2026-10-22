@@ -1,7 +1,7 @@
-import { getLocale, m } from '@openbots/i18n/client';
+import { getLocale, m } from '@repo/i18n/client';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { Item, ItemContent, ItemGroup, ItemTitle, ItemValue } from '@/components/ui/item';
-import type { Bot, ConversationListItem } from '@openbots/contracts/universal';
+import type { Bot, ConversationListItem } from '@repo/contracts/universal';
 
 interface BotDetailsFactsProps {
   bot: Bot;

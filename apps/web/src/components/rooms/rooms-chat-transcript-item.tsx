@@ -4,8 +4,8 @@ import { RoomsChatNotice } from '@/components/rooms/rooms-chat-notice';
 import { RoomsChatReactions } from '@/components/rooms/rooms-chat-reactions';
 import { RoomsChatReply } from '@/components/rooms/rooms-chat-reply';
 import { MessageScrollerItem } from '@/components/ui/message-scroller';
-import type { ChatMessage, RoomsReactionGroup } from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type { ChatMessage, RoomsReactionGroup } from '@repo/client/client';
+import type { Bot } from '@repo/contracts/universal';
 
 interface RoomsChatTranscriptItemProps {
   message: ChatMessage

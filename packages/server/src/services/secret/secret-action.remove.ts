@@ -1,7 +1,7 @@
 import { secretQueryRules } from './secret-query.rules';
 import { SECRET } from './secret.constants';
 import type { SecretServiceDeps } from '../../types/secret.types';
-import type { SecretRemoveInput } from '@openbots/contracts/universal';
+import type { SecretRemoveInput } from '@repo/contracts/universal';
 
 export async function secretActionRemove(deps: SecretServiceDeps, { name }: SecretRemoveInput) {
   const rules = await secretQueryRules(deps);

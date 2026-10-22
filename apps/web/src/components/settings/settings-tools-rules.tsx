@@ -1,5 +1,5 @@
-import { toolApprovalRules } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { toolApprovalRules } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import IconPencil from '~icons/lucide/pencil';
 import IconTrash2 from '~icons/lucide/trash-2';
-import type { ToolApprovalRule, ToolSettingsForm } from '@openbots/contracts/universal';
+import type { ToolApprovalRule, ToolSettingsForm } from '@repo/contracts/universal';
 
 const SETTINGS_TOOLS_RULE_BEHAVIOR = {
   allow: m.settings_tools_rules_allow,

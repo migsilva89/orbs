@@ -1,5 +1,5 @@
 {
-  "name": "@openbots/server",
+  "name": "@repo/server",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -9,7 +9,7 @@
     "lint:fix": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
   },
   "devDependencies": {
-    "@openbots/typescript-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:"
   },
@@ -22,12 +22,12 @@
   },
   "dependencies": {
     "uqr": "catalog:",
-    "@openbots/errors": "workspace:*",
-    "@openbots/logger": "workspace:*",
-    "@openbots/runtime": "workspace:*",
+    "@repo/errors": "workspace:*",
+    "@repo/logger": "workspace:*",
+    "@repo/runtime": "workspace:*",
     "kysely": "catalog:",
     "zod": "catalog:",
-    "@openbots/contracts": "workspace:*",
+    "@repo/contracts": "workspace:*",
     "@orpc/server": "catalog:",
     "@orpc/shared": "catalog:",
     "@orpc/ratelimit": "catalog:",
@@ -35,8 +35,8 @@
     "ts-pattern": "catalog:",
     "@typesafe-ai/sdk": "catalog:",
     "@earendil-works/pi-coding-agent": "catalog:",
-    "@openbots/i18n": "workspace:*",
+    "@repo/i18n": "workspace:*",
     "takumi-js": "catalog:",
-    "@openbots/avatar-blobs": "workspace:*"
+    "@repo/avatar-blobs": "workspace:*"
   }
 }

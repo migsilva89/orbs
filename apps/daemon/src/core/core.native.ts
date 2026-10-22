@@ -1,5 +1,5 @@
-import { env } from '@openbots/env/server';
-import { log } from '@openbots/logger/server';
+import { env } from '@repo/env/server';
+import { log } from '@repo/logger/server';
 import {
   makeAlarmService,
   makeImageService,
@@ -12,11 +12,11 @@ import {
   makeStorageLockService,
   makeStorageService,
   runtimeEnvNative,
-} from '@openbots/runtime/native';
-import { makeSecretBrokerService, makeSecretProxyService } from '@openbots/secret-proxy/native';
+} from '@repo/runtime/native';
+import { makeSecretBrokerService, makeSecretProxyService } from '@repo/secret-proxy/native';
 import { join } from 'node:path';
-import { credentialsKeyNative, makeAttachmentStorageService, makeAvatarImageService, makeDatabaseService, makeMcpService, makeWorkspaceService, workspacePathsNative } from '@openbots/server/native';
-import { makeCredentialsService, makeSecretService, makeServices, makeSettingsService } from '@openbots/server/server';
+import { credentialsKeyNative, makeAttachmentStorageService, makeAvatarImageService, makeDatabaseService, makeMcpService, makeWorkspaceService, workspacePathsNative } from '@repo/server/native';
+import { makeCredentialsService, makeSecretService, makeServices, makeSettingsService } from '@repo/server/server';
 import { coreLocalNative } from './core-local.native';
 import { corePairingNative } from './core-pairing.native';
 import { coreServerNative } from './core-server.native';
@@ -38,12 +38,12 @@ export async function coreNativeRun(): Promise<void> {
   log.info({
     tag: 'daemon',
     message: 'Daemon started',
-    host: env.OPENBOTS_HOST,
+    host: env.DAEMON_HOST,
     port: server.port,
   });
 
   resources.defer(corePairingNative(services));
-  process.send?.('openbots:ready');
+  process.send?.('daemon:ready');
 
   await stopped;
 }
@@ -65,7 +65,7 @@ function coreNativeSignals(resources: AsyncDisposableStack): Promise<void> {
 }
 
 async function coreNativeServices(resources: AsyncDisposableStack) {
-  const paths = await workspacePathsNative(env.OPENBOTS_DATA_DIR);
+  const paths = await workspacePathsNative(env.DATA_DIR);
 
   const lock = await makeStorageLockService({ path: paths.lock });
   resources.defer(() => lock.close());
@@ -80,7 +80,7 @@ async function coreNativeServices(resources: AsyncDisposableStack) {
   resources.defer(() => providers.close());
   const credentialsKey = await credentialsKeyNative(paths.data);
   const credentials = makeCredentialsService({ database, key: credentialsKey });
-  const mcpAuth = makeMcpAuthService({ credentials });
+  const mcpAuth = makeMcpAuthService({ credentials, appName: env.APP_NAME });
   resources.defer(() => mcpAuth.close());
   const settings = makeSettingsService({ database });
   const secrets = makeSecretService({ credentials, settings });
@@ -119,6 +119,7 @@ async function coreNativeServices(resources: AsyncDisposableStack) {
     mcpAuth,
     providers,
     runtime: {
+      appName: env.APP_NAME,
       storage: makeStorageService({ root: paths.bots }),
       alarm,
       models: providers.models,

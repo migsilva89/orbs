@@ -1,8 +1,8 @@
-import { useChatAround } from '@openbots/client/react';
+import { useChatAround } from '@repo/client/react';
 import { useEffect } from 'react';
 import { RoomsChatTranscript } from '@/components/rooms/rooms-chat-transcript';
-import type { ChatMessage } from '@openbots/client/client';
-import type { Bot, ConversationView } from '@openbots/contracts/universal';
+import type { ChatMessage } from '@repo/client/client';
+import type { Bot, ConversationView } from '@repo/contracts/universal';
 
 interface RoomsChatAroundProps {
   bot: Bot

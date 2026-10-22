@@ -1,7 +1,7 @@
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, Tooltip, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartLegendItems, ChartTooltipContent } from '@/components/ui/chart';
 import { ARTIFACTS } from '@/services/artifacts/artifacts.constants';
-import type { ArtifactsChart } from '@openbots/client/client';
+import type { ArtifactsChart } from '@repo/client/client';
 
 interface ArtifactChartProps {
   chart: ArtifactsChart

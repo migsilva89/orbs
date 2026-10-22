@@ -1,5 +1,5 @@
-import { useChatSubagent } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useChatSubagent } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { Check, ChevronRight, Square, X } from 'lucide-react-native';
 import { ActivityIndicator, Pressable } from 'react-native';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { QuestionCard, QuestionCardHeader, QuestionCardOptions } from '@/components/ui/question-card';
 import { Text } from '@/components/ui/text';
-import type { ToolPart, ToolSubagent } from '@openbots/client/client';
+import type { ToolPart, ToolSubagent } from '@repo/client/client';
 
 interface ChatSubagentProps {
   botId: string;

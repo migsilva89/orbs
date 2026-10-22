@@ -1,7 +1,7 @@
 import { match, P } from 'ts-pattern';
 import { pluginScan } from './plugin-files.utils';
 import type { PluginLoaderServiceDeps, PluginLoadParams } from '../../types/plugin.types';
-import type { PluginCatalog } from '@openbots/contracts/universal';
+import type { PluginCatalog } from '@repo/contracts/universal';
 
 export async function pluginQueryDiscover(
   deps: PluginLoaderServiceDeps,

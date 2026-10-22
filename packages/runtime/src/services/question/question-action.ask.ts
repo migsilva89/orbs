@@ -1,6 +1,6 @@
 import { awaitWithContext } from '@earendil-works/chord/context';
-import { secretRule } from '@openbots/contracts/universal';
-import * as m from '@openbots/i18n/messages';
+import { secretRule } from '@repo/contracts/universal';
+import * as m from '@repo/i18n/messages';
 import { match, P } from 'ts-pattern';
 import { QUESTION, questionDocument } from './question.constants';
 import { questionCopy } from './question.utils';

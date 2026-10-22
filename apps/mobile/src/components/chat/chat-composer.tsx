@@ -1,7 +1,7 @@
-import { chatResetCommand, mentionLinks, mentionQuery, mentionSegments, roomsMessageText } from '@openbots/client/client';
-import { useChatAttachmentsNative } from '@openbots/client/native';
-import { useChatSend } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { chatResetCommand, mentionLinks, mentionQuery, mentionSegments, roomsMessageText } from '@repo/client/client';
+import { useChatAttachmentsNative } from '@repo/client/native';
+import { useChatSend } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { ArrowUp, Plus, Square } from 'lucide-react-native';
 import { useState } from 'react';
@@ -17,8 +17,8 @@ import { useToast } from '@/hooks/use-toast';
 import { ChatMentions } from './chat-mentions';
 import { ChatQueue } from './chat-queue';
 import type { RpcSession } from '@/types/rpc.types';
-import type * as ClientTypes from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type * as ClientTypes from '@repo/client/client';
+import type { Bot } from '@repo/contracts/universal';
 import type { Dispatch, SetStateAction } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 

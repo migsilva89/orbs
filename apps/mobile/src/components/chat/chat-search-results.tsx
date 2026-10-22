@@ -1,11 +1,11 @@
-import { roomsSearchSnippet } from '@openbots/client/client';
-import { getLocale, m } from '@openbots/i18n/client';
+import { roomsSearchSnippet } from '@repo/client/client';
+import { getLocale, m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { Item, ItemContent } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
-import type { RoomsSearchResults } from '@openbots/client/client';
+import type { RoomsSearchResults } from '@repo/client/client';
 
 interface ChatSearchResultsProps {
   results: RoomsSearchResults;

@@ -1,6 +1,6 @@
-import { CHAT, mentionQuote } from '@openbots/client/client';
-import { chatViewOptions, useChatRoom } from '@openbots/client/react';
-import { useChatQuote, useChatRead } from '@openbots/client/web';
+import { CHAT, mentionQuote } from '@repo/client/client';
+import { chatViewOptions, useChatRoom } from '@repo/client/react';
+import { useChatQuote, useChatRead } from '@repo/client/web';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
@@ -15,8 +15,8 @@ import { LAYOUT_SHORTCUT_OPTIONS, LAYOUT_SHORTCUT_OVERLAYS, LAYOUT_SHORTCUTS } f
 import { rpc } from '@/services/rpc/rpc.client';
 import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
 import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
-import type { ChatMessage, ChatOutgoing, RoomsChat as RoomsChatItem } from '@openbots/client/client';
-import type { Bot, ConversationView } from '@openbots/contracts/universal';
+import type { ChatMessage, ChatOutgoing, RoomsChat as RoomsChatItem } from '@repo/client/client';
+import type { Bot, ConversationView } from '@repo/contracts/universal';
 
 interface RoomsChatViewProps {
   bot: Bot

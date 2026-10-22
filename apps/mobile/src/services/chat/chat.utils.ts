@@ -1,8 +1,8 @@
-import { botUsageLabel, htmlReplySegments, toolBlocks } from '@openbots/client/client';
-import { getLocale, m } from '@openbots/i18n/client';
+import { botUsageLabel, htmlReplySegments, toolBlocks } from '@repo/client/client';
+import { getLocale, m } from '@repo/i18n/client';
 import { match } from 'ts-pattern';
 import type * as ChatTypes from '@/types/chat.types';
-import type { ChatMessage } from '@openbots/client/client';
+import type { ChatMessage } from '@repo/client/client';
 
 export function chatMessageDetails(message: ChatMessage): string[] {
   const date = new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium', timeStyle: 'short' });

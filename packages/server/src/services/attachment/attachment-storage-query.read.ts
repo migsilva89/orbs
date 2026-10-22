@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { constants } from 'node:fs';
 import { open } from 'node:fs/promises';
 import { dirname } from 'node:path';

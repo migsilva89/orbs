@@ -1,6 +1,6 @@
 import { InboxDoc } from '@earendil-works/pi-durable';
-import { REPLY } from '@openbots/contracts/universal';
-import { Errors } from '@openbots/errors/universal';
+import { REPLY } from '@repo/contracts/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeActionInterrupt } from './runtime-action.interrupt';
 import { RUNTIME_ATTACHMENT_ENTRY } from './runtime-attachment.constants';
@@ -11,7 +11,7 @@ import type { RuntimeQueuedInput } from '../../types/attachment.types';
 import type { RuntimeServiceDeps, RuntimeUpdateSubmissionParams } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ConversationId, SubmissionId } from '@earendil-works/pi-durable';
-import type { MessageQuote } from '@openbots/contracts/universal';
+import type { MessageQuote } from '@repo/contracts/universal';
 
 export async function runtimeActionUpdateSubmission(
   deps: RuntimeServiceDeps,

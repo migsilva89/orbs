@@ -1,7 +1,7 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { CronExpressionParser } from 'cron-parser';
 import { match } from 'ts-pattern';
-import type { RoutineSchedule } from '@openbots/contracts/universal';
+import type { RoutineSchedule } from '@repo/contracts/universal';
 
 export function routineNextRunAt(schedule: RoutineSchedule, after: number): number {
   return match(schedule)

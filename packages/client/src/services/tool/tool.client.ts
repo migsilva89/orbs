@@ -1,9 +1,9 @@
-import { toolCallArtifact, toolCallPeerDetails, toolCallSubagent, toolCallSubagentDetails } from '@openbots/contracts/universal';
+import { toolCallArtifact, toolCallPeerDetails, toolCallSubagent, toolCallSubagentDetails } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { TOOL_ARTIFACT_NAMES, TOOL_MCP_NAME, TOOL_PATH_KEYS, TOOL_PEER_NAMES, TOOL_PRESENTATIONS, TOOL_PREVIEW_KEYS, TOOL_QUESTION, TOOL_SUBAGENT } from './tool.constants';
 import { toolInputText, toolInputTexts, toolReadableName } from './tool.utils';
 import type * as ToolTypes from '../../types/tool.types';
-import type { Bot, ToolCallArtifact } from '@openbots/contracts/universal';
+import type { Bot, ToolCallArtifact } from '@repo/contracts/universal';
 import type { DynamicToolUIPart } from 'ai';
 
 export function toolBlocks({ parts, hideVerbose = false }: ToolTypes.ToolBlocksParams): ToolTypes.ToolBlock[] {

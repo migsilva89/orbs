@@ -1,5 +1,5 @@
 import { defineDoc, defineDocFamily, defineEntry } from '@earendil-works/pi-durable';
-import { ARTIFACT } from '@openbots/contracts/universal';
+import { ARTIFACT } from '@repo/contracts/universal';
 import type { ArtifactContent, ArtifactDocument, ArtifactVersionData } from '../../types/artifact.types';
 
 export const artifactDocument = defineDoc<ArtifactDocument>({

@@ -2,14 +2,14 @@ import { defineDoc, defineDocFamily } from '@earendil-works/pi-durable';
 import type { RuntimeApproval, RuntimeBotBinding } from '../../types/runtime.types';
 
 export const runtimeToolApproval = defineDoc({
-  kind: 'openbots.tool-approval',
+  kind: 'bots.tool-approval',
   version: 1,
   scope: 'task',
   initial: (): { approval: RuntimeApproval | null } => ({ approval: null }),
 });
 
 export const runtimeBot = defineDoc({
-  kind: 'openbots.bot',
+  kind: 'bots.bot',
   version: 1,
   scope: 'conversation',
   history: 'latest',
@@ -18,7 +18,7 @@ export const runtimeBot = defineDoc({
 });
 
 export const runtimeBotConversations = defineDocFamily<RuntimeBotBinding, null>({
-  kind: 'openbots.bot-conversation',
+  kind: 'bots.bot-conversation',
   version: 1,
   scope: 'session',
   family: true,

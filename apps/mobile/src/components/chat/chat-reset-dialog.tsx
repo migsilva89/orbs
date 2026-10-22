@@ -1,5 +1,5 @@
-import { useChatReset } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useChatReset } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { match, P } from 'ts-pattern';

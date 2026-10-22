@@ -1,6 +1,6 @@
 import { BACKGROUND_CONTEXT } from '@earendil-works/chord/context';
 import { createToolSearchExtension } from '@earendil-works/pi-durable/tool-search';
-import { log } from '@openbots/logger/server';
+import { log } from '@repo/logger/server';
 import { match, P } from 'ts-pattern';
 import { artifactBlocksCatalog } from '../artifact/artifact-blocks.utils';
 import { collaborationExtension } from '../collaboration/collaboration.extension';
@@ -76,9 +76,10 @@ import type { RuntimeSearchParams } from '../../types/history.types';
 import type { RuntimeRegisterBotToolsParams } from '../../types/runtime-bot-tools.types';
 import type * as RuntimeTypes from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export async function makeRuntimeService({
+  appName,
   storage,
   alarm,
   models: sourceModels,
@@ -100,6 +101,7 @@ export async function makeRuntimeService({
 
   // One model limiter and one extension list for every bot store.
   const shared: RuntimeTypes.RuntimeSharedDeps = {
+    appName,
     storage,
     alarm,
     models: runtimeModels(sourceModels),

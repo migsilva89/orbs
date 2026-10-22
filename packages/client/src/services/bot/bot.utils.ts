@@ -1,11 +1,11 @@
-import { COLOR_BY_ID } from '@openbots/avatar-blobs/skins';
-import { getLocale, m } from '@openbots/i18n/client';
+import { COLOR_BY_ID } from '@repo/avatar-blobs/skins';
+import { getLocale, m } from '@repo/i18n/client';
 import { match, P } from 'ts-pattern';
 import { BOT, BOT_BUBBLE_TEXT, BOT_MODEL_BRAND_PREFIXES, BOT_MODEL_VERSION_PATTERN, BOT_PROVIDER_BRAND_PREFIXES } from './bot.constants';
 import type * as BotTypes from '../../types/bot.types';
 import type { ChatActivity, ChatUsage } from '../../types/chat.types';
-import type { ExpressionId } from '@openbots/avatar-blobs/expressions';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type { ExpressionId } from '@repo/avatar-blobs/expressions';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function botSkillName({ name }: BotTypes.BotSkillNameParams): string {
   return name

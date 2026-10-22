@@ -5,7 +5,7 @@ import { watchNotifications } from '../../notifications';
 import { CHAT } from './chat.constants';
 import type { ChatHistoryParams } from '../../types/chat.types';
 import type { RpcContextValue } from '../../types/rpc.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function chatViewOptions({ client, rpc }: RpcContextValue, target: UniversalTypes.ConversationTarget) {
   return queryOptions({

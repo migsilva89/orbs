@@ -4,7 +4,7 @@ import Svg, { Line, Path, Rect } from 'react-native-svg';
 import { useCSSVariable } from 'uniwind';
 import { Text } from '@/components/ui/text';
 import { ARTIFACTS } from '@/services/artifacts/artifacts.constants';
-import type { ArtifactsChart } from '@openbots/client/client';
+import type { ArtifactsChart } from '@repo/client/client';
 
 interface ArtifactChartProps {
   chart: ArtifactsChart;

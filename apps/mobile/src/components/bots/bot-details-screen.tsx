@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
@@ -18,7 +18,7 @@ import { useChatReturn } from '@/hooks/use-chat-return';
 import { useConnection } from '@/hooks/use-connection';
 import type { BotDetailsTab } from '@/types/bot-details.types';
 import type { RpcSession } from '@/types/rpc.types';
-import type { Bot, ConversationListItem } from '@openbots/contracts/universal';
+import type { Bot, ConversationListItem } from '@repo/contracts/universal';
 
 interface BotDetailsScreenProps {
   botId: string;

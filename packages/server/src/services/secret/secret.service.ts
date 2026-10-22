@@ -5,7 +5,7 @@ import { secretQueryRules } from './secret-query.rules';
 import { secretQuerySettings } from './secret-query.settings';
 import { secretQueryValue } from './secret-query.value';
 import type * as SecretTypes from '../../types/secret.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function makeSecretService(deps: SecretTypes.SecretServiceDeps) {
   return {

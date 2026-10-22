@@ -1,10 +1,10 @@
-import { ROOMS_MUTE_DURATIONS } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { ROOMS_MUTE_DURATIONS } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { DropdownMenuItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
 import IconBell from '~icons/lucide/bell';
 import IconBellOff from '~icons/lucide/bell-off';
-import type { RoomsChat } from '@openbots/client/client';
-import type { useChatSettings } from '@openbots/client/react';
+import type { RoomsChat } from '@repo/client/client';
+import type { useChatSettings } from '@repo/client/react';
 
 interface RoomsMuteMenuProps {
   chat: RoomsChat

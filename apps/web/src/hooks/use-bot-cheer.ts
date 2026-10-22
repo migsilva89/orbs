@@ -1,4 +1,4 @@
-import { BOT_CHEER } from '@openbots/client/client';
+import { BOT_CHEER } from '@repo/client/client';
 import { useEffect, useRef, useState } from 'react';
 import type { PointerEvent } from 'react';
 

@@ -82,7 +82,7 @@ The daemon creates `ModelRuntime` from `@earendil-works/pi-coding-agent` and pas
 
 Pi's [credentials example](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/sdk/09-api-keys-and-oauth.ts) demonstrates the default runtime and custom auth/model paths. Defaults load `auth.json` and `models.json` from Pi's agent directory; `PI_CODING_AGENT_DIR` selects a separate directory. Existing Pi credentials are reused, with persistence, locking, and OAuth refresh owned by Pi. Skills load from their configured directories without copying or linking them. MCP configuration discovery stays in server/native; Pi clients and tools stay in runtime/native. Trusted Durable plugin loading lives in runtime/native. No SQL credential adapter is needed for provider authentication.
 
-The native host owns one Durable SQLite store per bot at `OPENBOTS_DATA_DIR/data/bots/<botId>/runtime.sql`, guarded by `data/daemon.lock`. Loading provider configuration neither changes that path nor creates a coding-agent session. Model selection remains in Durable agent configuration; `ModelRuntime` does not import CLI settings or tools.
+The native host owns one Durable SQLite store per bot at `DATA_DIR/data/bots/<botId>/runtime.sql`, guarded by `data/daemon.lock`. Loading provider configuration neither changes that path nor creates a coding-agent session. Model selection remains in Durable agent configuration; `ModelRuntime` does not import CLI settings or tools.
 
 Provider login uses native `ModelRuntime.login` with an `AuthInteraction` adapter for remote prompts and events. Login sessions belong to the initiating paired device; answers carry a prompt ID. Cancellation, expiry, revocation and daemon shutdown end pending interactions. Credentials remain in Pi, and read-only status calls do not refresh them.
 
@@ -90,11 +90,11 @@ MCP OAuth uses `McpOAuthProvider`, `authorizeMcp` and `adaptOAuthProvider` from 
 
 ## Bot conversation mapping
 
-A session-scoped `openbots.bot-conversation` document family maps each bot UUID to its Pi conversation ID. The runtime creates the mapping and configures an ownerless conversation in one Pi transaction. Reconfiguration preserves the ID and transcript. Bot settings come from app SQL; provider authentication stays shared through `ModelRuntime`.
+A session-scoped `bots.bot-conversation` document family maps each bot UUID to its Pi conversation ID. The runtime creates the mapping and configures an ownerless conversation in one Pi transaction. Reconfiguration preserves the ID and transcript. Bot settings come from app SQL; provider authentication stays shared through `ModelRuntime`.
 
 The server restores all bot configurations before calling `resume()`. Same-bot configuration, history clear and delete are serialized in memory. Directory, skill, instruction, plugin, and MCP preparation run outside SQL. After that work, configuration rereads the bot row and relevant domain settings and retries if the values that affect Pi config changed, then publishes. SQL and Pi do not share a transaction: a failed Pi synchronization leaves SQL settings for startup or the next submission to reconcile. Pi stores only the relative `agents/<botId>` working directory, not a machine-specific path.
 
-`conversation.watch({ botId })` and `watchConversation(client, { botId }, signal)` select a bot view. All paired devices act as the owner. The original root is not deleted or automatically adopted as a bot. Tools and permission enforcement now use Pi CodingTools and hooks. Skill loading lives in `@openbots/runtime/native`; MCP config-file discovery lives in `@openbots/server/native`; MCP clients and tools live in `@openbots/runtime/native`. Server policy selects inheritance. Runtime never imports server. MCP OAuth uses the native `pi-mcp/oauth` helpers through the runtime auth service.
+`conversation.watch({ botId })` and `watchConversation(client, { botId }, signal)` select a bot view. All paired devices act as the owner. The original root is not deleted or automatically adopted as a bot. Tools and permission enforcement now use Pi CodingTools and hooks. Skill loading lives in `@repo/runtime/native`; MCP config-file discovery lives in `@repo/server/native`; MCP clients and tools live in `@repo/runtime/native`. Server policy selects inheritance. Runtime never imports server. MCP OAuth uses the native `pi-mcp/oauth` helpers through the runtime auth service.
 
 The initial bot-routing slice had static typecheck/lint validation only. The tool checks below subsequently exercised bot creation/update and recovery. The earlier transport probes predate bot routing; real-provider calls remain unverified.
 
@@ -118,7 +118,7 @@ The RPC accepts `{ botId, limit?, cursor? }`, validates a limit of 1–100, and 
 
 Follow the pinned official [coding-tools example](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/durable/test/examples/17-coding-tools.ts), [coding-agent environment example](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/durable/test/examples/26-coding-agent.ts), and [read-only selection example](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/durable/test/examples/27-plan-mode.ts).
 
-Openbots installs `CodingTools` and a final `ToolTask.beforeTool` hook. The host supplies `NodeExecutionEnv` rooted at the data directory. Server policy returns allow, deny, or ask. Read-only trust is checked against Pi’s resolved tool registration, not its name; replacement and wrapped tools need an explicit declaration. Conversation context is loaded only when a configured Auto judge needs it. Ask creates a task-scoped `openbots.tool-approval` document; Pi's `watchDoc` waits for a decision and its task graph supplies the pending list. The document preserves the deadline across reopen. The host timer only enforces that deadline while running. No SQL approval copy is needed.
+Openbots installs `CodingTools` and a final `ToolTask.beforeTool` hook. The host supplies `NodeExecutionEnv` rooted at the data directory. Server policy returns allow, deny, or ask. Read-only trust is checked against Pi’s resolved tool registration, not its name; replacement and wrapped tools need an explicit declaration. Conversation context is loaded only when a configured Auto judge needs it. Ask creates a task-scoped `bots.tool-approval` document; Pi's `watchDoc` waits for a decision and its task graph supplies the pending list. The document preserves the deadline across reopen. The host timer only enforces that deadline while running. No SQL approval copy is needed.
 
 Custom tools use the same Pi registry and permission hook:
 
@@ -148,7 +148,7 @@ A bot's optional `fallbackModel` is stored with its primary selection in the per
 
 ## MCP tools
 
-`@openbots/runtime/native` follows the [Pi MCP client example](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/mcp/README.md): connect with `McpClient`, call `listTools`, forward `callTool` with its abort signal, convert results with `toLlmContent`, then close the client. The daemon constructs MCP clients from `@openbots/runtime/native` and the MCP domain service from `@openbots/server/native`. The server reads settings/configuration files and resolves encrypted `envCredentials`/`headerCredentials` from the app credential store; runtime clients receive prepared configuration and own connections. Discovery checks credential presence without decryption. Tools register as Durable `defineTool` definitions in a bot-specific extension. Pi’s registry supports replacing an installed extension by name; the Openbots permission hook stays last.
+`@repo/runtime/native` follows the [Pi MCP client example](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/mcp/README.md): connect with `McpClient`, call `listTools`, forward `callTool` with its abort signal, convert results with `toLlmContent`, then close the client. The daemon constructs MCP clients from `@repo/runtime/native` and the MCP domain service from `@repo/server/native`. The server reads settings/configuration files and resolves encrypted `envCredentials`/`headerCredentials` from the app credential store; runtime clients receive prepared configuration and own connections. Discovery checks credential presence without decryption. Tools register as Durable `defineTool` definitions in a bot-specific extension. Pi’s registry supports replacing an installed extension by name; the Openbots permission hook stays last.
 
 MCP registrations use `deferred: true` and Pi's `createToolSearchExtension()` from `@earendil-works/pi-durable/tool-search`. Native `tool_search` returns `control.addTools`; Pi persists the selected schemas in `pi.agent.modelTools`. Configuration leaves that field unchanged. Only the exact native search registration is trusted as a read; MCP calls remain gated, and Read-only excludes them from search. This defers model schemas, not connections. No separate search index or RPC is needed.
 
@@ -186,7 +186,7 @@ Disposable native SQLite checks on 2026-10-18 verified default reuse, isolation 
 
 ## Main-chat sidebar index
 
-`conversation.list()` reads one session-scoped `openbots.conversation-index` document and Pi's `taskGraph()`. Bot configuration registers only the stable main conversation; temporary peer contexts and subagents are not indexed. Server joins current bot display settings and sorts the rows. The daemon has no sidebar logic.
+`conversation.list()` reads one session-scoped `bots.conversation-index` document and Pi's `taskGraph()`. Bot configuration registers only the stable main conversation; temporary peer contexts and subagents are not indexed. Server joins current bot display settings and sorts the rows. The daemon has no sidebar logic.
 
 Pi 1.3.0 exposes neither a sidebar query nor a transactional entry-projection hook. Runtime therefore observes `subscribeCommits()` and admits a derived document update in a microtask after the listener returns, as listeners cannot call Session APIs. A higher entry ID wins when several updates overlap. A failed summary update is retried with the next commit; the update is idempotent. Closing Pi removes the observer.
 
@@ -234,7 +234,7 @@ Disposable SQLite probes verified source metadata invalidation, pre-existing tem
 
 ## Attachment integration
 
-Pi Durable 1.3.0 accepts text and inline image blocks, but has no blob store or lazy file input. Openbots stores binary files in server/native and metadata in the conversation-scoped `openbots.attachments` document. Owner input uses `openbots.attachment-message` with file references; native CodingTools read files when needed. Images become model image blocks through the read result, not through copied base64 in the inbox. Pi persists native tool results, which can include image/text contents after a read. PDF extraction is environment/tool dependent.
+Pi Durable 1.3.0 accepts text and inline image blocks, but has no blob store or lazy file input. Openbots stores binary files in server/native and metadata in the conversation-scoped `bots.attachments` document. Owner input uses `bots.attachment-message` with file references; native CodingTools read files when needed. Images become model image blocks through the read result, not through copied base64 in the inbox. Pi persists native tool results, which can include image/text contents after a read. PDF extraction is environment/tool dependent.
 
 Use Pi commits for retain/remove/expiry and queued edits. Return plain metadata copies from commits; Chord draft proxies cannot be structured-cloned or returned after their transaction ends. Retaining before submit prevents delete/submit races but is not atomic with admission. Failed or cancelled submissions may keep retained files; cleanup only removes expired unretained metadata and old orphan blobs. This conservative policy preserves historical references.
 
@@ -246,7 +246,7 @@ A separate native SQLite/faux-provider check covered attachment queue edits, rep
 
 ## Chat interactions
 
-Quotes use `tx.entry()` to resolve an entry from the authorized conversation. Openbots saves a bounded text snapshot in `openbots.reply-message`, or beside files in `openbots.attachment-message`. The model receives the quote as user context. Queue edits rebuild the entry and model text together in `InboxDoc`; no SQL message mirror is involved.
+Quotes use `tx.entry()` to resolve an entry from the authorized conversation. Openbots saves a bounded text snapshot in `bots.reply-message`, or beside files in `bots.attachment-message`. The model receives the quote as user context. Queue edits rebuild the entry and model text together in `InboxDoc`; no SQL message mirror is involved.
 
 Pi has no public retry action. The `retry` runtime command checks the latest native generation task, then creates `GenerationTask` and assigns `LiveDoc.run` in one commit, following the installed harness's `startRun` implementation. It resumes against current saved context with `inputs: []`, without another owner entry or changing the original failed submission receipt. A stale task, active run or queued context reset conflicts. Applied reset/compaction is part of current context; retry does not restore earlier context or undo tool side effects.
 
@@ -262,7 +262,7 @@ The real runtime factory also passed read-only `bot_question` permission identit
 
 ## Routine integration
 
-Routines use a conversation-scoped `openbots.routines` document (`fork: 'initial'`) and a registered `openbots.routine` task. Each task belongs to the bot's main conversation with `background: true`. The extension is installed before `Harness.open` so saved tasks are available on recovery. Bot restore still precedes `resume`.
+Routines use a conversation-scoped `bots.routines` document (`fork: 'initial'`) and a registered `bots.routine` task. Each task belongs to the bot's main conversation with `background: true`. The extension is installed before `Harness.open` so saved tasks are available on recovery. Bot restore still precedes `resume`.
 
 The phases are `check` → `wait` → `check` → `deliver`. `check` atomically claims an occurrence and freezes its prompt, or checkpoints a deadline. `wait` races native `TaskRuntime.sleep` against a document revision change. A child cancellation context releases the losing timer and the watch; pause/removal/rescheduling do not leave a second scheduler behind. `deliver` submits with a task/occurrence request ID and waits for Pi's receipt, so replay after admission reuses it. Submission is outside the transaction; the persisted claim is the boundary after which controls let that occurrence finish.
 
@@ -274,7 +274,7 @@ Routine tools use native `defineTool` registrations, with schemas derived once f
 
 ## Todo integration
 
-Todos use a conversation-scoped `openbots.todos` document (`fork: 'initial'`) on the bot's main conversation: `{ nextId, todos }` with small numeric IDs the model can quote. No SQL table or task is needed. The `openbots.todos` extension adds a `todos` system prompt [section](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/durable/README.md#system-prompt) that reads the document through `input.read` and lists up to 20 open todos. An empty list omits the section, so ordinary chats are unchanged.
+Todos use a conversation-scoped `bots.todos` document (`fork: 'initial'`) on the bot's main conversation: `{ nextId, todos }` with small numeric IDs the model can quote. No SQL table or task is needed. The `bots.todos` extension adds a `todos` system prompt [section](https://github.com/earendil-works/pi/blob/8efd314fa3d3232ce197d8d7a6a5660530b9d83e/packages/durable/README.md#system-prompt) that reads the document through `input.read` and lists up to 20 open todos. An empty list omits the section, so ordinary chats are unchanged.
 
 Pi stores sections as positional system entries and appends one only when the text changes. A disposable faux-provider check on 2026-10-20 confirmed: no section before the first todo, one entry after it, the same entry reused on an unchanged turn, and a `todos: null` removal entry after the last todo was done. Subagents and temporary contexts have their own empty document, so the section appears only in the main chat. `bot_todo_*` tools still target the main chat from any context.
 

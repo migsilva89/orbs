@@ -34,7 +34,7 @@ export async function mcpActionConnect(deps: McpClientServiceDeps, { botId, entr
       const directory = join(deps.root, 'agents', botId);
 
       const client = new McpClient({
-        name: 'openbots',
+        name: 'bots',
         version: '1.0.0',
         requestTimeoutMs: 10_000,
         roots: [{ uri: pathToFileURL(directory).href, name: botId }],

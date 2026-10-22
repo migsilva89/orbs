@@ -1,11 +1,11 @@
 import { resolveElementProps, validateSpec } from '@json-render/core';
-import { ARTIFACT, artifactComponents, artifactSpec } from '@openbots/contracts/universal';
-import { Errors } from '@openbots/errors/universal';
+import { ARTIFACT, artifactComponents, artifactSpec } from '@repo/contracts/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { artifactContent, artifactContentKey, artifactVersionEntry } from './artifact.constants';
 import type { ArtifactDocument, ArtifactRecord, ArtifactVersionPointer } from '../../types/artifact.types';
 import type { ConversationId, Tx } from '@earendil-works/pi-durable';
-import type { Artifact, ArtifactSpec, ArtifactSummary } from '@openbots/contracts/universal';
+import type { Artifact, ArtifactSpec, ArtifactSummary } from '@repo/contracts/universal';
 
 export function artifactGet(doc: ArtifactDocument | null | undefined, artifactId: string): ArtifactRecord {
   return match(doc?.artifacts[artifactId])

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Bot, ConversationWhenBusy } from '@openbots/contracts/universal';
+import type { Bot, ConversationWhenBusy } from '@repo/contracts/universal';
 import type { Generated } from 'kysely';
 import type { DatabaseSync } from 'node:sqlite';
 

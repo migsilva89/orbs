@@ -1,5 +1,5 @@
 import { StorageRequestError } from '@earendil-works/pi-durable';
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { z } from 'zod';
 import { collaborationTemporaryLinks } from '../collaboration/collaboration.constants';
@@ -8,7 +8,7 @@ import { runtimeQueryConversation } from './runtime-query.conversation';
 import type { RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ConversationId } from '@earendil-works/pi-durable';
-import type { ConversationContextPage, ConversationContextsInput } from '@openbots/contracts/universal';
+import type { ConversationContextPage, ConversationContextsInput } from '@repo/contracts/universal';
 
 const temporaryCursor = z.object({ offset: z.number().int().nonnegative() });
 

@@ -1,5 +1,5 @@
-import { m } from '@openbots/i18n/client';
-import { getLocale } from '@openbots/i18n/runtime';
+import { m } from '@repo/i18n/client';
+import { getLocale } from '@repo/i18n/runtime';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useHydrated, useMatch } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -16,8 +16,8 @@ import * as Sidebar from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconPanelRight from '~icons/lucide/panel-right';
-import type { RoomsChat } from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type { RoomsChat } from '@repo/client/client';
+import type { Bot } from '@repo/contracts/universal';
 
 export function RoomsDetails() {
   const direct = useMatch({ from: '/_chat/rooms/direct/$handle', shouldThrow: false });

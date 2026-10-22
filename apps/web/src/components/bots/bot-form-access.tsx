@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useFormContext } from 'react-hook-form';
 import { BotPermissionSelect } from '@/components/bots/bot-permission-select';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/forms/form';
@@ -9,8 +9,8 @@ import IconFileText from '~icons/lucide/file-text';
 import IconPlug from '~icons/lucide/plug';
 import IconShield from '~icons/lucide/shield';
 import IconSparkles from '~icons/lucide/sparkles';
-import type { BotInherit } from '@openbots/client/client';
-import type { BotForm } from '@openbots/contracts/universal';
+import type { BotInherit } from '@repo/client/client';
+import type { BotForm } from '@repo/contracts/universal';
 
 const BOT_FORM_INHERIT = [
   { resource: 'skills', icon: IconSparkles, label: m.rooms_bot_global_skills },

@@ -2,7 +2,7 @@ import { match } from 'ts-pattern';
 import { skillQuerySettings } from './skill-query.settings';
 import { SKILL } from './skill.constants';
 import type { SkillServiceDeps } from '../../types/skill.types';
-import type { SkillConfigureInput } from '@openbots/contracts/universal';
+import type { SkillConfigureInput } from '@repo/contracts/universal';
 
 export async function skillActionConfigure(deps: SkillServiceDeps, { directories }: SkillConfigureInput) {
   await match(directories)

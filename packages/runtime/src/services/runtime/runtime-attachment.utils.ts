@@ -1,8 +1,8 @@
-import { ATTACHMENT, attachmentMessage } from '@openbots/contracts/universal';
+import { ATTACHMENT, attachmentMessage } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { RUNTIME_ATTACHMENT_ENTRY } from './runtime-attachment.constants';
 import type { UserInput } from '@earendil-works/pi-durable';
-import type { Attachment } from '@openbots/contracts/universal';
+import type { Attachment } from '@repo/contracts/universal';
 
 function runtimeAttachmentPath(conversationId: number, file: Pick<Attachment, 'id' | 'name'>) {
   return `.attachments/${conversationId}/${file.id}/${file.name}`;

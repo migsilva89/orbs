@@ -1,4 +1,4 @@
-import { rpcContext } from '@openbots/client/react';
+import { rpcContext } from '@repo/client/react';
 import { LazyMotion } from 'motion/react';
 import { LayoutPullToRefresh } from '@/components/layout/layout-pull-to-refresh';
 import { Toaster } from '@/components/ui/sonner';

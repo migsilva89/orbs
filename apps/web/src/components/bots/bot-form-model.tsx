@@ -1,9 +1,9 @@
-import { botFallbackModel } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { botFallbackModel } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { BotSettingsFields } from '@/components/bots/bot-settings-fields';
 import { FormErrorsAndHint, FormField, FormItem, FormLabel } from '@/components/ui/forms/form';
-import type { BotForm } from '@openbots/contracts/universal';
+import type { BotForm } from '@repo/contracts/universal';
 
 interface BotFormModelProps {
   busy: boolean

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Attachment } from '@openbots/contracts/universal';
+import type { Attachment } from '@repo/contracts/universal';
 
 export interface AttachmentStorageDeps {
   root: string;

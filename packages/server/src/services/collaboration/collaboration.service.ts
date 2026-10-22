@@ -1,7 +1,7 @@
 import { collaborationQueryBots } from './collaboration-query.bots';
 import { collaborationQueryRecipient } from './collaboration-query.recipient';
 import type { CollaborationServiceDeps } from '../../types/collaboration.types';
-import type { CollaborationBotParams, CollaborationRecipientParams } from '@openbots/runtime/server';
+import type { CollaborationBotParams, CollaborationRecipientParams } from '@repo/runtime/server';
 
 export function makeCollaborationService(deps: CollaborationServiceDeps) {
   return {

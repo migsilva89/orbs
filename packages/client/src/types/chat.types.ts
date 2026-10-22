@@ -1,6 +1,6 @@
 import type { RoomsReactionGroup } from './rooms.types';
 import type * as ToolTypes from './tool.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 import type { UIMessage } from 'ai';
 
 /** How the owner answers a tool approval; `always` also approves the tool for this bot from now on. */

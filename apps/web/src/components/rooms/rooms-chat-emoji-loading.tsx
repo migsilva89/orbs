@@ -1,5 +1,5 @@
-import { ROOMS } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { ROOMS } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';

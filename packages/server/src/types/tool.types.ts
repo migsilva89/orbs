@@ -2,8 +2,8 @@ import type { CredentialsService } from '../services/credentials/credentials.ser
 import type { DatabaseService } from '../services/database/database.service';
 import type { SettingsService } from '../services/settings/settings.service';
 import type { Context } from '@earendil-works/chord/context';
-import type { ToolSettings } from '@openbots/contracts/universal';
-import type { RuntimeToolCall } from '@openbots/runtime/server';
+import type { ToolSettings } from '@repo/contracts/universal';
+import type { RuntimeToolCall } from '@repo/runtime/server';
 
 export interface ToolServiceDeps {
   database: DatabaseService;

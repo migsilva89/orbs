@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { Brain } from 'lucide-react-native';
 import { useState } from 'react';
 import { Markdown } from '@/components/ui/markdown';

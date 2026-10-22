@@ -1,9 +1,9 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/components/ui/sidebar';
-import type { ChatActivity } from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type { ChatActivity } from '@repo/client/client';
+import type { Bot } from '@repo/contracts/universal';
 
 interface RoomsChatPillProps {
   bot: Bot

@@ -34,7 +34,7 @@ The daemon may also import native factories and shared env/logging for compositi
 
 - Packages never import apps. Runtime never imports server or client. Clients never import server/runtime implementations or server env.
 - Portable server code never imports `/native` implementations. Inject native service objects; use type-only imports for their public interfaces.
-- Use explicit `@openbots/*` package exports. No relative imports across packages and no cyclic file or package dependencies, including type-only cycles.
+- Use explicit `@repo/*` package exports. No relative imports across packages and no cyclic file or package dependencies, including type-only cycles.
 - Read another domain through its public service, not its action/query/driver files. Core wires dependencies; it contains no product decisions.
 
 ## Services and files

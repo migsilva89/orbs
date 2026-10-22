@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { cva } from 'cva';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/cn';

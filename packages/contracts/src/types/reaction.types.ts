@@ -3,8 +3,8 @@ import { conversationTarget } from './conversation.types';
 import { messageQuote } from './reply.types';
 
 export const REACTION = {
-  docKind: 'openbots.entry-reaction',
-  entryKind: 'openbots.reaction-message',
+  docKind: 'bots.entry-reaction',
+  entryKind: 'bots.reaction-message',
   toolName: 'bot_react',
   /** The owner can take a reaction back this long before the bot hears about it. */
   deliverMs: 2000,

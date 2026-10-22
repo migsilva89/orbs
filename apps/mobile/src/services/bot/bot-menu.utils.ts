@@ -1,5 +1,5 @@
-import { BOT_PERMISSION_LABELS, ROOMS_SEND_MODES } from '@openbots/client/client';
-import { botFields, conversationWhenBusy } from '@openbots/contracts/universal';
+import { BOT_PERMISSION_LABELS, ROOMS_SEND_MODES } from '@repo/client/client';
+import { botFields, conversationWhenBusy } from '@repo/contracts/universal';
 import type { BotMenuPermissionsParams, BotMenuSendModesParams } from '@/types/bot-menu.types';
 import type { MenuItem } from '@/types/menu.types';
 

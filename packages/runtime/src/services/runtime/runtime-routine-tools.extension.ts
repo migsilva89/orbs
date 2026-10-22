@@ -1,7 +1,7 @@
 import { Type } from '@earendil-works/pi-ai';
 import { defineExtension, defineTool } from '@earendil-works/pi-durable';
-import { Errors } from '@openbots/errors/universal';
-import * as m from '@openbots/i18n/messages';
+import { Errors } from '@repo/errors/universal';
+import * as m from '@repo/i18n/messages';
 import { match, P } from 'ts-pattern';
 import {
   routineToolCreate,
@@ -16,7 +16,7 @@ import { runtimeBot } from './runtime.constants';
 import type { RuntimeRoutineToolsDeps } from '../../types/runtime-routine.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ToolExecutionApi } from '@earendil-works/pi-durable';
-import type { Routine } from '@openbots/contracts/universal';
+import type { Routine } from '@repo/contracts/universal';
 
 export function runtimeRoutineToolsExtension(deps: RuntimeRoutineToolsDeps) {
   const list = defineTool({
@@ -81,7 +81,7 @@ export function runtimeRoutineToolsExtension(deps: RuntimeRoutineToolsDeps) {
   });
 
   return {
-    extension: defineExtension({ name: 'openbots.routine-tools', tools: [list, create, update, run, remove] }),
+    extension: defineExtension({ name: 'bots.routine-tools', tools: [list, create, update, run, remove] }),
     readOnlyTools: [list],
   };
 }

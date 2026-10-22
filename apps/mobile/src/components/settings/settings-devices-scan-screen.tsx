@@ -1,5 +1,5 @@
-import { authPairCode } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { authPairCode } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import { Camera } from 'lucide-react-native';
@@ -11,6 +11,7 @@ import { Empty } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
+import { BRAND_APP_NAME } from '@/services/brand/brand.constants';
 import { connectionPair } from '@/services/connection/connection.client';
 import { connectionCodeFromUrl } from '@/services/connection/connection.utils';
 import type { BarcodeScanningResult } from 'expo-camera';
@@ -90,7 +91,7 @@ export function SettingsDevicesScanScreen() {
               </Button>
             ))
             .exhaustive()}
-          description={m.mobile_scan_permission_description()}
+          description={m.mobile_scan_permission_description({ name: BRAND_APP_NAME })}
           icon={(
             <Icon
               icon={Camera}

@@ -1,7 +1,7 @@
 import { Type } from '@earendil-works/pi-ai';
 import { defineExtension, defineTool } from '@earendil-works/pi-durable';
-import { Errors } from '@openbots/errors/universal';
-import * as m from '@openbots/i18n/messages';
+import { Errors } from '@repo/errors/universal';
+import * as m from '@repo/i18n/messages';
 import { match, P } from 'ts-pattern';
 import {
   artifactToolCreate,
@@ -15,7 +15,7 @@ import { runtimeBot } from './runtime.constants';
 import type { RuntimeArtifactToolsDeps } from '../../types/runtime-artifact.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ToolExecutionApi } from '@earendil-works/pi-durable';
-import type { Artifact, ArtifactSummary } from '@openbots/contracts/universal';
+import type { Artifact, ArtifactSummary } from '@repo/contracts/universal';
 
 export function runtimeArtifactToolsExtension(deps: RuntimeArtifactToolsDeps) {
   const list = defineTool({
@@ -74,7 +74,7 @@ export function runtimeArtifactToolsExtension(deps: RuntimeArtifactToolsDeps) {
   });
 
   return {
-    extension: defineExtension({ name: 'openbots.artifact-tools', tools: [list, get, blocks, create, update] }),
+    extension: defineExtension({ name: 'bots.artifact-tools', tools: [list, get, blocks, create, update] }),
     readOnlyTools: [list, get, blocks],
   };
 }

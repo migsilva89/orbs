@@ -1,7 +1,7 @@
 import { defineExtension, defineTool, section, StorageRequestError } from '@earendil-works/pi-durable';
-import { REACTION } from '@openbots/contracts/universal';
-import { Errors } from '@openbots/errors/universal';
-import * as m from '@openbots/i18n/messages';
+import { REACTION } from '@repo/contracts/universal';
+import { Errors } from '@repo/errors/universal';
+import * as m from '@repo/i18n/messages';
 import { match, P } from 'ts-pattern';
 import {
   runtimeHistoryToolPage,
@@ -14,7 +14,7 @@ import { runtimeHistoryOutput, runtimeHistoryPage } from './runtime-history.util
 import { runtimeReactionSetBot } from './runtime-reaction.utils';
 import type { Context } from '@earendil-works/chord/context';
 import type { Cursor, ToolExecutionApi } from '@earendil-works/pi-durable';
-import type { ConversationReaction } from '@openbots/contracts/universal';
+import type { ConversationReaction } from '@repo/contracts/universal';
 
 export function runtimeChatToolsExtension() {
   const history = defineTool({
@@ -51,7 +51,7 @@ export function runtimeChatToolsExtension() {
 
   return {
     extension: defineExtension({
-      name: 'openbots.chat-tools',
+      name: 'bots.chat-tools',
       tools: [history, search, react],
       sections: [section('reactions', () => m.ui_tool_bot_react_prompt())],
     }),

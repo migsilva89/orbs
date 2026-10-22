@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { AvatarStudio } from '@/components/avatars/avatar-studio';
 import { LayoutShellDashboard } from '@/components/layout/layout-shell-dashboard';

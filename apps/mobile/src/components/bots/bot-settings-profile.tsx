@@ -1,12 +1,12 @@
-import { BOT, botHandle } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { BOT, botHandle } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { Bot } from 'lucide-react-native';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { BotAvatarPicker } from '@/components/bots/bot-avatar-picker';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { Card } from '@/components/ui/card';
 import { FormField } from '@/components/ui/form-field';
-import type { BotForm } from '@openbots/contracts/universal';
+import type { BotForm } from '@repo/contracts/universal';
 
 interface BotSettingsProfileProps {
   isDisabled: boolean;

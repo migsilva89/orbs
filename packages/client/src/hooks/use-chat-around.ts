@@ -4,7 +4,7 @@ import { chatEntryIds, chatMessages } from '../services/chat/chat.utils';
 import { useChatReactions } from './use-chat-reactions';
 import { useRpc } from './use-rpc';
 import type { ChatAroundParams } from '../types/chat.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 /** The messages around one entry, such as a search result, with older and newer pages on demand. */
 export function useChatAround({ bot, bots, view, entryId }: ChatAroundParams) {

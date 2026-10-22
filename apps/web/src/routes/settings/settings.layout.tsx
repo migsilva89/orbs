@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { SettingsPage } from '@/components/settings/settings-page';
 import { rpc } from '@/services/rpc/rpc.client';

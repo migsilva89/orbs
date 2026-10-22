@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { createContext, use, useState } from 'react';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { TraceCollapsibleTrigger, TraceIcon, TraceLine, TraceTitle } from '@/components/ui/trace';

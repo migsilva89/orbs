@@ -1,10 +1,10 @@
-import { log } from '@openbots/logger/server';
-import { notificationItemKey } from '@openbots/runtime/server';
+import { log } from '@repo/logger/server';
+import { notificationItemKey } from '@repo/runtime/server';
 import { notificationActionSend } from './notification-action.send';
 import { notificationQueryTarget } from './notification-query.target';
 import { notificationItems } from './notification.utils';
 import type { NotificationServiceDeps } from '../../types/notification.types';
-import type { NotificationItem } from '@openbots/contracts/universal';
+import type { NotificationItem } from '@repo/contracts/universal';
 
 export async function notificationActionWatch(deps: NotificationServiceDeps) {
   const watch = await deps.runtime.watchNotifications();

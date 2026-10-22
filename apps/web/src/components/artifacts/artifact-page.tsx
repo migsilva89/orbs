@@ -1,6 +1,6 @@
-import { artifactsStore } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
-import { getLocale } from '@openbots/i18n/runtime';
+import { artifactsStore } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
+import { getLocale } from '@repo/i18n/runtime';
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Outlet, useHydrated } from '@tanstack/react-router';
 import { ArtifactView } from '@/components/artifacts/artifact-view';

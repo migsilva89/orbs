@@ -3,7 +3,7 @@ import { todoDocument } from './todo.constants';
 import { todoCopy } from './todo.utils';
 import type { TodoCreateParams, TodoServiceDeps } from '../../types/todo.types';
 import type { Context } from '@earendil-works/chord/context';
-import type { Todo } from '@openbots/contracts/universal';
+import type { Todo } from '@repo/contracts/universal';
 
 export async function todoActionCreate({ harness }: TodoServiceDeps, params: TodoCreateParams, context: Context) {
   return harness.commit(async (tx) => {

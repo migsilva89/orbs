@@ -1,4 +1,4 @@
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot } from '@repo/contracts/universal';
 
 export interface MentionTarget {
   kind: 'skill' | 'command' | 'bot' | 'quote';

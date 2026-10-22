@@ -1,8 +1,8 @@
-import { CHAT } from '@openbots/client/client';
+import { CHAT } from '@repo/client/client';
 import { MessageFile, MessageImage } from '@/components/ui/message';
 import { connectionFileSource } from '@/services/connection/connection.client';
 import type { RpcSession } from '@/types/rpc.types';
-import type { RoomsFilePart } from '@openbots/client/client';
+import type { RoomsFilePart } from '@repo/client/client';
 
 interface ChatFilesItemProps {
   session: RpcSession;

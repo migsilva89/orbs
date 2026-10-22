@@ -1,5 +1,5 @@
 import { replicatedState } from '@earendil-works/chord';
-import { log } from '@openbots/logger/server';
+import { log } from '@repo/logger/server';
 import { match } from 'ts-pattern';
 import type { RuntimeBot, RuntimeDirectory } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';

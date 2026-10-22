@@ -1,9 +1,9 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { botActionConfigure } from './bot-action.configure';
 import { botRecord, botValues } from './bot.utils';
 import type { BotServiceDeps } from '../../types/bot.types';
-import type { BotUpdateInput } from '@openbots/contracts/universal';
+import type { BotUpdateInput } from '@repo/contracts/universal';
 
 export async function botActionUpdate(deps: BotServiceDeps, { botId, ...changes }: BotUpdateInput) {
   await deps.database.db.transaction().execute(async (tx) => {

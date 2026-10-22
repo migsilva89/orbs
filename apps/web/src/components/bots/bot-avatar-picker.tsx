@@ -1,9 +1,9 @@
-import { EXPRESSIONS } from '@openbots/avatar-blobs/expressions';
-import { BODIES, COLORS } from '@openbots/avatar-blobs/skins';
-import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS, BOT } from '@openbots/client/client';
-import { useBotAvatarUpload } from '@openbots/client/react';
-import { AVATAR } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { EXPRESSIONS } from '@repo/avatar-blobs/expressions';
+import { BODIES, COLORS } from '@repo/avatar-blobs/skins';
+import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS, BOT } from '@repo/client/client';
+import { useBotAvatarUpload } from '@repo/client/react';
+import { AVATAR } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useRef } from 'react';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import { useBotAvatarFlash } from '@/hooks/use-bot-avatar-flash';
 import IconChevronLeft from '~icons/lucide/chevron-left';
 import IconChevronRight from '~icons/lucide/chevron-right';
 import IconImageUp from '~icons/lucide/image-up';
-import type { BotAvatar as BotAvatarValue } from '@openbots/client/client';
+import type { BotAvatar as BotAvatarValue } from '@repo/client/client';
 import type { MouseEvent } from 'react';
 
 const revealOnHover = 'opacity-0 group-focus-within/avatar:opacity-100 group-hover/avatar:opacity-100 pointer-coarse:opacity-100';

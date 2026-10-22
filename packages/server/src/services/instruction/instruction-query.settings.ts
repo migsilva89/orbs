@@ -1,4 +1,4 @@
-import { instructionSettings } from '@openbots/contracts/universal';
+import { instructionSettings } from '@repo/contracts/universal';
 import { INSTRUCTION } from './instruction.constants';
 import type { InstructionServiceDeps } from '../../types/instruction.types';
 

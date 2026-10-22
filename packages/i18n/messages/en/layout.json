@@ -1,6 +1,5 @@
 {
-  "layout_brand": "Openbots",
-  "layout_install_title": "Add Openbots to your Home Screen",
+  "layout_install_title": "Add {name} to your Home Screen",
   "layout_install_instructions": "Tap Share, then Add to Home Screen. Keep Open as Web App on and tap Add.",
   "layout_install_dismiss": "Dismiss install hint",
   "layout_sidebar_resize": "Drag to resize or click to toggle the sidebar",

@@ -1,5 +1,5 @@
-import { TOOL_PEER_NAMES, toolCollapsed, toolGroupState, toolIdentity, toolOutputText, toolPeers, toolRunning } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { TOOL_PEER_NAMES, toolCollapsed, toolGroupState, toolIdentity, toolOutputText, toolPeers, toolRunning } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { Fragment, useState } from 'react';

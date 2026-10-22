@@ -1,5 +1,5 @@
-import { EXPRESSIONS } from '@openbots/avatar-blobs/expressions';
-import { BODIES, COLORS } from '@openbots/avatar-blobs/skins';
+import { EXPRESSIONS } from '@repo/avatar-blobs/expressions';
+import { BODIES, COLORS } from '@repo/avatar-blobs/skins';
 import { z } from 'zod';
 import { instructionCatalog } from './instruction.types';
 import { mcpCatalog } from './mcp.types';

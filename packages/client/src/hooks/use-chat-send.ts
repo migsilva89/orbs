@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useMutation, useMutationState } from '@tanstack/react-query';
 import { generateId } from 'ai';
 import { useEffect, useEffectEvent, useRef } from 'react';
@@ -6,7 +6,7 @@ import { chatResetCommand } from '../services/chat/chat.utils';
 import { mentionSubmission } from '../services/mention/mention.client';
 import { useRpc } from './use-rpc';
 import type { ChatSendInput, ChatSendParams, ChatSendResult } from '../types/chat.types';
-import type { CommandExecuteInput } from '@openbots/contracts/universal';
+import type { CommandExecuteInput } from '@repo/contracts/universal';
 import type { MutationState } from '@tanstack/react-query';
 
 /**

@@ -3,7 +3,7 @@ import { SvgXml } from 'react-native-svg';
 import { useCSSVariable } from 'uniwind';
 import { Icon } from '@/components/ui/icon';
 import { BRAND_LOGOS } from '@/services/brand/brand.constants';
-import type { BotBrand } from '@openbots/client/client';
+import type { BotBrand } from '@repo/client/client';
 
 interface BotBrandLogoProps {
   brand: BotBrand | 'cursor' | 'openrouter' | null;

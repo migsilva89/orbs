@@ -1,4 +1,4 @@
-import { env } from '@openbots/env/server';
+import { env } from '@repo/env/server';
 import tailwindcss from '@tailwindcss/vite';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,13 +13,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   clearScreen: false,
+  envDir: '../..',
   server: {
     host: true,
     proxy: {
-      '/rpc': { target: env.OPENBOTS_DAEMON_URL, ws: true },
-      '/files': { target: env.OPENBOTS_DAEMON_URL },
-      '/avatars': { target: env.OPENBOTS_DAEMON_URL },
-      '/health': { target: env.OPENBOTS_DAEMON_URL },
+      '/rpc': { target: env.DAEMON_URL, ws: true },
+      '/files': { target: env.DAEMON_URL },
+      '/avatars': { target: env.DAEMON_URL },
+      '/health': { target: env.DAEMON_URL },
     },
   },
   preview: {

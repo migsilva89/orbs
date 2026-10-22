@@ -1,7 +1,7 @@
 import { avatarActionUpload } from './avatar-action.upload';
 import { avatarQueryBot } from './avatar-query.bot';
 import type { AvatarImageParams, AvatarServiceDeps } from '../../types/avatar.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function makeAvatarService(deps: AvatarServiceDeps) {
   return {

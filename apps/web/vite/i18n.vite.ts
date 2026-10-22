@@ -1,4 +1,4 @@
-import { createI18nPlugin as createI18nPluginBase } from '@openbots/i18n/vite';
+import { createI18nPlugin as createI18nPluginBase } from '@repo/i18n/vite';
 import { resolve } from 'node:path';
 
 export function createI18nPlugin(dirname: string) {

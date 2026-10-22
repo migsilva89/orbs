@@ -1,11 +1,11 @@
-import { useSettingsProviderSession } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useSettingsProviderSession } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { match } from 'ts-pattern';
 import { Button } from '@/components/ui/button';
 import { FormErrors } from '@/components/ui/forms/form';
 import { Input } from '@/components/ui/input';
 import IconX from '~icons/lucide/x';
-import type { ProviderSession } from '@openbots/contracts/universal';
+import type { ProviderSession } from '@repo/contracts/universal';
 
 interface SettingsProviderSessionProps {
   session: ProviderSession

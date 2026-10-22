@@ -1,6 +1,6 @@
 import { match, P } from 'ts-pattern';
 import type { ConversationServiceDeps } from '../../types/conversation.types';
-import type { ConversationUpdateSubmissionInput } from '@openbots/contracts/universal';
+import type { ConversationUpdateSubmissionInput } from '@repo/contracts/universal';
 
 export async function conversationActionUpdateSubmission(
   { runtime, bots, skill, attachments }: ConversationServiceDeps,

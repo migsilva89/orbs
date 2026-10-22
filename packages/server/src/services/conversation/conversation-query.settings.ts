@@ -1,7 +1,7 @@
-import { conversationWhenBusy } from '@openbots/contracts/universal';
+import { conversationWhenBusy } from '@repo/contracts/universal';
 import { CONVERSATION } from './conversation.constants';
 import type { ConversationServiceDeps } from '../../types/conversation.types';
-import type { ConversationSettings } from '@openbots/contracts/universal';
+import type { ConversationSettings } from '@repo/contracts/universal';
 
 export async function conversationQuerySettings({ settings }: ConversationServiceDeps): Promise<ConversationSettings> {
   const records = await settings.queries.get({ keys: [CONVERSATION.whenBusySetting, CONVERSATION.hideVerboseSetting] });

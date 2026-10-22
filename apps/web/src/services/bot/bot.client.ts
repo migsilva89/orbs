@@ -1,6 +1,6 @@
-import { botBubble } from '@openbots/client/client';
+import { botBubble } from '@repo/client/client';
 import type { BotBubbleStyle } from '@/types/bot.types';
-import type { BotBubbleParams } from '@openbots/client/client';
+import type { BotBubbleParams } from '@repo/client/client';
 
 export function botBubbleStyle({ avatar }: BotBubbleParams): BotBubbleStyle | undefined {
   const bubble = botBubble({ avatar });

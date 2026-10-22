@@ -1,7 +1,7 @@
 import { match, P } from 'ts-pattern';
 import { mcpFingerprint } from './mcp.utils';
 import type { McpClientParams, McpClientServiceDeps } from '../../types/mcp.types';
-import type { McpCatalog } from '@openbots/contracts/universal';
+import type { McpCatalog } from '@repo/contracts/universal';
 
 export async function mcpQueryCatalog(deps: McpClientServiceDeps, { botId, config }: McpClientParams): Promise<McpCatalog> {
   const diagnostics = [...config.diagnostics];

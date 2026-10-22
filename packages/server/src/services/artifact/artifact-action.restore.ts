@@ -1,5 +1,5 @@
 import type { ArtifactServiceDeps } from '../../types/artifact.types';
-import type { ArtifactRestoreInput } from '@openbots/contracts/universal';
+import type { ArtifactRestoreInput } from '@repo/contracts/universal';
 
 export async function artifactActionRestore({ bots, runtime }: ArtifactServiceDeps, params: ArtifactRestoreInput) {
   await bots.queries.get({ botId: params.botId });

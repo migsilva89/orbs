@@ -1,5 +1,5 @@
 import type { AttachmentServiceDeps } from '../../types/attachment.types';
-import type { AttachmentGetInput } from '@openbots/contracts/universal';
+import type { AttachmentGetInput } from '@repo/contracts/universal';
 
 export async function attachmentQueryDownload({ runtime, storage }: AttachmentServiceDeps, params: AttachmentGetInput) {
   const { conversationId, attachment } = await runtime.queries.attachment(params);

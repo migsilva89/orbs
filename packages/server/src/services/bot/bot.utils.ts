@@ -1,8 +1,8 @@
-import { botAvatar, botInherit, modelSelection } from '@openbots/contracts/universal';
+import { botAvatar, botInherit, modelSelection } from '@repo/contracts/universal';
 import { match } from 'ts-pattern';
 import type { BotServiceDeps } from '../../types/bot.types';
 import type { DatabaseBot } from '../../types/database.types';
-import type { Bot, BotCreateInput } from '@openbots/contracts/universal';
+import type { Bot, BotCreateInput } from '@repo/contracts/universal';
 
 export function botRecord(row: DatabaseBot): Bot {
   return {

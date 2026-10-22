@@ -1,5 +1,5 @@
-import { ATTACHMENT } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { ATTACHMENT } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useMutation } from '@tanstack/react-query';
 import { generateId } from 'ai';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';

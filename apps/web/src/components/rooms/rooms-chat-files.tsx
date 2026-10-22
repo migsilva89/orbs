@@ -1,7 +1,7 @@
-import { useChatAttachmentUrl } from '@openbots/client/web';
+import { useChatAttachmentUrl } from '@repo/client/web';
 import { Button } from '@/components/ui/button';
 import IconLucideFileText from '~icons/lucide/file-text';
-import type { RoomsFilePart } from '@openbots/client/client';
+import type { RoomsFilePart } from '@repo/client/client';
 
 interface RoomsChatFilesItemProps {
   botId: string

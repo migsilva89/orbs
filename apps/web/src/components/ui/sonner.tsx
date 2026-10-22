@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { Toaster as Sonner, toast as sonnerToast } from 'sonner';
 import { cn } from '@/lib/cn';
 import type { ComponentProps, ReactNode } from 'react';

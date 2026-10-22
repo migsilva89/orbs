@@ -1,4 +1,4 @@
-import { limitSettings } from '@openbots/contracts/universal';
+import { limitSettings } from '@repo/contracts/universal';
 import { LIMIT } from './limit.constants';
 import { limitStoredSettings } from './limit.utils';
 import type { LimitServiceDeps } from '../../types/limit.types';

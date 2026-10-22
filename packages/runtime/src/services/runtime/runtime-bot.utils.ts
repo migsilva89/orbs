@@ -1,6 +1,6 @@
 import { BACKGROUND_CONTEXT } from '@earendil-works/chord/context';
 import { createRegistry, Harness } from '@earendil-works/pi-durable';
-import { log } from '@openbots/logger/server';
+import { log } from '@repo/logger/server';
 import { match, P } from 'ts-pattern';
 import { makeArtifactService } from '../artifact/artifact.service';
 import { makeConversationIndexService } from '../conversation-index/conversation-index.service';
@@ -63,6 +63,7 @@ export async function runtimeBotOpen(shared: RuntimeSharedDeps, botId: string): 
     }
 
     const deps: RuntimeServiceDeps = {
+      appName: shared.appName,
       botId,
       directory: shared.directory,
       harness,

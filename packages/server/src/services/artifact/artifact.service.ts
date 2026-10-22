@@ -7,7 +7,7 @@ import { artifactQueryList } from './artifact-query.list';
 import { artifactQueryListBot } from './artifact-query.list-bot';
 import { artifactQueryVersions } from './artifact-query.versions';
 import type { ArtifactServiceDeps } from '../../types/artifact.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function makeArtifactService(deps: ArtifactServiceDeps) {
   return {

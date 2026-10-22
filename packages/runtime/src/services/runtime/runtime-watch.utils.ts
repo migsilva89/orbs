@@ -1,10 +1,10 @@
 import { GenerationTask } from '@earendil-works/pi-durable';
-import { ARTIFACT, REACTION } from '@openbots/contracts/universal';
+import { ARTIFACT, REACTION } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeRun } from './runtime-run.utils';
 import type { Draft } from '@earendil-works/chord';
 import type { CommitChange, ConversationId } from '@earendil-works/pi-durable';
-import type { ConversationState } from '@openbots/contracts/universal';
+import type { ConversationState } from '@repo/contracts/universal';
 
 export function runtimeWatchChanges(state: Draft<ConversationState>, changes: readonly CommitChange[]) {
   const conversationId = state.conversationId as ConversationId;
@@ -31,7 +31,7 @@ export function runtimeWatchChanges(state: Draft<ConversationState>, changes: re
       .with({
         type: 'document',
         conversationId,
-        record: { kind: P.union(REACTION.docKind, 'openbots.question') },
+        record: { kind: P.union(REACTION.docKind, 'bots.question') },
       }, () => {
         state.interactionsRevision += 1;
       })

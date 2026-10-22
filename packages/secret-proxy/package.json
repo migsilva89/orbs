@@ -1,5 +1,5 @@
 {
-  "name": "@openbots/secret-proxy",
+  "name": "@repo/secret-proxy",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -19,7 +19,7 @@
     "ts-pattern": "catalog:"
   },
   "devDependencies": {
-    "@openbots/typescript-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:"
   }

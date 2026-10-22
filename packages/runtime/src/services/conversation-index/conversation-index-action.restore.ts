@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { conversationIndex } from './conversation-index.constants';
 import { conversationIndexFind, conversationIndexLatest } from './conversation-index.utils';

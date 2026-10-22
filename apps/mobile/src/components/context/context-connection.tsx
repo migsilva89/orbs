@@ -1,5 +1,5 @@
-import { rpcContext } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { rpcContext } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { focusManager, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect, useEffectEvent, useState } from 'react';
 import { AppState } from 'react-native';
@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { connectionForget, connectionRead } from '@/services/connection/connection.client';
 import { rpcClientCreate } from '@/services/rpc/rpc.client';
 import type { ConnectionContextValue } from '@/types/connection-context.types';
-import type { ConnectionSaved } from '@openbots/contracts/universal';
+import type { ConnectionSaved } from '@repo/contracts/universal';
 import type { ReactNode } from 'react';
 
 interface ContextConnectionProps {

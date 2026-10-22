@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { cn } from '@/lib/cn';

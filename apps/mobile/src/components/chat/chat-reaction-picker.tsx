@@ -1,5 +1,5 @@
-import { useChatMessageReaction } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useChatMessageReaction } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -11,7 +11,7 @@ import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
 import { emojiListOptions, emojiSearch } from '@/services/emoji/emoji.client';
 import { EMOJI } from '@/services/emoji/emoji.constants';
-import type { ChatMessageReactionParams } from '@openbots/client/client';
+import type { ChatMessageReactionParams } from '@repo/client/client';
 
 interface ChatReactionPickerProps {
   botId: string;

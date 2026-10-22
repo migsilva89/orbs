@@ -1,4 +1,4 @@
-import { useNotificationPresence } from '@openbots/client/react';
+import { useNotificationPresence } from '@repo/client/react';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';

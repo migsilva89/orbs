@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { ScrollView } from 'react-native';
 import { Markdown } from '@/components/ui/markdown';
 import { useChatReturn } from '@/hooks/use-chat-return';

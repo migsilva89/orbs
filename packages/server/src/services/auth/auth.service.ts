@@ -8,7 +8,7 @@ import { authQueryDevice } from './auth-query.device';
 import { authQueryDevices } from './auth-query.devices';
 import { authQueryGrant } from './auth-query.grant';
 import type * as AuthTypes from '../../types/auth.types';
-import type { AuthRedeemInput } from '@openbots/contracts/universal';
+import type { AuthRedeemInput } from '@repo/contracts/universal';
 
 export function makeAuthService({ database }: AuthTypes.AuthServiceParams) {
   const revocations = new Set<AuthTypes.AuthRevocationListener>();

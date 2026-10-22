@@ -1,5 +1,5 @@
 {
-  "name": "@openbots/errors",
+  "name": "@repo/errors",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -15,7 +15,7 @@
     "lint:fix": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
   },
   "devDependencies": {
-    "@openbots/typescript-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:"
   },

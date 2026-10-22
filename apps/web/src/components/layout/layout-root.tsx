@@ -1,5 +1,5 @@
-import { m } from '@openbots/i18n/client';
-import { getLocale } from '@openbots/i18n/runtime';
+import { m } from '@repo/i18n/client';
+import { getLocale } from '@repo/i18n/runtime';
 import { ClientOnly, HeadContent, Scripts } from '@tanstack/react-router';
 import { ContextProviders } from '@/components/context/context-providers';
 import { ContextShellScript } from '@/components/context/context-shell';

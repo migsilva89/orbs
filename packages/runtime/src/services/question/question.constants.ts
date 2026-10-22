@@ -2,10 +2,10 @@ import { defineDoc } from '@earendil-works/pi-durable';
 import type { QuestionRecord } from '../../types/question.types';
 
 export const QUESTION = {
-  extension: 'openbots.questions',
+  extension: 'bots.questions',
   tool: 'bot_question',
   secretTool: 'bot_secret',
-  document: 'openbots.question',
+  document: 'bots.question',
   timeoutMs: 300_000,
 } as const;
 

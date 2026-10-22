@@ -1,6 +1,6 @@
-import { toolBlocks } from '@openbots/client/client';
-import { useChatHideVerbose } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { toolBlocks } from '@repo/client/client';
+import { useChatHideVerbose } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { isFileUIPart } from 'ai';
 import { Fragment, useState } from 'react';
@@ -19,7 +19,7 @@ import { useLongPress } from '@/hooks/use-long-press';
 import { MENTION_ALLOWED_TAGS } from '@/services/mention/mention.constants';
 import { mentionRemark } from '@/services/mention/mention.utils';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { ChatMessage, ToolBot } from '@openbots/client/client';
+import type { ChatMessage, ToolBot } from '@repo/client/client';
 import type * as ReactTypes from 'react';
 
 const mentionComponents = { mention: RoomsChatMention };

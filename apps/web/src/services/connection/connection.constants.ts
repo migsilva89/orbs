@@ -1,5 +1,5 @@
 export const CONNECTION = {
-  storageKey: 'openbots.connection',
+  storageKey: 'bots.connection',
   rpcPath: '/rpc',
   cookieMaxAgeSeconds: 365 * 24 * 60 * 60,
 } as const;

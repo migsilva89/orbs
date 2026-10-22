@@ -1,12 +1,12 @@
-import { roomsChoice } from '@openbots/client/client';
-import { useChatQuestion } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { roomsChoice } from '@repo/client/client';
+import { useChatQuestion } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { Question, QuestionDescription, QuestionField, QuestionHeader, QuestionHeading, QuestionOption, QuestionOptions, QuestionTitle } from '@/components/ui/ai/question';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import IconArrowUp from '~icons/lucide/arrow-up';
 import IconX from '~icons/lucide/x';
-import type { ConversationQuestion } from '@openbots/contracts/universal';
+import type { ConversationQuestion } from '@repo/contracts/universal';
 
 interface RoomsChatQuestionsProps {
   question: ConversationQuestion

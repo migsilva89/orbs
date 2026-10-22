@@ -1,5 +1,5 @@
-import { routinesScheduleText } from '@openbots/client/client';
-import { getLocale, m } from '@openbots/i18n/client';
+import { routinesScheduleText } from '@repo/client/client';
+import { getLocale, m } from '@repo/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { CalendarClock, Ellipsis } from 'lucide-react-native';

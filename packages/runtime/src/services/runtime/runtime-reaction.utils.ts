@@ -1,13 +1,13 @@
 import { AssistantEntry, UserEntry } from '@earendil-works/pi-durable';
-import { ATTACHMENT, REACTION, REPLY } from '@openbots/contracts/universal';
-import { Errors } from '@openbots/errors/universal';
+import { ATTACHMENT, REACTION, REPLY } from '@repo/contracts/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeReactions } from './runtime-reaction.constants';
 import { runtimeBot } from './runtime.constants';
 import type { RuntimeReaction, RuntimeReactToolInput } from '../../types/reaction.types';
 import type { Context } from '@earendil-works/chord/context';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
-import type { ConversationReaction } from '@openbots/contracts/universal';
+import type { ConversationReaction } from '@repo/contracts/universal';
 
 const runtimeReactionOwnerKinds = new Set<string>([UserEntry.kind, ATTACHMENT.entryKind, REPLY.entryKind]);
 
@@ -15,7 +15,7 @@ export function runtimeReactionTarget(entry: PiDurableTypes.EntryRecord | undefi
   return match(entry)
     .with({
       conversationId,
-      kind: P.union(UserEntry.kind, ATTACHMENT.entryKind, REPLY.entryKind, 'openbots.bot-message', 'openbots.bot-reply'),
+      kind: P.union(UserEntry.kind, ATTACHMENT.entryKind, REPLY.entryKind, 'bots.bot-message', 'bots.bot-reply'),
     }, (value) => value)
     .with({ conversationId, kind: AssistantEntry.kind }, (value) => match(value.model?.[0])
       .with({ role: 'assistant' }, (message) => (

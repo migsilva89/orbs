@@ -1,11 +1,11 @@
 #!/usr/bin/env bun
-import { env } from '@openbots/env/server';
-import { isAppError } from '@openbots/errors/universal';
-import { initNativeLogger, log } from '@openbots/logger/server';
+import { env } from '@repo/env/server';
+import { isAppError } from '@repo/errors/universal';
+import { initNativeLogger, log } from '@repo/logger/server';
 import { match } from 'ts-pattern';
 import { coreCommandNative } from './core/core-command.native';
 
-initNativeLogger(env.OPENBOTS_LOG_LEVEL);
+initNativeLogger(env.LOG_LEVEL);
 
 try {
   await coreCommandNative();

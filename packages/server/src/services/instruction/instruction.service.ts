@@ -3,7 +3,7 @@ import { instructionQueryDiscover } from './instruction-query.discover';
 import { instructionQueryLoad } from './instruction-query.load';
 import { instructionQuerySettings } from './instruction-query.settings';
 import type { InstructionBotParams, InstructionLoadParams, InstructionServiceDeps } from '../../types/instruction.types';
-import type { InstructionConfigureInput } from '@openbots/contracts/universal';
+import type { InstructionConfigureInput } from '@repo/contracts/universal';
 
 export function makeInstructionService(deps: InstructionServiceDeps) {
   return {

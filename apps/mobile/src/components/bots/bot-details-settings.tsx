@@ -1,6 +1,6 @@
-import { BOT_PERMISSION_LABELS, BOT_THINKING_LEVEL_LABELS, botModelBrand, ROOMS_SEND_MODES } from '@openbots/client/client';
-import { useBotUpdate, useChatSettings } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { BOT_PERMISSION_LABELS, BOT_THINKING_LEVEL_LABELS, botModelBrand, ROOMS_SEND_MODES } from '@repo/client/client';
+import { useBotUpdate, useChatSettings } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { ChevronRight, ListOrdered, PencilLine, ShieldCheck } from 'lucide-react-native';
@@ -11,7 +11,7 @@ import { Icon } from '@/components/ui/icon';
 import { Item, ItemButton, ItemContent, ItemGroup, ItemMedia, ItemTitle, ItemValue } from '@/components/ui/item';
 import { botMenuPermissions, botMenuSendModes } from '@/services/bot/bot-menu.utils';
 import type { RpcSession } from '@/types/rpc.types';
-import type { Bot, ConversationListItem } from '@openbots/contracts/universal';
+import type { Bot, ConversationListItem } from '@repo/contracts/universal';
 
 interface BotDetailsSettingsProps {
   session: RpcSession;

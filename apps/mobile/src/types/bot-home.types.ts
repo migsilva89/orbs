@@ -1,4 +1,4 @@
-import type { ConversationListItem } from '@openbots/contracts/universal';
+import type { ConversationListItem } from '@repo/contracts/universal';
 
 export type BotHomeGroup = 'pinned' | 'others' | 'hidden';
 

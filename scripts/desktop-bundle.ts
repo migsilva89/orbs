@@ -2,7 +2,7 @@ import { cpSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
 const root = path.resolve(import.meta.dir, '..');
-const target = path.join(root, 'apps/desktop/dist/openbots');
+const target = path.join(root, 'apps/desktop/dist/server');
 
 rmSync(target, { recursive: true, force: true });
 

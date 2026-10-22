@@ -1,7 +1,7 @@
-import * as m from '@openbots/i18n/messages';
+import * as m from '@repo/i18n/messages';
 import { match } from 'ts-pattern';
 import type { NotificationPresence } from '../../types/notification.types';
-import type { NotificationItem, NotificationState } from '@openbots/contracts/universal';
+import type { NotificationItem, NotificationState } from '@repo/contracts/universal';
 
 export function notificationBody(item: NotificationItem) {
   return match(item.kind)

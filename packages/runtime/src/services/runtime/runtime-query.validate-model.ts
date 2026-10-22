@@ -1,5 +1,5 @@
 import { getSupportedThinkingLevels } from '@earendil-works/pi-ai/models';
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import type { RuntimeModelParams, RuntimeModelsDeps } from '../../types/runtime.types';
 

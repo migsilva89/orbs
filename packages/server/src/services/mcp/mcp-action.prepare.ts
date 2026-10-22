@@ -1,9 +1,9 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { createHash } from 'node:crypto';
 import { match, P } from 'ts-pattern';
 import { mcpQueryConfig } from './mcp-query.config';
 import type { McpPrepareParams, McpServiceDeps } from '../../types/mcp.types';
-import type { McpEntry } from '@openbots/runtime/server';
+import type { McpEntry } from '@repo/runtime/server';
 
 export async function mcpActionPrepare(deps: McpServiceDeps, { bot, settings }: McpPrepareParams) {
   const config = await mcpQueryConfig(deps, {

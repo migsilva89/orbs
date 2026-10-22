@@ -1,9 +1,9 @@
-import { log } from '@openbots/logger/server';
+import { log } from '@repo/logger/server';
 import { match } from 'ts-pattern';
 import { botQueryGet } from './bot-query.get';
 import { botQueue } from './bot.utils';
 import type { BotServiceDeps } from '../../types/bot.types';
-import type { BotGetInput } from '@openbots/contracts/universal';
+import type { BotGetInput } from '@repo/contracts/universal';
 
 export async function botActionDelete(deps: BotServiceDeps, { botId }: BotGetInput) {
   await botQueryGet(deps, { botId });

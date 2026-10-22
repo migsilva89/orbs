@@ -1,4 +1,4 @@
-import { mentionQuote } from '@openbots/client/client';
+import { mentionQuote } from '@repo/client/client';
 import { useLocalSearchParams } from 'expo-router';
 import { ChatRoom } from '@/components/chat/chat-room';
 import type { ChatRouteParams } from '@/types/chat.types';

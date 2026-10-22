@@ -1,5 +1,6 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import Electrobun, { ApplicationMenu, BrowserView, BrowserWindow, PATHS, Screen, Tray, Utils } from 'electrobun/main';
+import { DESKTOP_BUILD } from './desktop-build';
 import { desktopNetworkFind, desktopNetworkProbe, desktopNetworkSelf, desktopNetworkTailscale } from './desktop-network';
 import { desktopNotify } from './desktop-notify';
 import { desktopProcessRuns, desktopServerLeftovers, desktopServerPairLink, desktopServerStart } from './desktop-server';
@@ -20,10 +21,12 @@ let quitReady = false;
 let frameTimer: Timer | undefined;
 let tray: Tray | null = null;
 
+const appName = DESKTOP_BUILD.name;
+
 const headless = process.env[DESKTOP.headless.env] === '1';
 const atLogin = process.env[DESKTOP.login.env] === '1';
 // Electrobun always enables the WebKit inspector, so release builds hide the native menu that offers "Inspect Element".
-const nativeMenuBlock = process.env.OPENBOTS_WEB_DEV ? '' : "window.addEventListener('contextmenu', (event) => event.preventDefault());";
+const nativeMenuBlock = process.env.DESKTOP_WEB_DEV ? '' : "window.addEventListener('contextmenu', (event) => event.preventDefault());";
 // CEF never settles navigator.clipboard.writeText, so copies always go through the host.
 const clipboardBridge = "{ const copy = (text) => { window.__electrobunSendToHost({ copy: String(text) }); return Promise.resolve(); }; if (navigator.clipboard) navigator.clipboard.writeText = copy; else Object.defineProperty(navigator, 'clipboard', { value: { writeText: copy } }); }";
 // Electrobun drags the window from JS, so macOS never sees a title bar double-click; forward it to the host.
@@ -46,14 +49,14 @@ function desktopTrayRender(): void {
   const busy = Boolean(operation ?? quitting);
   const remote = headless ? undefined : desktopRemote();
   const local = headless || desktopStateRead().connection === 'local';
-  const remoteStatus = remote ? m.desktop_tray_remote({ host: new URL(remote).host }) : undefined;
-  const status = remoteStatus ?? (server ? m.desktop_tray_running() : m.desktop_tray_stopped());
+  const remoteStatus = remote ? m.desktop_tray_remote({ name: appName, host: new URL(remote).host }) : undefined;
+  const status = remoteStatus ?? (server ? m.desktop_tray_running({ name: appName }) : m.desktop_tray_stopped({ name: appName }));
 
   tray?.setMenu([
-    { type: 'normal', label: busy ? m.desktop_saving() : status, enabled: false },
+    { type: 'normal', label: busy ? m.desktop_saving({ name: appName }) : status, enabled: false },
     { type: 'separator' },
-    { type: 'normal', label: m.desktop_tray_open(), action: 'open', enabled: !busy },
-    { type: 'normal', label: m.desktop_tray_retry(), action: 'retry', hidden: !local || Boolean(server), enabled: !busy },
+    { type: 'normal', label: m.desktop_tray_open({ name: appName }), action: 'open', enabled: !busy },
+    { type: 'normal', label: m.desktop_tray_retry({ name: appName }), action: 'retry', hidden: !local || Boolean(server), enabled: !busy },
     { type: 'normal', label: m.desktop_connect_menu(), action: 'connect', enabled: !busy, hidden: headless },
     {
       type: 'normal',
@@ -69,7 +72,7 @@ function desktopTrayRender(): void {
     },
     {
       type: 'normal',
-      label: m.desktop_urls(),
+      label: m.desktop_urls({ name: appName }),
       enabled: Boolean(server) && !busy,
       hidden: !local,
       submenu: (server?.urls ?? []).map((url) => ({
@@ -83,11 +86,11 @@ function desktopTrayRender(): void {
     },
     { type: 'normal', label: m.desktop_tailscale_stopped(), enabled: false, hidden: server?.tailscale !== 'stopped' },
     { type: 'normal', label: m.desktop_tailscale_missing(), enabled: false, hidden: server?.tailscale !== 'missing' },
-    { type: 'normal', label: m.desktop_port_fallback(), enabled: false, hidden: !server?.portFallback },
+    { type: 'normal', label: m.desktop_port_fallback({ name: appName, port: DESKTOP.ports[0] }), enabled: false, hidden: !server?.portFallback },
     ...headless ? [] : [
       { type: 'normal', label: m.desktop_tray_login(), action: 'login', checked: desktopLoginEnabled() },
       { type: 'separator' },
-      { type: 'normal', label: m.desktop_tray_quit(), action: 'quit', enabled: !busy },
+      { type: 'normal', label: m.desktop_tray_quit({ name: appName }), action: 'quit', enabled: !busy },
     ] as const,
   ]);
 }
@@ -127,9 +130,9 @@ function desktopMainOpen(url: string): void {
   const saved = desktopStateRead().window;
 
   const window = new BrowserWindow({
-    title: 'Openbots',
+    title: appName,
     url,
-    preload: `document.documentElement.dataset.shell = 'desktop'; window.__openbotsAddresses = ${JSON.stringify(server?.urls.filter((address) => address !== server?.url) ?? [])}; ${clipboardBridge} ${titleBarBridge} ${server && url.startsWith(server.url) ? pairBridge : ''} ${nativeMenuBlock}`,
+    preload: `document.documentElement.dataset.shell = 'desktop'; window.__botsAddresses = ${JSON.stringify(server?.urls.filter((address) => address !== server?.url) ?? [])}; ${clipboardBridge} ${titleBarBridge} ${server && url.startsWith(server.url) ? pairBridge : ''} ${nativeMenuBlock}`,
     frame: saved && desktopFrameVisible(saved) ? saved : desktopFrameDefault(),
     titleBarStyle: 'hiddenInset',
     trafficLightOffset: DESKTOP.mainWindow.trafficLights,
@@ -216,14 +219,14 @@ async function desktopServerRun(settings: DesktopTypes.DesktopSettings, open = t
 
     return {};
   } catch (error) {
-    return { error: m.desktop_error_start({ path: error instanceof Error ? error.message : '' }) };
+    return { error: m.desktop_error_start({ name: appName, path: error instanceof Error ? error.message : '' }) };
   }
 }
 
 async function desktopError(message: string): Promise<void> {
   await Utils.showMessageBox({
     type: 'error',
-    title: 'Openbots',
+    title: appName,
     message,
   });
 }
@@ -293,12 +296,12 @@ function desktopProbeMessage(probe: DesktopTypes.DesktopProbe): string {
     return m.desktop_error_remote_self();
   }
 
-  return probe.status === 'not-openbots' ? m.desktop_error_remote_not_openbots({ url: probe.url }) : m.desktop_error_remote_unreachable({ url: probe.url });
+  return probe.status === 'foreign' ? m.desktop_error_remote_foreign({ name: appName, url: probe.url }) : m.desktop_error_remote_unreachable({ name: appName, url: probe.url });
 }
 
 async function desktopLocked(task: () => Promise<DesktopTypes.DesktopSaveResult>): Promise<DesktopTypes.DesktopSaveResult> {
   try {
-    return await desktopLock(task, { error: m.desktop_saving() });
+    return await desktopLock(task, { error: m.desktop_saving({ name: appName }) });
   } catch (error) {
     return { error: error instanceof Error ? error.message : String(error) };
   }
@@ -384,6 +387,7 @@ function desktopConnectOpen(screen: DesktopTypes.DesktopConnectScreen): void {
           const network = remote ? remoteNetwork : 'local';
 
           return {
+            name: appName,
             screen: connectScreen,
             remote: Boolean(remote),
             address: remote ?? '',
@@ -420,7 +424,7 @@ function desktopConnectOpen(screen: DesktopTypes.DesktopConnectScreen): void {
   const { workArea } = Screen.getPrimaryDisplay();
 
   const window = new BrowserWindow({
-    title: 'Openbots',
+    title: appName,
     url: DESKTOP.connectUrl,
     frame: {
       ...DESKTOP.connectWindow,
@@ -604,9 +608,9 @@ await desktopExclusive(async () => {
 
   const { response } = await Utils.showMessageBox({
     type: 'error',
-    title: 'Openbots',
+    title: appName,
     message: result.error,
-    detail: m.desktop_tray_recovery(),
+    detail: m.desktop_tray_recovery({ name: appName }),
     buttons: [m.desktop_tray_keep_running(), m.desktop_quit()],
     defaultId: 0,
     cancelId: 1,

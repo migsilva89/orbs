@@ -1,11 +1,11 @@
-import { useChatAround } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useChatAround } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import { MessageList } from '@/components/ui/message-list';
 import { Text } from '@/components/ui/text';
-import type { ChatMessage } from '@openbots/client/client';
-import type { Bot, ConversationReaction, ConversationView } from '@openbots/contracts/universal';
+import type { ChatMessage } from '@repo/client/client';
+import type { Bot, ConversationReaction, ConversationView } from '@repo/contracts/universal';
 import type { ReactElement } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 

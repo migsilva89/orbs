@@ -1,5 +1,5 @@
-import { htmlTitle } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { htmlTitle } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { Code } from 'lucide-react-native';
 import { HtmlFrame } from '@/components/ui/html-frame';

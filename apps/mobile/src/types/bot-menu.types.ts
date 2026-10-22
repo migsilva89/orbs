@@ -1,5 +1,5 @@
-import type { BotPermission } from '@openbots/client/client';
-import type { ConversationWhenBusy } from '@openbots/contracts/universal';
+import type { BotPermission } from '@repo/client/client';
+import type { ConversationWhenBusy } from '@repo/contracts/universal';
 
 export interface BotMenuSendModesParams {
   defaultLabel: string;

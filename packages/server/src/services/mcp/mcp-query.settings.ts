@@ -1,4 +1,4 @@
-import { mcpSettings } from '@openbots/contracts/universal';
+import { mcpSettings } from '@repo/contracts/universal';
 import { MCP } from './mcp.constants';
 import type { McpServiceDeps } from '../../types/mcp.types';
 

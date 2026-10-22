@@ -1,6 +1,6 @@
 import type { Harness } from '@earendil-works/pi-durable';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
-import type { QuestionAnswer, SecretRule } from '@openbots/contracts/universal';
+import type { QuestionAnswer, SecretRule } from '@repo/contracts/universal';
 
 export interface QuestionServiceDeps {
   harness: Harness;

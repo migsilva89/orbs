@@ -1,7 +1,7 @@
 import { defineCatalog } from '@json-render/core';
 import { defineRegistry, JSONUIProvider, Renderer, useBoundProp } from '@json-render/react-native';
 import { schema } from '@json-render/react-native/schema';
-import { artifactComponents } from '@openbots/contracts/universal';
+import { artifactComponents } from '@repo/contracts/universal';
 import { Check, ChevronDown, ChevronsUpDown, ExternalLink, Info } from 'lucide-react-native';
 import { Children, useState } from 'react';
 import { Image, Linking, Pressable, ScrollView, Switch, View } from 'react-native';
@@ -23,7 +23,7 @@ import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/cn';
 import { ARTIFACTS } from '@/services/artifacts/artifacts.constants';
 import type { StateStore } from '@json-render/core';
-import type { ArtifactSpec } from '@openbots/contracts/universal';
+import type { ArtifactSpec } from '@repo/contracts/universal';
 
 const { registry } = defineRegistry(defineCatalog(schema, { components: artifactComponents, actions: {} }), {
   components: {

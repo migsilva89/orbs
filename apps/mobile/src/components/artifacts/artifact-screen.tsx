@@ -1,5 +1,5 @@
-import { artifactsStore } from '@openbots/client/client';
-import { getLocale, m } from '@openbots/i18n/client';
+import { artifactsStore } from '@repo/client/client';
+import { getLocale, m } from '@repo/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { match, P } from 'ts-pattern';
@@ -9,7 +9,7 @@ import { useConnection } from '@/hooks/use-connection';
 import { useToast } from '@/hooks/use-toast';
 import { ArtifactView } from './artifact-view';
 import type { RpcSession } from '@/types/rpc.types';
-import type { Artifact } from '@openbots/contracts/universal';
+import type { Artifact } from '@repo/contracts/universal';
 
 interface ArtifactScreenProps {
   botId: string;

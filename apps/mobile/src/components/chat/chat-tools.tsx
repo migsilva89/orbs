@@ -1,5 +1,5 @@
-import { TOOL_PEER_NAMES, toolGroupState, toolIdentity, toolInputTexts, toolOutputText, toolPeers, toolPresentation, toolPreview, toolRunning } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { TOOL_PEER_NAMES, toolGroupState, toolIdentity, toolInputTexts, toolOutputText, toolPeers, toolPresentation, toolPreview, toolRunning } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { AlarmClock, Bot, Cpu, FileText, LayoutDashboard, ListTodo, MessageCircleQuestion, Plug, Search, SquarePen, Terminal, Wrench } from 'lucide-react-native';
 import { Fragment, useState } from 'react';
@@ -9,8 +9,8 @@ import { Menu } from '@/components/ui/menu';
 import { Text } from '@/components/ui/text';
 import { Trace, TraceCode, TraceContent, TraceRow } from '@/components/ui/trace';
 import type { TraceStatus } from '@/components/ui/trace';
-import type { ToolIconKind, ToolPart, ToolPeer } from '@openbots/client/client';
-import type { Bot as BotItem } from '@openbots/contracts/universal';
+import type { ToolIconKind, ToolPart, ToolPeer } from '@repo/client/client';
+import type { Bot as BotItem } from '@repo/contracts/universal';
 import type { LucideIcon } from 'lucide-react-native';
 
 const CHAT_TOOL_ICONS = {

@@ -1,13 +1,14 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { BuildConfig, PATHS } from 'electrobun/main';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { DESKTOP_BUILD } from './desktop-build';
 import { DESKTOP } from './desktop.constants';
 import { desktopSettings, desktopState } from './types/desktop.types';
 import type { DesktopSettings, DesktopState } from './types/desktop.types';
 
-const desktopDataDir = process.env.OPENBOTS_DATA_DIR ?? DESKTOP.dataDir;
+const desktopDataDir = process.env.DATA_DIR ?? DESKTOP.dataDir;
 
 export const desktopHome = { root: resolve(desktopDataDir.replace(/^~(?=\/|$)/u, homedir())) };
 
@@ -26,13 +27,13 @@ export async function desktopSettingsPrompt(host: string): Promise<string | null
     '/usr/bin/osascript', '-e', `on run argv
       try
         activate
-        set answer to display dialog (item 1 of argv) with title "Openbots" default answer (item 2 of argv) buttons {item 3 of argv, item 4 of argv} default button 2 cancel button 1
+        set answer to display dialog (item 1 of argv) with title (item 5 of argv) default answer (item 2 of argv) buttons {item 3 of argv, item 4 of argv} default button 2 cancel button 1
         return text returned of answer
       on error number -128
         return
       end try
     end run`,
-    m.desktop_network_custom(), host, m.desktop_cancel(), m.desktop_save(),
+    m.desktop_network_custom(), host, m.desktop_cancel(), m.desktop_save(), DESKTOP_BUILD.name,
   ], { stdout: 'pipe', stderr: 'pipe' });
 
   const [output, error, exitCode] = await Promise.all([
@@ -62,7 +63,7 @@ export function desktopStateWrite(patch: Partial<DesktopState>): void {
 }
 
 function desktopLoginPath(): string {
-  return join(homedir(), DESKTOP.login.agents, `${DESKTOP.login.label}.${BuildConfig.getSync().channel}.plist`);
+  return join(homedir(), DESKTOP.login.agents, `${DESKTOP_BUILD.identifier}.login.${BuildConfig.getSync().channel}.plist`);
 }
 
 function desktopLoginPlist(): string {
@@ -72,7 +73,7 @@ function desktopLoginPlist(): string {
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>Label</key><string>${DESKTOP.login.label}.${BuildConfig.getSync().channel}</string>
+  <key>Label</key><string>${DESKTOP_BUILD.identifier}.login.${BuildConfig.getSync().channel}</string>
   <key>ProgramArguments</key><array><string>${launcher}</string></array>
   <key>EnvironmentVariables</key><dict><key>${DESKTOP.login.env}</key><string>1</string></dict>
   <key>RunAtLoad</key><true/>

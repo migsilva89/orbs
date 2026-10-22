@@ -4,7 +4,7 @@ import { match } from 'ts-pattern';
 import { chatAnswerProblem } from '../services/chat/chat.utils';
 import { useRpc } from './use-rpc';
 import type { ChatApprovalDecision } from '../types/chat.types';
-import type { ToolApproval } from '@openbots/contracts/universal';
+import type { ToolApproval } from '@repo/contracts/universal';
 
 /** Answers a pending tool approval; `always` also stops the bot asking for this tool. `problem` explains a failed or no longer pending answer. */
 export function useChatApproval(approval: ToolApproval) {

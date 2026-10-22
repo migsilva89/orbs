@@ -1,6 +1,6 @@
 import { CredentialSynchronizationError } from '@earendil-works/pi-coding-agent';
-import { Errors } from '@openbots/errors/universal';
-import * as m from '@openbots/i18n/messages';
+import { Errors } from '@repo/errors/universal';
+import * as m from '@repo/i18n/messages';
 import { match, P } from 'ts-pattern';
 import { PROVIDER } from './provider.constants';
 import {

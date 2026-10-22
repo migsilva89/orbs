@@ -17,8 +17,8 @@ import type { ServerService } from '../services/server/server.service';
 import type { SkillService } from '../services/skill/skill.service';
 import type { TodoService } from '../services/todo/todo.service';
 import type { ToolService } from '../services/tool/tool.service';
-import type { ProviderService, RuntimeService } from '@openbots/runtime/server';
 import type { RequestHeadersPluginContext } from '@orpc/server/plugins';
+import type { ProviderService, RuntimeService } from '@repo/runtime/server';
 
 export interface RpcContext extends RequestHeadersPluginContext {
   server: ServerService;

@@ -1,9 +1,9 @@
 import { AssistantEntry, UserEntry } from '@earendil-works/pi-durable';
-import { ATTACHMENT, attachmentMessage, REPLY, replyMessage } from '@openbots/contracts/universal';
+import { ATTACHMENT, attachmentMessage, REPLY, replyMessage } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { COLLABORATION } from '../collaboration/collaboration.constants';
 import type { Cursor, EntryRecord, Page } from '@earendil-works/pi-durable';
-import type { ConversationHistoryMessage, ConversationSearchPage } from '@openbots/contracts/universal';
+import type { ConversationHistoryMessage, ConversationSearchPage } from '@repo/contracts/universal';
 
 export function runtimeHistoryPage(page: Page<EntryRecord, Cursor>, query?: string): ConversationSearchPage {
   const needle = query?.toLowerCase();

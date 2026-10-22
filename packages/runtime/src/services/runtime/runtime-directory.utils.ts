@@ -1,5 +1,5 @@
-import { Errors } from '@openbots/errors/universal';
-import { log } from '@openbots/logger/server';
+import { Errors } from '@repo/errors/universal';
+import { log } from '@repo/logger/server';
 import { match, P } from 'ts-pattern';
 import type { RuntimeBot, RuntimeBotChange } from '../../types/runtime.types';
 

@@ -1,4 +1,4 @@
-import { getLocale, m } from '@openbots/i18n/client';
+import { getLocale, m } from '@repo/i18n/client';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { ChevronRight, LayoutDashboard } from 'lucide-react-native';

@@ -1,4 +1,4 @@
-import { modelSelection } from '@openbots/contracts/universal';
+import { modelSelection } from '@repo/contracts/universal';
 import { z } from 'zod';
 import type { Context } from '@earendil-works/pi-ai';
 import type { ModelsSimpleStreamOptions } from '@earendil-works/pi-ai/models';

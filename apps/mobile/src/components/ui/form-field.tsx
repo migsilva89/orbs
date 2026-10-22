@@ -1,4 +1,4 @@
-import { expandValidationError } from '@openbots/i18n/validation';
+import { expandValidationError } from '@repo/i18n/validation';
 import { useController } from 'react-hook-form';
 import { FormInput } from './form-input';
 import type { ComponentProps } from 'react';

@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { BotAvatar } from '@/components/bots/bot-avatar';
@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { roomsLink } from '@/services/rooms/rooms.client';
 import IconMessageCircle from '~icons/lucide/message-circle';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot } from '@repo/contracts/universal';
 import type { ReactNode } from 'react';
 
 interface RoomsMentionCardProps {

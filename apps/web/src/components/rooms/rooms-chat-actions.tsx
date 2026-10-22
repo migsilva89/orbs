@@ -1,5 +1,5 @@
-import { ROOMS, roomsMessageText } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { ROOMS, roomsMessageText } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useState } from 'react';
 import { RoomsChatEmojiChoices } from '@/components/rooms/rooms-chat-emoji-choices';
 import { RoomsChatInfo } from '@/components/rooms/rooms-chat-info';
@@ -18,7 +18,7 @@ import IconEllipsisVertical from '~icons/lucide/ellipsis-vertical';
 import IconInfo from '~icons/lucide/info';
 import IconReply from '~icons/lucide/reply';
 import IconTextSelect from '~icons/lucide/text-select';
-import type { ChatMessage } from '@openbots/client/client';
+import type { ChatMessage } from '@repo/client/client';
 
 interface RoomsChatActionsProps {
   message: ChatMessage

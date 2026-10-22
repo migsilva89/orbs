@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useState } from 'react';
 import { RoomsChatEmojiChoices } from '@/components/rooms/rooms-chat-emoji-choices';
 import { Button } from '@/components/ui/button';

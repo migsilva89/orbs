@@ -1,22 +1,22 @@
 {
-  "name": "@openbots/desktop",
+  "name": "@repo/desktop",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:macos": "bun ../../scripts/desktop-bundle.ts && OPENBOTS_DATA_DIR=$HOME/.config/openbots-dev OPENBOTS_WEB_DEV=$(cd ../web && pwd) electrobun dev",
-    "build:macos": "bun ../../scripts/desktop-bundle.ts && electrobun build --env=stable",
+    "dev:macos": "bun --env-file=../../.env ../../scripts/desktop-bundle.ts && DATA_DIR=$HOME/.config/openbots-dev DESKTOP_WEB_DEV=$(cd ../web && pwd) bun --env-file=../../.env electrobun dev",
+    "build:macos": "bun --env-file=../../.env ../../scripts/desktop-bundle.ts && bun --env-file=../../.env electrobun build --env=stable",
     "check": "electrobun prepare && tsrs --noEmit",
     "lint": "electrobun prepare && oxlint src/ electrobun.config.ts -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
     "lint:fix": "electrobun prepare && oxlint src/ electrobun.config.ts -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
   },
   "dependencies": {
-    "@openbots/env": "workspace:*",
-    "@openbots/i18n": "workspace:*",
+    "@repo/env": "workspace:*",
+    "@repo/i18n": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@openbots/typescript-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/bun": "catalog:",
     "electrobun": "2.0.2"
   }

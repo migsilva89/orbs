@@ -4,7 +4,7 @@ import { ContextMenu, Menu } from '@/components/ui/menu';
 import { useBotActions } from '@/hooks/use-bot-actions';
 import { useConnection } from '@/hooks/use-connection';
 import type { RpcSession } from '@/types/rpc.types';
-import type { ConversationListItem } from '@openbots/contracts/universal';
+import type { ConversationListItem } from '@repo/contracts/universal';
 import type { ReactElement } from 'react';
 
 interface BotActionsMenuProps {

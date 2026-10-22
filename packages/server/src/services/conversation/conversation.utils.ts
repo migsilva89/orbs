@@ -1,7 +1,7 @@
 import { match, P } from 'ts-pattern';
 import type { BotPreferences } from '../../types/bot.types';
-import type { Bot, ConversationPreferences, ConversationSummary } from '@openbots/contracts/universal';
-import type { ConversationIndexSummary } from '@openbots/runtime/server';
+import type { Bot, ConversationPreferences, ConversationSummary } from '@repo/contracts/universal';
+import type { ConversationIndexSummary } from '@repo/runtime/server';
 
 export function conversationSummaries(summaries: ConversationIndexSummary[], preferences: Map<string, BotPreferences>): ConversationSummary[] {
   return summaries.flatMap((summary) => match(preferences.get(summary.botId))

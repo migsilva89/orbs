@@ -1,11 +1,11 @@
 import { copyJson } from '@earendil-works/chord';
 import { diffRevisions } from '@earendil-works/chord/delta';
-import { Errors } from '@openbots/errors/universal';
 import { streamToAsyncIteratorObject } from '@orpc/server';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import type { ConversationSubscription, ConversationWatchTransform } from '../../types/conversation.types';
 import type { JsonValue } from '@earendil-works/chord';
-import type { ConversationFrame } from '@openbots/contracts/universal';
+import type { ConversationFrame } from '@repo/contracts/universal';
 
 export function conversationWatchStream<T extends object>(
   watch: ConversationSubscription<T>,

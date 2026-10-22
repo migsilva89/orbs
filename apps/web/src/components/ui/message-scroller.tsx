@@ -1,5 +1,5 @@
-import { Errors } from '@openbots/errors/universal';
-import { m } from '@openbots/i18n/client';
+import { Errors } from '@repo/errors/universal';
+import { m } from '@repo/i18n/client';
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
 import { cva } from 'cva';
 import { createContext, use, useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';

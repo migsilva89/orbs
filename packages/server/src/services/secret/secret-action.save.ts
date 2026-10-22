@@ -1,7 +1,7 @@
 import { secretQueryRules } from './secret-query.rules';
 import { SECRET } from './secret.constants';
 import type { SecretServiceDeps } from '../../types/secret.types';
-import type { SecretSaveInput } from '@openbots/contracts/universal';
+import type { SecretSaveInput } from '@repo/contracts/universal';
 
 export async function secretActionSave(deps: SecretServiceDeps, { name, hosts, value }: SecretSaveInput) {
   const rules = await secretQueryRules(deps);

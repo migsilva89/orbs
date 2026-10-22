@@ -1,4 +1,4 @@
-import { chatResetSearch } from '@openbots/contracts/universal';
+import { chatResetSearch } from '@repo/contracts/universal';
 import { createFileRoute } from '@tanstack/react-router';
 import { RoomsResetDialog } from '@/components/rooms/rooms-reset-dialog';
 import { useDialogNavigation } from '@/hooks/use-dialog-navigation';

@@ -1,9 +1,9 @@
-import { roomsMessageText } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { roomsMessageText } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import type { ChatMessage, ChatPart, ToolBot } from '@openbots/client/client';
+import type { ChatMessage, ChatPart, ToolBot } from '@repo/client/client';
 
 interface RoomsChatNoticeProps {
   message: ChatMessage

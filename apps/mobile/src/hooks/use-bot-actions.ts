@@ -1,10 +1,10 @@
-import { ROOMS_MUTE_DURATIONS } from '@openbots/client/client';
-import { useChatSettings } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { ROOMS_MUTE_DURATIONS } from '@repo/client/client';
+import { useChatSettings } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { botMenuSendModes } from '@/services/bot/bot-menu.utils';
 import type { MenuItem } from '@/types/menu.types';
-import type { ConversationListItem } from '@openbots/contracts/universal';
+import type { ConversationListItem } from '@repo/contracts/universal';
 
 export function useBotActions(chat: ConversationListItem): MenuItem[] {
   const router = useRouter();

@@ -1,11 +1,11 @@
-import { useChatQueue } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useChatQueue } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { PromptInputButton, PromptInputDrawer } from '@/components/ui/ai/prompt-input';
 import { cn } from '@/lib/cn';
 import IconArrowUp from '~icons/lucide/arrow-up';
 import IconListOrdered from '~icons/lucide/list-ordered';
 import IconX from '~icons/lucide/x';
-import type { ChatQueued, ChatQueueParams } from '@openbots/client/client';
+import type { ChatQueued, ChatQueueParams } from '@repo/client/client';
 
 interface RoomsChatQueueProps {
   botId: string

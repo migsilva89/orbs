@@ -1,4 +1,4 @@
-import { skillSettings } from '@openbots/contracts/universal';
+import { skillSettings } from '@repo/contracts/universal';
 import { SKILL } from './skill.constants';
 import type { SkillServiceDeps } from '../../types/skill.types';
 

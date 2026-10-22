@@ -1,4 +1,4 @@
-import { htmlReplyContent } from '@openbots/client/client';
+import { htmlReplyContent } from '@repo/client/client';
 import { parseMarkdownIntoBlocks } from 'streamdown';
 
 export function htmlReplyBlocks(content: string): string[] {

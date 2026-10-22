@@ -1,5 +1,5 @@
-import { useChatArrange, useChatSettings } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useChatArrange, useChatSettings } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { RoomsMuteMenu } from '@/components/rooms/rooms-mute-menu';
@@ -13,7 +13,7 @@ import IconPin from '~icons/lucide/pin';
 import IconPinOff from '~icons/lucide/pin-off';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import IconTrash2 from '~icons/lucide/trash-2';
-import type { RoomsChat } from '@openbots/client/client';
+import type { RoomsChat } from '@repo/client/client';
 
 interface RoomsActionsProps {
   chat: RoomsChat

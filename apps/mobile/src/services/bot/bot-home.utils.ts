@@ -1,5 +1,5 @@
-import { roomsFold, roomsSidebarOrder } from '@openbots/client/client';
-import { getLocale, m } from '@openbots/i18n/client';
+import { roomsFold, roomsSidebarOrder } from '@repo/client/client';
+import { getLocale, m } from '@repo/i18n/client';
 import { match } from 'ts-pattern';
 import type { BotHomeSection, BotHomeSectionsParams } from '@/types/bot-home.types';
 

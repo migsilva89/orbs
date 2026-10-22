@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match } from 'ts-pattern';
 import { routineDocument } from './routine.constants';
 import { routineCopy, routineGet } from './routine.utils';

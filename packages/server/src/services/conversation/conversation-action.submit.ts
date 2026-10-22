@@ -1,7 +1,7 @@
 import { match, P } from 'ts-pattern';
 import { conversationQuerySettings } from './conversation-query.settings';
 import type { ConversationServiceDeps } from '../../types/conversation.types';
-import type { ConversationSubmitInput } from '@openbots/contracts/universal';
+import type { ConversationSubmitInput } from '@repo/contracts/universal';
 
 export async function conversationActionSubmit(
   deps: ConversationServiceDeps,

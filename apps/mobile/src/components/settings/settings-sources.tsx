@@ -1,5 +1,5 @@
-import { useSettingsSources } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useSettingsSources } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { FolderTree } from 'lucide-react-native';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { SettingsPathList } from './settings-path-list';

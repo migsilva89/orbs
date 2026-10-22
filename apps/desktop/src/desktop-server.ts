@@ -1,6 +1,7 @@
 import { PATHS } from 'electrobun/main';
 import { closeSync, existsSync, mkdirSync, openSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { DESKTOP_BUILD } from './desktop-build';
 import { desktopNetworkAdvertise, desktopNetworkOrigins, desktopNetworkProbe, desktopNetworkUrl } from './desktop-network';
 import { desktopHome, desktopStateRead, desktopStateWrite } from './desktop-settings';
 import { DESKTOP } from './desktop.constants';
@@ -36,7 +37,7 @@ async function desktopWaitFor(ready: () => boolean | Promise<boolean>, timeoutMs
   return desktopAttempt();
 }
 
-const webDev = process.env.OPENBOTS_WEB_DEV;
+const webDev = process.env.DESKTOP_WEB_DEV;
 
 function desktopDaemonEntry(): string[] {
   return webDev
@@ -85,7 +86,7 @@ async function desktopPortAnswers(hostname: string, port: number): Promise<boole
   }
 }
 
-/** Openbots already running for this data folder, such as dev servers or a daemon started from the CLI. The app uses it and never stops it. */
+/** A server already running for this data folder, such as dev servers or a daemon started from the CLI. The app uses it and never stops it. */
 async function desktopServerAdopt(): Promise<DesktopServer | null> {
   if (!existsSync(join(desktopHome.root, DESKTOP.daemonSocket))) {
     return null;
@@ -152,7 +153,8 @@ export async function desktopServerStart(settings: DesktopSettings): Promise<Des
     const shared = {
       PATH: process.env.PATH,
       HOME: process.env.HOME,
-      OPENBOTS_DATA_DIR: process.env.OPENBOTS_DATA_DIR,
+      DATA_DIR: process.env.DATA_DIR,
+      APP_NAME: DESKTOP_BUILD.name,
     };
 
     const daemon = Bun.spawn(desktopDaemonEntry(), {
@@ -161,9 +163,9 @@ export async function desktopServerStart(settings: DesktopSettings): Promise<Des
       stderr: log,
       env: {
         ...shared,
-        OPENBOTS_HOST: DESKTOP.localHost,
-        OPENBOTS_PORT: String(daemonPort),
-        OPENBOTS_PUBLIC_URL: url,
+        DAEMON_HOST: DESKTOP.localHost,
+        DAEMON_PORT: String(daemonPort),
+        WEB_PUBLIC_URL: url,
       },
     });
 
@@ -175,9 +177,9 @@ export async function desktopServerStart(settings: DesktopSettings): Promise<Des
       stderr: log,
       env: {
         ...shared,
-        OPENBOTS_WEB_HOST: host,
-        OPENBOTS_WEB_PORT: String(port),
-        OPENBOTS_DAEMON_URL: desktopNetworkUrl(DESKTOP.localHost, daemonPort),
+        WEB_HOST: host,
+        WEB_PORT: String(port),
+        DAEMON_URL: desktopNetworkUrl(DESKTOP.localHost, daemonPort),
       },
     });
 
@@ -244,7 +246,7 @@ export async function desktopServerPairLink(server: DesktopServer): Promise<stri
     env: {
       PATH: process.env.PATH,
       HOME: process.env.HOME,
-      OPENBOTS_DATA_DIR: process.env.OPENBOTS_DATA_DIR,
+      DATA_DIR: process.env.DATA_DIR,
     },
   });
 

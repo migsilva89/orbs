@@ -1,4 +1,4 @@
-import { AVATAR } from '@openbots/contracts/universal';
+import { AVATAR } from '@repo/contracts/universal';
 import { AVATAR_IMAGE } from './avatar.constants';
 
 export function avatarSrc(imageId: string) {

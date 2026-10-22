@@ -1,7 +1,7 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
-import { useSettingsTools } from '@openbots/client/react';
-import { TOOL_APPROVAL, toolSettingsForm } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { useSettingsTools } from '@repo/client/react';
+import { TOOL_APPROVAL, toolSettingsForm } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { SettingsPanel } from '@/components/settings/settings-panel';

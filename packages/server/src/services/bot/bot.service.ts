@@ -18,7 +18,7 @@ import { botQueryPlugins } from './bot-query.plugins';
 import { botQueryPreferences } from './bot-query.preferences';
 import { botQuerySkills } from './bot-query.skills';
 import type * as BotTypes from '../../types/bot.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function makeBotService(deps: Omit<BotTypes.BotServiceDeps, 'queues' | 'changes' | 'muteExpiry'>) {
   const serviceDeps: BotTypes.BotServiceDeps = {

@@ -1,7 +1,7 @@
 import type { RuntimeConversationParams } from './runtime.types';
 import type { InboxItem } from '@earendil-works/pi-durable';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
-import type { Attachment } from '@openbots/contracts/universal';
+import type { Attachment } from '@repo/contracts/universal';
 
 export interface RuntimeAttachments extends PiDurableTypes.JsonObject {
   files: Record<string, Attachment>;

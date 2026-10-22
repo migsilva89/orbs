@@ -1,6 +1,6 @@
 import { copyJson } from '@earendil-works/chord';
 import { AgentDoc } from '@earendil-works/pi-durable';
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeBot, runtimeBotConversations } from '../runtime/runtime.constants';
 import { collaborationTemporaryBinding, collaborationTemporaryContext } from './collaboration.constants';

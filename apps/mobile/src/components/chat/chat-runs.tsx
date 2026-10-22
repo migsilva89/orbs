@@ -1,13 +1,13 @@
-import { BOT_ACTIVITY_LABELS, toolRunning } from '@openbots/client/client';
-import { useChatHideVerbose } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { BOT_ACTIVITY_LABELS, toolRunning } from '@repo/client/client';
+import { useChatHideVerbose } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { View } from 'react-native';
 import { ChatApproval } from './chat-approval';
 import { ChatFailure } from './chat-failure';
 import { ChatQuestion } from './chat-question';
 import { ChatTyping } from './chat-typing';
-import type { ChatActivity, ChatMessage } from '@openbots/client/client';
-import type { Bot, ConversationQuestion, ToolApproval } from '@openbots/contracts/universal';
+import type { ChatActivity, ChatMessage } from '@repo/client/client';
+import type { Bot, ConversationQuestion, ToolApproval } from '@repo/contracts/universal';
 
 interface ChatRunsProps {
   bot: Bot;

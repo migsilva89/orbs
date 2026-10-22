@@ -1,7 +1,7 @@
-import { DEFAULT_EXPRESSION, EXPRESSION_BY_ID } from '@openbots/avatar-blobs/expressions';
-import { avatarMarkup, avatarStill, avatarSvg } from '@openbots/avatar-blobs/player';
-import { BODY_BY_ID, COLOR_BY_ID, DEFAULT_BODY, DEFAULT_COLOR, INVERT_ON_DARK, INVERT_ON_LIGHT } from '@openbots/avatar-blobs/skins';
-import { HALF_VIEWBOX } from '@openbots/avatar-blobs/viewbox';
+import { DEFAULT_EXPRESSION, EXPRESSION_BY_ID } from '@repo/avatar-blobs/expressions';
+import { avatarMarkup, avatarStill, avatarSvg } from '@repo/avatar-blobs/player';
+import { BODY_BY_ID, COLOR_BY_ID, DEFAULT_BODY, DEFAULT_COLOR, INVERT_ON_DARK, INVERT_ON_LIGHT } from '@repo/avatar-blobs/skins';
+import { HALF_VIEWBOX } from '@repo/avatar-blobs/viewbox';
 import { cva } from 'cva';
 import { useId } from 'react';
 import { Image, View } from 'react-native';
@@ -12,7 +12,7 @@ import { useConnection } from '@/hooks/use-connection';
 import { cn } from '@/lib/cn';
 import { connectionAvatarUri } from '@/services/connection/connection.client';
 import { Text } from './text';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot } from '@repo/contracts/universal';
 import type { VariantProps } from 'cva';
 
 // The blob art leaves padding inside its viewbox; zooming in lets it fill the avatar circle.

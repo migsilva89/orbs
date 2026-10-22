@@ -1,6 +1,6 @@
-import { CHAT, ROOMS } from '@openbots/client/client';
-import { useChatAttachmentUrl } from '@openbots/client/web';
-import { m } from '@openbots/i18n/client';
+import { CHAT, ROOMS } from '@repo/client/client';
+import { useChatAttachmentUrl } from '@repo/client/web';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { RoomsDetailsSection } from '@/components/rooms/rooms-details-section';
@@ -12,7 +12,7 @@ import { rpc } from '@/services/rpc/rpc.client';
 import IconFileText from '~icons/lucide/file-text';
 import IconImages from '~icons/lucide/images';
 import IconLayoutDashboard from '~icons/lucide/layout-dashboard';
-import type { Attachment } from '@openbots/contracts/universal';
+import type { Attachment } from '@repo/contracts/universal';
 
 interface RoomsDetailsMediaProps {
   botId: string

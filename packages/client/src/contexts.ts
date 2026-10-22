@@ -1,6 +1,6 @@
 import { applyImmutable } from '@earendil-works/chord/delta';
 import type { Client } from './types/client.types';
-import type { ConversationContextWatchState, ConversationTarget } from '@openbots/contracts/universal';
+import type { ConversationContextWatchState, ConversationTarget } from '@repo/contracts/universal';
 
 export async function* watchConversationContexts(client: Client, params: ConversationTarget, signal: AbortSignal) {
   const frames = await client.conversation.watchContexts(params, { signal });

@@ -3,5 +3,5 @@ export const PROVIDER = {
   maxRetainedSessions: 64,
   maxEvents: 32,
   sessionTimeoutMs: 600_000,
-  agentName: 'openbots',
+  agentName: 'bots',
 } as const;

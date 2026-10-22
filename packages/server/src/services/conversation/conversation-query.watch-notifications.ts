@@ -1,10 +1,10 @@
 import { replicatedState } from '@earendil-works/chord';
 import { BACKGROUND_CONTEXT, withAbortSignal } from '@earendil-works/chord/context';
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match } from 'ts-pattern';
 import { conversationWatchStream } from './conversation-watch.utils';
 import type { ConversationListWatchParams, ConversationServiceDeps } from '../../types/conversation.types';
-import type { NotificationItem, NotificationState } from '@openbots/contracts/universal';
+import type { NotificationItem, NotificationState } from '@repo/contracts/universal';
 
 export async function conversationQueryWatchNotifications(
   { auth, runtime, bots, notifications }: ConversationServiceDeps,

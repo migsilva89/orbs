@@ -1,5 +1,5 @@
-import { avatarImageId } from '@openbots/contracts/universal';
-import { Errors } from '@openbots/errors/universal';
+import { avatarImageId } from '@repo/contracts/universal';
+import { Errors } from '@repo/errors/universal';
 import { realpath } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { AVATAR_IMAGE } from './avatar.constants';

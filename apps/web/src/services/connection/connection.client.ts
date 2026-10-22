@@ -1,10 +1,10 @@
-import { makeHttpClient } from '@openbots/client/client';
-import { connectionStored } from '@openbots/contracts/universal';
+import { makeHttpClient } from '@repo/client/client';
+import { connectionStored } from '@repo/contracts/universal';
 import { createIsomorphicFn } from '@tanstack/react-start';
 import { CONNECTION } from './connection.constants';
 import { connectionCookie, connectionParse } from './connection.utils';
 import type * as ConnectionTypes from '@/types/connection.types';
-import type { ConnectionSaved } from '@openbots/contracts/universal';
+import type { ConnectionSaved } from '@repo/contracts/universal';
 
 export const connectionRead = createIsomorphicFn()
   .server(async () => {

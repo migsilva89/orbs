@@ -1,10 +1,10 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useEffect, useRef, useState } from 'react';
 import { AvatarBlob } from '@/components/avatars/avatar-blob';
 import { cn } from '@/lib/cn';
-import type { ExpressionId } from '@openbots/avatar-blobs/expressions';
-import type { BodyId, ColorId } from '@openbots/avatar-blobs/skins';
-import type { StateId } from '@openbots/avatar-blobs/states';
+import type { ExpressionId } from '@repo/avatar-blobs/expressions';
+import type { BodyId, ColorId } from '@repo/avatar-blobs/skins';
+import type { StateId } from '@repo/avatar-blobs/states';
 
 interface ConnectFriendsBot {
   body: BodyId

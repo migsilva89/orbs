@@ -1,14 +1,14 @@
-import { EXPRESSIONS } from '@openbots/avatar-blobs/expressions';
-import { BODIES, COLORS } from '@openbots/avatar-blobs/skins';
-import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS, BOT } from '@openbots/client/client';
-import { useBotAvatarPick } from '@openbots/client/native';
-import { m } from '@openbots/i18n/client';
+import { EXPRESSIONS } from '@repo/avatar-blobs/expressions';
+import { BODIES, COLORS } from '@repo/avatar-blobs/skins';
+import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS, BOT } from '@repo/client/client';
+import { useBotAvatarPick } from '@repo/client/native';
+import { m } from '@repo/i18n/client';
 import { ChevronLeft, ChevronRight, ImageUp } from 'lucide-react-native';
 import { AccessibilityInfo, Pressable, View } from 'react-native';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import type { BotAvatar } from '@openbots/client/client';
+import type { BotAvatar } from '@repo/client/client';
 
 interface BotAvatarPickerProps {
   name: string;

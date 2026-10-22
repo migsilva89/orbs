@@ -7,7 +7,7 @@ import type { RuntimeBotParams } from '../../types/runtime.types';
 import type { Models } from '@earendil-works/pi-ai/models';
 import type { ModelRef } from '@earendil-works/pi-durable';
 
-const ROUTE_PROVIDER = 'openbots-fallback';
+const ROUTE_PROVIDER = 'bots-fallback';
 
 export function runtimeModelRef(bot: RuntimeBotParams): ModelRef {
   return match(bot.fallbackModel)

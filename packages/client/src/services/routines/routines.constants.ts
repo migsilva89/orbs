@@ -1,5 +1,5 @@
-import { m } from '@openbots/i18n/client';
-import type { RoutineSchedule } from '@openbots/contracts/universal';
+import { m } from '@repo/i18n/client';
+import type { RoutineSchedule } from '@repo/contracts/universal';
 
 export const ROUTINES_SCHEDULE_KINDS = {
   once: m.rooms_routines_kind_once,

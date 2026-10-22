@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { mcpQueryConfig } from './mcp-query.config';
 import { mcpQuerySettings } from './mcp-query.settings';

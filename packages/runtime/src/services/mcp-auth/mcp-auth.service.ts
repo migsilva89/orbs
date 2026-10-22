@@ -8,9 +8,10 @@ import { mcpAuthQueryStatus } from './mcp-auth-query.status';
 import { mcpAuthProvider } from './mcp-auth.utils';
 import type * as McpAuthTypes from '../../types/mcp-auth.types';
 
-export function makeMcpAuthService({ credentials }: McpAuthTypes.McpAuthServiceDeps) {
+export function makeMcpAuthService({ credentials, appName }: McpAuthTypes.McpAuthServiceDeps) {
   const deps: McpAuthTypes.McpAuthServiceState = {
     credentials,
+    appName,
     pending: new Map(),
     providers: new Map(),
     epochs: new Map(),

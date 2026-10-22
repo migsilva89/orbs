@@ -1,13 +1,13 @@
-import { DEFAULT_EXPRESSION, EXPRESSION_BY_ID } from '@openbots/avatar-blobs/expressions';
-import { AvatarPlayer, avatarStill, avatarSvg } from '@openbots/avatar-blobs/player';
-import { BODY_BY_ID, COLOR_BY_ID, COLORS, DEFAULT_BODY, DEFAULT_COLOR, INVERT_ON_DARK, INVERT_ON_LIGHT } from '@openbots/avatar-blobs/skins';
-import { HALF_VIEWBOX } from '@openbots/avatar-blobs/viewbox';
+import { DEFAULT_EXPRESSION, EXPRESSION_BY_ID } from '@repo/avatar-blobs/expressions';
+import { AvatarPlayer, avatarStill, avatarSvg } from '@repo/avatar-blobs/player';
+import { BODY_BY_ID, COLOR_BY_ID, COLORS, DEFAULT_BODY, DEFAULT_COLOR, INVERT_ON_DARK, INVERT_ON_LIGHT } from '@repo/avatar-blobs/skins';
+import { HALF_VIEWBOX } from '@repo/avatar-blobs/viewbox';
 import { createElement, Fragment, useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
 import { cn } from '@/lib/cn';
-import type { ExpressionId } from '@openbots/avatar-blobs/expressions';
-import type { AvatarSvgNode } from '@openbots/avatar-blobs/player';
-import type { BodyId, ColorId } from '@openbots/avatar-blobs/skins';
-import type { StateId } from '@openbots/avatar-blobs/states';
+import type { ExpressionId } from '@repo/avatar-blobs/expressions';
+import type { AvatarSvgNode } from '@repo/avatar-blobs/player';
+import type { BodyId, ColorId } from '@repo/avatar-blobs/skins';
+import type { StateId } from '@repo/avatar-blobs/states';
 import type { ReactElement } from 'react';
 
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';

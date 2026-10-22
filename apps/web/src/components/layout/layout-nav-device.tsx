@@ -1,4 +1,5 @@
-import { m } from '@openbots/i18n/client';
+import { env } from '@repo/env/client';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { match } from 'ts-pattern';
@@ -8,7 +9,7 @@ import { StatusDot } from '@/components/ui/status-dot';
 import { connectionForget } from '@/services/connection/connection.client';
 import { LAYOUT_MENU } from '@/services/layout/layout.constants';
 import { rpc } from '@/services/rpc/rpc.client';
-import BrandsOpenbots from '~icons/brands/openbots';
+import BrandsLogo from '~icons/brands/logo';
 import LucideChevronsUpDown from '~icons/lucide/chevrons-up-down';
 import IconLogOut from '~icons/lucide/log-out';
 import type { ConnectionInfo } from '@/types/connection.types';
@@ -40,13 +41,13 @@ export function LayoutNavDevice({ connection }: LayoutNavDeviceProps) {
           <DropdownMenu.DropdownMenuTrigger asChild>
             <Sidebar.SidebarMenuButton size="lg">
               <span className="relative flex size-8 shrink-0 items-center justify-center">
-                <BrandsOpenbots aria-hidden="true" className="size-5" />
+                <BrandsLogo aria-hidden="true" className="size-5" />
                 <span className="absolute -right-0.5 -bottom-0.5 flex rounded-full bg-sidebar p-0.5">
                   <StatusDot label={server.isError ? m.layout_unreachable() : m.layout_connected()} variant={status} />
                 </span>
               </span>
               <div className="grid flex-1 text-left text-sm/tight group-data-[collapsible=icon]:sr-only">
-                <span className="truncate font-semibold">{m.layout_brand()}</span>
+                <span className="truncate font-semibold">{env.VITE_APP_NAME}</span>
                 <span className="truncate text-xxs text-muted-foreground">{host}</span>
               </div>
               <LucideChevronsUpDown className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />

@@ -1,4 +1,4 @@
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export interface InstructionLoaderServiceDeps {
   root: string;

@@ -1,5 +1,5 @@
-import { BOT_THINKING_LEVEL_LABELS, botChooseModel, botFallbackModel, botModelKey } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { BOT_THINKING_LEVEL_LABELS, botChooseModel, botFallbackModel, botModelKey } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { Brain, Cpu, LifeBuoy, Sparkles } from 'lucide-react-native';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -10,8 +10,8 @@ import { ItemGroup } from '@/components/ui/item';
 import { LabelDescription } from '@/components/ui/label';
 import type { MenuItem } from '@/types/menu.types';
 import type { RpcSession } from '@/types/rpc.types';
-import type { BotModel, BotThinkingLevel } from '@openbots/client/client';
-import type { BotForm, ModelSelection } from '@openbots/contracts/universal';
+import type { BotModel, BotThinkingLevel } from '@repo/client/client';
+import type { BotForm, ModelSelection } from '@repo/contracts/universal';
 
 interface BotSettingsModelProps {
   session: RpcSession;

@@ -1,5 +1,5 @@
-import { ROOMS } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { ROOMS } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { ChevronRight, FileText, Images, LayoutDashboard } from 'lucide-react-native';
@@ -11,7 +11,7 @@ import { Item, ItemButton, ItemContent, ItemGroup, ItemMedia, ItemTitle } from '
 import { Text } from '@/components/ui/text';
 import { connectionFileSource } from '@/services/connection/connection.client';
 import type { RpcSession } from '@/types/rpc.types';
-import type { Attachment } from '@openbots/contracts/universal';
+import type { Attachment } from '@repo/contracts/universal';
 
 interface BotDetailsMediaProps {
   session: RpcSession;

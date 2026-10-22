@@ -1,7 +1,7 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
-import { useBotCreate } from '@openbots/client/react';
-import { botForm } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { useBotCreate } from '@repo/client/react';
+import { botForm } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useForm } from 'react-hook-form';
 import { BotFormAvatar } from '@/components/bots/bot-form-avatar';
 import { BotFormModel } from '@/components/bots/bot-form-model';
@@ -9,8 +9,8 @@ import { BotFormProfile } from '@/components/bots/bot-form-profile';
 import { ButtonLoading } from '@/components/ui/button-loading';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormErrors } from '@/components/ui/forms/form';
-import type { BotSettings } from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type { BotSettings } from '@repo/client/client';
+import type { Bot } from '@repo/contracts/universal';
 
 interface BotCreateDialogProps {
   settings: BotSettings | null

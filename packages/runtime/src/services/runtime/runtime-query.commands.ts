@@ -1,7 +1,7 @@
-import { commandArguments, commandIdArguments } from '@openbots/contracts/universal';
-import * as m from '@openbots/i18n/messages';
+import { commandArguments, commandIdArguments } from '@repo/contracts/universal';
+import * as m from '@repo/i18n/messages';
 import { z } from 'zod';
-import type { Command } from '@openbots/contracts/universal';
+import type { Command } from '@repo/contracts/universal';
 
 const argumentsSchema = z.record(z.string(), z.json()).parse(z.toJSONSchema(commandArguments));
 const idArgumentsSchema = z.record(z.string(), z.json()).parse(z.toJSONSchema(commandIdArguments));

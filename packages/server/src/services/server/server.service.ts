@@ -1,4 +1,4 @@
-import { SERVER_PROTOCOL, serverInfo } from '@openbots/contracts/universal';
+import { SERVER_PROTOCOL, serverInfo } from '@repo/contracts/universal';
 import { serverQueryValidateConnection } from './server-query.validate-connection';
 import type { ServerConnectionParams, ServerServiceDeps } from '../../types/server.types';
 

@@ -8,7 +8,7 @@ import { cn } from '@/lib/cn';
 import { Icon } from './icon';
 import { markdownColorContext } from './markdown';
 import { Text, textContext } from './text';
-import type { BotBubble } from '@openbots/client/client';
+import type { BotBubble } from '@repo/client/client';
 import type { VariantProps } from 'cva';
 import type { ImageURISource, ViewProps } from 'react-native';
 

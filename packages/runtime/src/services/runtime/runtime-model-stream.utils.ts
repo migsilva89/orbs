@@ -5,7 +5,7 @@ import { match, P } from 'ts-pattern';
 import type { RuntimeModelRequest } from '../../types/runtime-model.types';
 import type * as PiAiTypes from '@earendil-works/pi-ai';
 import type { Models, ModelsSimpleStreamOptions } from '@earendil-works/pi-ai/models';
-import type { ModelSelection } from '@openbots/contracts/universal';
+import type { ModelSelection } from '@repo/contracts/universal';
 
 export function runtimeModelStream(models: Models, { route, context, options }: RuntimeModelRequest) {
   const stream = createAssistantMessageEventStream();

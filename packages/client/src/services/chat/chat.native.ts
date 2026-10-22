@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import type { ChatPicked } from '../../types/chat.types';
 
 /** Reads a picked photo or file from its local uri as an uploadable File. */

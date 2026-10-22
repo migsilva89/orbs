@@ -1,9 +1,9 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { SETTINGS } from '../services/settings/settings.constants';
 import { useRpc } from './use-rpc';
-import type { ProviderSession } from '@openbots/contracts/universal';
+import type { ProviderSession } from '@repo/contracts/universal';
 
 /** Follows one provider login: polls while pending, answers its prompts, and refreshes the provider list once it ends. */
 export function useSettingsProviderSession(started: ProviderSession) {

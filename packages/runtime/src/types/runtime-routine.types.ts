@@ -1,5 +1,5 @@
 import { Type } from '@earendil-works/pi-ai';
-import { routineCreate, routineTarget, routineUpdate } from '@openbots/contracts/universal';
+import { routineCreate, routineTarget, routineUpdate } from '@repo/contracts/universal';
 import { z } from 'zod';
 import type { RuntimeServiceDeps } from './runtime.types';
 

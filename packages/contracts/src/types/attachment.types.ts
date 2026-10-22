@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { messageQuote } from './reply.types';
 
 export const ATTACHMENT = {
-  entryKind: 'openbots.attachment-message',
+  entryKind: 'bots.attachment-message',
   maxBytes: 10 * 1024 * 1024,
   maxPerMessage: 4,
   pendingTtlMs: 24 * 60 * 60 * 1000,

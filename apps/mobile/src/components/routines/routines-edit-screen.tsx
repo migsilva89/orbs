@@ -1,6 +1,6 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
-import { routineEditForm } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { routineEditForm } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useRouter } from 'expo-router';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -13,7 +13,7 @@ import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
 import { RoutinesScheduleField } from './routines-schedule-field';
 import type { RpcSession } from '@/types/rpc.types';
-import type { Routine, RoutineEditForm } from '@openbots/contracts/universal';
+import type { Routine, RoutineEditForm } from '@repo/contracts/universal';
 
 interface RoutinesEditScreenProps {
   botId: string;

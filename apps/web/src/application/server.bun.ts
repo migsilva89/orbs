@@ -1,5 +1,5 @@
-import { env } from '@openbots/env/server';
-import { initNativeLogger, log } from '@openbots/logger/server';
+import { env } from '@repo/env/server';
+import { initNativeLogger, log } from '@repo/logger/server';
 import { join, posix, sep } from 'node:path';
 import type { RpcProxySocket } from '@/types/rpc.types';
 import type { ServerWebSocket, WebSocketOptions } from 'bun';
@@ -14,7 +14,7 @@ const PRELOAD_MAX_BYTES = 5 * 1024 * 1024;
 const LOOPBACK_HOSTS = ['127.0.0.1', '::1', 'localhost'];
 
 try {
-  initNativeLogger(env.OPENBOTS_LOG_LEVEL);
+  initNativeLogger(env.LOG_LEVEL);
 
   const app: { default: { fetch: (request: Request) => Promise<Response> } } = await import(SERVER_ENTRY_POINT);
   const assets: Record<string, (request: Request) => Response> = {};
@@ -70,14 +70,14 @@ try {
   }
 
   const server = Bun.serve({
-    hostname: env.OPENBOTS_WEB_HOST,
-    port: env.OPENBOTS_WEB_PORT,
+    hostname: env.WEB_HOST,
+    port: env.WEB_PORT,
     routes: assets,
     fetch: async (request, bun) => {
       const { pathname, search } = new URL(request.url);
 
       if (pathname === '/rpc' || pathname === '/health' || pathname.startsWith('/rpc/') || pathname.startsWith('/files/') || pathname.startsWith('/avatars/')) {
-        const target = new URL(pathname + search, env.OPENBOTS_DAEMON_URL);
+        const target = new URL(pathname + search, env.DAEMON_URL);
         const headers = new Headers(request.headers);
         headers.delete('host');
 
@@ -160,11 +160,11 @@ try {
     onDemandFiles,
   });
 
-  if (!LOOPBACK_HOSTS.includes(env.OPENBOTS_WEB_HOST)) {
+  if (!LOOPBACK_HOSTS.includes(env.WEB_HOST)) {
     log.warn({
       tag: 'native',
-      message: 'The web app is reachable from your network. Set OPENBOTS_WEB_HOST=127.0.0.1 to keep it local.',
-      host: env.OPENBOTS_WEB_HOST,
+      message: 'The web app is reachable from your network. Set WEB_HOST=127.0.0.1 to keep it local.',
+      host: env.WEB_HOST,
     });
   }
 

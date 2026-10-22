@@ -1,5 +1,5 @@
-import { m } from '@openbots/i18n/client';
-import type { ConversationWhenBusy } from '@openbots/contracts/universal';
+import { m } from '@repo/i18n/client';
+import type { ConversationWhenBusy } from '@repo/contracts/universal';
 
 export const ROOMS_MUTE_DURATIONS = [
   { duration: 60 * 60 * 1000, label: m.rooms_mute_1h },
@@ -26,8 +26,8 @@ export const ROOMS = {
   mediaRecentMs: 7 * 24 * 60 * 60 * 1000,
   routinesRefreshMs: 60_000,
   todosRefreshMs: 15_000,
-  draftKeyPrefix: 'openbots.draft.',
-  prefillEvent: 'openbots.prefill',
+  draftKeyPrefix: 'bots.draft.',
+  prefillEvent: 'bots.prefill',
   chime: { notesHz: [660, 880], noteSeconds: 0.12, volume: 0.12, fadeTo: 0.0001, closeMs: 1000 },
   recommendedChoice: '(Recommended)',
   timeGapMs: 60 * 60 * 1000,

@@ -1,6 +1,6 @@
 import { Type } from '@earendil-works/pi-ai';
 import { defineExtension, defineTool } from '@earendil-works/pi-durable';
-import * as m from '@openbots/i18n/messages';
+import * as m from '@repo/i18n/messages';
 import { collaborationActionSend } from './collaboration-action.send';
 import { collaborationDeliveryTask } from './collaboration-delivery.task';
 import { COLLABORATION } from './collaboration.constants';

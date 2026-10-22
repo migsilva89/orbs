@@ -1,5 +1,5 @@
 import { defineTask } from '@earendil-works/pi-durable';
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { routineNextRunAt } from './routine-schedule.utils';
 import { routineWait } from './routine-wait.utils';
@@ -7,7 +7,7 @@ import { routineDocument } from './routine.constants';
 import type { RoutineTaskInput, RoutineTaskState } from '../../types/routine.types';
 
 export const routineTask = defineTask<RoutineTaskInput, RoutineTaskState, null>({
-  name: 'openbots.routine',
+  name: 'bots.routine',
   version: 1,
   initial: () => ({ phase: 'check' }),
   phases: {
@@ -57,7 +57,7 @@ export const routineTask = defineTask<RoutineTaskInput, RoutineTaskState, null>(
         type: 'input',
         content: checkpoint.prompt,
         whenBusy: 'followUp',
-        requestId: `openbots.routine:${task.id}:${checkpoint.occurrence}`,
+        requestId: `bots.routine:${task.id}:${checkpoint.occurrence}`,
       }, context);
 
       await api.commit(async (tx) => {

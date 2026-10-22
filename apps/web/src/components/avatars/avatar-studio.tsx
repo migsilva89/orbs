@@ -1,17 +1,17 @@
-import { DEFAULT_EXPRESSION, EXPRESSIONS } from '@openbots/avatar-blobs/expressions';
-import { BODIES, COLORS, DEFAULT_BODY, DEFAULT_COLOR } from '@openbots/avatar-blobs/skins';
-import { SEQUENCE, stateDef } from '@openbots/avatar-blobs/states';
-import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { DEFAULT_EXPRESSION, EXPRESSIONS } from '@repo/avatar-blobs/expressions';
+import { BODIES, COLORS, DEFAULT_BODY, DEFAULT_COLOR } from '@repo/avatar-blobs/skins';
+import { SEQUENCE, stateDef } from '@repo/avatar-blobs/states';
+import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useEffect, useState } from 'react';
 import { AvatarBlob } from '@/components/avatars/avatar-blob';
 import { LayoutPageHeader } from '@/components/layout/layout-page-header';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label, LabelDescription } from '@/components/ui/label';
-import type { ExpressionId } from '@openbots/avatar-blobs/expressions';
-import type { BodyId, ColorId } from '@openbots/avatar-blobs/skins';
-import type { StateId } from '@openbots/avatar-blobs/states';
+import type { ExpressionId } from '@repo/avatar-blobs/expressions';
+import type { BodyId, ColorId } from '@repo/avatar-blobs/skins';
+import type { StateId } from '@repo/avatar-blobs/states';
 
 const STATE_LABELS = {
   idle: m.avatars_state_idle,

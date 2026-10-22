@@ -1,5 +1,5 @@
 import type * as PiTypes from '@earendil-works/pi-durable';
-import type * as ContractTypes from '@openbots/contracts/universal';
+import type * as ContractTypes from '@repo/contracts/universal';
 
 export interface TodoServiceDeps {
   harness: PiTypes.Harness;

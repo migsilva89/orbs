@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { ScanQrCode } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
@@ -9,6 +9,7 @@ import { Icon } from '@/components/ui/icon';
 import { ItemTitle } from '@/components/ui/item';
 import { LabelDescription } from '@/components/ui/label';
 import { useConnection } from '@/hooks/use-connection';
+import { BRAND_APP_NAME } from '@/services/brand/brand.constants';
 import { SettingsDevicesPair } from './settings-devices-pair';
 
 export function SettingsDevicesPairScreen() {
@@ -28,7 +29,7 @@ export function SettingsDevicesPairScreen() {
             <Icon icon={ScanQrCode} tone="muted" />
             <ItemTitle>{m.settings_devices_scan_title()}</ItemTitle>
           </View>
-          <LabelDescription>{m.settings_devices_scan_description()}</LabelDescription>
+          <LabelDescription>{m.settings_devices_scan_description({ name: BRAND_APP_NAME })}</LabelDescription>
           <Button
             size="sm"
             variant="outline"

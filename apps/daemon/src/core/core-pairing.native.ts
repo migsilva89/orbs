@@ -1,9 +1,9 @@
-import { env } from '@openbots/env/server';
+import { env } from '@repo/env/server';
 import { renderUnicodeCompact } from 'uqr';
-import type { makeServices } from '@openbots/server/server';
+import type { makeServices } from '@repo/server/server';
 
 export function corePairingNative(services: Awaited<ReturnType<typeof makeServices>>): () => void {
-  const serverUrl = new URL(env.OPENBOTS_PUBLIC_URL).origin;
+  const serverUrl = new URL(env.WEB_PUBLIC_URL).origin;
   let timer: Timer | undefined;
 
   async function issue(): Promise<void> {

@@ -1,14 +1,14 @@
-import { ROOMS } from '@openbots/client/client';
-import { useChatPendingSync } from '@openbots/client/react';
-import { AVATAR } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { ROOMS } from '@repo/client/client';
+import { useChatPendingSync } from '@repo/client/react';
+import { AVATAR } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
 import { useEffect, useEffectEvent, useRef } from 'react';
 import { match } from 'ts-pattern';
 import { roomsLink } from '@/services/rooms/rooms.client';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { NotificationItem } from '@openbots/contracts/universal';
+import type { NotificationItem } from '@repo/contracts/universal';
 
 export function useRoomsNotify() {
   const queryClient = useQueryClient();

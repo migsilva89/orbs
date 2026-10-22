@@ -2,7 +2,7 @@ import { MemoryRateLimiter } from '@orpc/ratelimit/memory';
 import { match, P } from 'ts-pattern';
 import { LIMIT } from './limit.constants';
 import type { LimitWindows } from '../../types/limit.types';
-import type { LimitConfigureInput, LimitSettings, LimitWindow } from '@openbots/contracts/universal';
+import type { LimitConfigureInput, LimitSettings, LimitWindow } from '@repo/contracts/universal';
 
 export function limitPeerKey(peer: string | null) {
   return match(peer)

@@ -48,7 +48,7 @@ export function collaborationDeliveryTask({ directory }: Pick<CollaborationTypes
               type: 'input',
               content: answer,
               whenBusy: 'followUp',
-              requestId: `openbots.reply:${task.input.requestId}`,
+              requestId: `bots.reply:${task.input.requestId}`,
               entry: { kind: COLLABORATION.reply,
                 data: {
                   fromBotId: task.input.recipientId,
@@ -82,7 +82,7 @@ async function collaborationDeliver(
         const submission = await conversation.submit({
           type: 'input',
           content: `[Private message from ${input.senderName}. Answer this request; do not delegate it to another bot.]\n\n${input.message}`,
-          requestId: `openbots.delivery:${input.requestId}`,
+          requestId: `bots.delivery:${input.requestId}`,
           whenBusy,
           entry: { kind: COLLABORATION.message,
             data: {

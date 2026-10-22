@@ -13,7 +13,7 @@ function desktopWindowSet(window: Pointer, setter: string, value: ReturnType<typ
 }
 
 export function desktopWindowToolbar(window: Pointer): void {
-  const toolbar = desktopSend.one(desktopSend.none(desktopClass('NSToolbar'), desktopSelector('alloc')), desktopSelector('initWithIdentifier:'), desktopString('openbots'));
+  const toolbar = desktopSend.one(desktopSend.none(desktopClass('NSToolbar'), desktopSelector('alloc')), desktopSelector('initWithIdentifier:'), desktopString('main'));
 
   desktopWindowSet(window, 'setToolbar:', toolbar);
 }

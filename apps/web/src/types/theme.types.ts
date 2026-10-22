@@ -1,4 +1,4 @@
-import type { ThemePalette } from '@openbots/contracts/universal';
+import type { ThemePalette } from '@repo/contracts/universal';
 
 export type ThemeResolved = 'light' | 'dark';
 export type ThemeChoice = ThemeResolved | 'system';

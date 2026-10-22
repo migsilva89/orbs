@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { authTokenHash } from './auth.utils';
 import type { AuthServiceDeps, AuthTokenParams } from '../../types/auth.types';
 

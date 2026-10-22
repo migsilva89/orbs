@@ -1,5 +1,5 @@
 import { CredentialSynchronizationError } from '@earendil-works/pi-coding-agent';
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { providerAbort, providerSweep } from './provider.utils';
 import type * as ProviderTypes from '../../types/provider.types';

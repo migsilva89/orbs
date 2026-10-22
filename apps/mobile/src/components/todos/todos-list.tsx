@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { Circle, CircleCheck, ListTodo, X } from 'lucide-react-native';
@@ -15,7 +15,7 @@ import { Text } from '@/components/ui/text';
 import { useToast } from '@/hooks/use-toast';
 import type { BotDetailsSectionProps } from '@/types/bot-details.types';
 import type { RpcSession } from '@/types/rpc.types';
-import type { Todo } from '@openbots/contracts/universal';
+import type { Todo } from '@repo/contracts/universal';
 
 interface TodosListProps extends BotDetailsSectionProps {
   session: RpcSession;

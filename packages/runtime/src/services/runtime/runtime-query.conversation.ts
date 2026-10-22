@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeBot, runtimeBotConversations } from './runtime.constants';
 import type { RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';

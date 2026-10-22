@@ -5,7 +5,7 @@ import { mcpQueryDiscover } from './mcp-query.discover';
 import { mcpQuerySettings } from './mcp-query.settings';
 import { mcpQueryTarget } from './mcp-query.target';
 import type * as McpTypes from '../../types/mcp.types';
-import type { BotGetInput, McpConfigureInput } from '@openbots/contracts/universal';
+import type { BotGetInput, McpConfigureInput } from '@repo/contracts/universal';
 
 export function makeMcpService(deps: McpTypes.McpServiceDeps) {
   return {

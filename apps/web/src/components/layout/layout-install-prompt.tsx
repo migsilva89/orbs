@@ -1,4 +1,5 @@
-import { m } from '@openbots/i18n/client';
+import { env } from '@repo/env/client';
+import { m } from '@repo/i18n/client';
 import { useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -17,10 +18,10 @@ export function LayoutInstallPrompt() {
   }
 
   return (
-    <aside aria-label={m.layout_install_title()} className="fixed inset-x-4 top-4 z-40 mx-auto max-w-sm">
+    <aside aria-label={m.layout_install_title({ name: env.VITE_APP_NAME })} className="fixed inset-x-4 top-4 z-40 mx-auto max-w-sm">
       <Alert role="note">
         <IconShare />
-        <AlertTitle className="mr-8">{m.layout_install_title()}</AlertTitle>
+        <AlertTitle className="mr-8">{m.layout_install_title({ name: env.VITE_APP_NAME })}</AlertTitle>
         <AlertDescription className="mr-8">{m.layout_install_instructions()}</AlertDescription>
         <Button
           aria-label={m.layout_install_dismiss()}

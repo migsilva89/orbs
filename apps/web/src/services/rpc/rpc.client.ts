@@ -1,6 +1,6 @@
-import { makeClient, makeHttpClient } from '@openbots/client/client';
-import { env } from '@openbots/env/server';
 import { createRouterUtils } from '@orpc/tanstack-query';
+import { makeClient, makeHttpClient } from '@repo/client/client';
+import { env } from '@repo/env/server';
 import { createIsomorphicFn } from '@tanstack/react-start';
 import { getRequest } from '@tanstack/react-start/server';
 import { connectionMigrate, connectionRead, connectionRpcUrl, connectionSocketUrl } from '@/services/connection/connection.client';
@@ -13,7 +13,7 @@ export const rpcClient = createIsomorphicFn()
     const request = getRequest();
 
     return {
-      url: connectionRpcUrl({ serverUrl: env.OPENBOTS_DAEMON_URL }),
+      url: connectionRpcUrl({ serverUrl: env.DAEMON_URL }),
       serverId: connection?.serverId,
       token: () => connection?.token,
       fetch: (url, init) => fetch(url, {

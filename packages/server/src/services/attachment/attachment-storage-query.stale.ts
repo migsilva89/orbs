@@ -1,11 +1,11 @@
-import { ATTACHMENT } from '@openbots/contracts/universal';
+import { ATTACHMENT } from '@repo/contracts/universal';
 import { readdir, realpath, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { match } from 'ts-pattern';
 import { attachmentStorageId } from '../../types/attachment-storage.types';
 import { attachmentStorageDirectory } from './attachment-storage.utils';
 import type { AttachmentStorageDeps, AttachmentStorageTarget } from '../../types/attachment-storage.types';
-import type { Attachment } from '@openbots/contracts/universal';
+import type { Attachment } from '@repo/contracts/universal';
 
 export async function attachmentStorageQueryStale({ root }: AttachmentStorageDeps, params: AttachmentStorageTarget): Promise<Attachment[]> {
   const directory = resolve(await realpath(root), 'agents', params.botId, '.attachments', String(params.conversationId));

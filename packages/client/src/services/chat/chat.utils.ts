@@ -1,10 +1,10 @@
-import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entrySubagentReport, REACTION, reactionMessage, REPLY, replyMessage, toolCallJson } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entrySubagentReport, REACTION, reactionMessage, REPLY, replyMessage, toolCallJson } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { match, P } from 'ts-pattern';
 import { mentionSubmission } from '../mention/mention.client';
 import { CHAT, CHAT_FILE_TYPES } from './chat.constants';
 import type * as ChatTypes from '../../types/chat.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function chatMessages({ entries, bot, bots }: ChatTypes.ChatMessagesParams): ChatTypes.ChatMessage[] {
   const botsById = new Map(bots.map((item) => [item.id, item]));

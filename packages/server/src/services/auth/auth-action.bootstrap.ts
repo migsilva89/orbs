@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match } from 'ts-pattern';
 import { authActionPair } from './auth-action.pair';
 import type { AuthBootstrapParams, AuthServiceDeps } from '../../types/auth.types';

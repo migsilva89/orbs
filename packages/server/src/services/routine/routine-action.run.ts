@@ -1,5 +1,5 @@
 import type { RoutineServiceDeps } from '../../types/routine.types';
-import type { RoutineTarget } from '@openbots/contracts/universal';
+import type { RoutineTarget } from '@repo/contracts/universal';
 
 export async function routineActionRun({ bots, runtime }: RoutineServiceDeps, params: RoutineTarget) {
   await bots.actions.configure({ botId: params.botId });

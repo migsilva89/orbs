@@ -1,5 +1,5 @@
-import { artifactBlocks, artifactComponents } from '@openbots/contracts/universal';
-import * as m from '@openbots/i18n/messages';
+import { artifactBlocks, artifactComponents } from '@repo/contracts/universal';
+import * as m from '@repo/i18n/messages';
 import { z } from 'zod';
 
 const descriptions = {

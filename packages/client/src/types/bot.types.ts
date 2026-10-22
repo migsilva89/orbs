@@ -1,8 +1,8 @@
 import type { ChatActivity } from './chat.types';
-import type { ExpressionId } from '@openbots/avatar-blobs/expressions';
-import type { BodyId, ColorId } from '@openbots/avatar-blobs/skins';
-import type { StateId } from '@openbots/avatar-blobs/states';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type { ExpressionId } from '@repo/avatar-blobs/expressions';
+import type { BodyId, ColorId } from '@repo/avatar-blobs/skins';
+import type { StateId } from '@repo/avatar-blobs/states';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export type BotBrand = 'anthropic' | 'openai' | 'xai' | 'google' | 'deepseek' | 'mistral' | 'qwen' | 'meta' | 'perplexity';
 

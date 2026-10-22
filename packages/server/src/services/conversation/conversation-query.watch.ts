@@ -1,5 +1,5 @@
 import { BACKGROUND_CONTEXT, withAbortSignal } from '@earendil-works/chord/context';
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match } from 'ts-pattern';
 import { conversationWatchStream } from './conversation-watch.utils';
 import type { ConversationServiceDeps, ConversationWatchParams } from '../../types/conversation.types';

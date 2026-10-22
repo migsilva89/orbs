@@ -1,8 +1,8 @@
 import { useKeyboardChatComposerInset } from '@legendapp/list/keyboard';
-import { botBubble, CHAT, roomsMessageText, roomsReactionGroups, roomsTimeLabel } from '@openbots/client/client';
-import { useChatUnread } from '@openbots/client/native';
-import { chatViewOptions, useChatPendingSync, useChatReaction, useChatRoom } from '@openbots/client/react';
-import { getLocale, m } from '@openbots/i18n/client';
+import { botBubble, CHAT, roomsMessageText, roomsReactionGroups, roomsTimeLabel } from '@repo/client/client';
+import { useChatUnread } from '@repo/client/native';
+import { chatViewOptions, useChatPendingSync, useChatReaction, useChatRoom } from '@repo/client/react';
+import { getLocale, m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
@@ -23,8 +23,8 @@ import { ChatMessage } from './chat-message';
 import { ChatRuns } from './chat-runs';
 import type { RpcSession } from '@/types/rpc.types';
 import type { LegendListRef } from '@legendapp/list/react-native';
-import type { ChatMessage as ChatMessageItem, ChatOutgoing, MentionItem } from '@openbots/client/client';
-import type { Bot, ConversationReaction, ConversationView } from '@openbots/contracts/universal';
+import type { ChatMessage as ChatMessageItem, ChatOutgoing, MentionItem } from '@repo/client/client';
+import type { Bot, ConversationReaction, ConversationView } from '@repo/contracts/universal';
 
 interface ChatRoomProps {
   botId: string;

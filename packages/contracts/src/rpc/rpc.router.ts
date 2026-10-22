@@ -1,6 +1,6 @@
-import { errorSchemas } from '@openbots/errors/universal';
 import { asyncIteratorObject, oc as baseContract } from '@orpc/contract';
 import { openapi } from '@orpc/openapi';
+import { errorSchemas } from '@repo/errors/universal';
 import {
   artifact,
   artifactBlocks,

@@ -1,6 +1,6 @@
-import { useSettingsSecrets } from '@openbots/client/react';
-import { secretMode } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { useSettingsSecrets } from '@repo/client/react';
+import { secretMode } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { ExternalLink, KeyRound, Lock, Route, Trash2 } from 'lucide-react-native';
 import { Linking } from 'react-native';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
@@ -8,7 +8,7 @@ import { BotSettingsMenuRow } from '@/components/bots/bot-settings-menu-row';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Item, ItemButton, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
-import type { SecretMode } from '@openbots/contracts/universal';
+import type { SecretMode } from '@repo/contracts/universal';
 
 const SETTINGS_SECRETS_MODE = {
   proxy: m.settings_secrets_mode_proxy,

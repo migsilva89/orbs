@@ -1,9 +1,9 @@
 import { defineDoc, defineDocFamily } from '@earendil-works/pi-durable';
-import { ENTRY } from '@openbots/contracts/universal';
+import { ENTRY } from '@repo/contracts/universal';
 import type * as CollaborationTypes from '../../types/collaboration.types';
 
 export const collaborationCall = defineDoc({
-  kind: 'openbots.bot-delivery-call',
+  kind: 'bots.bot-delivery-call',
   version: 1,
   scope: 'task',
   initial: (): CollaborationTypes.CollaborationCall => ({ deliveryId: null }),
@@ -11,7 +11,7 @@ export const collaborationCall = defineDoc({
 
 /** Random ID of the sender's store. A history clear starts a new store, so old peer bindings and request IDs never match it. */
 export const collaborationStore = defineDoc<CollaborationTypes.CollaborationStore>({
-  kind: 'openbots.bot-store',
+  kind: 'bots.bot-store',
   version: 1,
   scope: 'session',
   initial: () => ({ storeId: null }),
@@ -19,7 +19,7 @@ export const collaborationStore = defineDoc<CollaborationTypes.CollaborationStor
 
 /** Recipient-store binding keyed by `senderId:senderStoreId:sourceConversationId`. */
 export const collaborationTemporaryBinding = defineDocFamily<CollaborationTypes.CollaborationTemporaryBinding, null>({
-  kind: 'openbots.bot-temporary-binding',
+  kind: 'bots.bot-temporary-binding',
   version: 1,
   scope: 'session',
   family: true,
@@ -27,7 +27,7 @@ export const collaborationTemporaryBinding = defineDocFamily<CollaborationTypes.
 });
 
 export const collaborationTemporaryLinks = defineDoc<CollaborationTypes.CollaborationTemporaryLinks>({
-  kind: 'openbots.bot-temporary-links',
+  kind: 'bots.bot-temporary-links',
   version: 1,
   scope: 'conversation',
   history: 'latest',
@@ -36,7 +36,7 @@ export const collaborationTemporaryLinks = defineDoc<CollaborationTypes.Collabor
 });
 
 export const collaborationTemporaryContext = defineDoc<CollaborationTypes.CollaborationTemporaryContext>({
-  kind: 'openbots.bot-temporary-context',
+  kind: 'bots.bot-temporary-context',
   version: 1,
   scope: 'conversation',
   history: 'latest',
@@ -52,8 +52,8 @@ export const collaborationTemporaryContext = defineDoc<CollaborationTypes.Collab
 });
 
 export const COLLABORATION = {
-  extension: 'openbots.collaboration',
-  delivery: 'openbots.bot-delivery',
+  extension: 'bots.collaboration',
+  delivery: 'bots.bot-delivery',
   message: ENTRY.peerMessage,
   reply: ENTRY.peerReply,
 } as const;

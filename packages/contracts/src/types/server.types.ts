@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const SERVER_PROTOCOL = {
   version: 1,
-  versionHeader: 'x-openbots-protocol',
-  serverIdHeader: 'x-openbots-server-id',
+  versionHeader: 'x-bots-protocol',
+  serverIdHeader: 'x-bots-server-id',
 } as const;
 
 export const serverInfo = z.object({

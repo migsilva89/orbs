@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { Electroview } from 'electrobun/view';
 import { DESKTOP } from '../../desktop.constants';
 import type { DesktopConnectView, DesktopRPC } from '../../types/desktop.types';
@@ -33,31 +33,36 @@ const found = connectElement<HTMLElement>('#found');
 const foundLabel = connectElement<HTMLElement>('#found-label');
 const foundList = connectElement<HTMLElement>('#found-list');
 
-const copy: Record<string, string> = {
-  '#choose-title': m.desktop_connect_title(),
-  '#current-title': m.desktop_connection_current(),
-  '#current-mode-label': m.desktop_connection_mode(),
-  '#current-address-label': m.desktop_connect_address(),
-  '#current-network-label': m.desktop_connection_network(),
-  '#current-status-label': m.desktop_connection_status(),
-  '#current-status': m.desktop_connection_checking(),
-  '#choose-hint': m.desktop_connect_hint(),
-  '#local-label': m.desktop_connect_local(),
-  '#local-hint': m.desktop_connect_local_hint(),
-  '#remote-label': m.desktop_connect_remote(),
-  '#remote-hint': m.desktop_connect_remote_hint(),
-  '#address-label': m.desktop_connect_address(),
-  '#submit': m.desktop_connect_button(),
-  '#retry': m.desktop_retry(),
-  '#change': m.desktop_change(),
-  '#unreachable-hint': m.desktop_unreachable_hint(),
-};
+let appName = '';
 
-for (const [selector, text] of Object.entries(copy)) {
-  connectElement(selector).textContent = text;
+function connectCopy(): void {
+  const copy: Record<string, string> = {
+    '#choose-title': m.desktop_connect_title({ name: appName }),
+    '#current-title': m.desktop_connection_current(),
+    '#current-mode-label': m.desktop_connection_mode(),
+    '#current-address-label': m.desktop_connect_address(),
+    '#current-network-label': m.desktop_connection_network(),
+    '#current-status-label': m.desktop_connection_status(),
+    '#current-status': m.desktop_connection_checking(),
+    '#choose-hint': m.desktop_connect_hint(),
+    '#local-label': m.desktop_connect_local(),
+    '#local-hint': m.desktop_connect_local_hint({ name: appName }),
+    '#remote-label': m.desktop_connect_remote(),
+    '#remote-hint': m.desktop_connect_remote_hint({ name: appName }),
+    '#address-label': m.desktop_connect_address(),
+    '#submit': m.desktop_connect_button(),
+    '#retry': m.desktop_retry(),
+    '#change': m.desktop_change(),
+    '#unreachable-hint': m.desktop_unreachable_hint({ name: appName }),
+  };
+
+  for (const [selector, text] of Object.entries(copy)) {
+    connectElement(selector).textContent = text;
+  }
+
+  document.title = appName;
+  address.placeholder = m.desktop_connect_placeholder();
 }
-
-address.placeholder = m.desktop_connect_placeholder();
 
 let busy = false;
 let checking = false;
@@ -84,7 +89,7 @@ function connectRemote(): boolean {
 
 function connectFind(): Promise<void> {
   found.hidden = false;
-  foundLabel.textContent = m.desktop_connect_finding();
+  foundLabel.textContent = m.desktop_connect_finding({ name: appName });
 
   return rpc.request.connectFind().then((servers) => {
     foundLabel.textContent = m.desktop_connect_found();
@@ -131,7 +136,7 @@ function connectShow(view: DesktopConnectView): void {
 
   choose.hidden = view.screen !== 'choose';
   unreachable.hidden = view.screen !== 'unreachable';
-  unreachableTitle.textContent = m.desktop_unreachable_title({ host });
+  unreachableTitle.textContent = m.desktop_unreachable_title({ name: appName, host });
   address.value = view.address;
   current.hidden = !view.current;
 
@@ -189,5 +194,9 @@ setInterval(() => {
   void connectHealth();
 }, DESKTOP.connectRetryMs);
 
-void rpc.request.connectLoad().then(connectShow);
+void rpc.request.connectLoad().then((view) => {
+  appName = view.name;
+  connectCopy();
+  connectShow(view);
+});
 void electroview;

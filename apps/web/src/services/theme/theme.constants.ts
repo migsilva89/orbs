@@ -1,11 +1,11 @@
-import { THEME_PRESETS } from '@openbots/client/client';
+import { THEME_PRESETS } from '@repo/client/client';
 import type { ThemeConfig, ThemeSnapshot } from '@/types/theme.types';
 
 export const THEME_IMPORT_LIMITS = { nameLength: 80, cssLength: 64_000 };
 
 export const THEME_CONFIG: ThemeConfig = {
-  modeKey: 'openbots.theme',
-  palettesKey: 'openbots.palettes',
+  modeKey: 'bots.theme',
+  palettesKey: 'bots.palettes',
   tokens: [
     '--background',
     '--foreground',
@@ -52,6 +52,6 @@ export const THEME_CONFIG: ThemeConfig = {
 export const THEME_SERVER_SNAPSHOT: ThemeSnapshot = {
   choice: 'system',
   resolved: 'light',
-  selected: 'openbots',
+  selected: 'default',
   themes: THEME_PRESETS,
 };

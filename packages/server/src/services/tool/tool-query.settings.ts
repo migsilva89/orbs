@@ -1,4 +1,4 @@
-import { TOOL_APPROVAL, toolApprovalRules, toolApprovalTimeout } from '@openbots/contracts/universal';
+import { TOOL_APPROVAL, toolApprovalRules, toolApprovalTimeout } from '@repo/contracts/universal';
 import { TOOL } from './tool.constants';
 import type { ToolServiceDeps } from '../../types/tool.types';
 

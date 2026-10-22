@@ -4,7 +4,7 @@ import { routineActionRun } from './routine-action.run';
 import { routineActionUpdate } from './routine-action.update';
 import { routineQueryList } from './routine-query.list';
 import type { RoutineServiceDeps } from '../../types/routine.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function makeRoutineService(deps: RoutineServiceDeps) {
   return {

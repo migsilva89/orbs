@@ -1,7 +1,7 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
-import { useBotUpdate } from '@openbots/client/react';
-import { botForm } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { useBotUpdate } from '@repo/client/react';
+import { botForm } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, Outlet, useRouter } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
@@ -27,7 +27,7 @@ import IconScrollText from '~icons/lucide/scroll-text';
 import IconShieldCheck from '~icons/lucide/shield-check';
 import IconSparkles from '~icons/lucide/sparkles';
 import IconTrash from '~icons/lucide/trash-2';
-import type { Bot, BotForm } from '@openbots/contracts/universal';
+import type { Bot, BotForm } from '@repo/contracts/universal';
 
 interface BotPageFormProps {
   bot: Bot

@@ -1,4 +1,4 @@
-import { log } from '@openbots/logger/server';
+import { log } from '@repo/logger/server';
 import { createServerEntry, createStartHandler, defaultStreamHandler } from '@tanstack/react-start/server';
 import { match } from 'ts-pattern';
 import type { Register } from '@tanstack/react-start';

@@ -1,7 +1,7 @@
-import { BOT_ACTIVITY_LABELS, toolRunning } from '@openbots/client/client';
-import { useChatHideVerbose } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
-import type { ChatActivity, ChatMessage } from '@openbots/client/client';
+import { BOT_ACTIVITY_LABELS, toolRunning } from '@repo/client/client';
+import { useChatHideVerbose } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
+import type { ChatActivity, ChatMessage } from '@repo/client/client';
 
 interface RoomsChatActivityProps {
   botName: string

@@ -1,7 +1,7 @@
 import { workspaceActionPrepareDirectory } from './workspace-action.prepare-directory';
 import { workspaceActionRemoveDirectory } from './workspace-action.remove-directory';
 import type { WorkspaceServiceDeps } from '../../types/workspace.types';
-import type { BotGetInput } from '@openbots/contracts/universal';
+import type { BotGetInput } from '@repo/contracts/universal';
 
 export function makeWorkspaceService(deps: WorkspaceServiceDeps) {
   return {

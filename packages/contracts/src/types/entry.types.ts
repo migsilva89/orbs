@@ -1,15 +1,15 @@
 import { z } from 'zod';
 
-/** Entry kinds a client renders. Pi writes the `pi.*` kinds; Openbots writes peer and subagent entries. */
+/** Entry kinds a client renders. Pi writes the `pi.*` kinds; the host writes peer and subagent entries. */
 export const ENTRY = {
   user: 'pi.user',
   assistant: 'pi.assistant',
   toolResult: 'pi.tool-result',
   reset: 'pi.reset',
   compaction: 'pi.compaction',
-  peerMessage: 'openbots.bot-message',
-  peerReply: 'openbots.bot-reply',
-  subagentReport: 'openbots.subagent-report',
+  peerMessage: 'bots.bot-message',
+  peerReply: 'bots.bot-reply',
+  subagentReport: 'bots.subagent-report',
 } as const;
 
 export const entryPeerMessage = z.object({

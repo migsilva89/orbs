@@ -3,8 +3,8 @@
     {
       "layers": [
         {
-          "image-name": "orbs.svg",
-          "name": "orbs",
+          "image-name": "logo.svg",
+          "name": "logo",
           "position": {
             "scale": 1.8,
             "translation-in-points": [

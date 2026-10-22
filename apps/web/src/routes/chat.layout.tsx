@@ -1,6 +1,6 @@
-import { useChatListSync } from '@openbots/client/react';
-import { chatSearch } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { useChatListSync } from '@repo/client/react';
+import { chatSearch } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { LayoutShellDashboard } from '@/components/layout/layout-shell-dashboard';
 import { RoomsDetails } from '@/components/rooms/rooms-details';

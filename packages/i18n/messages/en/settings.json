@@ -109,7 +109,7 @@
   "settings_devices_pair_ready": "Scan this code with the new device, or copy it and paste it there.",
   "settings_devices_scan": "Scan a code",
   "settings_devices_scan_title": "Connect to another server",
-  "settings_devices_scan_description": "Scan a pairing code from another Openbots server. This phone then leaves the current server.",
+  "settings_devices_scan_description": "Scan a pairing code from another {name} server. This phone then leaves the current server.",
   "settings_providers": "Providers",
   "settings_providers_connected": "Connected",
   "settings_providers_disconnected": "Not connected",
@@ -131,7 +131,7 @@
   "settings_providers_link": "Open sign-in page",
   "settings_providers_device_code": "Enter code {code} at",
   "settings_providers_send": "Send",
-  "settings_devices_pair_loopback": "This code works only on this computer. To pair a phone or another computer, open Openbots through its network or Tailscale address first.",
+  "settings_devices_pair_loopback": "This code works only on this computer. To pair a phone or another computer, open {name} through its network or Tailscale address first.",
   "settings_notify_prefer": "Send notifications to",
   "settings_notify_prefer_phone": "Phone",
   "settings_notify_prefer_computer": "Computer"

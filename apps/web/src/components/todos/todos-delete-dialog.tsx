@@ -1,8 +1,8 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ConfirmationDialog } from '@/components/ui/alert-dialog';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { Bot, Todo } from '@openbots/contracts/universal';
+import type { Bot, Todo } from '@repo/contracts/universal';
 
 interface TodosDeleteDialogProps {
   bot: Bot

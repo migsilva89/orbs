@@ -1,8 +1,8 @@
-import { ARTIFACT } from '@openbots/contracts/universal';
+import { ARTIFACT } from '@repo/contracts/universal';
 import type { RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ConversationId, Cursor } from '@earendil-works/pi-durable';
-import type { ArtifactBotListInput, ArtifactSummary } from '@openbots/contracts/universal';
+import type { ArtifactBotListInput, ArtifactSummary } from '@repo/contracts/universal';
 
 export async function runtimeQueryListBotArtifacts(deps: RuntimeServiceDeps, params: ArtifactBotListInput, context: Context): Promise<ArtifactSummary[]> {
   async function runtimeConversations(cursor?: Cursor): Promise<ConversationId[]> {

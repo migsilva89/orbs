@@ -1,5 +1,5 @@
-import { artifactsStore } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { artifactsStore } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { match, P } from 'ts-pattern';
@@ -9,7 +9,7 @@ import { PreviewCard } from '@/components/ui/preview-card';
 import { toasty } from '@/components/ui/sonner';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconLayoutDashboard from '~icons/lucide/layout-dashboard';
-import type { ToolCallArtifact } from '@openbots/contracts/universal';
+import type { ToolCallArtifact } from '@repo/contracts/universal';
 
 interface RoomsChatArtifactProps {
   artifact: ToolCallArtifact

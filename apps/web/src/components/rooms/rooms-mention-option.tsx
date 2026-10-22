@@ -1,10 +1,10 @@
-import { botSkillName, mentionTarget } from '@openbots/client/client';
+import { botSkillName, mentionTarget } from '@repo/client/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconBox from '~icons/lucide/box';
 import IconSquareSlash from '~icons/lucide/square-slash';
-import type { Command, Skill } from '@openbots/contracts/universal';
+import type { Command, Skill } from '@repo/contracts/universal';
 
 interface RoomsMentionOptionProps {
   href: string

@@ -1,5 +1,5 @@
-import { htmlDocument } from '@openbots/client/client';
-import { htmlFrameMessageText } from '@openbots/contracts/universal';
+import { htmlDocument } from '@repo/client/client';
+import { htmlFrameMessageText } from '@repo/contracts/universal';
 import { useEffect, useRef, useState } from 'react';
 import { Linking } from 'react-native';
 import { WebView } from 'react-native-webview';
@@ -74,8 +74,8 @@ export function HtmlFrame({ html, title, fill = false, isUnderHeader = false }: 
 
     if (message.success) {
       match(message.data)
-        .with({ type: 'openbots.html-height' }, ({ height: content }) => setHeight(Math.max(HTML_FRAME_HEIGHT.min, Math.min(HTML_FRAME_HEIGHT.max, content))))
-        .with({ type: 'openbots.html-link' }, ({ url }) => void Linking.openURL(url))
+        .with({ type: 'bots.html-height' }, ({ height: content }) => setHeight(Math.max(HTML_FRAME_HEIGHT.min, Math.min(HTML_FRAME_HEIGHT.max, content))))
+        .with({ type: 'bots.html-link' }, ({ url }) => void Linking.openURL(url))
         .exhaustive();
     }
   }

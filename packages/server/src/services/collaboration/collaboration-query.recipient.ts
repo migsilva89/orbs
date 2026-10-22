@@ -1,7 +1,7 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import type { CollaborationServiceDeps } from '../../types/collaboration.types';
-import type { CollaborationRecipientParams } from '@openbots/runtime/server';
+import type { CollaborationRecipientParams } from '@repo/runtime/server';
 
 export async function collaborationQueryRecipient(
   { database }: CollaborationServiceDeps,

@@ -1,4 +1,4 @@
-import type { RoutineSchedule } from '@openbots/contracts/universal';
+import type { RoutineSchedule } from '@repo/contracts/universal';
 
 export interface RoutinesScheduleTextParams {
   schedule: RoutineSchedule;

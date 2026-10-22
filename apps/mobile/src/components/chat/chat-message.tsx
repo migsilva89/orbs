@@ -1,6 +1,6 @@
-import { mentionMarkdown, mentionTarget } from '@openbots/client/client';
-import { useChatHideVerbose } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { mentionMarkdown, mentionTarget } from '@repo/client/client';
+import { useChatHideVerbose } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { Linking } from 'react-native';
 import { match } from 'ts-pattern';
@@ -19,8 +19,8 @@ import { ChatSubagent } from './chat-subagent';
 import { ChatTools } from './chat-tools';
 import type { ChatMessagePart } from '@/types/chat.types';
 import type { RpcSession } from '@/types/rpc.types';
-import type { BotBubble, ChatMessage as ChatMessageItem, RoomsReactionGroup } from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type { BotBubble, ChatMessage as ChatMessageItem, RoomsReactionGroup } from '@repo/client/client';
+import type { Bot } from '@repo/contracts/universal';
 
 interface ChatMessageProps {
   session: RpcSession;

@@ -1,4 +1,4 @@
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot } from '@repo/contracts/universal';
 
 export interface BotDetailsRouteParams extends Record<string, string | string[] | undefined> {
   botId: string;

@@ -1,5 +1,5 @@
-import { skillSettings } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { skillSettings } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FormErrors } from '@/components/ui/forms/form';

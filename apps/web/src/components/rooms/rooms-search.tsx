@@ -1,7 +1,7 @@
-import { ROOMS, roomsSearchSnippet } from '@openbots/client/client';
-import { useChatSearch } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
-import { getLocale } from '@openbots/i18n/runtime';
+import { ROOMS, roomsSearchSnippet } from '@repo/client/client';
+import { useChatSearch } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
+import { getLocale } from '@repo/i18n/runtime';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useState } from 'react';
 import { BotAvatar } from '@/components/bots/bot-avatar';
@@ -9,7 +9,7 @@ import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, C
 import { Kbd } from '@/components/ui/kbd';
 import { Skeleton } from '@/components/ui/skeleton';
 import { roomsLink } from '@/services/rooms/rooms.client';
-import type { RoomsSearchEntry } from '@openbots/client/client';
+import type { RoomsSearchEntry } from '@repo/client/client';
 
 export function RoomsSearch() {
   const navigate = useNavigate();

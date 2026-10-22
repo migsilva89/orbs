@@ -4,7 +4,7 @@ import { attachmentStorageActionWrite } from './attachment-storage-action.write'
 import { attachmentStorageQueryRead } from './attachment-storage-query.read';
 import { attachmentStorageQueryStale } from './attachment-storage-query.stale';
 import type * as AttachmentStorageTypes from '../../types/attachment-storage.types';
-import type { BotGetInput } from '@openbots/contracts/universal';
+import type { BotGetInput } from '@repo/contracts/universal';
 
 export function makeAttachmentStorageService(deps: AttachmentStorageTypes.AttachmentStorageDeps) {
   return {

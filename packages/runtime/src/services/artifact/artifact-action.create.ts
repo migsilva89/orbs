@@ -3,7 +3,7 @@ import { artifactDocument } from './artifact.constants';
 import { artifactAppendVersion, artifactCopy, artifactReadVersion } from './artifact.utils';
 import type { ArtifactCreateParams, ArtifactRecord, ArtifactServiceDeps } from '../../types/artifact.types';
 import type { Context } from '@earendil-works/chord/context';
-import type { Artifact } from '@openbots/contracts/universal';
+import type { Artifact } from '@repo/contracts/universal';
 
 export async function artifactActionCreate(
   { harness }: ArtifactServiceDeps,

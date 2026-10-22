@@ -1,7 +1,7 @@
 import { Type } from '@earendil-works/pi-ai';
 import { defineExtension, defineTool } from '@earendil-works/pi-durable';
-import { Errors } from '@openbots/errors/universal';
-import * as m from '@openbots/i18n/messages';
+import { Errors } from '@repo/errors/universal';
+import * as m from '@repo/i18n/messages';
 import { match, P } from 'ts-pattern';
 import {
   todoToolCreate,
@@ -16,7 +16,7 @@ import { runtimeBot } from './runtime.constants';
 import type { RuntimeTodoToolsDeps } from '../../types/runtime-todo.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ToolExecutionApi } from '@earendil-works/pi-durable';
-import type { Todo } from '@openbots/contracts/universal';
+import type { Todo } from '@repo/contracts/universal';
 
 export function runtimeTodoToolsExtension(deps: RuntimeTodoToolsDeps) {
   const list = defineTool({
@@ -69,7 +69,7 @@ export function runtimeTodoToolsExtension(deps: RuntimeTodoToolsDeps) {
   });
 
   return {
-    extension: defineExtension({ name: 'openbots.todo-tools', tools: [list, create, update, remove] }),
+    extension: defineExtension({ name: 'bots.todo-tools', tools: [list, create, update, remove] }),
     readOnlyTools: [list],
   };
 }

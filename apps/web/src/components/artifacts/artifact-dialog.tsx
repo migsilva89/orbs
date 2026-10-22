@@ -1,5 +1,5 @@
-import { artifactsStore } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { artifactsStore } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { ArtifactView } from '@/components/artifacts/artifact-view';

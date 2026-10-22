@@ -2,9 +2,9 @@ import { z } from 'zod';
 import { conversationTarget } from './conversation.types';
 
 export const ARTIFACT = {
-  docKind: 'openbots.artifacts',
-  contentKind: 'openbots.artifact-content',
-  entryKind: 'openbots.artifact-version',
+  docKind: 'bots.artifacts',
+  contentKind: 'bots.artifact-content',
+  entryKind: 'bots.artifact-version',
   listLimit: 100,
   versionsKept: 10,
   specBytesMax: 200_000,

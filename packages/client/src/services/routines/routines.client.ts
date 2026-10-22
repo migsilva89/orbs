@@ -1,8 +1,8 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { match } from 'ts-pattern';
 import { ROUTINES } from './routines.constants';
 import type { RoutinesScheduleTextParams } from '../../types/routines.types';
-import type { RoutineSchedule } from '@openbots/contracts/universal';
+import type { RoutineSchedule } from '@repo/contracts/universal';
 
 export function routinesScheduleText({ schedule, locale }: RoutinesScheduleTextParams): string {
   function routinesCronText(expression: string): string {

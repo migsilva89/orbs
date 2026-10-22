@@ -1,7 +1,7 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { BotAvatarPicker } from '@/components/bots/bot-avatar-picker';
-import type { BotForm } from '@openbots/contracts/universal';
+import type { BotForm } from '@repo/contracts/universal';
 
 interface BotFormAvatarProps {
   busy: boolean

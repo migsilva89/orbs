@@ -3,7 +3,7 @@ import { toolActionJudge } from './tool-action.judge';
 import { toolQueryAlwaysAllowed } from './tool-query.always-allowed';
 import { toolQuerySettings } from './tool-query.settings';
 import type { ToolAuthorizeParams, ToolServiceDeps } from '../../types/tool.types';
-import type { RuntimeToolDecision } from '@openbots/runtime/server';
+import type { RuntimeToolDecision } from '@repo/runtime/server';
 
 export async function toolActionAuthorize(deps: ToolServiceDeps, call: ToolAuthorizeParams): Promise<RuntimeToolDecision> {
   call.context.abortSignal?.throwIfAborted();

@@ -1,5 +1,5 @@
-import { useSettingsProviderSession } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useSettingsProviderSession } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { X } from 'lucide-react-native';
 import { Linking, View } from 'react-native';
 import { match } from 'ts-pattern';
@@ -9,7 +9,7 @@ import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { LabelDescription } from '@/components/ui/label';
 import { Text } from '@/components/ui/text';
-import type { ProviderSession } from '@openbots/contracts/universal';
+import type { ProviderSession } from '@repo/contracts/universal';
 
 interface SettingsProviderSessionProps {
   session: ProviderSession;

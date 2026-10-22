@@ -4,8 +4,8 @@ import { RoomsChatApproval } from '@/components/rooms/rooms-chat-approval';
 import { RoomsChatFailure } from '@/components/rooms/rooms-chat-failure';
 import { RoomsChatQuestions } from '@/components/rooms/rooms-chat-questions';
 import { MessageScrollerItem } from '@/components/ui/message-scroller';
-import type { ChatActivity, ChatMessage } from '@openbots/client/client';
-import type { Bot, ConversationQuestion, ToolApproval } from '@openbots/contracts/universal';
+import type { ChatActivity, ChatMessage } from '@repo/client/client';
+import type { Bot, ConversationQuestion, ToolApproval } from '@repo/contracts/universal';
 
 interface RoomsChatRunsProps {
   bot: Bot

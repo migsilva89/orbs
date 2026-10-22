@@ -1,6 +1,7 @@
-import { useSettingsDevices } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
-import { getLocale } from '@openbots/i18n/runtime';
+import { useSettingsDevices } from '@repo/client/react';
+import { env } from '@repo/env/client';
+import { m } from '@repo/i18n/client';
+import { getLocale } from '@repo/i18n/runtime';
 import { Link, useHydrated } from '@tanstack/react-router';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { Button } from '@/components/ui/button';
@@ -83,7 +84,7 @@ export function SettingsDevices({ connection }: SettingsDevicesProps) {
               </Button>
             </div>
           ) : null}
-          {isLoopback ? <PanelDescription>{m.settings_devices_pair_loopback()}</PanelDescription> : null}
+          {isLoopback ? <PanelDescription>{m.settings_devices_pair_loopback({ name: env.VITE_APP_NAME })}</PanelDescription> : null}
           <FormErrors error={settings.pairProblem} />
           <ButtonLoading
             className="self-start"

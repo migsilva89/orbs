@@ -1,7 +1,7 @@
 import { Type } from '@earendil-works/pi-ai';
 import { defineExtension, defineTool } from '@earendil-works/pi-durable';
-import { botCreate } from '@openbots/contracts/universal';
-import * as m from '@openbots/i18n/messages';
+import { botCreate } from '@repo/contracts/universal';
+import * as m from '@repo/i18n/messages';
 import {
   botToolCreate,
   botToolCreateParameters,
@@ -14,7 +14,7 @@ import {
 } from '../../types/runtime-bot-tools.types';
 import { runtimeQueryModels } from './runtime-query.models';
 import type { RuntimeBotToolsDeps } from '../../types/runtime-bot-tools.types';
-import type { Bot, BotCatalog, BotSwapModelsResult } from '@openbots/contracts/universal';
+import type { Bot, BotCatalog, BotSwapModelsResult } from '@repo/contracts/universal';
 
 export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
   const get = defineTool({
@@ -82,7 +82,7 @@ export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
 
   return {
     extension: defineExtension({
-      name: 'openbots.bot-tools',
+      name: 'bots.bot-tools',
       tools: [get, create, update, swapModels, catalog, models],
     }),
     readOnlyTools: [get, catalog, models],

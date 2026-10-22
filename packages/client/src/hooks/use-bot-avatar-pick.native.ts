@@ -1,7 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import { chatReadPicked } from '../services/chat/chat.native';
 import { useBotAvatarUpload } from './use-bot-avatar-upload';
-import type { BotAvatarImage } from '@openbots/contracts/universal';
+import type { BotAvatarImage } from '@repo/contracts/universal';
 
 /** Picks a square photo from the library and uploads it as a bot avatar; resolves null when the owner cancels. */
 export function useBotAvatarPick() {

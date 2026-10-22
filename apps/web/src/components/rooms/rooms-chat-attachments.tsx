@@ -1,7 +1,7 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { PromptInputAttachment, PromptInputDrawer } from '@/components/ui/ai/prompt-input';
 import { InputGroupAddon } from '@/components/ui/input-group';
-import type { useChatAttachmentsWeb } from '@openbots/client/web';
+import type { useChatAttachmentsWeb } from '@repo/client/web';
 
 interface RoomsChatAttachmentsProps {
   files: ReturnType<typeof useChatAttachmentsWeb>

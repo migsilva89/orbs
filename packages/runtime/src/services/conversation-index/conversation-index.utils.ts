@@ -1,11 +1,11 @@
 import { AssistantEntry, UserEntry } from '@earendil-works/pi-durable';
-import { ATTACHMENT, attachmentMessage, REPLY, replyMessage } from '@openbots/contracts/universal';
-import { Errors } from '@openbots/errors/universal';
+import { ATTACHMENT, attachmentMessage, REPLY, replyMessage } from '@repo/contracts/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import type { ConversationIndexDocument, ConversationIndexPreview, ConversationIndexSummary } from '../../types/conversation-index.types';
 import type { Context } from '@earendil-works/chord/context';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
-import type { ConversationSummary } from '@openbots/contracts/universal';
+import type { ConversationSummary } from '@repo/contracts/universal';
 
 export function conversationIndexMessage(entry: PiDurableTypes.EntryRecord): ConversationSummary['lastMessage'] {
   return match(entry.kind)

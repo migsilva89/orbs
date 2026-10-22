@@ -1,4 +1,4 @@
-import { mentionHandle, mentionHref, mentionTarget } from '@openbots/client/client';
+import { mentionHandle, mentionHref, mentionTarget } from '@repo/client/client';
 import { visit } from 'unist-util-visit';
 import type { MentionRemarkParams } from '@/types/mention.types';
 import type { Root, Text } from 'mdast';

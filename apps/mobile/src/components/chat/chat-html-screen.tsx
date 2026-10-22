@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { View } from 'react-native';
 import { HtmlFrame } from '@/components/ui/html-frame';
 

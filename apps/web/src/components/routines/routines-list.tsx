@@ -1,5 +1,5 @@
-import { ROOMS } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { ROOMS } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { RoomsPrefillLink } from '@/components/rooms/rooms-prefill-link';
 import { RoutinesItem } from '@/components/routines/routines-item';
@@ -9,7 +9,7 @@ import { ItemGroup } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCalendarClock from '~icons/lucide/calendar-clock';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot } from '@repo/contracts/universal';
 
 interface RoutinesListProps {
   bot: Bot

@@ -1,7 +1,7 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
-import type { ConversationConfigureInput } from '@openbots/contracts/universal';
+import type { ConversationConfigureInput } from '@repo/contracts/universal';
 
 /** Daemon-wide chat defaults: the send mode for busy bots and whether chats hide tool calls and thinking. */
 export function useChatDefaults() {

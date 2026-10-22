@@ -1,4 +1,4 @@
-import type { makeServices } from '@openbots/server/server';
+import type { makeServices } from '@repo/server/server';
 
 export interface CoreRpcNativeParams {
   isLocal?: boolean;

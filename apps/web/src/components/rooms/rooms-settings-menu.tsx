@@ -2,7 +2,7 @@ import { Slot as SlotPrimitive } from 'radix-ui';
 import { useState } from 'react';
 import { RoomsActions } from '@/components/rooms/rooms-actions';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import type { RoomsChat } from '@openbots/client/client';
+import type { RoomsChat } from '@repo/client/client';
 import type { ComponentProps, MouseEvent, ReactElement } from 'react';
 
 interface RoomsSettingsMenuProps {

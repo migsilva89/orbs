@@ -1,9 +1,9 @@
 import { DndContext, DragOverlay, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { ROOMS_DRAG_PRESS, roomsSidebarOrder } from '@openbots/client/client';
-import { useChatArrange } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { ROOMS_DRAG_PRESS, roomsSidebarOrder } from '@repo/client/client';
+import { useChatArrange } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';

@@ -1,9 +1,9 @@
-import { ROOMS_APPROVAL_CHOICES, roomsApprovalText, toolPresentation } from '@openbots/client/client';
-import { useChatApproval } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { ROOMS_APPROVAL_CHOICES, roomsApprovalText, toolPresentation } from '@repo/client/client';
+import { useChatApproval } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { QuestionCard, QuestionCardHeader, QuestionCardOption, QuestionCardOptions } from '@/components/ui/question-card';
 import { Text } from '@/components/ui/text';
-import type { ToolApproval } from '@openbots/contracts/universal';
+import type { ToolApproval } from '@repo/contracts/universal';
 
 interface ChatApprovalProps {
   approval: ToolApproval;

@@ -1,7 +1,7 @@
-import { BOT_PERMISSION_LABELS, BOT_THINKING_LEVEL_LABELS, ROOMS_SEND_MODE_DEFAULT, ROOMS_SEND_MODES } from '@openbots/client/client';
-import { useBotUpdate, useChatSettings } from '@openbots/client/react';
-import { botFields, conversationWhenBusy } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { BOT_PERMISSION_LABELS, BOT_THINKING_LEVEL_LABELS, ROOMS_SEND_MODE_DEFAULT, ROOMS_SEND_MODES } from '@repo/client/client';
+import { useBotUpdate, useChatSettings } from '@repo/client/react';
+import { botFields, conversationWhenBusy } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { RoomsDetailsSection } from '@/components/rooms/rooms-details-section';
@@ -13,8 +13,8 @@ import IconChevronRight from '~icons/lucide/chevron-right';
 import IconListOrdered from '~icons/lucide/list-ordered';
 import IconSettings2 from '~icons/lucide/settings-2';
 import IconShieldCheck from '~icons/lucide/shield-check';
-import type { RoomsChat } from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type { RoomsChat } from '@repo/client/client';
+import type { Bot } from '@repo/contracts/universal';
 
 interface RoomsDetailsBotProps {
   bot: Bot

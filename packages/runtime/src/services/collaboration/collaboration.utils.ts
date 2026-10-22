@@ -1,5 +1,5 @@
 import { AssistantEntry } from '@earendil-works/pi-durable';
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeBot } from '../runtime/runtime.constants';
 import type { Context } from '@earendil-works/chord/context';

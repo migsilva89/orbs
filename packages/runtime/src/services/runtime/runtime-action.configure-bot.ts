@@ -7,12 +7,12 @@ import type { RuntimeBotParams, RuntimeServiceDeps } from '../../types/runtime.t
 import type { Context } from '@earendil-works/chord/context';
 
 export async function runtimeActionConfigureBot(
-  { harness, registry, extensions, readOnlyTools, index }: RuntimeServiceDeps,
+  { appName, harness, registry, extensions, readOnlyTools, index }: RuntimeServiceDeps,
   bot: RuntimeBotParams,
   context: Context,
 ) {
   // Persisted Pi extension id; renaming would drop already admitted tools.
-  const botTools = defineExtension({ name: `openbots.resources.${bot.id}`, tools: bot.tools });
+  const botTools = defineExtension({ name: `bots.resources.${bot.id}`, tools: bot.tools });
   runtimePluginsInstall(registry, bot.plugins);
   registry.install(botTools);
 
@@ -31,10 +31,10 @@ export async function runtimeActionConfigureBot(
       model: runtimeModelRef(bot),
       thinkingLevel: bot.thinkingLevel,
       instructions: [
-        '# Openbots runtime',
-        'You are a bot inside Openbots. Openbots is the host application; Pi Durable is your agent harness, running inside the Openbots daemon. Your model provider supplies inference, not the host or harness. You are not a standalone Pi, Codex CLI, Claude Code, or Paseo session.',
-        `Your Openbots bot ID is ${bot.id}. Your configured primary model is ${bot.modelProvider}/${bot.modelId}, with ${bot.thinkingLevel} thinking. This is configuration, not proof of which model served a particular response; a configured fallback may be used.`,
-        'Openbots persists your conversation and runs your tools. The available tool schemas describe your current capabilities. Openbots tools use the bot_ prefix for bot management, peer messaging, questions, routines, todos, history, reactions, and artifacts. Native Pi tools, MCP tools, and plugins retain their own names. Use only tools actually available to you; access is subject to your bot permission policy.',
+        `# ${appName} runtime`,
+        `You are a bot inside ${appName}. ${appName} is the host application; Pi Durable is your agent harness, running inside the ${appName} daemon. Your model provider supplies inference, not the host or harness. You are not a standalone Pi, Codex CLI, Claude Code, or Paseo session.`,
+        `Your ${appName} bot ID is ${bot.id}. Your configured primary model is ${bot.modelProvider}/${bot.modelId}, with ${bot.thinkingLevel} thinking. This is configuration, not proof of which model served a particular response; a configured fallback may be used.`,
+        `${appName} persists your conversation and runs your tools. The available tool schemas describe your current capabilities. ${appName} tools use the bot_ prefix for bot management, peer messaging, questions, routines, todos, history, reactions, and artifacts. Native Pi tools, MCP tools, and plugins retain their own names. Use only tools actually available to you; access is subject to your bot permission policy.`,
         'Bot settings, selected instruction files, and skills provide additional context. Do not infer your machine, deployment location, or launcher from a provider name or an instruction file path. If the current context does not establish those details, say they are unknown.',
         RUNTIME_HTML_GUIDE,
         ...bot.instructionFiles.map(({ path, content }) => `# ${path}\n\n${content}`),

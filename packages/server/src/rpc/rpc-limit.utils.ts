@@ -1,5 +1,5 @@
-import { Errors } from '@openbots/errors/universal';
 import { AsyncIteratorClass, isAsyncIteratorObject } from '@orpc/shared';
+import { Errors } from '@repo/errors/universal';
 import { match } from 'ts-pattern';
 import type { LimitLease } from '../types/limit.types';
 import type { RpcLimitOutputParams } from '../types/rpc-limit.types';

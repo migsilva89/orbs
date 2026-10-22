@@ -1,5 +1,5 @@
 import { authorizeMcp } from '@earendil-works/pi-mcp/oauth';
-import { Errors, isAppError } from '@openbots/errors/universal';
+import { Errors, isAppError } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { MCP_AUTH } from './mcp-auth.constants';
 import {

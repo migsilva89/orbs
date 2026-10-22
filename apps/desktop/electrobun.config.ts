@@ -1,22 +1,34 @@
 import type { ElectrobunConfig } from 'electrobun';
 
+const name = process.env.APP_NAME ?? 'Openbots';
+const identifier = process.env.DESKTOP_BUNDLE_ID ?? 'app.openbots.desktop';
+const codesign = process.env.DESKTOP_CODESIGN === 'true';
+
 export default {
   app: {
-    name: 'Openbots',
-    identifier: process.env.OPENBOTS_DESKTOP_ID ?? 'app.openbots.desktop',
-    version: process.env.OPENBOTS_APP_VERSION ?? '0.0.0',
+    name,
+    identifier,
+    version: process.env.DESKTOP_VERSION ?? '0.0.0',
   },
   build: {
     mainProcess: 'bun',
     bun: { entrypoint: 'src/desktop.ts' },
     views: { connect: { entrypoint: 'src/views/connect/index.ts' } },
     copy: {
-      'dist/openbots': 'views/openbots',
+      'dist/server': 'views/server',
       'src/views/connect/index.html': 'views/connect/index.html',
     },
-    mac: { codesign: false, notarize: false, createDmg: false, icons: 'icon.icon', bundleCEF: true, defaultRenderer: 'cef' },
+    mac: {
+      codesign,
+      notarize: codesign && process.env.DESKTOP_NOTARIZE === 'true',
+      createDmg: false,
+      icons: 'icon.icon',
+      bundleCEF: true,
+      defaultRenderer: 'cef',
+    },
   },
   scripts: { postBuild: '../../scripts/desktop-plist.ts' },
-  runtime: { exitOnLastWindowClosed: false },
+  // Read back at runtime through BuildConfig, so packaged builds keep the name and identifier.
+  runtime: { exitOnLastWindowClosed: false, name, identifier },
   release: { generatePatch: false },
 } satisfies ElectrobunConfig;

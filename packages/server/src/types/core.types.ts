@@ -6,7 +6,7 @@ import type { McpService } from '../services/mcp/mcp.service';
 import type { SecretService } from '../services/secret/secret.service';
 import type { SettingsService } from '../services/settings/settings.service';
 import type { WorkspaceService } from '../services/workspace/workspace.service';
-import type * as ServerTypes from '@openbots/runtime/server';
+import type * as ServerTypes from '@repo/runtime/server';
 
 export interface CoreServicesParams {
   database: DatabaseService;

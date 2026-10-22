@@ -1,11 +1,11 @@
-import { ROUTINES_SCHEDULE_KINDS, routinesScheduleDefault } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { ROUTINES_SCHEDULE_KINDS, routinesScheduleDefault } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useFormContext } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { FormControl, FormErrorsAndHint, FormField, FormItem, FormLabel } from '@/components/ui/forms/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { RoutineEditForm, RoutineSchedule } from '@openbots/contracts/universal';
+import type { RoutineEditForm, RoutineSchedule } from '@repo/contracts/universal';
 
 export function RoutinesScheduleFields() {
   const form = useFormContext<RoutineEditForm>();

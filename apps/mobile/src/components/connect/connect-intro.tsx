@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { Lock } from 'lucide-react-native';
 import { View } from 'react-native';
 import { match } from 'ts-pattern';
@@ -11,6 +11,7 @@ import { LabelDescription } from '@/components/ui/label';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
+import { BRAND_APP_NAME } from '@/services/brand/brand.constants';
 import { ConnectForm } from './connect-form';
 
 export function ConnectIntro() {
@@ -30,7 +31,7 @@ export function ConnectIntro() {
               <Brand size="lg" />
             </View>
             <CardTitle className="text-center" size="lg">{m.connect_title()}</CardTitle>
-            <CardDescription className="text-center" variant="plain">{m.mobile_connect_description({ name: m.layout_brand() })}</CardDescription>
+            <CardDescription className="text-center" variant="plain">{m.mobile_connect_description({ name: BRAND_APP_NAME })}</CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             {match(isLoading)
@@ -55,7 +56,7 @@ export function ConnectIntro() {
             className="shrink text-center"
             tone="muted"
             variant="caption"
-          >{m.connect_privacy_proof({ name: m.layout_brand() })}</Text>
+          >{m.connect_privacy_proof({ name: BRAND_APP_NAME })}</Text>
         </View>
       </View>
     </Screen>

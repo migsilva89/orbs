@@ -1,22 +1,30 @@
-import { m } from '@openbots/i18n/messages';
+import { m } from '@repo/i18n/messages';
+import { existsSync } from 'node:fs';
 import { z } from 'zod';
 import type { ExpoConfig } from 'expo/config';
 
+// One .env at the repo root for every app; shell variables still win.
+if (existsSync('../../.env')) {
+  process.loadEnvFile('../../.env');
+}
+
 const appEnv = z.object({
   APP_VARIANT: z.enum(['development', 'preview', 'production']).default('development'),
-  OPENBOTS_APP_NAME: z.string().trim().min(1).default('Openbots'),
-  OPENBOTS_APP_SLUG: z.string().trim().min(1).default('openbots'),
-  OPENBOTS_APP_SCHEME: z.string().trim().min(1).default('openbots'),
-  OPENBOTS_BUNDLE_ID: z.string().trim().min(1).default('app.openbots.mobile'),
-  OPENBOTS_APPLE_TEAM_ID: z.string().trim().min(1).optional(),
-  OPENBOTS_EAS_OWNER: z.string().trim().min(1).optional(),
-  OPENBOTS_EAS_PROJECT_ID: z.uuid().optional(),
-}).parse(process.env);
+  APP_NAME: z.string().trim().min(1).default('Openbots'),
+  MOBILE_BUNDLE_ID: z.string().trim().min(1).default('app.openbots.mobile'),
+  MOBILE_SCHEME: z.string().trim().min(1).default('openbots'),
+  MOBILE_APPLE_TEAM_ID: z.string().trim().min(1).optional(),
+  MOBILE_EAS_SLUG: z.string().trim().min(1).default('openbots'),
+  MOBILE_EAS_OWNER: z.string().trim().min(1).optional(),
+  MOBILE_EAS_PROJECT_ID: z.uuid().optional(),
+}).parse(Object.fromEntries(Object.entries(process.env).filter(([, value]) => value !== '')));
+
+const name = appEnv.APP_NAME;
 
 const VARIANTS = {
-  development: { name: `${appEnv.OPENBOTS_APP_NAME} Dev`, suffix: '-dev', bundleSuffix: '.dev' },
-  preview: { name: `${appEnv.OPENBOTS_APP_NAME} Preview`, suffix: '-preview', bundleSuffix: '.preview' },
-  production: { name: appEnv.OPENBOTS_APP_NAME, suffix: '', bundleSuffix: '' },
+  development: { name: `${name} Dev`, suffix: '-dev', bundleSuffix: '.dev' },
+  preview: { name: `${name} Preview`, suffix: '-preview', bundleSuffix: '.preview' },
+  production: { name, suffix: '', bundleSuffix: '' },
 } satisfies Record<typeof appEnv.APP_VARIANT, { name: string; suffix: string; bundleSuffix: string }>;
 
 const INTER_WEIGHTS = [
@@ -32,37 +40,37 @@ const INTER_WEIGHTS = [
 const interPath = (file: string) => `./node_modules/@expo-google-fonts/inter/${file}`;
 
 const variant = VARIANTS[appEnv.APP_VARIANT];
-const bundleIdentifier = `${appEnv.OPENBOTS_BUNDLE_ID}${variant.bundleSuffix}`;
+const bundleIdentifier = `${appEnv.MOBILE_BUNDLE_ID}${variant.bundleSuffix}`;
 
 export default (): ExpoConfig => ({
   name: variant.name,
-  slug: appEnv.OPENBOTS_APP_SLUG,
-  scheme: `${appEnv.OPENBOTS_APP_SCHEME}${variant.suffix}`,
+  slug: appEnv.MOBILE_EAS_SLUG,
+  scheme: `${appEnv.MOBILE_SCHEME}${variant.suffix}`,
   version: '0.1.0',
   orientation: 'default',
   userInterfaceStyle: 'automatic',
   ios: {
     bundleIdentifier,
-    appleTeamId: appEnv.OPENBOTS_APPLE_TEAM_ID,
+    appleTeamId: appEnv.MOBILE_APPLE_TEAM_ID,
     supportsTablet: true,
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
-      NSLocalNetworkUsageDescription: m.mobile_local_network_permission(),
+      NSLocalNetworkUsageDescription: m.mobile_local_network_permission({ name }),
     },
   },
   android: {
     package: bundleIdentifier,
   },
   experiments: { typedRoutes: true },
-  owner: appEnv.OPENBOTS_EAS_OWNER,
-  extra: { eas: { projectId: appEnv.OPENBOTS_EAS_PROJECT_ID } },
+  owner: appEnv.MOBILE_EAS_OWNER,
+  extra: { appName: name, eas: { projectId: appEnv.MOBILE_EAS_PROJECT_ID } },
   plugins: [
     'expo-router',
     'expo-secure-store',
     'expo-notifications',
     '@pierrecapo/expo-notification-service-extension',
-    ['expo-camera', { cameraPermission: m.mobile_camera_permission(), microphonePermission: false, recordAudioAndroid: false }],
-    ['expo-image-picker', { photosPermission: m.mobile_photos_permission(), cameraPermission: m.mobile_camera_permission(), microphonePermission: false }],
+    ['expo-camera', { cameraPermission: m.mobile_camera_permission({ name }), microphonePermission: false, recordAudioAndroid: false }],
+    ['expo-image-picker', { photosPermission: m.mobile_photos_permission({ name }), cameraPermission: m.mobile_camera_permission({ name }), microphonePermission: false }],
     [
       'expo-font',
       {

@@ -1,5 +1,5 @@
 import type { ChatMessage } from './chat.types';
-import type { Bot, ToolCallArtifact, ToolCallSubagent } from '@openbots/contracts/universal';
+import type { Bot, ToolCallArtifact, ToolCallSubagent } from '@repo/contracts/universal';
 import type { DynamicToolUIPart } from 'ai';
 
 /** A tool call in a message, for clients that do not depend on the AI SDK. */

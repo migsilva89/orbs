@@ -1,6 +1,6 @@
 import type { SettingsService } from '../services/settings/settings.service';
-import type { Bot, SkillSettings } from '@openbots/contracts/universal';
-import type { SkillLoaderService } from '@openbots/runtime/server';
+import type { Bot, SkillSettings } from '@repo/contracts/universal';
+import type { SkillLoaderService } from '@repo/runtime/server';
 
 export interface SkillServiceDeps {
   settings: SettingsService;

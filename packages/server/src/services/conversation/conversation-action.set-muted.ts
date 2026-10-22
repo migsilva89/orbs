@@ -1,8 +1,8 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { conversationQueryPreferences } from './conversation-query.preferences';
 import type { ConversationServiceDeps } from '../../types/conversation.types';
-import type { ConversationSetMutedInput } from '@openbots/contracts/universal';
+import type { ConversationSetMutedInput } from '@repo/contracts/universal';
 
 export async function conversationActionSetMuted(deps: ConversationServiceDeps, { botId, isMuted, mutedUntil }: ConversationSetMutedInput) {
   match({ isMuted, mutedUntil })

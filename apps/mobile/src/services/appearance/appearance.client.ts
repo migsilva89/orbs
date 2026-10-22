@@ -1,5 +1,5 @@
-import { THEME_PRESETS } from '@openbots/client/client';
-import { themePreferences } from '@openbots/contracts/universal';
+import { THEME_PRESETS } from '@repo/client/client';
+import { themePreferences } from '@repo/contracts/universal';
 import * as SecureStore from 'expo-secure-store';
 import { Uniwind } from 'uniwind';
 import { APPEARANCE_CHOICES, APPEARANCE_DARK_SELECTORS, APPEARANCE_PALETTES_KEY, APPEARANCE_STORAGE_KEY } from './appearance.constants';
@@ -21,12 +21,12 @@ export function appearancePalettesRead(): AppearanceTypes.AppearancePalettes {
   const stored = themePreferences.safeParse(JSON.parse(SecureStore.getItem(APPEARANCE_PALETTES_KEY) ?? 'null'));
 
   if (!stored.success) {
-    return { selected: 'openbots', themes: THEME_PRESETS };
+    return { selected: 'default', themes: THEME_PRESETS };
   }
 
   const themes = [...THEME_PRESETS, ...stored.data.custom.filter((theme) => !THEME_PRESETS.some((preset) => preset.id === theme.id))];
 
-  return { selected: themes.some((theme) => theme.id === stored.data.selected) ? stored.data.selected : 'openbots', themes };
+  return { selected: themes.some((theme) => theme.id === stored.data.selected) ? stored.data.selected : 'default', themes };
 }
 
 export function appearancePalettesSave({ selected, themes }: AppearanceTypes.AppearancePalettes) {

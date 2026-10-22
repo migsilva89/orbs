@@ -1,5 +1,5 @@
-import { authToken } from '@openbots/contracts/universal';
-import { Errors } from '@openbots/errors/universal';
+import { authToken } from '@repo/contracts/universal';
+import { Errors } from '@repo/errors/universal';
 import { match } from 'ts-pattern';
 import { authQueryDevice } from './auth-query.device';
 import type { AuthAuthenticateParams, AuthServiceDeps } from '../../types/auth.types';

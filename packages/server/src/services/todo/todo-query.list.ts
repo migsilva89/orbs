@@ -1,5 +1,5 @@
 import type { TodoServiceDeps } from '../../types/todo.types';
-import type { BotGetInput } from '@openbots/contracts/universal';
+import type { BotGetInput } from '@repo/contracts/universal';
 
 export async function todoQueryList({ bots, runtime }: TodoServiceDeps, params: BotGetInput) {
   await bots.queries.get({ botId: params.botId });

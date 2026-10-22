@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { cva } from 'cva';
 import { cn } from '@/lib/cn';
 import IconLucideBan from '~icons/lucide/ban';

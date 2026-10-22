@@ -1,10 +1,10 @@
-import { env } from '@openbots/env/server';
+import { env } from '@repo/env/server';
 import { isIP } from 'node:net';
 import { match, P } from 'ts-pattern';
-import { coreHandler } from '@openbots/server/server';
+import { coreHandler } from '@repo/server/server';
 import { coreRpcNative } from './core-rpc.native';
 import type { CoreServerAvatarParams } from '../types/core.types';
-import type { makeServices } from '@openbots/server/server';
+import type { makeServices } from '@repo/server/server';
 
 const CORE_SERVER_AVATAR = /^\/avatars\/(?:bots\/(?<botId>[\da-f-]{36})\.png|(?<imageId>[\da-f-]{36})\.webp)$/u;
 
@@ -12,8 +12,8 @@ export function coreServerNative(services: Awaited<ReturnType<typeof makeService
   const rpc = coreRpcNative(services);
 
   return Bun.serve({
-    hostname: env.OPENBOTS_HOST,
-    port: env.OPENBOTS_PORT,
+    hostname: env.DAEMON_HOST,
+    port: env.DAEMON_PORT,
     maxRequestBodySize: 12 * 1024 * 1024,
     fetch(request, server) {
       const url = new URL(request.url);
@@ -86,7 +86,7 @@ function coreServerAllowedOrigin(request: Request): boolean {
     .otherwise((value) => {
       const hostname = URL.parse(value)?.hostname.replace(/^\[|\]$/gu, '') ?? '';
 
-      return env.OPENBOTS_ALLOWED_ORIGINS.includes(URL.parse(value)?.origin ?? value)
+      return env.DAEMON_ALLOWED_ORIGINS.includes(URL.parse(value)?.origin ?? value)
         || isIP(hostname) !== 0
         || hostname === 'localhost'
         || hostname.endsWith('.localhost');

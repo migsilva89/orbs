@@ -1,4 +1,4 @@
-import { chatInitialViewOptions } from '@openbots/client/react';
+import { chatInitialViewOptions } from '@repo/client/react';
 import { createFileRoute, Outlet, useMatch } from '@tanstack/react-router';
 import { RoomsPage } from '@/components/rooms/rooms-page';
 import { roomsDirectBot } from '@/services/rooms/rooms.client';

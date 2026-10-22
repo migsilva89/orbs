@@ -1,7 +1,7 @@
 import { defineCatalog } from '@json-render/core';
 import { defineRegistry, JSONUIProvider, Renderer, useBoundProp } from '@json-render/react';
 import { schema } from '@json-render/react/schema';
-import { artifactComponents } from '@openbots/contracts/universal';
+import { artifactComponents } from '@repo/contracts/universal';
 import { Children, lazy, Suspense, useId } from 'react';
 import { match, P } from 'ts-pattern';
 import { Response } from '@/components/ui/ai/response';
@@ -28,7 +28,7 @@ import IconChevronDown from '~icons/lucide/chevron-down';
 import IconExternalLink from '~icons/lucide/external-link';
 import IconInfo from '~icons/lucide/info';
 import type { StateStore } from '@json-render/core';
-import type { ArtifactSpec } from '@openbots/contracts/universal';
+import type { ArtifactSpec } from '@repo/contracts/universal';
 
 const ArtifactChart = lazy(() => import('@/components/artifacts/artifact-chart').then((module) => ({ default: module.ArtifactChart })));
 

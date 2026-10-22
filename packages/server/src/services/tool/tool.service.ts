@@ -6,8 +6,8 @@ import { toolQuerySettings } from './tool-query.settings';
 import { TOOL } from './tool.constants';
 import type { ToolAllowAlwaysParams, ToolAlwaysAllowedParams, ToolServiceDeps } from '../../types/tool.types';
 import type { Context } from '@earendil-works/chord/context';
-import type { ToolConfigureInput } from '@openbots/contracts/universal';
-import type { RuntimeToolCall } from '@openbots/runtime/server';
+import type { ToolConfigureInput } from '@repo/contracts/universal';
+import type { RuntimeToolCall } from '@repo/runtime/server';
 
 export function makeToolService(deps: ToolServiceDeps) {
   return {

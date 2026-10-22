@@ -1,10 +1,10 @@
-import { roomsMessageText } from '@openbots/client/client';
+import { roomsMessageText } from '@repo/client/client';
 import { useState } from 'react';
 import { Avatar } from '@/components/ui/avatar';
 import { Trace, TraceCode, TraceContent, TraceRow } from '@/components/ui/trace';
 import { chatNoticeTitle } from '@/services/chat/chat.utils';
-import type { ChatMessage } from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type { ChatMessage } from '@repo/client/client';
+import type { Bot } from '@repo/contracts/universal';
 
 interface ChatNoticeProps {
   message: ChatMessage;

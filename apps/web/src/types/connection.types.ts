@@ -1,4 +1,4 @@
-import type { AuthPairPayload, ConnectionSaved } from '@openbots/contracts/universal';
+import type { AuthPairPayload, ConnectionSaved } from '@repo/contracts/universal';
 
 export type ConnectionInfo = Pick<ConnectionSaved, 'serverUrl' | 'serverId' | 'deviceId'>;
 

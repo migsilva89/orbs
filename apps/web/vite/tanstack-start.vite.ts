@@ -21,9 +21,9 @@ export function createTanstackStartPlugin() {
       maxTraceDepth: 30,
       client: {
         specifiers: [
-          '@openbots/env/server',
-          '@openbots/i18n/server',
-          '@openbots/logger/server',
+          '@repo/env/server',
+          '@repo/i18n/server',
+          '@repo/logger/server',
         ],
         files: ['**/*.server.*'],
       },

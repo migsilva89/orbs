@@ -72,11 +72,14 @@ export const desktopTailscaleStatus = z.object({
   })).optional(),
 });
 
-export const desktopHealth = z.object({ status: z.literal('ok'), app: z.literal('openbots') });
+/** App name and bundle ID that electrobun.config.ts stores in the build. */
+export const desktopBuild = z.object({ name: z.string().min(1), identifier: z.string().min(1) });
+
+export const desktopHealth = z.object({ status: z.literal('ok'), app: z.literal('bots') });
 
 export type DesktopTailscale = 'running' | 'stopped' | 'missing';
 
-export type DesktopProbe = { status: 'invalid' } | { status: 'ok' | 'self' | 'not-openbots' | 'unreachable'; url: string };
+export type DesktopProbe = { status: 'invalid' } | { status: 'ok' | 'self' | 'foreign' | 'unreachable'; url: string };
 
 export interface DesktopOrigins {
   tailscale: DesktopTailscale;
@@ -104,6 +107,7 @@ export interface DesktopFound {
 }
 
 export interface DesktopConnectView {
+  name: string;
   screen: DesktopConnectScreen;
   remote: boolean;
   address: string;

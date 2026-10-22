@@ -4,8 +4,8 @@ import type { McpService } from '../services/mcp/mcp.service';
 import type { PluginService } from '../services/plugin/plugin.service';
 import type { SkillService } from '../services/skill/skill.service';
 import type { WorkspaceService } from '../services/workspace/workspace.service';
-import type * as UniversalTypes from '@openbots/contracts/universal';
-import type { RuntimeService } from '@openbots/runtime/server';
+import type * as UniversalTypes from '@repo/contracts/universal';
+import type { RuntimeService } from '@repo/runtime/server';
 
 export interface BotDatabaseDeps {
   database: DatabaseService;

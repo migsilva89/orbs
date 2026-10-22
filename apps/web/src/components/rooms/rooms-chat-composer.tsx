@@ -1,8 +1,8 @@
-import { chatResetCommand, mentionHref, mentionSegments, ROOMS, roomsMessageText } from '@openbots/client/client';
-import { useChatSend } from '@openbots/client/react';
-import { useChatAttachmentsWeb, useChatDraft } from '@openbots/client/web';
-import { ATTACHMENT } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { chatResetCommand, mentionHref, mentionSegments, ROOMS, roomsMessageText } from '@repo/client/client';
+import { useChatSend } from '@repo/client/react';
+import { useChatAttachmentsWeb, useChatDraft } from '@repo/client/web';
+import { ATTACHMENT } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
@@ -21,8 +21,8 @@ import { usePreferences } from '@/hooks/use-preferences';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconPaperclip from '~icons/lucide/paperclip';
 import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
-import type * as ClientTypes from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type * as ClientTypes from '@repo/client/client';
+import type { Bot } from '@repo/contracts/universal';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 
 const PromptInputEditor = lazy(() => import('@/components/ui/ai/prompt-input-editor').then((module) => ({ default: module.PromptInputEditor })));

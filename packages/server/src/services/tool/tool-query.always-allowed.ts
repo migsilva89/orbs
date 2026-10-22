@@ -1,4 +1,4 @@
-import { toolAlwaysAllowed } from '@openbots/contracts/universal';
+import { toolAlwaysAllowed } from '@repo/contracts/universal';
 import { TOOL } from './tool.constants';
 import type { ToolAlwaysAllowedParams, ToolServiceDeps } from '../../types/tool.types';
 

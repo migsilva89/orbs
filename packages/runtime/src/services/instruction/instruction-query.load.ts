@@ -1,5 +1,5 @@
 import { getAgentDir } from '@earendil-works/pi-coding-agent';
-import { log } from '@openbots/logger/server';
+import { log } from '@repo/logger/server';
 import { readFile, realpath, stat } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';

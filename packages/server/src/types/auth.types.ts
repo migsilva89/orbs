@@ -1,5 +1,5 @@
 import type { DatabaseService } from '../services/database/database.service';
-import type { AuthPairInput } from '@openbots/contracts/universal';
+import type { AuthPairInput } from '@repo/contracts/universal';
 
 export interface AuthServiceParams {
   database: DatabaseService;

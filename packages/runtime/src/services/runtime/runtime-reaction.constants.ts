@@ -1,5 +1,5 @@
 import { defineDocFamily } from '@earendil-works/pi-durable';
-import { REACTION } from '@openbots/contracts/universal';
+import { REACTION } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import type { RuntimeReaction } from '../../types/reaction.types';
 

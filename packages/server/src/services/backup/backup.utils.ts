@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { createHash } from 'node:crypto';
 import { constants } from 'node:fs';
 import { chmod, lstat, mkdir, open, readdir, readFile, realpath, rename, rm, rmdir, writeFile } from 'node:fs/promises';
@@ -73,7 +73,7 @@ export async function backupAssertSource(root: string) {
 
 export async function backupStage(destination: string) {
   await backupAssertAbsent(destination);
-  const staging = join(dirname(destination), `.openbots-backup-${crypto.randomUUID()}`);
+  const staging = join(dirname(destination), `.bots-backup-${crypto.randomUUID()}`);
   await mkdir(staging, { mode: DIRECTORY_MODE });
 
   return staging;

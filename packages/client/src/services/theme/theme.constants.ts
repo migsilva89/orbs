@@ -1,7 +1,7 @@
-import type { ThemePalette } from '@openbots/contracts/universal';
+import type { ThemePalette } from '@repo/contracts/universal';
 
 export const THEME_PRESETS: ThemePalette[] = [
-  { id: 'openbots', name: 'Openbots', light: {}, dark: {} },
+  { id: 'default', name: 'Default', light: {}, dark: {} },
   {
     id: 'ocean',
     name: 'Ocean',

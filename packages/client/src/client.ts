@@ -1,8 +1,8 @@
-import { SERVER_PROTOCOL } from '@openbots/contracts/universal';
 import { createORPCClient, DynamicLink } from '@orpc/client';
 import { RPCLink as FetchRPCLink } from '@orpc/client/fetch';
 import { RetryLinkPlugin } from '@orpc/client/plugins';
 import { RPCLink } from '@orpc/client/websocket';
+import { SERVER_PROTOCOL } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import type { Client, ClientOptions, HttpClientOptions } from './types/client.types';
 

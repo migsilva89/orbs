@@ -1,5 +1,5 @@
-import { htmlDocument } from '@openbots/client/client';
-import { htmlFrameMessage } from '@openbots/contracts/universal';
+import { htmlDocument } from '@repo/client/client';
+import { htmlFrameMessage } from '@repo/contracts/universal';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
 import { useTheme } from '@/hooks/use-theme';
@@ -19,7 +19,7 @@ export function HtmlFrame({ html, title }: HtmlFrameProps) {
   const postTheme = () => {
     const styles = getComputedStyle(window.document.documentElement);
     frame.current?.contentWindow?.postMessage({
-      type: 'openbots.html-theme',
+      type: 'bots.html-theme',
       appearance: theme.resolved,
       tokens: Object.fromEntries(THEME_CONFIG.tokens.map((token) => [token, styles.getPropertyValue(token)])),
     }, '*');
@@ -39,8 +39,8 @@ export function HtmlFrame({ html, title }: HtmlFrameProps) {
         return;
       }
       match(message.data)
-        .with({ type: 'openbots.html-height' }, ({ height: contentHeight }) => setHeight(Math.max(80, Math.min(1600, contentHeight))))
-        .with({ type: 'openbots.html-link' }, ({ url }) => {
+        .with({ type: 'bots.html-height' }, ({ height: contentHeight }) => setHeight(Math.max(80, Math.min(1600, contentHeight))))
+        .with({ type: 'bots.html-link' }, ({ url }) => {
           if (window.document.activeElement === frame.current && navigator.userActivation.isActive) {
             window.open(url, '_blank', 'noopener,noreferrer');
           }

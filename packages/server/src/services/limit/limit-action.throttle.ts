@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match } from 'ts-pattern';
 import { limitPeerKey, limitRetryAfterSeconds } from './limit.utils';
 import type { LimitRuntimeDeps, LimitThrottleParams } from '../../types/limit.types';

@@ -2,7 +2,7 @@ import { match, P } from 'ts-pattern';
 import { toolQuerySettings } from './tool-query.settings';
 import { TOOL } from './tool.constants';
 import type { ToolServiceDeps } from '../../types/tool.types';
-import type { ToolConfigureInput } from '@openbots/contracts/universal';
+import type { ToolConfigureInput } from '@repo/contracts/universal';
 
 export async function toolActionConfigure(deps: ToolServiceDeps, { jevApiKey, approvalRules, approvalTimeoutMinutes }: ToolConfigureInput) {
   await match(jevApiKey)

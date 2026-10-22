@@ -1,4 +1,4 @@
-import { makeStorageLockService } from '@openbots/runtime/native';
+import { makeStorageLockService } from '@repo/runtime/native';
 import { join } from 'node:path';
 import { backupCreate } from '../../types/backup.types';
 import { BACKUP } from './backup.constants';

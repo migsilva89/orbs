@@ -1,5 +1,5 @@
 {
-  "name": "@openbots/tanstack-helpers",
+  "name": "@repo/tanstack-helpers",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -20,7 +20,7 @@
     "type-fest": "catalog:"
   },
   "devDependencies": {
-    "@openbots/typescript-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "typescript": "catalog:"

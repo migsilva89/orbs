@@ -1,8 +1,8 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
-import { botDefaultSettings } from '@openbots/client/client';
-import { useBotCreate } from '@openbots/client/react';
-import { botForm } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { botDefaultSettings } from '@repo/client/client';
+import { useBotCreate } from '@repo/client/react';
+import { botForm } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useRouter } from 'expo-router';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -14,7 +14,7 @@ import { BotSettingsProfile } from '@/components/bots/bot-settings-profile';
 import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
 import type { RpcSession } from '@/types/rpc.types';
-import type { BotSettings } from '@openbots/client/client';
+import type { BotSettings } from '@repo/client/client';
 
 export function BotCreateScreen() {
   const { session } = useConnection();

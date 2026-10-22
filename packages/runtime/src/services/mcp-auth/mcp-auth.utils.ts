@@ -1,5 +1,5 @@
 import { adaptOAuthProvider, McpOAuthAuthorizationRequiredError, McpOAuthProvider } from '@earendil-works/pi-mcp/oauth';
-import { Errors, isAppError } from '@openbots/errors/universal';
+import { Errors, isAppError } from '@repo/errors/universal';
 import { createHash } from 'node:crypto';
 import { match, P } from 'ts-pattern';
 import { mcpAuthStored } from '../../types/mcp-auth.types';
@@ -236,7 +236,7 @@ export function mcpAuthBind(
       const oauth = new McpOAuthProvider({
         serverUrl,
         redirectUrl,
-        clientMetadata: { client_name: MCP_AUTH.clientName },
+        clientMetadata: { client_name: deps.appName },
         store: mcpAuthStateStore(deps, serverUrl, {
           redirectUrl,
           epoch,

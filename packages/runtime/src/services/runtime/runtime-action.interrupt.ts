@@ -1,5 +1,5 @@
 import { GenerationTask, LiveDoc, UserEntry } from '@earendil-works/pi-durable';
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import type { RuntimeInterruptDraft, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';

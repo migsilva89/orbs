@@ -1,5 +1,5 @@
-import { contract, SERVER_PROTOCOL } from '@openbots/contracts/universal';
 import { implement } from '@orpc/server';
+import { contract, SERVER_PROTOCOL } from '@repo/contracts/universal';
 import { match } from 'ts-pattern';
 import { rpcLimitOutput } from './rpc-limit.utils';
 import type { RpcContext } from '../types/rpc.types';

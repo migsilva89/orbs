@@ -1,6 +1,6 @@
-import { botBubble, roomsMessageText } from '@openbots/client/client';
-import { chatViewOptions, useChatPendingSync, useChatRoom } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { botBubble, roomsMessageText } from '@repo/client/client';
+import { chatViewOptions, useChatPendingSync, useChatRoom } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
@@ -19,7 +19,7 @@ import { useConnection } from '@/hooks/use-connection';
 import { ChatMessage } from './chat-message';
 import { ChatRuns } from './chat-runs';
 import type { RpcSession } from '@/types/rpc.types';
-import type { Bot, ConversationView } from '@openbots/contracts/universal';
+import type { Bot, ConversationView } from '@repo/contracts/universal';
 
 interface ChatSubagentScreenProps {
   botId: string;

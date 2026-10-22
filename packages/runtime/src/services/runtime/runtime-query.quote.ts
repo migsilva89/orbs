@@ -1,11 +1,11 @@
 import { AssistantEntry, UserEntry } from '@earendil-works/pi-durable';
-import { ATTACHMENT, attachmentMessage, REPLY, replyMessage } from '@openbots/contracts/universal';
-import { Errors } from '@openbots/errors/universal';
+import { ATTACHMENT, attachmentMessage, REPLY, replyMessage } from '@repo/contracts/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import type { RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { ConversationId, EntryId } from '@earendil-works/pi-durable';
-import type { MessageQuote } from '@openbots/contracts/universal';
+import type { MessageQuote } from '@repo/contracts/universal';
 
 export async function runtimeQueryQuote(
   { harness }: RuntimeServiceDeps,
@@ -39,7 +39,7 @@ export async function runtimeQueryQuote(
           role: 'user' as const,
           content: replyMessage.parse(value.data).content,
         }))
-        .with({ conversationId, kind: P.union(UserEntry.kind, AssistantEntry.kind, 'openbots.bot-message', 'openbots.bot-reply') }, (value) => (
+        .with({ conversationId, kind: P.union(UserEntry.kind, AssistantEntry.kind, 'bots.bot-message', 'bots.bot-reply') }, (value) => (
           match(value.model?.[0])
             .with({ role: P.union('user', 'assistant') }, (message) => ({
               role: message.role,
@@ -59,7 +59,7 @@ export async function runtimeQueryQuote(
           role: value.role,
           content: value.content.slice(0, 4000),
           ...match(entry)
-            .with({ kind: P.union('openbots.bot-message', 'openbots.bot-reply'), data: { fromBotId: P.string } }, ({ data }) => ({
+            .with({ kind: P.union('bots.bot-message', 'bots.bot-reply'), data: { fromBotId: P.string } }, ({ data }) => ({
               role: 'assistant' as const,
               botId: data.fromBotId,
             }))

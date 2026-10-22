@@ -1,4 +1,4 @@
-import { avatarImageId } from '@openbots/contracts/universal';
+import { avatarImageId } from '@repo/contracts/universal';
 import { readdir, stat } from 'node:fs/promises';
 import { basename, resolve } from 'node:path';
 import { match } from 'ts-pattern';

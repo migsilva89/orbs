@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { Slot as SlotPrimitive } from 'radix-ui';
 import { cn } from '@/lib/cn';
 import ChevronRightICon from '~icons/lucide/chevron-right';

@@ -1,5 +1,5 @@
 import { defineExtension, section } from '@earendil-works/pi-durable';
-import * as m from '@openbots/i18n/messages';
+import * as m from '@repo/i18n/messages';
 import { match } from 'ts-pattern';
 import { TODO_PROMPT_LIMIT, todoDocument } from './todo.constants';
 
@@ -8,7 +8,7 @@ import { TODO_PROMPT_LIMIT, todoDocument } from './todo.constants';
  * keeps the prompt cache warm, and an empty list omits the section.
  */
 export const todoExtension = defineExtension({
-  name: 'openbots.todos',
+  name: 'bots.todos',
   sections: [section('todos', async (input, context) => {
     const doc = await input.read.snapshot(todoDocument, input.conversationId, context);
     const open = (doc?.todos ?? []).filter((todo) => !todo.isDone);

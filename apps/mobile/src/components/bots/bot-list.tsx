@@ -1,6 +1,6 @@
-import { watchConversations } from '@openbots/client/client';
-import { useChatSearch } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { watchConversations } from '@repo/client/client';
+import { useChatSearch } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { experimental_streamedQuery as streamedQuery, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { Bot, LayoutDashboard, Plus, QrCode, Star, UserRound } from 'lucide-react-native';
@@ -28,7 +28,7 @@ import { botHomeSections } from '@/services/bot/bot-home.utils';
 import { BotHomeRow } from './bot-home-row';
 import type { BotHomeGroup } from '@/types/bot-home.types';
 import type { ConnectionContextValue } from '@/types/connection-context.types';
-import type { ConversationListItem } from '@openbots/contracts/universal';
+import type { ConversationListItem } from '@repo/contracts/universal';
 
 export function BotList() {
   const { session } = useConnection();

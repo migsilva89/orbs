@@ -2,7 +2,7 @@ import { match } from 'ts-pattern';
 import { LIMIT } from './limit.constants';
 import { limitSettingsMerge, limitWindowsCreate } from './limit.utils';
 import type { LimitRuntimeDeps } from '../../types/limit.types';
-import type { LimitConfigureInput } from '@openbots/contracts/universal';
+import type { LimitConfigureInput } from '@repo/contracts/universal';
 
 export async function limitActionConfigure(deps: LimitRuntimeDeps, params: LimitConfigureInput) {
   const previous = deps.state.configure;

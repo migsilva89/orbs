@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import type * as ToolTypes from '../../types/tool.types';
 
 export const TOOL_PREVIEW_KEYS = ['command', 'path', 'query', 'name', 'title', 'text', 'emoji'];

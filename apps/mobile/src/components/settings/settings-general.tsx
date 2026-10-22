@@ -1,7 +1,7 @@
-import { ROOMS_SEND_MODES } from '@openbots/client/client';
-import { useChatDefaults, useChatHideVerbose, useNotificationSettings } from '@openbots/client/react';
-import { conversationWhenBusy, notificationPlatform } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { ROOMS_SEND_MODES } from '@repo/client/client';
+import { useChatDefaults, useChatHideVerbose, useNotificationSettings } from '@repo/client/react';
+import { conversationWhenBusy, notificationPlatform } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { BellRing, EyeOff, ListOrdered, Monitor, Palette, Settings } from 'lucide-react-native';
 import { useState } from 'react';
@@ -15,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { appearanceRead, appearanceSave } from '@/services/appearance/appearance.client';
 import { APPEARANCE_CHOICES } from '@/services/appearance/appearance.constants';
 import type { AppearanceChoice } from '@/types/appearance.types';
-import type { NotificationPlatform } from '@openbots/contracts/universal';
+import type { NotificationPlatform } from '@repo/contracts/universal';
 
 const SETTINGS_APPEARANCE_LABELS = {
   system: m.settings_appearance_system,

@@ -1,10 +1,10 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { match } from 'ts-pattern';
 import { useRpc } from './use-rpc';
 import type { SettingsProviderStatus } from '../types/settings.types';
-import type { Provider, ProviderAuthType, ProviderSession } from '@openbots/contracts/universal';
+import type { Provider, ProviderAuthType, ProviderSession } from '@repo/contracts/universal';
 
 /** AI provider sign-in: connected and available providers, and the login still running or failed; finished ones show in the list instead. */
 export function useSettingsProviders() {

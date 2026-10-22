@@ -29,7 +29,7 @@ import { conversationQueryWatchContexts } from './conversation-query.watch-conte
 import { conversationQueryWatchList } from './conversation-query.watch-list';
 import { conversationQueryWatchNotifications } from './conversation-query.watch-notifications';
 import type * as ConversationTypes from '../../types/conversation.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function makeConversationService(deps: ConversationTypes.ConversationServiceDeps) {
   return {

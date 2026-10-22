@@ -1,7 +1,7 @@
-import { DEFAULT_EXPRESSION, EXPRESSION_BY_ID } from '@openbots/avatar-blobs/expressions';
-import { avatarMarkup, avatarStill, avatarSvg } from '@openbots/avatar-blobs/player';
-import { BODY_BY_ID, COLOR_BY_ID, DEFAULT_BODY, DEFAULT_COLOR } from '@openbots/avatar-blobs/skins';
-import { HALF_VIEWBOX } from '@openbots/avatar-blobs/viewbox';
+import { DEFAULT_EXPRESSION, EXPRESSION_BY_ID } from '@repo/avatar-blobs/expressions';
+import { avatarMarkup, avatarStill, avatarSvg } from '@repo/avatar-blobs/player';
+import { BODY_BY_ID, COLOR_BY_ID, DEFAULT_BODY, DEFAULT_COLOR } from '@repo/avatar-blobs/skins';
+import { HALF_VIEWBOX } from '@repo/avatar-blobs/viewbox';
 import { render } from 'takumi-js';
 import { container, image, text } from 'takumi-js/helpers';
 import { match, P } from 'ts-pattern';

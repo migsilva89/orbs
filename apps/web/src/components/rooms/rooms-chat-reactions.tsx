@@ -1,5 +1,5 @@
-import { m } from '@openbots/i18n/client';
-import type { RoomsReactionGroup } from '@openbots/client/client';
+import { m } from '@repo/i18n/client';
+import type { RoomsReactionGroup } from '@repo/client/client';
 
 interface RoomsChatReactionsProps {
   groups: RoomsReactionGroup[]

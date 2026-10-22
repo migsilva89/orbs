@@ -1,6 +1,6 @@
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import IconArrowLeftRight from '~icons/lucide/arrow-left-right';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot } from '@repo/contracts/universal';
 
 interface RoomsPairPillProps {
   sender: Bot

@@ -9,8 +9,8 @@ import type { ToolService } from '../services/tool/tool.service';
 import type { AuthAuthenticateParams } from './auth.types';
 import type { BotPreferences } from './bot.types';
 import type { ReplicatedState } from '@earendil-works/chord';
-import type { ConversationAnswerQuestionInput } from '@openbots/contracts/universal';
-import type { RuntimeService } from '@openbots/runtime/server';
+import type { ConversationAnswerQuestionInput } from '@repo/contracts/universal';
+import type { RuntimeService } from '@repo/runtime/server';
 
 export interface ConversationServiceDeps {
   auth: AuthService;

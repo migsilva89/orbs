@@ -1,4 +1,4 @@
-import { notificationItemKey } from '@openbots/runtime/server';
+import { notificationItemKey } from '@repo/runtime/server';
 import { notificationQuerySettings } from './notification-query.settings';
 import { NOTIFICATION } from './notification.constants';
 import { notificationActiveAt } from './notification.utils';

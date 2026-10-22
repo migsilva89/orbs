@@ -3,7 +3,7 @@ import { themeActionSubscribe } from './theme-action.subscribe.client';
 import { themeQuerySnapshot } from './theme-query.snapshot.client';
 import { THEME_CONFIG, THEME_SERVER_SNAPSHOT } from './theme.constants';
 import type * as ThemeTypes from '@/types/theme.types';
-import type { ThemePalette } from '@openbots/contracts/universal';
+import type { ThemePalette } from '@repo/contracts/universal';
 
 export function themeCreateService() {
   const state: ThemeTypes.ThemeState = { listeners: new Set() };

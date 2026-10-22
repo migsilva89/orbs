@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match } from 'ts-pattern';
 import { providerAbort, providerOwnedSession, providerSweep } from './provider.utils';
 import type * as ProviderTypes from '../../types/provider.types';

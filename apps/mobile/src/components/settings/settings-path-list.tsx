@@ -1,5 +1,5 @@
-import { skillSettings } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { skillSettings } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { Trash2 } from 'lucide-react-native';
 import { useState } from 'react';
 import { View } from 'react-native';

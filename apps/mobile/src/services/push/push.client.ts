@@ -1,5 +1,5 @@
-import { notificationPushData } from '@openbots/contracts/universal';
 import { configureNotificationExtension } from '@pierrecapo/expo-notification-service-extension';
+import { notificationPushData } from '@repo/contracts/universal';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';

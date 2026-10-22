@@ -1,7 +1,7 @@
-import { useChatDraft } from '@openbots/client/web';
+import { useChatDraft } from '@repo/client/web';
 import { Link } from '@tanstack/react-router';
 import { roomsLink } from '@/services/rooms/rooms.client';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot } from '@repo/contracts/universal';
 import type { ReactNode } from 'react';
 
 interface RoomsPrefillLinkProps {

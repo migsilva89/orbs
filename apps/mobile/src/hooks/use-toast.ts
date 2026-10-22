@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { use } from 'react';
 import { match, P } from 'ts-pattern';
 import { toastContext } from '@/context/toast';

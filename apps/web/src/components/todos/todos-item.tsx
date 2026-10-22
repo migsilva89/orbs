@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { toasty } from '@/components/ui/sonner';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconGripVertical from '~icons/lucide/grip-vertical';
 import IconX from '~icons/lucide/x';
-import type { Bot, Todo } from '@openbots/contracts/universal';
+import type { Bot, Todo } from '@repo/contracts/universal';
 
 interface TodosItemProps {
   bot: Bot

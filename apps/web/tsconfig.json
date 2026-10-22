@@ -1,5 +1,5 @@
 {
-  "extends": "@openbots/typescript-config/react.json",
+  "extends": "@repo/typescript-config/react.json",
   "compilerOptions": {
     "strict": true,
     "tsBuildInfoFile": "./node_modules/.cache/typescript/tsbuildinfo.json",

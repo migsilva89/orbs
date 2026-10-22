@@ -5,7 +5,7 @@ import { limitQuerySettings } from './limit-query.settings';
 import { LIMIT } from './limit.constants';
 import { limitWindowsCreate } from './limit.utils';
 import type * as LimitTypes from '../../types/limit.types';
-import type { LimitConfigureInput } from '@openbots/contracts/universal';
+import type { LimitConfigureInput } from '@repo/contracts/universal';
 
 export function makeLimitService(deps: LimitTypes.LimitServiceDeps) {
   const runtime: LimitTypes.LimitRuntimeDeps = {

@@ -1,3 +1,7 @@
+import Constants from 'expo-constants';
+
+export const BRAND_APP_NAME: string = Constants.expoConfig?.extra?.appName;
+
 export const BRAND_LOGOS = {
   anthropic: [
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 257" fill="currentColor"><path fill="#d97757" d="m50.228 170.321l50.357-28.257l.843',

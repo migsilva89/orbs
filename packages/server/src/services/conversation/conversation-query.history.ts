@@ -1,5 +1,5 @@
 import type { ConversationServiceDeps } from '../../types/conversation.types';
-import type { ConversationHistoryInput } from '@openbots/contracts/universal';
+import type { ConversationHistoryInput } from '@repo/contracts/universal';
 
 export async function conversationQueryHistory({ runtime, bots }: ConversationServiceDeps, params: ConversationHistoryInput) {
   await bots.queries.get({ botId: params.botId });

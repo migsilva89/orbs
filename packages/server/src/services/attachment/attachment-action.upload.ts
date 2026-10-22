@@ -1,7 +1,7 @@
 import { attachmentActionSweep } from './attachment-action.sweep';
 import { attachmentName } from './attachment.utils';
 import type { AttachmentServiceDeps } from '../../types/attachment.types';
-import type { AttachmentUploadInput } from '@openbots/contracts/universal';
+import type { AttachmentUploadInput } from '@repo/contracts/universal';
 
 export async function attachmentActionUpload(deps: AttachmentServiceDeps, params: AttachmentUploadInput) {
   const { bots, runtime, storage } = deps;

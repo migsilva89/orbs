@@ -1,7 +1,7 @@
-import { useSettingsProviderLogout } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useSettingsProviderLogout } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { ConfirmationDialog } from '@/components/ui/alert-dialog';
-import type { Provider } from '@openbots/contracts/universal';
+import type { Provider } from '@repo/contracts/universal';
 
 interface SettingsProviderLogoutDialogProps {
   provider: Provider

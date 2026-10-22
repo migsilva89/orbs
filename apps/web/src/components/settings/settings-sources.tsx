@@ -1,5 +1,5 @@
-import { useSettingsSources } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useSettingsSources } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { SettingsPathList } from '@/components/settings/settings-path-list';
 import { PanelRow } from '@/components/ui/panel';

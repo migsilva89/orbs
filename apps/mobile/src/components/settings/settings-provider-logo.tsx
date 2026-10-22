@@ -1,4 +1,4 @@
-import { botModelBrand } from '@openbots/client/client';
+import { botModelBrand } from '@repo/client/client';
 import { Server } from 'lucide-react-native';
 import { match } from 'ts-pattern';
 import { BotBrandLogo } from '@/components/bots/bot-brand-logo';

@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { env } from '@repo/env/client';
 import { cva } from 'cva';
 import { cn } from '@/lib/cn';
 
@@ -14,5 +14,5 @@ interface LayoutBrandProps {
 }
 
 export function LayoutBrand({ className, size }: LayoutBrandProps) {
-  return <span className={cn(layoutBrandVariants({ size }), className)}>{m.layout_brand()}</span>;
+  return <span className={cn(layoutBrandVariants({ size }), className)}>{env.VITE_APP_NAME}</span>;
 }

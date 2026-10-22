@@ -1,9 +1,9 @@
-import { credentialsKey } from '@openbots/contracts/universal';
+import { credentialsKey } from '@repo/contracts/universal';
 import { z } from 'zod';
 import type { McpAuthService } from '../services/mcp-auth/mcp-auth.service';
 import type { ToolRegistration } from '@earendil-works/pi-durable';
 import type { AuthProvider, McpClient } from '@earendil-works/pi-mcp';
-import type { McpCatalog } from '@openbots/contracts/universal';
+import type { McpCatalog } from '@repo/contracts/universal';
 
 export interface McpClientServiceDeps {
   root: string;

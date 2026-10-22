@@ -1,6 +1,6 @@
 import type { SettingsService } from '../services/settings/settings.service';
-import type { Bot, InstructionSettings } from '@openbots/contracts/universal';
-import type { InstructionLoaderService } from '@openbots/runtime/server';
+import type { Bot, InstructionSettings } from '@repo/contracts/universal';
+import type { InstructionLoaderService } from '@repo/runtime/server';
 
 export interface InstructionServiceDeps {
   settings: SettingsService;

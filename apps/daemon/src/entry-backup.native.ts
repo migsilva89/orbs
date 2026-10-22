@@ -1,14 +1,14 @@
-import { env } from '@openbots/env/server';
-import { initNativeLogger, log } from '@openbots/logger/server';
+import { env } from '@repo/env/server';
+import { initNativeLogger, log } from '@repo/logger/server';
 import { resolve } from 'node:path';
 import { match, P } from 'ts-pattern';
-import { makeBackupService, workspacePathsRootNative } from '@openbots/server/native';
+import { makeBackupService, workspacePathsRootNative } from '@repo/server/native';
 
-initNativeLogger(env.OPENBOTS_LOG_LEVEL);
+initNativeLogger(env.LOG_LEVEL);
 
 const args = process.argv.slice(2);
 const [command, path] = args;
-const backup = makeBackupService({ root: workspacePathsRootNative(env.OPENBOTS_DATA_DIR) });
+const backup = makeBackupService({ root: workspacePathsRootNative(env.DATA_DIR) });
 
 const run = match(args)
   .with(['create', P.string], ([, destination]) => () => backup.actions.create({ destination: resolve(destination) }))

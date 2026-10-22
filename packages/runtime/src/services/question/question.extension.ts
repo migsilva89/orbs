@@ -1,7 +1,7 @@
 import { Type } from '@earendil-works/pi-ai';
 import { defineExtension, defineTool } from '@earendil-works/pi-durable';
-import { QUESTION as QUESTION_BOUNDS } from '@openbots/contracts/universal';
-import * as m from '@openbots/i18n/messages';
+import { QUESTION as QUESTION_BOUNDS } from '@repo/contracts/universal';
+import * as m from '@repo/i18n/messages';
 import { questionActionAsk } from './question-action.ask';
 import { QUESTION } from './question.constants';
 

@@ -1,4 +1,4 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { mcpAuthAbort, mcpAuthBumpSave, mcpAuthPrune, mcpAuthServerUrl } from './mcp-auth.utils';
 import type * as McpAuthTypes from '../../types/mcp-auth.types';

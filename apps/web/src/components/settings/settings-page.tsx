@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { ClientOnly, Link } from '@tanstack/react-router';
 import { LayoutPageHeader } from '@/components/layout/layout-page-header';
 import { SettingsAppearance } from '@/components/settings/settings-appearance';

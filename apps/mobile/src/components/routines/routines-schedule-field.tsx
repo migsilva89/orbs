@@ -1,6 +1,6 @@
 import { DatePicker, Host } from '@expo/ui/swift-ui';
-import { ROUTINES_SCHEDULE_KINDS, routinesScheduleDefault } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { ROUTINES_SCHEDULE_KINDS, routinesScheduleDefault } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { ChevronsUpDown } from 'lucide-react-native';
 import { useController, useFormContext } from 'react-hook-form';
 import { View } from 'react-native';
@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label, LabelDescription } from '@/components/ui/label';
 import { Menu } from '@/components/ui/menu';
 import { Text } from '@/components/ui/text';
-import type { RoutineEditForm } from '@openbots/contracts/universal';
+import type { RoutineEditForm } from '@repo/contracts/universal';
 
 interface RoutinesScheduleFieldProps {
   isDisabled: boolean;

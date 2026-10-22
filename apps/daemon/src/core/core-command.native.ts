@@ -1,9 +1,9 @@
-import { authPair, SERVER_PROTOCOL } from '@openbots/contracts/universal';
-import { env } from '@openbots/env/server';
-import { Errors } from '@openbots/errors/universal';
-import { log } from '@openbots/logger/server';
 import { createORPCClient } from '@orpc/client';
 import { RPCLink } from '@orpc/client/fetch';
+import { authPair, SERVER_PROTOCOL } from '@repo/contracts/universal';
+import { env } from '@repo/env/server';
+import { Errors } from '@repo/errors/universal';
+import { log } from '@repo/logger/server';
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { realpathSync } from 'node:fs';
@@ -13,9 +13,9 @@ import { dirname, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { match } from 'ts-pattern';
 import { renderUnicodeCompact } from 'uqr';
-import { workspacePathsRootNative } from '@openbots/server/native';
-import type { router } from '@openbots/server/server';
+import { workspacePathsRootNative } from '@repo/server/native';
 import type { RouterClient } from '@orpc/server';
+import type { router } from '@repo/server/server';
 
 const HELP = `Usage:
   openbots start [--detach]
@@ -28,7 +28,7 @@ Service commands change startup at the next macOS login, not the running daemon.
 `;
 
 const ENTRY = realpathSync(process.argv[1]);
-const ROOT = workspacePathsRootNative(env.OPENBOTS_DATA_DIR);
+const ROOT = workspacePathsRootNative(env.DATA_DIR);
 const LOG = join(ROOT, 'data', 'daemon.log');
 
 export async function coreCommandNative(): Promise<void> {
@@ -76,7 +76,7 @@ export async function coreCommandNative(): Promise<void> {
     });
 }
 
-async function coreCommandPairNative(url = env.OPENBOTS_PUBLIC_URL): Promise<void> {
+async function coreCommandPairNative(url = env.WEB_PUBLIC_URL): Promise<void> {
   const { serverUrl } = authPair.parse({ serverUrl: url });
   const unix = join(ROOT, 'data', 'ipc', 'rpc.sock');
 
@@ -107,7 +107,7 @@ async function coreCommandDetachNative(): Promise<void> {
       child.once('exit', () => reject(new Errors.INTERNAL_ERROR({ internal: `Daemon failed to start. See ${LOG}` })));
       child.once('message', (message) => {
         match(message)
-          .with('openbots:ready', () => ready())
+          .with('daemon:ready', () => ready())
           .otherwise(() => reject(new Errors.INTERNAL_ERROR({ internal: `Unexpected daemon startup response. See ${LOG}` })));
       });
     });
@@ -133,7 +133,7 @@ async function coreCommandServiceNative(command: 'register' | 'unregister'): Pro
     });
 
   const id = createHash('sha256').update(ROOT).digest('hex').slice(0, 12);
-  const label = `app.openbots.daemon.${id}`;
+  const label = `bots.daemon.${id}`;
   const path = join(homedir(), 'Library', 'LaunchAgents', `${label}.plist`);
 
   await match(command)
@@ -152,7 +152,7 @@ async function coreCommandServiceNative(command: 'register' | 'unregister'): Pro
         WorkingDirectory: resolve(import.meta.dirname, '../..'),
         EnvironmentVariables: {
           ...Object.fromEntries(Object.entries(env).map(([key, value]) => [key, String(value)])),
-          OPENBOTS_DATA_DIR: ROOT,
+          DATA_DIR: ROOT,
           PATH: process.env.PATH ?? '/usr/bin:/bin:/usr/sbin:/sbin',
         },
         RunAtLoad: true,

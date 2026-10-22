@@ -1,6 +1,6 @@
-import { useSettingsSecrets } from '@openbots/client/react';
-import { secretMode } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { useSettingsSecrets } from '@repo/client/react';
+import { secretMode } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { Button } from '@/components/ui/button';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/components/ui/panel';
@@ -9,7 +9,7 @@ import IconKeyRound from '~icons/lucide/key-round';
 import IconLock from '~icons/lucide/lock';
 import IconRoute from '~icons/lucide/route';
 import IconTrash from '~icons/lucide/trash-2';
-import type { SecretMode } from '@openbots/contracts/universal';
+import type { SecretMode } from '@repo/contracts/universal';
 
 const SETTINGS_SECRETS_MODE = {
   proxy: m.settings_secrets_mode_proxy,

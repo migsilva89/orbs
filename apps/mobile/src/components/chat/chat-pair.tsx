@@ -1,6 +1,6 @@
-import { botBubble, CHAT, chatPairMessages, roomsTimeLabel } from '@openbots/client/client';
-import { chatViewOptions, useChatPendingSync, useChatRoom } from '@openbots/client/react';
-import { getLocale, m } from '@openbots/i18n/client';
+import { botBubble, CHAT, chatPairMessages, roomsTimeLabel } from '@repo/client/client';
+import { chatViewOptions, useChatPendingSync, useChatRoom } from '@repo/client/react';
+import { getLocale, m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { View } from 'react-native';
@@ -17,7 +17,7 @@ import { ChatMessage } from './chat-message';
 import { ChatPairHeader } from './chat-pair-header';
 import { ChatRuns } from './chat-runs';
 import type { RpcSession } from '@/types/rpc.types';
-import type { Bot, ConversationView } from '@openbots/contracts/universal';
+import type { Bot, ConversationView } from '@repo/contracts/universal';
 
 const CHAT_PAIR_BAR_HEIGHT = 56;
 

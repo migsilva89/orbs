@@ -1,7 +1,8 @@
-import { m } from '@openbots/i18n/client';
+import { env } from '@repo/env/client';
+import { m } from '@repo/i18n/client';
 import { LayoutBrand } from '@/components/layout/layout-brand';
 import * as Card from '@/components/ui/card';
-import BrandsOpenbots from '~icons/brands/openbots';
+import BrandsLogo from '~icons/brands/logo';
 import IconLock from '~icons/lucide/lock';
 import { ConnectForm } from './connect-form';
 import { ConnectFriends } from './connect-friends';
@@ -15,11 +16,11 @@ export function ConnectCard() {
             <div className="w-full p-6 md:p-8">
               <div className="mb-6 flex flex-col items-center text-center">
                 <div className="mb-4 flex flex-col items-center gap-2">
-                  <BrandsOpenbots aria-hidden="true" className="size-10 text-black dark:text-white" />
+                  <BrandsLogo aria-hidden="true" className="size-10 text-black dark:text-white" />
                   <LayoutBrand size="lg" />
                 </div>
                 <h1 className="text-xl font-semibold">{m.connect_title()}</h1>
-                <p className="text-xs text-balance text-muted-foreground">{m.connect_description({ name: m.layout_brand() })}</p>
+                <p className="text-xs text-balance text-muted-foreground">{m.connect_description({ name: env.VITE_APP_NAME })}</p>
               </div>
               <ConnectForm />
             </div>
@@ -28,7 +29,7 @@ export function ConnectCard() {
         </Card.Card>
         <p className="mx-auto mt-4 max-w-full text-center text-xxs leading-none text-muted-foreground md:truncate">
           <IconLock className="mr-1 inline size-2.5 align-[-1px] text-muted-foreground" />
-          <span className="md:truncate">{m.connect_privacy_proof({ name: m.layout_brand() })}</span>
+          <span className="md:truncate">{m.connect_privacy_proof({ name: env.VITE_APP_NAME })}</span>
         </p>
       </div>
     </div>

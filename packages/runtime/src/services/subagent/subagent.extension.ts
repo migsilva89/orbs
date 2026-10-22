@@ -1,6 +1,6 @@
 import { Type } from '@earendil-works/pi-ai';
 import { defineExtension, defineTool } from '@earendil-works/pi-durable';
-import * as m from '@openbots/i18n/messages';
+import * as m from '@repo/i18n/messages';
 import { match, P } from 'ts-pattern';
 import { subagentActionRun } from './subagent-action.run';
 import { subagentActionSend } from './subagent-action.send';

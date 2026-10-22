@@ -1,16 +1,16 @@
-import { env } from '@openbots/env/server';
-import { errorStatusMap } from '@openbots/errors/universal';
-import { log } from '@openbots/logger/server';
 import { OpenAPIHandler } from '@orpc/openapi/fetch';
 import { onError, ORPCError } from '@orpc/server';
 import { RPCHandler as FetchRPCHandler } from '@orpc/server/fetch';
 import { CORSPlugin, RequestHeadersPlugin } from '@orpc/server/plugins';
 import { RPCHandler as WebsocketRPCHandler } from '@orpc/server/websocket';
+import { env } from '@repo/env/server';
+import { errorStatusMap } from '@repo/errors/universal';
+import { log } from '@repo/logger/server';
 import { match, P } from 'ts-pattern';
-import { router } from '@openbots/server/server';
+import { router } from '@repo/server/server';
 import type { CoreRpcNativeParams } from '../types/core.types';
-import type { makeServices } from '@openbots/server/server';
 import type { RPCHandlerOptions } from '@orpc/server/fetch';
+import type { makeServices } from '@repo/server/server';
 
 export function coreRpcNative(
   services: Awaited<ReturnType<typeof makeServices>>,
@@ -53,12 +53,12 @@ export function coreRpcNative(
       notifications: services.notifications,
     },
     http: new FetchRPCHandler(router, {
-      plugins: [...plugins, new CORSPlugin({ origin: env.OPENBOTS_ALLOWED_ORIGINS })],
+      plugins: [...plugins, new CORSPlugin({ origin: env.DAEMON_ALLOWED_ORIGINS })],
       interceptors,
       errorStatusMap,
     }),
     files: new OpenAPIHandler({ download: router.attachments.download }, {
-      plugins: [...plugins, new CORSPlugin({ origin: env.OPENBOTS_ALLOWED_ORIGINS })],
+      plugins: [...plugins, new CORSPlugin({ origin: env.DAEMON_ALLOWED_ORIGINS })],
       interceptors,
       errorStatusMap,
     }),

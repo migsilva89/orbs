@@ -1,6 +1,6 @@
-import { m } from '@openbots/i18n/client';
-import type { ExpressionId } from '@openbots/avatar-blobs/expressions';
-import type { BodyId, ColorId } from '@openbots/avatar-blobs/skins';
+import { m } from '@repo/i18n/client';
+import type { ExpressionId } from '@repo/avatar-blobs/expressions';
+import type { BodyId, ColorId } from '@repo/avatar-blobs/skins';
 
 export const AVATAR_BODY_LABELS = {
   circle: m.avatars_body_circle,

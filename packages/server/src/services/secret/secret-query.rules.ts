@@ -1,4 +1,4 @@
-import { secretRules } from '@openbots/contracts/universal';
+import { secretRules } from '@repo/contracts/universal';
 import { SECRET } from './secret.constants';
 import type { SecretServiceDeps } from '../../types/secret.types';
 

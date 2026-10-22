@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { ChevronRight, LayoutDashboard } from 'lucide-react-native';
@@ -8,7 +8,7 @@ import { Icon } from '@/components/ui/icon';
 import { ItemButton, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { PreviewCard } from '@/components/ui/preview-card';
 import type { RpcSession } from '@/types/rpc.types';
-import type { ToolCallArtifact } from '@openbots/contracts/universal';
+import type { ToolCallArtifact } from '@repo/contracts/universal';
 
 interface ChatArtifactProps {
   session: RpcSession;

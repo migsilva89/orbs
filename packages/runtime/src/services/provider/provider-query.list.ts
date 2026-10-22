@@ -1,7 +1,7 @@
 import { match, P } from 'ts-pattern';
 import { providerDeviceSession, providerSessionView } from './provider.utils';
 import type * as ProviderTypes from '../../types/provider.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function providerQueryList(
   deps: ProviderTypes.ProviderServiceDeps,

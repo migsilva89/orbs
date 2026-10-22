@@ -1,5 +1,5 @@
-import type { QueryNotifyParams, RpcContextValue } from '@openbots/client/react';
-import type { ConnectionSaved } from '@openbots/contracts/universal';
+import type { QueryNotifyParams, RpcContextValue } from '@repo/client/react';
+import type { ConnectionSaved } from '@repo/contracts/universal';
 import type { QueryClient } from '@tanstack/react-query';
 
 export interface RpcClientParams {

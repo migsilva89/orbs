@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useEffect, useEffectEvent, useRef } from 'react';
 import { useMessageScrollerScrollable } from '@/components/ui/message-scroller';
 

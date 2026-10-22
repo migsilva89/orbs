@@ -5,7 +5,7 @@ import { runtimeBot } from './runtime.constants';
 import type { CollaborationTemporaryLinks } from '../../types/collaboration.types';
 import type { RuntimeContextParams, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
-import type { ConversationContextItem } from '@openbots/contracts/universal';
+import type { ConversationContextItem } from '@repo/contracts/universal';
 
 export async function runtimeContextItem(
   { harness }: RuntimeServiceDeps,

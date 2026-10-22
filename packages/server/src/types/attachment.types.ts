@@ -1,7 +1,7 @@
 import type { AttachmentStorageService } from '../services/attachment/attachment-storage.service';
 import type { BotService } from '../services/bot/bot.service';
-import type { AttachmentTarget } from '@openbots/contracts/universal';
-import type { RuntimeService } from '@openbots/runtime/server';
+import type { AttachmentTarget } from '@repo/contracts/universal';
+import type { RuntimeService } from '@repo/runtime/server';
 
 export interface AttachmentServiceDeps {
   bots: BotService;

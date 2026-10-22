@@ -1,5 +1,5 @@
-import { queryMutationCache } from '@openbots/client/react';
-import { log } from '@openbots/logger/client';
+import { queryMutationCache } from '@repo/client/react';
+import { log } from '@repo/logger/client';
 import { isCancelledError, QueryCache, QueryClient } from '@tanstack/react-query';
 import { toasty } from '@/components/ui/sonner';
 

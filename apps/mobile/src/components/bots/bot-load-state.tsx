@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { ScrollView, View } from 'react-native';
 import { match } from 'ts-pattern';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';

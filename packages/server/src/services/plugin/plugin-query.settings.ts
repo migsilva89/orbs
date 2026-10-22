@@ -1,4 +1,4 @@
-import { pluginSettings } from '@openbots/contracts/universal';
+import { pluginSettings } from '@repo/contracts/universal';
 import { PLUGIN } from './plugin.constants';
 import type { PluginServiceDeps } from '../../types/plugin.types';
 

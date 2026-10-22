@@ -1,7 +1,7 @@
-import { preferences, preferencesStored } from '@openbots/contracts/universal';
+import { preferences, preferencesStored } from '@repo/contracts/universal';
 import { useSyncExternalStore } from 'react';
 import { PREFERENCES } from '@/services/preferences/preferences.constants';
-import type { Preferences } from '@openbots/contracts/universal';
+import type { Preferences } from '@repo/contracts/universal';
 
 export function usePreferences() {
   const stored = useSyncExternalStore(

@@ -1,5 +1,5 @@
 import type { ConversationId, Harness, JsonObject } from '@earendil-works/pi-durable';
-import type { ConversationSummary } from '@openbots/contracts/universal';
+import type { ConversationSummary } from '@repo/contracts/universal';
 
 export type ConversationIndexItem = Pick<ConversationSummary, 'botId' | 'conversationId' | 'lastMessage'> & {
   lastAssistantEntryId: number;

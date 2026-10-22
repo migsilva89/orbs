@@ -1,10 +1,10 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useFormContext } from 'react-hook-form';
 import { FormControl, FormErrorsAndHint, FormField, FormItem, FormLabel } from '@/components/ui/forms/form';
 import { PanelRow } from '@/components/ui/panel';
 import { Textarea } from '@/components/ui/textarea';
 import IconMessageSquareText from '~icons/lucide/message-square-text';
-import type { BotForm } from '@openbots/contracts/universal';
+import type { BotForm } from '@repo/contracts/universal';
 
 export function BotFormInstructions() {
   const form = useFormContext<BotForm>();

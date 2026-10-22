@@ -1,6 +1,6 @@
-import { BOT_THINKING_LEVEL_LABELS, botChooseModel, botModelKey, botModelUsage } from '@openbots/client/client';
-import { useRpc, useSettingsModelSwap } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { BOT_THINKING_LEVEL_LABELS, botChooseModel, botModelKey, botModelUsage } from '@repo/client/client';
+import { useRpc, useSettingsModelSwap } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useRouter } from 'expo-router';
 import { Brain, LifeBuoy, Sparkles } from 'lucide-react-native';
@@ -16,7 +16,7 @@ import { LabelDescription } from '@/components/ui/label';
 import { Text } from '@/components/ui/text';
 import { useToast } from '@/hooks/use-toast';
 import type { SettingsModelSwapSource } from '@/types/settings.types';
-import type { ModelSelection } from '@openbots/contracts/universal';
+import type { ModelSelection } from '@repo/contracts/universal';
 
 interface SettingsModelSwapScreenProps {
   from: SettingsModelSwapSource;

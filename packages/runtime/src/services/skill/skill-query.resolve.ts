@@ -1,5 +1,5 @@
 import { getAgentDir, loadSkills, parseFrontmatter } from '@earendil-works/pi-coding-agent';
-import { log } from '@openbots/logger/server';
+import { log } from '@repo/logger/server';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { match, P } from 'ts-pattern';

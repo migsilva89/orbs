@@ -1,13 +1,13 @@
 import { replicatedState } from '@earendil-works/chord';
 import { GenerationTask, InboxDoc, LiveDoc } from '@earendil-works/pi-durable';
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeQueryConversation } from './runtime-query.conversation';
 import { runtimeRun } from './runtime-run.utils';
 import { runtimeWatchChanges } from './runtime-watch.utils';
 import type { RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
-import type { ConversationState } from '@openbots/contracts/universal';
+import type { ConversationState } from '@repo/contracts/universal';
 
 export async function runtimeQueryWatch(deps: RuntimeServiceDeps, params: RuntimeConversationParams, context: Context) {
   const conversation = await runtimeQueryConversation(deps, params, context);

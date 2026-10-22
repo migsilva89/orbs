@@ -1,4 +1,4 @@
-import { toolCallJson, toolCallText } from '@openbots/contracts/universal';
+import { toolCallJson, toolCallText } from '@repo/contracts/universal';
 import type * as ToolTypes from '../../types/tool.types';
 import type { DynamicToolUIPart } from 'ai';
 

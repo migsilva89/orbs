@@ -1,5 +1,5 @@
-import { useSettingsDevices } from '@openbots/client/react';
-import { getLocale, m } from '@openbots/i18n/client';
+import { useSettingsDevices } from '@repo/client/react';
+import { getLocale, m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { Laptop } from 'lucide-react-native';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Item, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { SettingsDevicesPair } from './settings-devices-pair';
-import type { ConnectionSaved } from '@openbots/contracts/universal';
+import type { ConnectionSaved } from '@repo/contracts/universal';
 
 interface SettingsDevicesProps {
   connection: ConnectionSaved;

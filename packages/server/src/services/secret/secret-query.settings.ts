@@ -1,4 +1,4 @@
-import { secretMode } from '@openbots/contracts/universal';
+import { secretMode } from '@repo/contracts/universal';
 import { SECRET } from './secret.constants';
 import type { SecretServiceDeps } from '../../types/secret.types';
 

@@ -1,4 +1,4 @@
-import { ATTACHMENT, REPLY } from '@openbots/contracts/universal';
+import { ATTACHMENT, REPLY } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { COLLABORATION } from './collaboration.constants';
 import { collaborationBotId } from './collaboration.utils';

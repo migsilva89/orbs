@@ -1,4 +1,4 @@
-import { botDefaultSettings } from '@openbots/client/client';
+import { botDefaultSettings } from '@repo/client/client';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { BotCreateDialog } from '@/components/bots/bot-create-dialog';
 import { BotList } from '@/components/bots/bot-list';

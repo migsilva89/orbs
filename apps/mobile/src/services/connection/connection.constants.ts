@@ -1,1 +1,1 @@
-export const CONNECTION_STORAGE_KEY = 'openbots.connection';
+export const CONNECTION_STORAGE_KEY = 'bots.connection';

@@ -1,5 +1,5 @@
-import { useSettingsProviderLogout, useSettingsProviders } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useSettingsProviderLogout, useSettingsProviders } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 

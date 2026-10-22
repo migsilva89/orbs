@@ -2,8 +2,8 @@ import { match, P } from 'ts-pattern';
 import { mcpQueryConfig } from './mcp-query.config';
 import { mcpQuerySettings } from './mcp-query.settings';
 import type { McpBotParams, McpServiceDeps } from '../../types/mcp.types';
-import type { McpCatalog } from '@openbots/contracts/universal';
-import type { McpEntry } from '@openbots/runtime/server';
+import type { McpCatalog } from '@repo/contracts/universal';
+import type { McpEntry } from '@repo/runtime/server';
 
 export async function mcpQueryDiscover(deps: McpServiceDeps, { bot }: McpBotParams) {
   const settings = await mcpQuerySettings(deps);

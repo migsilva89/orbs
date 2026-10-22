@@ -1,4 +1,4 @@
-import { botSkillName, mentionTarget } from '@openbots/client/client';
+import { botSkillName, mentionTarget } from '@repo/client/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { Mention } from '@/components/ui/mention';

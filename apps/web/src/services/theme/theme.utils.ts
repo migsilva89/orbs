@@ -1,9 +1,9 @@
-import { themePreferences } from '@openbots/contracts/universal';
+import { themePreferences } from '@repo/contracts/universal';
 import type * as ThemeTypes from '@/types/theme.types';
 
 export function themeReadSnapshot(config: ThemeTypes.ThemeConfig): ThemeTypes.ThemeSnapshot {
   let storedMode: string | null = null;
-  let selected = 'openbots';
+  let selected = 'default';
   let themes = config.presets;
 
   try {
@@ -12,10 +12,10 @@ export function themeReadSnapshot(config: ThemeTypes.ThemeConfig): ThemeTypes.Th
 
     if (stored.success) {
       themes = [...config.presets, ...stored.data.custom.filter((item) => !config.presets.some((preset) => preset.id === item.id))];
-      selected = themes.some((theme) => theme.id === stored.data.selected) ? stored.data.selected : 'openbots';
+      selected = themes.some((theme) => theme.id === stored.data.selected) ? stored.data.selected : 'default';
     }
   } catch {
-    selected = 'openbots';
+    selected = 'default';
     themes = config.presets;
   }
 

@@ -1,6 +1,6 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
-import { authPairCode, connectionPairForm } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { authPairCode, connectionPairForm } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useRouter } from '@tanstack/react-router';
 import { useEffect, useEffectEvent } from 'react';
 import { useForm } from 'react-hook-form';
@@ -10,7 +10,7 @@ import { Form } from '@/components/ui/forms/form';
 import { FormInput } from '@/components/ui/forms/form-input';
 import { toasty } from '@/components/ui/sonner';
 import { connectionPair, connectionRead } from '@/services/connection/connection.client';
-import type { ConnectionPairForm } from '@openbots/contracts/universal';
+import type { ConnectionPairForm } from '@repo/contracts/universal';
 
 export function ConnectForm() {
   const router = useRouter();

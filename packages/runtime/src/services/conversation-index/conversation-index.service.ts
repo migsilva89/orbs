@@ -1,5 +1,5 @@
 import { BACKGROUND_CONTEXT } from '@earendil-works/chord/context';
-import { log } from '@openbots/logger/server';
+import { log } from '@repo/logger/server';
 import { match, P } from 'ts-pattern';
 import { conversationIndexActionRestore } from './conversation-index-action.restore';
 import { conversationIndexActionUpdate } from './conversation-index-action.update';

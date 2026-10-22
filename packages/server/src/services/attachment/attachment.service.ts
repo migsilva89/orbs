@@ -2,7 +2,7 @@ import { attachmentActionRemove } from './attachment-action.remove';
 import { attachmentActionUpload } from './attachment-action.upload';
 import { attachmentQueryDownload } from './attachment-query.download';
 import type { AttachmentPrepareParams, AttachmentServiceDeps } from '../../types/attachment.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function makeAttachmentService(deps: AttachmentServiceDeps) {
   return {

@@ -1,4 +1,4 @@
-import { makeRuntimeService } from '@openbots/runtime/server';
+import { makeRuntimeService } from '@repo/runtime/server';
 import { makeArtifactService } from '../services/artifact/artifact.service';
 import { makeAttachmentService } from '../services/attachment/attachment.service';
 import { makeAuthService } from '../services/auth/auth.service';

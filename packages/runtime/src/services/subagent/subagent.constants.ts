@@ -1,18 +1,18 @@
 import { defineDoc } from '@earendil-works/pi-durable';
-import { ENTRY } from '@openbots/contracts/universal';
+import { ENTRY } from '@repo/contracts/universal';
 import type { SubagentAgents, SubagentCall } from '../../types/subagent.types';
 
 export const SUBAGENT = {
-  extension: 'openbots.subagents',
+  extension: 'bots.subagents',
   tool: 'bot_subagent',
   stop: 'bot_subagent_stop',
-  anchor: 'openbots.subagent-anchor',
-  reporter: 'openbots.subagent-reporter',
-  agents: 'openbots.subagent-agents',
-  call: 'openbots.subagent-call',
+  anchor: 'bots.subagent-anchor',
+  reporter: 'bots.subagent-reporter',
+  agents: 'bots.subagent-agents',
+  call: 'bots.subagent-call',
   report: ENTRY.subagentReport,
-  request: 'openbots.subagent',
-  reportRequest: 'openbots.subagent-report',
+  request: 'bots.subagent',
+  reportRequest: 'bots.subagent-report',
   maxBackgroundAgents: 8,
 } as const;
 

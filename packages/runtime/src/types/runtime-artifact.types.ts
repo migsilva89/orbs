@@ -1,5 +1,5 @@
 import { Type } from '@earendil-works/pi-ai';
-import { artifactCreate, artifactGet, artifactUpdateFields } from '@openbots/contracts/universal';
+import { artifactCreate, artifactGet, artifactUpdateFields } from '@repo/contracts/universal';
 import { z } from 'zod';
 import type { ArtifactService } from '../services/artifact/artifact.service';
 

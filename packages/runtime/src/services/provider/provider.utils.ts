@@ -1,9 +1,9 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { PROVIDER } from './provider.constants';
 import type * as ProviderTypes from '../../types/provider.types';
 import type { AuthEvent, AuthPrompt } from '@earendil-works/pi-ai';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function providerSweep({ sessions }: ProviderTypes.ProviderServiceDeps) {
   const now = Date.now();

@@ -1,5 +1,5 @@
-import { authPairCode, connectionPairForm } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { authPairCode, connectionPairForm } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { match, P } from 'ts-pattern';

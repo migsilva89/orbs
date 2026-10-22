@@ -1,5 +1,5 @@
-import { Errors } from '@openbots/errors/universal';
-import { m } from '@openbots/i18n/client';
+import { Errors } from '@repo/errors/universal';
+import { m } from '@repo/i18n/client';
 import { cva } from 'cva';
 import { Slot as SlotPrimitive } from 'radix-ui';
 import { createContext, use, useEffect, useEffectEvent, useRef, useState } from 'react';

@@ -1,8 +1,8 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ConfirmationDialog } from '@/components/ui/alert-dialog';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { Bot, Routine } from '@openbots/contracts/universal';
+import type { Bot, Routine } from '@repo/contracts/universal';
 
 interface RoutinesDeleteDialogProps {
   bot: Bot

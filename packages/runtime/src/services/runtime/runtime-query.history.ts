@@ -1,5 +1,5 @@
 import { StorageRequestError } from '@earendil-works/pi-durable';
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeQueryConversation } from './runtime-query.conversation';
 import type { RuntimeHistoryParams, RuntimeServiceDeps } from '../../types/runtime.types';

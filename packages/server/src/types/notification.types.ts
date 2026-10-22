@@ -1,8 +1,8 @@
 import type { BotService } from '../services/bot/bot.service';
 import type { DatabaseService } from '../services/database/database.service';
 import type { SettingsService } from '../services/settings/settings.service';
-import type * as UniversalTypes from '@openbots/contracts/universal';
-import type { RuntimeService } from '@openbots/runtime/server';
+import type * as UniversalTypes from '@repo/contracts/universal';
+import type { RuntimeService } from '@repo/runtime/server';
 
 export interface NotificationServiceParams {
   database: DatabaseService;

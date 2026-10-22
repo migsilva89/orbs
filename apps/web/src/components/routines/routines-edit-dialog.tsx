@@ -1,6 +1,6 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
-import { routineEditForm } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { routineEditForm } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { RoutinesScheduleFields } from '@/components/routines/routines-schedule-fields';
@@ -10,7 +10,7 @@ import { Form, FormControl, FormErrors, FormErrorsAndHint, FormField, FormItem, 
 import { FormInput } from '@/components/ui/forms/form-input';
 import { Textarea } from '@/components/ui/textarea';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { Bot, Routine, RoutineEditForm } from '@openbots/contracts/universal';
+import type { Bot, Routine, RoutineEditForm } from '@repo/contracts/universal';
 
 interface RoutinesEditDialogProps {
   bot: Bot

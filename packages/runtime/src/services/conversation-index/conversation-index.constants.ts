@@ -3,7 +3,7 @@ import type { ConversationIndexDocument } from '../../types/conversation-index.t
 
 /** Pi-derived chat summaries of one bot store. Owner preferences such as pin and mute live in app SQL. */
 export const conversationIndex = defineDoc<ConversationIndexDocument>({
-  kind: 'openbots.conversation-summary',
+  kind: 'bots.conversation-summary',
   version: 1,
   scope: 'session',
   initial: () => ({ conversations: {} }),

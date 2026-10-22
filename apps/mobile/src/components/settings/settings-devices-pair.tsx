@@ -1,5 +1,5 @@
-import { useSettingsDevices } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useSettingsDevices } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import * as Clipboard from 'expo-clipboard';
 import { Copy, QrCode, RefreshCw } from 'lucide-react-native';
 import { View } from 'react-native';
@@ -11,7 +11,7 @@ import { Icon } from '@/components/ui/icon';
 import { ItemTitle } from '@/components/ui/item';
 import { LabelDescription } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import type { ConnectionSaved } from '@openbots/contracts/universal';
+import type { ConnectionSaved } from '@repo/contracts/universal';
 
 interface SettingsDevicesPairProps {
   connection: ConnectionSaved;

@@ -1,4 +1,4 @@
-import { AVATAR } from '@openbots/contracts/universal';
+import { AVATAR } from '@repo/contracts/universal';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { render } from 'takumi-js';
 import { container, image } from 'takumi-js/helpers';

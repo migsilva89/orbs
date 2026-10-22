@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useCanGoBack, useNavigate, useRouter, useSearch } from '@tanstack/react-router';
 import { lazy, useEffect, useId, useRef, useState } from 'react';

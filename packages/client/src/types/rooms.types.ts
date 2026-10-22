@@ -1,5 +1,5 @@
 import type { ChatMessage } from './chat.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 import type { DynamicToolUIPart } from 'ai';
 
 export type RoomsChat = UniversalTypes.ConversationListItem;

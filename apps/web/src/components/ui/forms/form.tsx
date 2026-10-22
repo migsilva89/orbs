@@ -1,7 +1,7 @@
 'use client';
 
-import { Errors } from '@openbots/errors/universal';
-import { deriveLabel, expandValidationError } from '@openbots/i18n/validation';
+import { Errors } from '@repo/errors/universal';
+import { deriveLabel, expandValidationError } from '@repo/i18n/validation';
 import { AnimatePresence } from 'motion/react';
 import * as motion from 'motion/react-m';
 import { Slot as SlotPrimitive } from 'radix-ui';

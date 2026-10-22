@@ -1,6 +1,6 @@
-import { useChatHideVerbose, useNotificationSettings } from '@openbots/client/react';
-import { notificationPlatform } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { useChatHideVerbose, useNotificationSettings } from '@repo/client/react';
+import { notificationPlatform } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { ClientOnly } from '@tanstack/react-router';
 import { useId, useState } from 'react';
 import { SettingsPanel } from '@/components/settings/settings-panel';
@@ -13,7 +13,7 @@ import IconBellRing from '~icons/lucide/bell-ring';
 import IconSettings from '~icons/lucide/settings';
 import IconSmartphone from '~icons/lucide/smartphone';
 import IconWrench from '~icons/lucide/wrench';
-import type { NotificationPlatform } from '@openbots/contracts/universal';
+import type { NotificationPlatform } from '@repo/contracts/universal';
 
 const SETTINGS_NOTIFY_PREFER = {
   phone: m.settings_notify_prefer_phone,

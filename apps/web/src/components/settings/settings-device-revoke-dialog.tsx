@@ -1,7 +1,7 @@
-import { useSettingsDeviceRevoke } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useSettingsDeviceRevoke } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { ConfirmationDialog } from '@/components/ui/alert-dialog';
-import type { Device } from '@openbots/contracts/universal';
+import type { Device } from '@repo/contracts/universal';
 
 interface SettingsDeviceRevokeDialogProps {
   device: Device

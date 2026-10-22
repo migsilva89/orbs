@@ -41,7 +41,7 @@ function htmlBootstrap() {
   };
 
   window.addEventListener('message', (event) => {
-    if (event.source !== window.parent || event.data?.type !== 'openbots.html-theme') {
+    if (event.source !== window.parent || event.data?.type !== 'bots.html-theme') {
       return;
     }
 
@@ -60,7 +60,7 @@ function htmlBootstrap() {
 
       if (height !== previousHeight) {
         previousHeight = height;
-        htmlPost({ type: 'openbots.html-height', height });
+        htmlPost({ type: 'bots.html-height', height });
       }
     };
 
@@ -82,7 +82,7 @@ function htmlBootstrap() {
     }
     event.preventDefault();
     if (event.isTrusted && href) {
-      htmlPost({ type: 'openbots.html-link', url: href });
+      htmlPost({ type: 'bots.html-link', url: href });
     }
   });
 }

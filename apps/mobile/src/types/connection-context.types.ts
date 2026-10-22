@@ -1,5 +1,5 @@
 import type { RpcSession } from '@/types/rpc.types';
-import type { ConnectionSaved } from '@openbots/contracts/universal';
+import type { ConnectionSaved } from '@repo/contracts/universal';
 
 export interface ConnectionContextValue {
   session: RpcSession | null;

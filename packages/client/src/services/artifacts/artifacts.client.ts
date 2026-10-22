@@ -1,5 +1,5 @@
 import { createStoreAdapter } from '@json-render/core/store-utils';
-import { artifactSaveState } from '@openbots/contracts/universal';
+import { artifactSaveState } from '@repo/contracts/universal';
 import { hashKey } from '@tanstack/react-query';
 import type { ArtifactsStoreParams } from '../../types/artifacts.types';
 import type { StateStore } from '@json-render/core';

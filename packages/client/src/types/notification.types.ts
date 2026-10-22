@@ -1,4 +1,4 @@
-import type { NotificationPlatform } from '@openbots/contracts/universal';
+import type { NotificationPlatform } from '@repo/contracts/universal';
 
 export interface NotificationPresenceParams {
   platform: NotificationPlatform;

@@ -1,7 +1,7 @@
 import type { CredentialsService } from '../services/credentials/credentials.service';
 import type { SettingsService } from '../services/settings/settings.service';
-import type { Bot, McpSettings } from '@openbots/contracts/universal';
-import type { McpClientService } from '@openbots/runtime/server';
+import type { Bot, McpSettings } from '@repo/contracts/universal';
+import type { McpClientService } from '@repo/runtime/server';
 
 export interface McpServiceDeps {
   root: string;

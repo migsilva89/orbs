@@ -8,7 +8,7 @@ import type { Conversation } from '@earendil-works/pi-durable';
 
 export function runtimeToolsExtension({ harness, readOnlyTools, ownTools, permissions }: RuntimeToolsDeps) {
   return defineExtension({
-    name: 'openbots.tools',
+    name: 'bots.tools',
     hooks: [hook(ToolTask, {
       beforeTool: async (call, api, context) => {
         const bot = await api.snapshot(runtimeBot, api.conversationId, context);

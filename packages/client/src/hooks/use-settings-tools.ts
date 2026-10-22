@@ -1,8 +1,8 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
 import type { SettingsDoneParams } from '../types/settings.types';
-import type { ToolSettingsForm } from '@openbots/contracts/universal';
+import type { ToolSettingsForm } from '@repo/contracts/universal';
 
 /** Tool approval rules, the approval timeout and the JEV key; an empty key keeps the saved one. */
 export function useSettingsTools({ onDone }: SettingsDoneParams) {

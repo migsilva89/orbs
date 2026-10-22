@@ -1,7 +1,7 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
-import { useSettingsModelSwap } from '@openbots/client/react';
-import { botSwapModels } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { useSettingsModelSwap } from '@repo/client/react';
+import { botSwapModels } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 import { BotAvatar } from '@/components/bots/bot-avatar';
@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormErrors, FormErrorsAndHint, FormField, FormItem, FormLabel } from '@/components/ui/forms/form';
 import { Item, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
-import type { BotModelUsage } from '@openbots/client/client';
+import type { BotModelUsage } from '@repo/client/client';
 
 interface SettingsModelSwapProps {
   usage: BotModelUsage

@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { AnimatePresence } from 'motion/react';
 import * as motion from 'motion/react-m';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';

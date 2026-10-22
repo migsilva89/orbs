@@ -1,6 +1,6 @@
-import { roomsChoice } from '@openbots/client/client';
-import { useChatQuestion } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { roomsChoice } from '@repo/client/client';
+import { useChatQuestion } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { ArrowUp, X } from 'lucide-react-native';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { QuestionCard, QuestionCardHeader, QuestionCardOption, QuestionCardOptions } from '@/components/ui/question-card';
 import { Text } from '@/components/ui/text';
-import type { ConversationQuestion } from '@openbots/contracts/universal';
+import type { ConversationQuestion } from '@repo/contracts/universal';
 
 interface ChatQuestionProps {
   question: ConversationQuestion;

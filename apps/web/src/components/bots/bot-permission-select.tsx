@@ -1,8 +1,8 @@
-import { BOT_PERMISSION_HINTS, BOT_PERMISSION_LABELS } from '@openbots/client/client';
-import { botFields } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { BOT_PERMISSION_HINTS, BOT_PERMISSION_LABELS } from '@repo/client/client';
+import { botFields } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { BotPermission } from '@openbots/client/client';
+import type { BotPermission } from '@repo/client/client';
 
 interface BotPermissionSelectProps {
   value: BotPermission

@@ -1,5 +1,5 @@
-import { botModelBrand, botModelUsage } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { botModelBrand, botModelUsage } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { BotBrandLogo } from '@/components/bots/bot-brand-logo';
@@ -12,7 +12,7 @@ import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/componen
 import { Skeleton } from '@/components/ui/skeleton';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCpu from '~icons/lucide/cpu';
-import type { BotModelUsage } from '@openbots/client/client';
+import type { BotModelUsage } from '@repo/client/client';
 
 export function SettingsModels() {
   const bots = useQuery(rpc.bots.list.queryOptions());

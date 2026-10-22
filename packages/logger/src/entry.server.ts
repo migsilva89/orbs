@@ -6,7 +6,7 @@ import type { LogLevel } from 'evlog';
 
 export function initNativeLogger(minLevel: LogLevel = 'info'): void {
   initLogger({
-    env: { service: 'openbots' },
+    env: { service: 'bots' },
     minLevel,
     redact: LOG_REDACT,
   });

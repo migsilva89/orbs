@@ -1,7 +1,7 @@
-import type { contract } from '@openbots/contracts/universal';
 import type { ClientContext } from '@orpc/client';
 import type { RPCLinkOptions } from '@orpc/client/fetch';
 import type { RouterContractClient } from '@orpc/contract';
+import type { contract } from '@repo/contracts/universal';
 
 export type Client = RouterContractClient<typeof contract>;
 

@@ -1,4 +1,4 @@
-import { artifactSpec, routineCreate, todo } from '@openbots/contracts/universal';
+import { artifactSpec, routineCreate, todo } from '@repo/contracts/universal';
 import { z } from 'zod';
 import type { ArtifactService } from '../services/artifact/artifact.service';
 import type { ConversationIndexService } from '../services/conversation-index/conversation-index.service';
@@ -14,9 +14,11 @@ import type { ToolCall } from '@earendil-works/pi-ai';
 import type { Models } from '@earendil-works/pi-ai/models';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
 import type { ImageProcessor } from '@earendil-works/pi-durable/tools';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export interface RuntimeServiceParams {
+  /** Host application name the bot instructions use. */
+  appName: string;
   storage: StorageService;
   alarm: AlarmService;
   models: Models;
@@ -86,19 +88,21 @@ export interface RuntimeModelsDeps {
 
 /** Built once per daemon and shared by every bot store, including the model-request limiter. */
 export interface RuntimeSharedDeps extends RuntimeModelsDeps {
+  appName: string;
   storage: StorageService;
   alarm: AlarmService;
   env: RuntimeServiceParams['env'];
   permissions: RuntimeToolPolicy;
   extensions: PiDurableTypes.Extension[];
   readOnlyTools: PiDurableTypes.ToolRegistration[];
-  /** Openbots' own bot tools (messaging, todos, routines, artifacts…); they run without asking the owner. */
+  /** The host's own bot tools (messaging, todos, routines, artifacts…); they run without asking the owner. */
   ownTools: PiDurableTypes.ToolRegistration[];
   directory: CollaborationDirectory;
 }
 
 /** One bot's Pi store. */
 export interface RuntimeServiceDeps extends RuntimeModelsDeps {
+  appName: string;
   botId: string;
   directory: CollaborationDirectory;
   harness: PiDurableTypes.Harness;

@@ -1,8 +1,8 @@
 import type { AuthService } from '../services/auth/auth.service';
 import type { BotService } from '../services/bot/bot.service';
 import type { McpService } from '../services/mcp/mcp.service';
-import type { McpAuthCompleteInput, McpAuthStartInput, McpAuthTarget } from '@openbots/contracts/universal';
-import type { McpAuthService } from '@openbots/runtime/server';
+import type { McpAuthCompleteInput, McpAuthStartInput, McpAuthTarget } from '@repo/contracts/universal';
+import type { McpAuthService } from '@repo/runtime/server';
 
 export interface McpAuthServiceDeps {
   bots: BotService;

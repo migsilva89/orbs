@@ -1,5 +1,5 @@
 import type { ConversationServiceDeps } from '../../types/conversation.types';
-import type { BotGetInput } from '@openbots/contracts/universal';
+import type { BotGetInput } from '@repo/contracts/universal';
 
 export async function conversationActionClear({ bots, attachments }: ConversationServiceDeps, { botId }: BotGetInput) {
   await bots.actions.clearHistory({ botId });

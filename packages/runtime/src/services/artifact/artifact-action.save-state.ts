@@ -1,7 +1,7 @@
 import { artifactActionUpdate } from './artifact-action.update';
 import type { ArtifactSaveStateParams, ArtifactServiceDeps } from '../../types/artifact.types';
 import type { Context } from '@earendil-works/chord/context';
-import type { Artifact } from '@openbots/contracts/universal';
+import type { Artifact } from '@repo/contracts/universal';
 
 export function artifactActionSaveState(
   deps: ArtifactServiceDeps,

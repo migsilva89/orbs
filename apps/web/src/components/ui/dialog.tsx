@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import { cn } from '@/lib/cn';
 import X from '~icons/lucide/x';

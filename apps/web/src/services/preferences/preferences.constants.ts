@@ -1,1 +1,1 @@
-export const PREFERENCES = { storageKey: 'openbots.preferences' } as const;
+export const PREFERENCES = { storageKey: 'bots.preferences' } as const;

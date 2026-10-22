@@ -1,5 +1,5 @@
-import { ROOMS } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { ROOMS } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { cva } from 'cva';
 import { lazy, Suspense, useState } from 'react';
 import { RoomsChatEmojiLoading } from '@/components/rooms/rooms-chat-emoji-loading';

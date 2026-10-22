@@ -1,10 +1,10 @@
-import { ROOMS_APPROVAL_CHOICES, roomsApprovalText, toolPresentation } from '@openbots/client/client';
-import { useChatApproval } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { ROOMS_APPROVAL_CHOICES, roomsApprovalText, toolPresentation } from '@repo/client/client';
+import { useChatApproval } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { ToolInput } from '@/components/tools/tool-input';
 import { Question, QuestionDescription, QuestionHeader, QuestionHeading, QuestionOption, QuestionOptions, QuestionTitle } from '@/components/ui/ai/question';
 import { ToolCode } from '@/components/ui/ai/tool';
-import type { ToolApproval } from '@openbots/contracts/universal';
+import type { ToolApproval } from '@repo/contracts/universal';
 
 interface RoomsChatApprovalProps {
   approval: ToolApproval

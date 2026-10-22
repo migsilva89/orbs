@@ -1,12 +1,12 @@
-import { TOOL_CODE_KEYS, toolReadableName } from '@openbots/client/client';
-import { toolCallEdits, toolCallJson, toolCallValue } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { TOOL_CODE_KEYS, toolReadableName } from '@repo/client/client';
+import { toolCallEdits, toolCallJson, toolCallValue } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { match } from 'ts-pattern';
 import { QuestionDetail, QuestionDetails } from '@/components/ui/ai/question';
 import { ToolCode } from '@/components/ui/ai/tool';
 import { Clamp } from '@/components/ui/clamp';
 import { cn } from '@/lib/cn';
-import type { ToolCallJsonValue } from '@openbots/contracts/universal';
+import type { ToolCallJsonValue } from '@repo/contracts/universal';
 import type { DynamicToolUIPart } from 'ai';
 
 interface ToolInputDiffProps {

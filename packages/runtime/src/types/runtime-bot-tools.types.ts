@@ -1,9 +1,9 @@
 import { Type } from '@earendil-works/pi-ai';
-import { botCreate, botGet, botSwapModels, botUpdate } from '@openbots/contracts/universal';
+import { botCreate, botGet, botSwapModels, botUpdate } from '@repo/contracts/universal';
 import { z } from 'zod';
 import type { RuntimeSharedDeps } from './runtime.types';
 import type { Models } from '@earendil-works/pi-ai/models';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export interface RuntimeBotToolsBots {
   actions: {

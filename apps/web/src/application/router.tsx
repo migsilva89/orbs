@@ -1,4 +1,4 @@
-import { bootZodErrors } from '@openbots/i18n/validation';
+import { bootZodErrors } from '@repo/i18n/validation';
 import { createRouter as createTanStackRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { tanstackQueryContext } from '@/services/tanstack/tanstack.client';

@@ -1,5 +1,5 @@
 {
-  "name": "@openbots/runtime",
+  "name": "@repo/runtime",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -9,7 +9,7 @@
     "lint:fix": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
   },
   "devDependencies": {
-    "@openbots/typescript-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:"
   },
@@ -27,13 +27,13 @@
     "@earendil-works/chord": "catalog:",
     "@earendil-works/pi-ai": "catalog:",
     "@earendil-works/pi-durable": "catalog:",
-    "@openbots/errors": "workspace:*",
-    "@openbots/i18n": "workspace:*",
+    "@repo/errors": "workspace:*",
+    "@repo/i18n": "workspace:*",
     "ts-pattern": "catalog:",
     "@earendil-works/pi-mcp": "catalog:",
     "@earendil-works/pi-coding-agent": "catalog:",
-    "@openbots/contracts": "workspace:*",
-    "@openbots/logger": "workspace:*",
+    "@repo/contracts": "workspace:*",
+    "@repo/logger": "workspace:*",
     "zod": "catalog:",
     "cron-parser": "catalog:",
     "@json-render/core": "catalog:"

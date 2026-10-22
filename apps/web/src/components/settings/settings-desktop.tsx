@@ -1,4 +1,5 @@
-import { m } from '@openbots/i18n/client';
+import { env } from '@repo/env/client';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { Button } from '@/components/ui/button';
@@ -26,7 +27,7 @@ export function SettingsDesktop() {
     return null;
   }
 
-  const addresses = window.__openbotsAddresses ?? [];
+  const addresses = window.__botsAddresses ?? [];
 
   return (
     <SettingsPanel
@@ -53,7 +54,7 @@ export function SettingsDesktop() {
         <PanelRow className="items-start">
           <IconShare />
           <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <PanelTitle asChild><h3>{m.desktop_connection_share()}</h3></PanelTitle>
+            <PanelTitle asChild><h3>{m.desktop_connection_share({ name: env.VITE_APP_NAME })}</h3></PanelTitle>
             {addresses.map((address) => (
               <div className="flex items-center justify-between gap-4" key={address}>
                 <span className="truncate font-mono text-xs">{address}</span>

@@ -10,7 +10,7 @@ const themeScript = `
 (() => {
   const config = ${JSON.stringify(THEME_CONFIG)};
   let choice = 'system';
-  let selected = 'openbots';
+  let selected = 'default';
   let themes = config.presets;
   try {
     const savedMode = localStorage.getItem(config.modeKey);

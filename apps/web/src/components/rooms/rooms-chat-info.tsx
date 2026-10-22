@@ -1,8 +1,8 @@
-import { botUsageLabel } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
-import { getLocale } from '@openbots/i18n/runtime';
+import { botUsageLabel } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
+import { getLocale } from '@repo/i18n/runtime';
 import { useHydrated } from '@tanstack/react-router';
-import type { ChatMessage } from '@openbots/client/client';
+import type { ChatMessage } from '@repo/client/client';
 
 interface RoomsChatInfoProps {
   message: ChatMessage

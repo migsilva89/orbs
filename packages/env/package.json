@@ -1,5 +1,5 @@
 {
-  "name": "@openbots/env",
+  "name": "@repo/env",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -23,8 +23,9 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@openbots/typescript-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }

@@ -1,5 +1,5 @@
-import { botSkillName, mentionHref } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { botSkillName, mentionHref } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { Box, SquareSlash } from 'lucide-react-native';
 import { match } from 'ts-pattern';
@@ -7,8 +7,8 @@ import { Avatar } from '@/components/ui/avatar';
 import { Icon } from '@/components/ui/icon';
 import { PromptDrawer, PromptDrawerItem, PromptDrawerList } from '@/components/ui/prompt-drawer';
 import type { RpcSession } from '@/types/rpc.types';
-import type { MentionItem, MentionQuery } from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type { MentionItem, MentionQuery } from '@repo/client/client';
+import type { Bot } from '@repo/contracts/universal';
 
 interface ChatMentionsProps {
   session: RpcSession;

@@ -4,7 +4,7 @@ import { runtimeReactionTarget, runtimeReactionView } from './runtime-reaction.u
 import type { RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { EntryId } from '@earendil-works/pi-durable';
-import type { ConversationReaction, ConversationReactionsInput } from '@openbots/contracts/universal';
+import type { ConversationReaction, ConversationReactionsInput } from '@repo/contracts/universal';
 
 export async function runtimeQueryReactions(
   deps: RuntimeServiceDeps,

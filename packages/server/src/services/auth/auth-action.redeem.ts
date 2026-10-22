@@ -1,8 +1,8 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { authTokenCreate, authTokenHash } from './auth.utils';
 import type { AuthServiceDeps } from '../../types/auth.types';
-import type { AuthRedeemInput } from '@openbots/contracts/universal';
+import type { AuthRedeemInput } from '@repo/contracts/universal';
 
 export async function authActionRedeem({ database }: AuthServiceDeps, params: AuthRedeemInput) {
   const grantHash = await authTokenHash(params.token);

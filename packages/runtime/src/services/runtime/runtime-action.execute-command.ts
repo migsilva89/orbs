@@ -1,5 +1,5 @@
-import { commandIdArguments } from '@openbots/contracts/universal';
-import { Errors } from '@openbots/errors/universal';
+import { commandIdArguments } from '@repo/contracts/universal';
+import { Errors } from '@repo/errors/universal';
 import { match } from 'ts-pattern';
 import { runtimeActionRetry } from './runtime-action.retry';
 import { runtimeQueryConversation } from './runtime-query.conversation';
@@ -7,7 +7,7 @@ import type { RuntimeServiceDeps } from '../../types/runtime.types';
 import type { JsonValue } from '@earendil-works/chord';
 import type { Context } from '@earendil-works/chord/context';
 import type { ConversationId, SubmissionId, TaskId } from '@earendil-works/pi-durable';
-import type { CommandExecuteInput } from '@openbots/contracts/universal';
+import type { CommandExecuteInput } from '@repo/contracts/universal';
 
 export async function runtimeActionExecuteCommand(
   deps: RuntimeServiceDeps,

@@ -1,9 +1,9 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match } from 'ts-pattern';
 import { botQueryGet } from './bot-query.get';
 import { botQueue } from './bot.utils';
 import type { BotConfiguration, BotServiceDeps } from '../../types/bot.types';
-import type { Bot, BotGetInput } from '@openbots/contracts/universal';
+import type { Bot, BotGetInput } from '@repo/contracts/universal';
 
 export function botActionConfigure(deps: BotServiceDeps, { botId }: BotGetInput) {
   return botQueue(deps, botId, botConfigure);

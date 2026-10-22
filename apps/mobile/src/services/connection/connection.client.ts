@@ -1,10 +1,10 @@
-import { makeHttpClient } from '@openbots/client/client';
-import { connectionStored, SERVER_PROTOCOL } from '@openbots/contracts/universal';
+import { makeHttpClient } from '@repo/client/client';
+import { connectionStored, SERVER_PROTOCOL } from '@repo/contracts/universal';
 import * as SecureStore from 'expo-secure-store';
 import { match } from 'ts-pattern';
 import { CONNECTION_STORAGE_KEY } from './connection.constants';
 import type { ConnectionAvatarParams, ConnectionFileParams, ConnectionPairParams } from '@/types/connection.types';
-import type { ConnectionSaved } from '@openbots/contracts/universal';
+import type { ConnectionSaved } from '@repo/contracts/universal';
 import type { ImageURISource } from 'react-native';
 
 export async function connectionRead(): Promise<ConnectionSaved | null> {

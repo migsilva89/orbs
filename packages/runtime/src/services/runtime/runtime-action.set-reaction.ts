@@ -1,5 +1,5 @@
-import { REACTION } from '@openbots/contracts/universal';
-import { Errors } from '@openbots/errors/universal';
+import { REACTION } from '@repo/contracts/universal';
+import { Errors } from '@repo/errors/universal';
 import { isMatching, match, P } from 'ts-pattern';
 import { runtimeQueryConversation } from './runtime-query.conversation';
 import { runtimeQueryQuote } from './runtime-query.quote';
@@ -9,7 +9,7 @@ import { runtimeReactionTarget, runtimeReactionToggle, runtimeReactionView } fro
 import type { RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 import type { EntryId } from '@earendil-works/pi-durable';
-import type { ConversationReaction, ConversationSetReactionInput } from '@openbots/contracts/universal';
+import type { ConversationReaction, ConversationSetReactionInput } from '@repo/contracts/universal';
 
 export async function runtimeActionSetReaction(
   deps: RuntimeServiceDeps,

@@ -1,9 +1,9 @@
-import { DEFAULT_EXPRESSION } from '@openbots/avatar-blobs/expressions';
-import { DEFAULT_BODY, DEFAULT_COLOR } from '@openbots/avatar-blobs/skins';
-import { m } from '@openbots/i18n/client';
+import { DEFAULT_EXPRESSION } from '@repo/avatar-blobs/expressions';
+import { DEFAULT_BODY, DEFAULT_COLOR } from '@repo/avatar-blobs/skins';
+import { m } from '@repo/i18n/client';
 import type * as BotTypes from '../../types/bot.types';
 import type { ChatActivity } from '../../types/chat.types';
-import type { ColorId } from '@openbots/avatar-blobs/skins';
+import type { ColorId } from '@repo/avatar-blobs/skins';
 
 export const BOT = {
   handleMaxLength: 48,

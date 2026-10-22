@@ -1,5 +1,5 @@
-import { createFaviconLinks, createMetadata } from '@openbots/tanstack-helpers/universal';
 import { ORPCError } from '@orpc/client';
+import { createFaviconLinks, createMetadata } from '@repo/tanstack-helpers/universal';
 import { createRootRouteWithContext } from '@tanstack/react-router';
 import { match, P } from 'ts-pattern';
 import { LayoutRootDocument, LayoutRootError, LayoutRootNotFound } from '@/components/layout/layout-root';

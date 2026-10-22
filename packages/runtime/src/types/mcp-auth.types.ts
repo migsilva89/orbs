@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { AuthProvider } from '@earendil-works/pi-mcp';
 import type { McpOAuthProvider } from '@earendil-works/pi-mcp/oauth';
-import type { McpAuthCompleteResult, McpAuthStartResult, McpAuthStatusResult } from '@openbots/contracts/universal';
+import type { McpAuthCompleteResult, McpAuthStartResult, McpAuthStatusResult } from '@repo/contracts/universal';
 
 export type { McpAuthCompleteResult, McpAuthStartResult, McpAuthStatusResult };
 
@@ -27,6 +27,8 @@ export interface McpAuthCredentials {
 
 export interface McpAuthServiceDeps {
   credentials: McpAuthCredentials;
+  /** Shown to the user on the OAuth consent screen. */
+  appName: string;
 }
 
 export interface McpAuthPending {

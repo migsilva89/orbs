@@ -1,7 +1,7 @@
-import { ROOMS_SEND_MODES } from '@openbots/client/client';
-import { useChatDefaults } from '@openbots/client/react';
-import { conversationWhenBusy, preferencesEnterAction } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { ROOMS_SEND_MODES } from '@repo/client/client';
+import { useChatDefaults } from '@repo/client/react';
+import { conversationWhenBusy, preferencesEnterAction } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { SettingsPanel } from '@/components/settings/settings-panel';
 import { PanelContent, PanelRow, PanelTitle } from '@/components/ui/panel';

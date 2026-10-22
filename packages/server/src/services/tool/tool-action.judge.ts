@@ -1,4 +1,4 @@
-import { log, redactSecrets } from '@openbots/logger/server';
+import { log, redactSecrets } from '@repo/logger/server';
 import { TypeSafeClient } from '@typesafe-ai/sdk';
 import { match, P } from 'ts-pattern';
 import { TOOL } from './tool.constants';

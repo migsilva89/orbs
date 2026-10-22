@@ -2,7 +2,7 @@ import { botActionConfigure } from './bot-action.configure';
 import { botQueryGet } from './bot-query.get';
 import { botQueue } from './bot.utils';
 import type { BotServiceDeps } from '../../types/bot.types';
-import type { BotGetInput } from '@openbots/contracts/universal';
+import type { BotGetInput } from '@repo/contracts/universal';
 
 export async function botActionClearHistory(deps: BotServiceDeps, { botId }: BotGetInput) {
   await botQueryGet(deps, { botId });

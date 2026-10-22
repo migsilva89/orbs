@@ -9,7 +9,7 @@ import IconOpenai from '~icons/logos/openai-icon';
 import IconPerplexity from '~icons/logos/perplexity-icon';
 import IconQwen from '~icons/logos/qwen-icon';
 import IconBox from '~icons/lucide/box';
-import type { BotBrand } from '@openbots/client/client';
+import type { BotBrand } from '@repo/client/client';
 import type { ComponentType, SVGProps } from 'react';
 
 const brandLogos = {

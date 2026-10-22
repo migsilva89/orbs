@@ -1,4 +1,4 @@
-import { roomsSidebarOrder } from '@openbots/client/client';
+import { roomsSidebarOrder } from '@repo/client/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useMatch, useNavigate } from '@tanstack/react-router';
 import { useHotkeys } from 'react-hotkeys-hook';

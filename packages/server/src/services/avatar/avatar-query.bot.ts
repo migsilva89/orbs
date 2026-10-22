@@ -1,6 +1,6 @@
-import { AVATAR } from '@openbots/contracts/universal';
+import { AVATAR } from '@repo/contracts/universal';
 import type { AvatarServiceDeps } from '../../types/avatar.types';
-import type { BotGetInput } from '@openbots/contracts/universal';
+import type { BotGetInput } from '@repo/contracts/universal';
 
 export async function avatarQueryBot({ bots, images }: AvatarServiceDeps, params: BotGetInput) {
   const bot = await bots.queries.get(params);

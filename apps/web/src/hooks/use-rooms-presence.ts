@@ -1,4 +1,4 @@
-import { useNotificationPresence } from '@openbots/client/react';
+import { useNotificationPresence } from '@repo/client/react';
 import { useEffect, useRef } from 'react';
 import { ROOMS_PRESENCE_EVENTS } from '@/services/rooms/rooms.constants';
 

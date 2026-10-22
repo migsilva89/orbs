@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const REPLY = { entryKind: 'openbots.reply-message' } as const;
+export const REPLY = { entryKind: 'bots.reply-message' } as const;
 
 export const messageQuote = z.object({
   entryId: z.number().int().positive(),

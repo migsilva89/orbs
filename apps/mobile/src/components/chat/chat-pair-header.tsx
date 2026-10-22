@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { ArrowLeftRight, ChevronLeft } from 'lucide-react-native';
 import { View } from 'react-native';
@@ -8,7 +8,7 @@ import { GlassButton } from '@/components/ui/glass-button';
 import { GlassSurface } from '@/components/ui/glass-surface';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot } from '@repo/contracts/universal';
 
 interface ChatPairHeaderProps {
   asker: Bot;

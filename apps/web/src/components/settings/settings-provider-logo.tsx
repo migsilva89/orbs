@@ -1,4 +1,4 @@
-import { botModelBrand } from '@openbots/client/client';
+import { botModelBrand } from '@repo/client/client';
 import { match } from 'ts-pattern';
 import { BotBrandLogo } from '@/components/bots/bot-brand-logo';
 import IconCursor from '~icons/logos/cursor-icon';

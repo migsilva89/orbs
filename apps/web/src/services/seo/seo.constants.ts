@@ -1,6 +1,7 @@
-import type { TanstackMetadata } from '@openbots/tanstack-helpers/universal';
+import { env } from '@repo/env/client';
+import type { TanstackMetadata } from '@repo/tanstack-helpers/universal';
 
-const SEO_APP_NAME = 'Openbots';
+const SEO_APP_NAME = env.VITE_APP_NAME;
 
 export const SEO_METADATA_DEFAULTS: TanstackMetadata = {
   charSet: 'utf-8',

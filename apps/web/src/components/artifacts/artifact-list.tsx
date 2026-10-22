@@ -1,5 +1,5 @@
-import { m } from '@openbots/i18n/client';
-import { getLocale } from '@openbots/i18n/runtime';
+import { m } from '@repo/i18n/client';
+import { getLocale } from '@repo/i18n/runtime';
 import { useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useHydrated } from '@tanstack/react-router';
 import { LayoutPageHeader } from '@/components/layout/layout-page-header';

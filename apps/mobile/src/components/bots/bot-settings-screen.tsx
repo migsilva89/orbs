@@ -1,7 +1,7 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
-import { useBotUpdate } from '@openbots/client/react';
-import { botForm } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { useBotUpdate } from '@repo/client/react';
+import { botForm } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, usePreventRemove, useRouter } from 'expo-router';
 import { CalendarClock, ListTodo, ScrollText, Trash2 } from 'lucide-react-native';
@@ -24,7 +24,7 @@ import { Icon } from '@/components/ui/icon';
 import { useChatReturn } from '@/hooks/use-chat-return';
 import { useConnection } from '@/hooks/use-connection';
 import type { RpcSession } from '@/types/rpc.types';
-import type { Bot, BotForm } from '@openbots/contracts/universal';
+import type { Bot, BotForm } from '@repo/contracts/universal';
 
 interface BotSettingsScreenProps {
   botId: string;

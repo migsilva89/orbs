@@ -4,7 +4,7 @@ import { todoActionReorder } from './todo-action.reorder';
 import { todoActionUpdate } from './todo-action.update';
 import { todoQueryList } from './todo-query.list';
 import type { TodoServiceDeps } from '../../types/todo.types';
-import type * as UniversalTypes from '@openbots/contracts/universal';
+import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function makeTodoService(deps: TodoServiceDeps) {
   return {

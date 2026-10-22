@@ -1,5 +1,5 @@
 {
-  "name": "@openbots/logger",
+  "name": "@repo/logger",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -22,7 +22,7 @@
     "evlog": "catalog:"
   },
   "devDependencies": {
-    "@openbots/typescript-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:"
   }

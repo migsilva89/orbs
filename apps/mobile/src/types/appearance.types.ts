@@ -1,5 +1,5 @@
 import type { APPEARANCE_CHOICES } from '@/services/appearance/appearance.constants';
-import type { ThemePalette } from '@openbots/contracts/universal';
+import type { ThemePalette } from '@repo/contracts/universal';
 
 export type AppearanceChoice = typeof APPEARANCE_CHOICES[number];
 

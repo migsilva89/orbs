@@ -1,4 +1,4 @@
-import { chatIndexSearch } from '@openbots/contracts/universal';
+import { chatIndexSearch } from '@repo/contracts/universal';
 import { createFileRoute } from '@tanstack/react-router';
 import { RoomsPage } from '@/components/rooms/rooms-page';
 

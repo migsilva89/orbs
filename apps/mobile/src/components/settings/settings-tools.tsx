@@ -1,6 +1,6 @@
-import { useSettingsTools } from '@openbots/client/react';
-import { TOOL_APPROVAL, toolApprovalRules } from '@openbots/contracts/universal';
-import { m } from '@openbots/i18n/client';
+import { useSettingsTools } from '@repo/client/react';
+import { TOOL_APPROVAL, toolApprovalRules } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { Pencil, ShieldCheck, Trash2 } from 'lucide-react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -13,7 +13,7 @@ import { Item, ItemContent, ItemGroup, ItemTitle, ItemValue } from '@/components
 import { LabelDescription } from '@/components/ui/label';
 import { Menu } from '@/components/ui/menu';
 import { Text } from '@/components/ui/text';
-import type { ToolApprovalRule, ToolSettings } from '@openbots/contracts/universal';
+import type { ToolApprovalRule, ToolSettings } from '@repo/contracts/universal';
 
 const SETTINGS_TOOLS_RULE_BEHAVIOR = {
   allow: m.settings_tools_rules_allow,

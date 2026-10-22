@@ -1,9 +1,9 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useMutation } from '@tanstack/react-query';
 import { botHandle } from '../services/bot/bot.utils';
 import { useRpc } from './use-rpc';
 import type { BotCreateParams } from '../types/bot.types';
-import type { BotForm } from '@openbots/contracts/universal';
+import type { BotForm } from '@repo/contracts/universal';
 
 /** Creates a bot from the shared bot form, filling an empty handle from the name, and refreshes the bot list. */
 export function useBotCreate({ onCreated }: BotCreateParams) {

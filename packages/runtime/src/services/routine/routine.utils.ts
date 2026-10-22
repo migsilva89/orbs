@@ -1,7 +1,7 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import type { RoutineDocument, RoutineRecord } from '../../types/routine.types';
-import type { Routine } from '@openbots/contracts/universal';
+import type { Routine } from '@repo/contracts/universal';
 
 export function routineGet(doc: RoutineDocument, routineId: string): RoutineRecord {
   return match(doc.routines[routineId])

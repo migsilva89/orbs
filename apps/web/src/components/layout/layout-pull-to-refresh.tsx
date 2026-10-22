@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { useEffect, useState } from 'react';
 import { useIsStandalone } from '@/hooks/use-is-standalone';
 import { LAYOUT_PULL_REFRESH } from '@/services/layout/layout.constants';

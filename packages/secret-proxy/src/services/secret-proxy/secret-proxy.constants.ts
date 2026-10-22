@@ -1,6 +1,6 @@
 export const SECRET_PROXY = {
   // Names are environment variable names, which never contain `-`, so one placeholder is never part of another.
-  placeholderPrefix: 'openbots-secret-',
+  placeholderPrefix: 'bots-secret-',
   placeholderSuffix: '-placeholder',
   bundleFile: 'ca-bundle.pem',
   scrubMaxBytes: 2 * 1024 * 1024,

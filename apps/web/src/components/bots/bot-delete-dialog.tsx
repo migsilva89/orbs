@@ -1,7 +1,7 @@
-import { useBotDelete } from '@openbots/client/react';
-import { m } from '@openbots/i18n/client';
+import { useBotDelete } from '@repo/client/react';
+import { m } from '@repo/i18n/client';
 import { ConfirmationDialog } from '@/components/ui/alert-dialog';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot } from '@repo/contracts/universal';
 
 interface BotDeleteDialogProps {
   bot: Bot

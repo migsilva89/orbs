@@ -1,4 +1,4 @@
-import { m } from '@openbots/i18n/client';
+import { m } from '@repo/i18n/client';
 import { generateId } from 'ai';
 import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';

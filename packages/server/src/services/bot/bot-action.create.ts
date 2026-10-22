@@ -1,9 +1,9 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { botActionConfigure } from './bot-action.configure';
 import { botValues } from './bot.utils';
 import type { BotServiceDeps } from '../../types/bot.types';
-import type { BotCreateInput } from '@openbots/contracts/universal';
+import type { BotCreateInput } from '@repo/contracts/universal';
 
 export async function botActionCreate(deps: BotServiceDeps, params: BotCreateInput) {
   deps.runtime.queries.validateModel(params);

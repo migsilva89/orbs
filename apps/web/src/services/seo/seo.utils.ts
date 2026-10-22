@@ -1,4 +1,4 @@
-import { createMetadata } from '@openbots/tanstack-helpers/universal';
+import { createMetadata } from '@repo/tanstack-helpers/universal';
 import { SEO_METADATA_DEFAULTS } from '@/services/seo/seo.constants';
 import type * as SeoTypes from '@/types/seo.types';
 

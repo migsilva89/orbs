@@ -1,10 +1,10 @@
-import { Errors } from '@openbots/errors/universal';
+import { Errors } from '@repo/errors/universal';
 import { chmod, lstat, mkdir, unlink } from 'node:fs/promises';
 import { join } from 'node:path';
 import { match } from 'ts-pattern';
 import { coreRpcNative } from './core-rpc.native';
 import type { CoreLocalNativeParams } from '../types/core.types';
-import type { makeServices } from '@openbots/server/server';
+import type { makeServices } from '@repo/server/server';
 
 const IPC_DIRECTORY_MODE = 0o700;
 const IPC_SOCKET_MODE = 0o600;

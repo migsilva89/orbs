@@ -1,5 +1,5 @@
-import { BOT_ACTIVITY_LABELS } from '@openbots/client/client';
-import { m } from '@openbots/i18n/client';
+import { BOT_ACTIVITY_LABELS } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Ellipsis } from 'lucide-react-native';
 import { View } from 'react-native';
@@ -10,8 +10,8 @@ import { GlassButton } from '@/components/ui/glass-button';
 import { GlassSurface } from '@/components/ui/glass-surface';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import type { ChatActivity } from '@openbots/client/client';
-import type { Bot } from '@openbots/contracts/universal';
+import type { ChatActivity } from '@repo/client/client';
+import type { Bot } from '@repo/contracts/universal';
 
 interface ChatHeaderProps {
   bot: Bot;

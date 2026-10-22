@@ -1,5 +1,5 @@
-import { m } from '@openbots/i18n/client';
-import { bootZodErrors } from '@openbots/i18n/validation';
+import { m } from '@repo/i18n/client';
+import { bootZodErrors } from '@repo/i18n/validation';
 import { Stack, ThemeProvider } from 'expo-router';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { Uniwind } from 'uniwind';

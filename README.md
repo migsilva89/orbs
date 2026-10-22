@@ -35,16 +35,16 @@ openbots service register          # Enable startup at the next macOS login
 openbots service unregister        # Disable startup at the next macOS login
 ```
 
-`openbots` without a subcommand runs in the foreground. `pair` defaults to `OPENBOTS_PUBLIC_URL`; use an origin reachable by the receiving device. All commands select the daemon using `OPENBOTS_DATA_DIR`. The existing storage lock prevents a second instance from opening the same stores. Detached startup writes to `data/daemon.log` and reports a failure instead of claiming success if startup exits early.
+`openbots` without a subcommand runs in the foreground. `pair` defaults to `WEB_PUBLIC_URL`; use an origin reachable by the receiving device. All commands select the daemon using `DATA_DIR`. The existing storage lock prevents a second instance from opening the same stores. Detached startup writes to `data/daemon.log` and reports a failure instead of claiming success if startup exits early.
 
 Service registration is macOS-only. It writes a per-user LaunchAgent for the selected data directory, using the current Bun executable, source entrypoint, validated Openbots environment settings, and `PATH`. Keep that executable and checkout available. Different data directories have separate registrations. Register/unregister only changes the next login; neither command loads, unloads, starts, or stops the current daemon. Registration does not copy provider secrets or create a CLI device credential.
 
-The daemon listens on all IPv4 interfaces (`0.0.0.0`), using port 3000 by default, so it can accept LAN and Tailscale connections. Set `OPENBOTS_HOST` to bind a specific interface. `GET /health` returns `{ "status": "ok" }`. The `/rpc` WebSocket carries control and live updates. HTTP POST under `/rpc` carries file upload/download through the same authenticated oRPC router. Pairing redemption uses a single-use pairing token; other RPC calls authenticate a device credential. Other HTTP paths return 404. SIGINT/SIGTERM close connections and stop the listener. Health confirms HTTP handling only, not database or agent readiness.
+The daemon listens on all IPv4 interfaces (`0.0.0.0`), using port 3000 by default, so it can accept LAN and Tailscale connections. Set `DAEMON_HOST` to bind a specific interface. `GET /health` returns `{ "status": "ok" }`. The `/rpc` WebSocket carries control and live updates. HTTP POST under `/rpc` carries file upload/download through the same authenticated oRPC router. Pairing redemption uses a single-use pairing token; other RPC calls authenticate a device credential. Other HTTP paths return 404. SIGINT/SIGTERM close connections and stop the listener. Health confirms HTTP handling only, not database or agent readiness.
 
-`OPENBOTS_DATA_DIR` is the only configurable storage path and defaults to `~/.config/openbots/`. Bot records keep IDs, not home-directory paths; derive each working folder from the root and bot ID. The native host expands `~` and resolves relative overrides before using this layout:
+`DATA_DIR` is the only configurable storage path and defaults to `~/.config/openbots/`. Bot records keep IDs, not home-directory paths; derive each working folder from the root and bot ID. The native host expands `~` and resolves relative overrides before using this layout:
 
 ```text
-OPENBOTS_DATA_DIR/
+DATA_DIR/
   agents/<botId>/                derived bot working folders (attachments in .attachments/)
   data/
     app.sqlite                   application SQLite database
@@ -67,14 +67,14 @@ The internal server service supports submit, watch, history, and stop through Pi
 
 ## Offline backup and restore
 
-Stop the daemon, then run the backup command with the same `OPENBOTS_DATA_DIR`. Restore writes into `OPENBOTS_DATA_DIR`, which must not exist yet. There is no backup RPC.
+Stop the daemon, then run the backup command with the same `DATA_DIR`. Restore writes into `DATA_DIR`, which must not exist yet. There is no backup RPC.
 
 ```sh
 bun run --cwd apps/daemon backup create ~/openbots-backup-2026-10-19
-OPENBOTS_DATA_DIR=~/.config/openbots-restored bun run --cwd apps/daemon backup restore ~/openbots-backup-2026-10-19
+DATA_DIR=~/.config/openbots-restored bun run --cwd apps/daemon backup restore ~/openbots-backup-2026-10-19
 ```
 
-The command uses `makeBackupService` from `@openbots/server/native`. Both the backup destination and restore root must be absent, with existing parent directories. Create takes the same storage lock as daemon startup; a running daemon returns `CONFLICT`. It snapshots the app database and every bot's Pi store with `VACUUM INTO`, copies any pending history-clear carry file, the credential key and bot workspaces, and records file sizes and SHA-256 checksums. Restore checks the manifest and publishes a complete directory without opening Pi, running migrations, or starting the daemon. Existing directories are never a restore target.
+The command uses `makeBackupService` from `@repo/server/native`. Both the backup destination and restore root must be absent, with existing parent directories. Create takes the same storage lock as daemon startup; a running daemon returns `CONFLICT`. It snapshots the app database and every bot's Pi store with `VACUUM INTO`, copies any pending history-clear carry file, the credential key and bot workspaces, and records file sizes and SHA-256 checksums. Restore checks the manifest and publishes a complete directory without opening Pi, running migrations, or starting the daemon. Existing directories are never a restore target.
 
 The bundle preserves the server identity, paired devices, encrypted application credentials, transcripts, tasks, bot files and attachments. It also contains the encryption key, so protect the whole bundle as secret data. It excludes runtime locks, local IPC, Pi's external provider-auth store and shared skill/plugin/instruction directories outside the data root. Their configured paths remain in settings. Symlinks and special files in bot workspaces, such as `node_modules/.bin` links, are skipped and listed under `skipped` in the manifest; reinstall dependencies after restore. Restore replaces the same logical daemon; do not run the source and restored copy as independent servers.
 
@@ -90,7 +90,7 @@ const pinnedClient = makeClient({ connect, token, serverId: server.id });
 
 Platform apps store the ID with the address and device credential, and use it in cache keys. `serverId` pins later requests to that daemon: another daemon at the same address returns `SERVER_MISMATCH` before an action runs. Identity checking does not replace TLS or device authentication.
 
-The shared client sends `x-openbots-protocol: 1` on every RPC call, including pairing redemption. Raw clients must send it too. A missing or different version returns `PROTOCOL_MISMATCH` with `supportedVersion` and `receivedVersion`; update the incompatible client or daemon before retrying. This is the application protocol version, independent of Pi and package versions. Protocol and identity failures are not retried automatically. Desktop/mobile connection storage and upgrade screens remain pending.
+The shared client sends `x-bots-protocol: 1` on every RPC call, including pairing redemption. Raw clients must send it too. A missing or different version returns `PROTOCOL_MISMATCH` with `supportedVersion` and `receivedVersion`; update the incompatible client or daemon before retrying. This is the application protocol version, independent of Pi and package versions. Protocol and identity failures are not retried automatically. Desktop/mobile connection storage and upgrade screens remain pending.
 
 ## Attachments
 
@@ -110,7 +110,7 @@ const downloadedFile = await client.attachments.download({ botId, attachmentId: 
 
 Use an absolute HTTP(S) RPC URL for a remote daemon. Uploads accept PNG, JPEG, WebP, GIF, PDF, plain text, Markdown, CSV and JSON, up to 10 MiB each and four files per message. Invalid size/type inputs return oRPC’s standard `BAD_REQUEST`; MIME charset parameters are ignored for the allowlist. Files bind to the selected `conversationId`, or the bot's main chat when omitted. Empty text is allowed with files. `attachments.list({ botId, conversationId, limit, before })` pages metadata without reading transcripts or file bytes. A removed cursor returns `NOT_FOUND`; restart the list in that case.
 
-Server/native stores bytes under `agents/<botId>/.attachments/<conversationId>/<attachmentId>/<name>`. Pi stores metadata and owner message references, without a SQL message/file table. Saved and queued attachment messages use `openbots.attachment-message` with `{ content, attachments }`; render that data for the owner text and file cards. Model input contains relative file references. Pi's native `read` tool handles text and supported images; PDF contents require an available bot tool. Upload acceptance alone does not imply PDF understanding. Uploads add references rather than bytes to user entries and the inbox. Pi can later persist image/text contents in native tool-result entries when a tool reads the file.
+Server/native stores bytes under `agents/<botId>/.attachments/<conversationId>/<attachmentId>/<name>`. Pi stores metadata and owner message references, without a SQL message/file table. Saved and queued attachment messages use `bots.attachment-message` with `{ content, attachments }`; render that data for the owner text and file cards. Model input contains relative file references. Pi's native `read` tool handles text and supported images; PDF contents require an available bot tool. Upload acceptance alone does not imply PDF understanding. Uploads add references rather than bytes to user entries and the inbox. Pi can later persist image/text contents in native tool-result entries when a tool reads the file.
 
 Queued edits accept `attachmentIds`: omit to preserve files, pass `[]` to remove them, or pass IDs to replace them. A file-only input cannot become empty. Queue, steer and interrupt share this representation. Skill expansion still applies before admission. Peer/custom inputs remain protected from owner queue edits.
 
@@ -231,7 +231,7 @@ The daemon uses Pi's `ModelRuntime.create()`, which loads saved provider credent
 
 Set `PI_CODING_AGENT_DIR` for both Pi and the daemon to use a separate auth/config directory, including for development versus production. Run them as the same OS user to share the default directory. Pi authentication uses its existing location. Skills are loaded directly from their source directories, including existing symlinks; MCP configuration discovery, stdio/Streamable HTTP connections and MCP OAuth APIs are available. Pi's auth file is sensitive and is not encrypted by this integration.
 
-This loads provider configuration, not CLI sessions, tools, extensions, or `settings.json`. Durable stores each bot's conversations, tasks, and recovery state in `OPENBOTS_DATA_DIR/data/bots/<botId>/runtime.sql`. Authentication is shared; each bot selects its own model through its database settings.
+This loads provider configuration, not CLI sessions, tools, extensions, or `settings.json`. Durable stores each bot's conversations, tasks, and recovery state in `DATA_DIR/data/bots/<botId>/runtime.sql`. Authentication is shared; each bot selects its own model through its database settings.
 
 Provider auth uses `providers.list()`, `providers.login({ providerId, authType })`, `providers.session({ id })`, `providers.complete({ id, promptId, answer })`, `providers.cancel({ id })` and `providers.logout({ providerId })`. Auth types are `api_key` and `oauth`, filtered by the selected Pi provider's login capabilities. Start returns a bounded, temporary login session. Poll its state, render Pi's notices or authorization link, and answer its current prompt. Each prompt has its own ID so an old answer cannot complete a later step.
 
@@ -245,7 +245,7 @@ The public budget is checked before authentication, per connection address, so u
 
 ## Device pairing
 
-Each daemon has one owner. Existing paired devices issue a pairing payload through authenticated `pairing.create`. `openbots pair` uses the existing `pairing.bootstrap` operation on the owner-only Unix socket at `data/ipc/rpc.sock`, before or after initial setup. It does not store a device credential or open the database. Public HTTP/WebSocket calls cannot bootstrap, even from loopback. At startup, while no device is paired, the daemon prints a pairing link (`OPENBOTS_PUBLIC_URL/connect#code=…`) and a terminal QR code, refreshing it when the grant expires. Open the link to prefill the web connect form. Desktop UI integration remains pending.
+Each daemon has one owner. Existing paired devices issue a pairing payload through authenticated `pairing.create`. `openbots pair` uses the existing `pairing.bootstrap` operation on the owner-only Unix socket at `data/ipc/rpc.sock`, before or after initial setup. It does not store a device credential or open the database. Public HTTP/WebSocket calls cannot bootstrap, even from loopback. At startup, while no device is paired, the daemon prints a pairing link (`WEB_PUBLIC_URL/connect#code=…`) and a terminal QR code, refreshing it when the grant expires. Open the link to prefill the web connect form. Desktop UI integration remains pending.
 
 | RPC call | Access | Result |
 | --- | --- | --- |
@@ -259,7 +259,7 @@ Each daemon has one owner. Existing paired devices issue a pairing payload throu
 The daemon creates a private IPC directory (`0700`) and socket (`0600`). That listener accepts only `POST /rpc/pairing/bootstrap`, rejects browser Origin headers, and requires the normal protocol header. A native client can use the shared HTTP client with Bun's Unix-socket fetch option:
 
 ```ts
-import { makeHttpClient } from '@openbots/client/client';
+import { makeHttpClient } from '@repo/client/client';
 
 const local = makeHttpClient({
   url: 'http://localhost/rpc',
@@ -278,14 +278,14 @@ The pairing API renders `qr.svg` for immediate display. `qr.payload` is an unpad
 
 Use HTTPS or the encrypted Tailscale path for remote pairing and requests. The native listener does not terminate TLS. The daemon accepts Bearer credentials, not cookies or query-string tokens; foreign browser origins are rejected. Request throttling is implemented through the limits service. See the [pairing plan](.agents/plans/main/05-auth-and-pairing.md).
 
-Each web deployment connects to its configured `OPENBOTS_DAEMON_URL`, including pairing. TanStack Start renders initial data on the server and hydrates the browser query cache; chat loads one complete view before switching to live WebSocket updates. The web stores its device credential in a browser-readable, same-site cookie so SSR and WebSocket calls use the same token. HTTPS connections set the Secure flag. Existing same-origin local-storage credentials migrate once; the credential is never included in hydrated page data, and SSR responses are private and not cached.
+Each web deployment connects to its configured `DAEMON_URL`, including pairing. TanStack Start renders initial data on the server and hydrates the browser query cache; chat loads one complete view before switching to live WebSocket updates. The web stores its device credential in a browser-readable, same-site cookie so SSR and WebSocket calls use the same token. HTTPS connections set the Secure flag. Existing same-origin local-storage credentials migrate once; the credential is never included in hydrated page data, and SSR responses are private and not cached.
 
 ## First RPC example
 
 `devices.list()` uses an [oRPC contract](https://orpc.dev/docs/contract-first) in `packages/contracts`, an implementation in `packages/server`, and the daemon's [WebSocket adapter](https://orpc.dev/docs/adapters/websocket) at `/rpc`. It returns only device IDs, names, and creation times. Pairing and device management use this same transport; the former HTTP endpoints have been removed.
 
 ```typescript
-import { makeClient } from '@openbots/client/client';
+import { makeClient } from '@repo/client/client';
 
 const client = makeClient({
   connect: () => new WebSocket('wss://daemon.example/rpc'),
@@ -325,7 +325,7 @@ const botId = bot.id;
 
 Bots store name, unique handle, instructions, provider/model, thinking level, avatar, permission, and skill, MCP, and plugin inheritance preferences. Avatars support blobs, small inline WebP images, colors, and emoji. All RPC inputs remain subject to the listener's 1 MiB payload limit. The default permission is `ask`; inheritance defaults to skills, MCP, and plugins. Permission modes are enforced through Pi tool selection and hooks. Skill, MCP, plugin, and instruction-file inheritance are implemented. Shared instruction files require the `agentsFile` inheritance flag, which is off by default. A working folder is not a sandbox.
 
-Create/update transactions write SQL only. `@openbots/server/native` workspace then creates and validates `agents/<botId>/` during configuration, including restore. Absolute paths are not stored in bot rows. Pi records the relative `agents/<botId>` working directory; the native execution environment resolves it against the data root.
+Create/update transactions write SQL only. `@repo/server/native` workspace then creates and validates `agents/<botId>/` during configuration, including restore. Absolute paths are not stored in bot rows. Pi records the relative `agents/<botId>` working directory; the native execution environment resolves it against the data root.
 
 Bulk replacement uses `bots.swapModels({ botIds, from, to, includeFallbacks })`. `from` matches both `modelProvider` and `modelId`; `to` also supplies `thinkingLevel`. Only selected matching primary models change, and matching fallback models change only when `includeFallbacks` is true. The result counts actual primary and fallback changes. Missing selected bots or invalid model settings reject the entire SQL change.
 
@@ -366,7 +366,7 @@ Each bot store keeps a small session-scoped Pi summary document from committed u
 Summary updates follow transcript commits. Startup repairs the index from bounded Pi history pages before resuming execution; reconfiguring an already indexed bot does not rescan it. The index is derived state, not another message log. `conversation.list` returns a snapshot. For live updates, use the client helper:
 
 ```ts
-import { watchConversations } from '@openbots/client/client';
+import { watchConversations } from '@repo/client/client';
 
 for await (const chats of watchConversations(client, signal)) {
   // Render main chats; open history only when a chat is selected.
@@ -421,7 +421,7 @@ Up to ten skill names are accepted, including manual-only skills. Runtime reads 
 
 Retries check Pi's conversation-scoped request ID before preparing the bot or reading skills. An already accepted request returns its original submission ID even if the skill file was removed, including after restart. New requests still validate and load the selected skills.
 
-Bot `.pi/skills` and `.agents/skills` take priority over configured directories, followed by Pi's global skills directory. The first matching skill name wins. Pi scans nested directories and deduplicates files reached through symlinks. Configured relative paths resolve against `OPENBOTS_DATA_DIR`; `~` expands to the daemon user's home. Shared directories default to `['~/.agents/skills']`; `PI_CODING_AGENT_DIR` selects Pi's global directory.
+Bot `.pi/skills` and `.agents/skills` take priority over configured directories, followed by Pi's global skills directory. The first matching skill name wins. Pi scans nested directories and deduplicates files reached through symlinks. Configured relative paths resolve against `DATA_DIR`; `~` expands to the daemon user's home. Shared directories default to `['~/.agents/skills']`; `PI_CODING_AGENT_DIR` selects Pi's global directory.
 
 Removing `skills` from a bot's inheritance disables shared and Pi-global sources but keeps bot-local skills. `directories: []` clears the additional directory list; omitted fields stay unchanged. Discovery and argument hints are cached per bot for 30 seconds. Directory, inheritance, or Pi agent-directory changes invalidate the cache immediately; file edits and new skills appear on the first request after expiry. Runtime refreshes on startup, bot configuration, and submission using that catalog; existing turns retain their current prompt. Pi adds skill descriptions and paths to the prompt, then reads full instructions on demand. Explicit invocation reads the selected skill body fresh.
 
@@ -463,7 +463,7 @@ Successful completion reconfigures the selected bot to reconnect and discover it
 `conversation.watchNotifications()` provides one authenticated stream for the daemon. The shared client helper applies its Chord frames:
 
 ```ts
-import { watchNotifications } from '@openbots/client/client';
+import { watchNotifications } from '@repo/client/client';
 
 for await (const state of watchNotifications(client, controller.signal)) {
   // state.pending: outstanding approval and question references
@@ -491,7 +491,7 @@ const { instructions, plugins } = await client.bots.catalog({ botId });
 
 Instruction order is Pi's agent directory, configured paths, then the bot working folder. The first two require `agentsFile` inheritance. The default configured path is `~/.agents/AGENTS.md`. A directory selects one file in Pi order: `AGENTS.override.md`, `AGENTS.md`, `AGENTS.MD`, `CLAUDE.md`, `CLAUDE.MD`. Paths may also name files directly; symlinks are deduplicated by realpath. Parent directories are not scanned. Bot-local files always apply, followed by the bot's explicit instructions. Missing default locations are skipped; unreadable files and missing explicit paths produce diagnostics and reject configuration. Files refresh on configuration, startup, and submission.
 
-Plugins load from bot `.pi/plugins` and `.agents/plugins`, followed by configured directories when `plugins` inheritance is enabled. Shared directories default to `~/.agents/plugins`. Each directory contains `.ts`, `.js`, or `.mjs` modules, or child folders with `index.ts`, `index.js`, or `index.mjs`. This scan is not recursive. Symlinks are deduplicated by realpath. Relative configured paths resolve against `OPENBOTS_DATA_DIR`; `~` expands to the daemon user's home.
+Plugins load from bot `.pi/plugins` and `.agents/plugins`, followed by configured directories when `plugins` inheritance is enabled. Shared directories default to `~/.agents/plugins`. Each directory contains `.ts`, `.js`, or `.mjs` modules, or child folders with `index.ts`, `index.js`, or `index.mjs`. This scan is not recursive. Symlinks are deduplicated by realpath. Relative configured paths resolve against `DATA_DIR`; `~` expands to the daemon user's home.
 
 Each module default-exports a Pi Durable extension, as in Pi's `defineExtension` examples:
 
@@ -506,7 +506,7 @@ export default defineExtension({
 
 Pi owns extension tools, sections, hooks, and tasks. Openbots selects extensions per bot and keeps its permission hook last. Plugin tools do not gain read-only trust. Plugins are trusted native code running as the daemon user; approval gates tool calls, not module imports or arbitrary JavaScript. Pi CLI ExtensionFactory modules are not supported. Module dependencies must resolve from the plugin's own location.
 
-Imports are cached by canonical path. Restart after editing module code; there is no hot reload. Invalid modules reject bot configuration and appear in catalog diagnostics. Distinct modules cannot share an extension name, and `openbots.*` names are reserved. Removing selection stops new use but does not unload code needed by admitted Pi work. Keep modules available while their tasks remain recoverable; removing required task definitions can prevent recovery.
+Imports are cached by canonical path. Restart after editing module code; there is no hot reload. Invalid modules reject bot configuration and appear in catalog diagnostics. Distinct modules cannot share an extension name, and `bots.*` names are reserved. Removing selection stops new use but does not unload code needed by admitted Pi work. Keep modules available while their tasks remain recoverable; removing required task definitions can prevent recovery.
 
 ## Peer collaboration and subagents
 
@@ -529,7 +529,7 @@ Openbots-owned tools use the `bot_` namespace. Finish pending calls that use the
 
 A temporary context lives in the recipient's store and lasts 48 hours from creation. The next temporary delivery after expiry archives the old context and creates a fresh one in the recipient's store; the sender's conversation keeps a pointer to it. Existing deliveries remain attached to their original context and can finish; history stays readable. This is lazy rotation, with no background cleanup timer or hard deletion. Default-mode messages never create or rotate temporary contexts. Tool details include `recipientConversationId`, which clients can open with the recipient’s `botId`.
 
-Peer delivery uses native Pi tasks, checkpoints, and stable submission IDs. The delivery task lives in the sender's store and submits into the recipient's store with request ID `openbots.delivery:<senderStoreId>:<taskId>`; a rerun after a crash gets the same submission back, so the recipient sees the message once. The sender's store ID is random per store, so task IDs that restart after a history clear never match an old delivery. The answer text is copied back with the result. Self-delivery and delegation triggered by peer requests/reports are denied. Each source conversation admits at most eight pending deliveries. Recipient conversations serialize their own turns. Stopping the sender does not stop the independent recipient or accepted background delivery. This is a local peer tool surface, not a separate DM UI or cross-daemon bridge.
+Peer delivery uses native Pi tasks, checkpoints, and stable submission IDs. The delivery task lives in the sender's store and submits into the recipient's store with request ID `bots.delivery:<senderStoreId>:<taskId>`; a rerun after a crash gets the same submission back, so the recipient sees the message once. The sender's store ID is random per store, so task IDs that restart after a history clear never match an old delivery. The answer text is copied back with the result. Self-delivery and delegation triggered by peer requests/reports are denied. Each source conversation admits at most eight pending deliveries. Recipient conversations serialize their own turns. Stopping the sender does not stop the independent recipient or accepted background delivery. This is a local peer tool surface, not a separate DM UI or cross-daemon bridge.
 
 Subagents follow Pi's foreground and background examples. They copy the parent's agent configuration and bot identity at creation, so approvals use the owning bot's current permission policy. Children cannot spawn further children or contact peers. A conversation runs at most eight background children at once; finished or stopped children no longer count. Names persist for reuse with send; removing them is not implemented. Foreground children stop with their owner task; background children survive parent stop. All tools still pass through the permission hook, including delegation tools.
 
@@ -588,7 +588,7 @@ Membership/name changes are scoped to the source conversation. Busy/idle changes
 `conversation.watch({ botId })` streams Pi's `LiveDoc` and `InboxDoc`, the conversation ID, and the latest saved entry ID. It never mounts the full transcript. The wire carries an initial snapshot followed by compact Chord operations. `watchConversation` loads the newest 50 stored entries, then fetches new entries in bounded pages as the saved entry ID advances. Its view contains `entries` in chronological order, `live`, `inbox`, and `historyCursor` for loading older pages:
 
 ```typescript
-import { watchConversation } from '@openbots/client/client';
+import { watchConversation } from '@repo/client/client';
 
 const controller = new AbortController();
 for await (const view of watchConversation(client, { botId }, controller.signal)) {
@@ -640,19 +640,19 @@ Before bot routing was added, a disposable WebSocket check with SQLite and Pi's 
 
 ## Configuration
 
-`@openbots/env/client` and `@openbots/env/server` export separate `env` objects using the same `createEnv` pattern. The client schema is empty. The iOS app reads its name, slug, scheme, bundle ID, Apple team and EAS project from `OPENBOTS_*` variables in `apps/mobile/.env`; see `apps/mobile/.env.example`. Without them it builds as Openbots (`app.openbots.mobile`).
+`@repo/env/client` and `@repo/env/server` export separate `env` objects using the same `createEnv` pattern. One `.env` at the repo root configures every app; see `.env.example`. `APP_NAME` (and `VITE_APP_NAME` for the web client) sets the product name, `MOBILE_*` the iOS bundle ID, scheme, Apple team and EAS project, and `DESKTOP_*` the macOS bundle ID and signing. Shell variables win over the file. Without it everything builds as Openbots (`app.openbots.mobile`, `app.openbots.desktop`). Stored identifiers (Pi document kinds, headers, storage keys) use a fixed `bots` namespace and do not follow the name.
 
 | Server setting | Default | Values |
 | --- | --- | --- |
-| `OPENBOTS_DATA_DIR` | `~/.config/openbots/` | Nonempty path; native host expands `~` and `~/`, and resolves relative paths |
-| `OPENBOTS_HOST` | `0.0.0.0` | Bind address or hostname |
-| `OPENBOTS_PORT` | `3000` | Integer from 1 to 65535 |
-| `OPENBOTS_LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
-| `OPENBOTS_ALLOWED_ORIGINS` | empty | Comma-separated browser or webview origins, such as `https://bots.example.com`. Requests without an Origin, or with an IP-literal or `localhost` Origin, are always allowed. Add every hostname origin that serves the web app |
-| `OPENBOTS_PUBLIC_URL` | `http://127.0.0.1:47190` | Web app URL used in the startup pairing link |
-| `OPENBOTS_DAEMON_URL` | `http://127.0.0.1:3000` | Daemon URL used by web SSR and the `/rpc` proxy |
-| `OPENBOTS_WEB_HOST` | `127.0.0.1` | Web app bind address |
-| `OPENBOTS_WEB_PORT` | `47190` | Web app port |
+| `DATA_DIR` | `~/.config/openbots/` | Nonempty path; native host expands `~` and `~/`, and resolves relative paths |
+| `DAEMON_HOST` | `0.0.0.0` | Bind address or hostname |
+| `DAEMON_PORT` | `3000` | Integer from 1 to 65535 |
+| `LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
+| `DAEMON_ALLOWED_ORIGINS` | empty | Comma-separated browser or webview origins, such as `https://bots.example.com`. Requests without an Origin, or with an IP-literal or `localhost` Origin, are always allowed. Add every hostname origin that serves the web app |
+| `WEB_PUBLIC_URL` | `http://127.0.0.1:47190` | Web app URL used in the startup pairing link |
+| `DAEMON_URL` | `http://127.0.0.1:3000` | Daemon URL used by web SSR and the `/rpc` proxy |
+| `WEB_HOST` | `127.0.0.1` | Web app bind address |
+| `WEB_PORT` | `47190` | Web app port |
 
 Bot settings and tool credentials belong in the app database; provider authentication uses Pi's auth files. The env package does not read or write local config files or generate secrets.
 
@@ -674,7 +674,7 @@ const older = page.next && await client.conversation.history({ botId, cursor: pa
 
 Pages contain Pi entries, newest first, with an optional `next` cursor. Return that cursor unchanged for the same bot; its absence means the end of history. The limit defaults to 50 and cannot exceed 100. This is the stored transcript, including runtime entries, not only the current model context. There is no SQL message copy.
 
-MCP connections are owned by `@openbots/runtime/native`, separately for each bot. The MCP service in `@openbots/server/native` owns directory settings and config-file discovery. It passes parsed configuration to runtime clients; the daemon only constructs and wires these objects. Startup, bot changes, and submission prepare enabled servers and reuse unchanged connections. A changed or disabled definition closes its previous connection. Tool-list notifications refresh the catalog on the next preparation; disconnected servers reconnect then. Local command configurations are trusted host configuration and run with the daemon’s OS access.
+MCP connections are owned by `@repo/runtime/native`, separately for each bot. The MCP service in `@repo/server/native` owns directory settings and config-file discovery. It passes parsed configuration to runtime clients; the daemon only constructs and wires these objects. Startup, bot changes, and submission prepare enabled servers and reuse unchanged connections. A changed or disabled definition closes its previous connection. Tool-list notifications refresh the catalog on the next preparation; disconnected servers reconnect then. Local command configurations are trusted host configuration and run with the daemon’s OS access.
 
 MCP tool calls use Durable tasks and the same Read-only/Ask/Auto/Full policy as other tools. Remote read-only hints do not bypass approvals; MCP tools are excluded in Read-only mode. Calls forward cancellation and progress, preserve MCP error results, and use `replay: 'unsafe'`. An interrupted external call is not automatically sent again after restart. The host closes MCP clients after stopping the runtime. Connection/discovery requests time out after 10 seconds; tool calls use a 60-second timeout renewed by progress.
 

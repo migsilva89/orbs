@@ -1,7 +1,7 @@
 import { linkOptions, notFound } from '@tanstack/react-router';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { RoomsPairLinkParams } from '@/types/rooms.types';
-import type { Bot } from '@openbots/contracts/universal';
+import type { Bot } from '@repo/contracts/universal';
 import type { QueryClient } from '@tanstack/react-query';
 
 export async function roomsDirectBot(queryClient: QueryClient, { handle }: Pick<Bot, 'handle'>) {

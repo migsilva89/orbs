@@ -18,7 +18,7 @@ export default {
       'src/views/connect/index.html': 'views/connect/index.html',
     },
     mac: {
-      // scripts/desktop-release.ts signs and notarizes with a dedicated keychain instead.
+      // scripts/desktop.ts release signs and notarizes with a dedicated keychain instead.
       codesign: false,
       notarize: false,
       createDmg: false,
@@ -27,7 +27,7 @@ export default {
       defaultRenderer: 'cef',
     },
   },
-  scripts: { postBuild: '../../scripts/desktop-plist.ts' },
+  scripts: { postBuild: '../../scripts/desktop.ts' },
   // Read back at runtime through BuildConfig, so packaged builds keep the name and identifier.
   runtime: { exitOnLastWindowClosed: false, name, identifier },
   release: { generatePatch: false },

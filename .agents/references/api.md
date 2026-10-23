@@ -5,7 +5,7 @@ A Bun/Turbo bot backend with a native daemon, device pairing, bot configuration,
 ```text
 apps/       daemon, desktop, mobile
 packages/   contracts, client, server, runtime, avatars, env, errors, i18n, logger, TanStack helpers, tooling, TypeScript presets
-scripts/    desktop bundle and release, mobile dev, agent-link sync
+scripts/    desktop.ts (bundle, plist, release) and mobile.ts (dev)
 .agents/    architecture, quality gate, Pi Durable examples
 ```
 

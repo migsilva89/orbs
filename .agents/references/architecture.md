@@ -192,7 +192,7 @@ apps/mobile/
 
 ```
 apps/desktop/
-├── electrobun.config.ts                app identity and build; signing happens in scripts/desktop-release.ts
+├── electrobun.config.ts                app identity and build; signing happens in scripts/desktop.ts release
 ├── icon.icon/                          the app icon
 └── src/
     ├── desktop.ts                      the main process: windows, tray, menus, local or remote server
@@ -226,7 +226,7 @@ packages/
 ├── AGENTS.md                           agent instructions; CLAUDE.md links to it
 ├── DESIGN.md                           UI principles
 ├── README.md                           what Openbots is, setup, scripts
-├── scripts/<area>-<task>.ts            build, release or dev step, run through a package.json script
+├── scripts/<app>.ts                    one script per app, a subcommand per build, release or dev step
 ├── .agents/references/<name>.md        standing references: architecture, API, quality gate
 ├── .agents/docs/<name>.md              library notes: Pi Durable examples
 ├── .agents/orchestrators/              worktree configs for Paseo, Orca, Conductor and T3 Code, and workspace.sh

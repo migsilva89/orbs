@@ -18,7 +18,13 @@
     "production": {
       "autoIncrement": true,
       "channel": "production",
+      "environment": "production",
       "env": { "APP_VARIANT": "production" }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": { "ascAppId": "6826402077" }
     }
   }
 }

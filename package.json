@@ -111,6 +111,7 @@
   },
   "catalogs": {
     "mobile": {
+      "@babel/plugin-transform-parameters": "^7.29.7",
       "@expo/fingerprint": "0.21.5",
       "@expo-google-fonts/inter": "^0.4.2",
       "@json-render/react-native": "0.21.1",
@@ -160,6 +161,7 @@
     "tsrs": "catalog:"
   },
   "scripts": {
+    "postinstall": "bun run --cwd packages/i18n i18n:compile",
     "dev:all": "turbo run dev --filter=@repo/web --filter=@repo/mobile --log-prefix=none --env-mode=loose",
     "dev:web": "turbo run dev --filter=@repo/web --log-prefix=none --env-mode=loose",
     "dev:mobile": "turbo run dev --filter=@repo/mobile --log-prefix=none --env-mode=loose",

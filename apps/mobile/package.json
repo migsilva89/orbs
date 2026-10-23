@@ -75,6 +75,7 @@
     "@pierrecapo/expo-notification-service-extension": "catalog:mobile"
   },
   "devDependencies": {
+    "@babel/plugin-transform-parameters": "catalog:mobile",
     "@types/react": "catalog:",
     "babel-preset-expo": "catalog:mobile",
     "typescript": "catalog:"

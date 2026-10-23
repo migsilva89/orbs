@@ -168,6 +168,7 @@
     "dev:mobile:native": "turbo run dev:native --filter=@repo/mobile --log-prefix=none --env-mode=loose",
     "clean": "sh -c 'set -eu; rm -rf .local logs coverage playwright-report test-results .cache apps/mobile/ios apps/mobile/android \"${TMPDIR:-/tmp}\"/metro-* \"${TMPDIR:-/tmp}\"/haste-* \"$HOME\"/Library/Developer/Xcode/DerivedData/OpenbotsDev-*; watchman watch-del-all >/dev/null 2>&1 || true; for root in packages apps .; do [ -d \"$root\" ] || continue; for name in node_modules .turbo dist build .output .nitro .tanstack .vite .expo .content-collections .bundle-stats coverage playwright-report test-results .cache .fallow; do find \"$root\" -type d -name \"$name\" -prune -exec rm -rf {} +; done; done; find . \\( -name tsconfig.tsbuildinfo -o -name \"*.log\" \\) -delete'",
     "dev:desktop": "turbo run dev:macos --filter=@repo/desktop --log-prefix=none --env-mode=loose",
+    "release:desktop": "bun --env-file=.env scripts/desktop-release.ts",
     "build:web": "turbo run build --filter=@repo/web",
     "start:web": "turbo run start --filter=@repo/web --log-prefix=none --env-mode=loose",
     "start:daemon": "turbo run start --filter=@repo/daemon --log-prefix=none --env-mode=loose",

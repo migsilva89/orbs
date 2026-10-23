@@ -2,7 +2,6 @@ import type { ElectrobunConfig } from 'electrobun';
 
 const name = process.env.APP_NAME ?? 'Openbots';
 const identifier = process.env.DESKTOP_BUNDLE_ID ?? 'app.openbots.desktop';
-const codesign = process.env.DESKTOP_CODESIGN === 'true';
 
 export default {
   app: {
@@ -19,8 +18,9 @@ export default {
       'src/views/connect/index.html': 'views/connect/index.html',
     },
     mac: {
-      codesign,
-      notarize: codesign && process.env.DESKTOP_NOTARIZE === 'true',
+      // scripts/desktop-release.ts signs and notarizes with a dedicated keychain instead.
+      codesign: false,
+      notarize: false,
       createDmg: false,
       icons: 'icon.icon',
       bundleCEF: true,

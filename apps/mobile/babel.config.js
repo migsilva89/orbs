@@ -3,6 +3,6 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
     // Hermes v1 cannot compile rest-destructured parameters (`...[a, b]`), which @orpc/server ships.
-    plugins: ['@babel/plugin-transform-parameters'],
+    plugins: [require.resolve('@babel/plugin-transform-parameters')],
   };
 };

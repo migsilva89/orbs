@@ -5,6 +5,7 @@ Bot backend with a native daemon, device pairing, bot configuration, and authent
 ## Read first
 
 - Before code changes, read `.agents/references/architecture.md` for structure and module conventions.
+- For daemon, RPC, storage and Pi behavior, read `.agents/references/api.md`.
 - Before UI changes, read `DESIGN.md`.
 - For Pi Durable work, read `.agents/docs/pi-durable.md` and check the runtime's own API before adding custom behavior.
 - When designing features, check [public Orbs](https://github.com/nikuscs/orbs) for ideas and edge cases, especially files, attachments, and tool permissions. It is a reference only, not a specification or architecture to copy. Follow Openbots scope and conventions; prefer a cleaner solution and existing Pi capabilities.
@@ -25,4 +26,4 @@ Bot backend with a native daemon, device pairing, bot configuration, and authent
 
 ## Validation
 
-Run `bun run check` and `bun run lint`; use `.agents/references/quality-gate.md` when reviewing. After changing agent guidance, run `bun scripts/utils-sync-agents.ts`.
+Run `bun run check` and `bun run lint`; use `.agents/references/quality-gate.md` when reviewing. After changing agent guidance, run `bun run agents:sync`.

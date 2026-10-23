@@ -23,6 +23,15 @@ packages/i18n/src/paraglide/
 .agents/research/
 .agents/tasks.md
 .agents/docs/todos.md
+.agents/state.md
+
+# Linked by bun run agents:sync
+.claude/skills
+.claude/agents
+/paseo.json
+/orca.yaml
+/conductor.json
+/t3.json
 
 # Signing material, never committed
 credentials.json

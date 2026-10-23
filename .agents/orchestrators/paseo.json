@@ -1,0 +1,24 @@
+{
+  "worktree": {
+    "setup": "./.agents/orchestrators/workspace.sh setup",
+    "terminals": [
+      {
+        "name": "dev",
+        "command": "./.agents/orchestrators/workspace.sh run"
+      }
+    ]
+  },
+  "scripts": {
+    "dev": {
+      "command": "./.agents/orchestrators/workspace.sh run"
+    }
+  },
+  "metadataGeneration": {
+    "branchName": {
+      "instructions": "Use <type>/<short-description> in lowercase kebab-case, for example feat/bot-avatars or fix/pairing-qr. Types: feat, fix, chore, docs, refactor."
+    },
+    "commitMessage": {
+      "instructions": "Write one plain imperative sentence that says what changed and why it matters, for example 'Animate bot avatars on iOS and register the notification extension for EAS signing'. No Conventional Commit prefix, no ticket ID."
+    }
+  }
+}

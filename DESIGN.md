@@ -1,6 +1,6 @@
 # Design
 
-A calm, native chat interface. Conversations lead; navigation and controls stay quiet. These principles guide future clients; no UI is implemented yet.
+A calm, native chat interface. Conversations lead; navigation and controls stay quiet. These principles guide every client.
 
 ## Visual language
 

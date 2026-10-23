@@ -22,5 +22,14 @@ packages/i18n/src/paraglide/
 .agents/plans/
 .agents/research/
 .agents/tasks.md
+.agents/docs/todos.md
+
+# Signing material, never committed
+credentials.json
+*.p8
+*.p12
+*.cer
+*.mobileprovision
+*.keychain-db
 
 packages/i18n/project.inlang/cache/

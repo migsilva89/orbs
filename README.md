@@ -1,11 +1,11 @@
 # Openbots
 
-A Bun/Turbo bot backend with a native daemon, device pairing, bot configuration, and authenticated submit, stop, and live views of persistent per-bot Pi Durable conversations. Pi supplies shared provider authentication. Explicit skill invocation, private peer messages, and foreground/background subagents are available. Attachment APIs are available. The web client (`apps/web`) includes provider login, and an iOS client lives in `apps/mobile`. Desktop is not implemented yet.
+A Bun/Turbo bot backend with a native daemon, device pairing, bot configuration, and authenticated submit, stop, and live views of persistent per-bot Pi Durable conversations. Pi supplies shared provider authentication. Explicit skill invocation, private peer messages, and foreground/background subagents are available. Attachment APIs are available. Clients: web (`apps/web`), iOS (`apps/mobile`) and a macOS desktop app (`apps/desktop`).
 
 ```text
 apps/       daemon, desktop, mobile
 packages/   contracts, client, server, runtime, avatars, env, errors, i18n, logger, TanStack helpers, tooling, TypeScript presets
-scripts/    agent-link sync
+scripts/    desktop bundle and release, mobile dev, agent-link sync
 .agents/    architecture, quality gate, Pi Durable examples
 ```
 
@@ -90,7 +90,7 @@ const pinnedClient = makeClient({ connect, token, serverId: server.id });
 
 Platform apps store the ID with the address and device credential, and use it in cache keys. `serverId` pins later requests to that daemon: another daemon at the same address returns `SERVER_MISMATCH` before an action runs. Identity checking does not replace TLS or device authentication.
 
-The shared client sends `x-bots-protocol: 1` on every RPC call, including pairing redemption. Raw clients must send it too. A missing or different version returns `PROTOCOL_MISMATCH` with `supportedVersion` and `receivedVersion`; update the incompatible client or daemon before retrying. This is the application protocol version, independent of Pi and package versions. Protocol and identity failures are not retried automatically. Desktop/mobile connection storage and upgrade screens remain pending.
+The shared client sends `x-bots-protocol: 1` on every RPC call, including pairing redemption. Raw clients must send it too. A missing or different version returns `PROTOCOL_MISMATCH` with `supportedVersion` and `receivedVersion`; update the incompatible client or daemon before retrying. This is the application protocol version, independent of Pi and package versions. Protocol and identity failures are not retried automatically. Client upgrade screens remain pending.
 
 ## Attachments
 
@@ -114,9 +114,9 @@ Server/native stores bytes under `agents/<botId>/.attachments/<conversationId>/<
 
 Queued edits accept `attachmentIds`: omit to preserve files, pass `[]` to remove them, or pass IDs to replace them. A file-only input cannot become empty. Queue, steer and interrupt share this representation. Skill expansion still applies before admission. Peer/custom inputs remain protected from owner queue edits.
 
-`attachments.remove` removes an unretained upload. Abandoned uploads expire after 24 hours and are swept on the next upload to that conversation, including old orphan blobs. Before send/edit, Pi marks selected files retained so deletion cannot race accepted references. Retention and submission are separate commits: failed sends, cancelled queue items and removed queue references can leave retained files. They are not swept or manually removable through this API. Whole-chat/bot deletion and its file cleanup remain pending.
+`attachments.remove` removes an unretained upload. Abandoned uploads expire after 24 hours and are swept on the next upload to that conversation, including old orphan blobs. Before send/edit, Pi marks selected files retained so deletion cannot race accepted references. Retention and submission are separate commits: failed sends, cancelled queue items and removed queue references can leave retained files. They are not swept or manually removable through this API.
 
-File responses use the oRPC binary protocol and return a `File`, not a public download URL. HTTP RPC responses disable caching and MIME sniffing. Composer upload/paste/drop, file cards and gallery UI remain pending.
+File responses use the oRPC binary protocol and return a `File`, not a public download URL. HTTP RPC responses disable caching and MIME sniffing.
 
 ## Message interactions
 
@@ -164,9 +164,9 @@ await client.conversation.answerQuestion({ ...target, answer: { kind: 'skip' } }
 
 Choices must come from the question's list, without duplicates; more than one requires `isMultiSelect`.
 
-The first answer before the five-minute deadline wins; `result.isAccepted` reports whether it was accepted. Question state and its deadline live in a task-scoped Pi document and survive restart. Stopping the task removes it from pending questions. This is separate from permission approval; the trusted `bot_question` tool also works in read-only mode. Multi-select cards and skip controls in clients are not implemented.
+The first answer before the five-minute deadline wins; `result.isAccepted` reports whether it was accepted. Question state and its deadline live in a task-scoped Pi document and survive restart. Stopping the task removes it from pending questions. This is separate from permission approval; the trusted `bot_question` tool also works in read-only mode.
 
-The selected chat watch includes `interactionsRevision`. Refetch visible reactions and pending questions on the initial state and when this value changes. It is a subscription-local invalidation counter, not a replay cursor. Reconnect starts with current state. Reaction buttons, question cards and retry controls remain UI work.
+The selected chat watch includes `interactionsRevision`. Refetch visible reactions and pending questions on the initial state and when this value changes. It is a subscription-local invalidation counter, not a replay cursor. Reconnect starts with current state.
 
 ## Runtime commands
 
@@ -203,7 +203,7 @@ Command and skill catalog items include `argumentsSchema` (JSON Schema) and null
 
 Bots use Pi Durable's `read`, `write`, `edit`, and `bash` tools in their working folder. Read-only offers only declared read tools. Ask waits for approval on other calls. Auto uses Jev and falls back to Ask when its key is absent or its decision is uncertain. Full permits calls without approval. Commands run as the daemon's OS user; the working directory is not a sandbox.
 
-Authenticated clients use `tools.pending({ botId })` and `tools.answer({ botId, id, approved })`. The pending list includes child subagent approvals, with a `conversationId` for opening their view. Requests expire after the approval timeout (`approvalTimeoutMinutes`, 1–10, default 5); an unanswered request counts as denied. Pi stores their state with the tool task and restores pending requests after restart. Custom tool extensions use the same gate, including nested calls. No approval UI is implemented yet.
+Authenticated clients use `tools.pending({ botId })` and `tools.answer({ botId, id, approved })`. The pending list includes child subagent approvals, with a `conversationId` for opening their view. Requests expire after the approval timeout (`approvalTimeoutMinutes`, 1–10, default 5); an unanswered request counts as denied. Pi stores their state with the tool task and restores pending requests after restart. Custom tool extensions use the same gate, including nested calls.
 
 `tools.configure({ jevApiKey })` saves the key; passing `null` removes it, and omitting it leaves it unchanged. `tools.settings()` returns the tool settings object, `{ isJevConfigured, approvalRules, approvalTimeoutMinutes }`, and never returns the key. `tools.configure({ approvalTimeoutMinutes })` changes the timeout for new requests. `tools.configure()` returns the updated settings after saving. Application secrets share the encrypted `credentials` table. The native daemon stores the encryption key in `data/credentials.key` with owner-only permissions. Keep that key for recovery; copying the entire data directory also copies the ability to decrypt the database. Pi's provider authentication remains in Pi's own store.
 
@@ -227,7 +227,7 @@ In every mode, stored values in any tool result are replaced with their placehol
 
 ## Provider authentication
 
-The daemon uses Pi's `ModelRuntime.create()`, which loads saved provider credentials from `auth.json` and custom model configuration from `models.json` in Pi's agent directory (default `~/.pi/agent`). Existing Pi logins are reused; Pi handles file locking and OAuth refresh. Paired devices can use the provider RPC below; Pi's `/login` command remains compatible. Login UI is not implemented.
+The daemon uses Pi's `ModelRuntime.create()`, which loads saved provider credentials from `auth.json` and custom model configuration from `models.json` in Pi's agent directory (default `~/.pi/agent`). Existing Pi logins are reused; Pi handles file locking and OAuth refresh. Paired devices can use the provider RPC below; Pi's `/login` command remains compatible.
 
 Set `PI_CODING_AGENT_DIR` for both Pi and the daemon to use a separate auth/config directory, including for development versus production. Run them as the same OS user to share the default directory. Pi authentication uses its existing location. Skills are loaded directly from their source directories, including existing symlinks; MCP configuration discovery, stdio/Streamable HTTP connections and MCP OAuth APIs are available. Pi's auth file is sensitive and is not encrypted by this integration.
 
@@ -245,7 +245,7 @@ The public budget is checked before authentication, per connection address, so u
 
 ## Device pairing
 
-Each daemon has one owner. Existing paired devices issue a pairing payload through authenticated `pairing.create`. `openbots pair` uses the existing `pairing.bootstrap` operation on the owner-only Unix socket at `data/ipc/rpc.sock`, before or after initial setup. It does not store a device credential or open the database. Public HTTP/WebSocket calls cannot bootstrap, even from loopback. At startup, while no device is paired, the daemon prints a pairing link (`WEB_PUBLIC_URL/connect#code=…`) and a terminal QR code, refreshing it when the grant expires. Open the link to prefill the web connect form. Desktop UI integration remains pending.
+Each daemon has one owner. Existing paired devices issue a pairing payload through authenticated `pairing.create`. `openbots pair` uses the existing `pairing.bootstrap` operation on the owner-only Unix socket at `data/ipc/rpc.sock`, before or after initial setup. It does not store a device credential or open the database. Public HTTP/WebSocket calls cannot bootstrap, even from loopback. At startup, while no device is paired, the daemon prints a pairing link (`WEB_PUBLIC_URL/connect#code=…`) and a terminal QR code, refreshing it when the grant expires. Open the link to prefill the web connect form.
 
 | RPC call | Access | Result |
 | --- | --- | --- |
@@ -276,7 +276,7 @@ Claimed grants retain their timestamp after expiry. Unclaimed expired grants are
 
 The pairing API renders `qr.svg` for immediate display. `qr.payload` is an unpadded URL-safe Base64 code containing `{ version: 1, serverUrl, token, expiresAt }`. Clients decode it with `authPairCode` and can render the code themselves. Base64 is an encoding, not encryption; treat the code as a temporary credential. Supply the address the new device can reach; the API normalizes the HTTP(S) origin and rejects credentials, paths, query strings, fragments, and wildcard bind addresses. Loopback addresses are allowed for pairing another browser on the same computer; the UI warns that these codes cannot connect another computer or phone. Scanning requires the app's future QR reader; this is not an app deep link.
 
-Use HTTPS or the encrypted Tailscale path for remote pairing and requests. The native listener does not terminate TLS. The daemon accepts Bearer credentials, not cookies or query-string tokens; foreign browser origins are rejected. Request throttling is implemented through the limits service. See the [pairing plan](.agents/plans/main/05-auth-and-pairing.md).
+Use HTTPS or the encrypted Tailscale path for remote pairing and requests. The native listener does not terminate TLS. The daemon accepts Bearer credentials, not cookies or query-string tokens; foreign browser origins are rejected. Request throttling is implemented through the limits service.
 
 Each web deployment connects to its configured `DAEMON_URL`, including pairing. TanStack Start renders initial data on the server and hydrates the browser query cache; chat loads one complete view before switching to live WebSocket updates. The web stores its device credential in a browser-readable, same-site cookie so SSR and WebSocket calls use the same token. HTTPS connections set the Secure flag. Existing same-origin local-storage credentials migrate once; the credential is never included in hydrated page data, and SSR responses are private and not cached.
 
@@ -391,7 +391,7 @@ await client.conversation.setMuted({ botId, isMuted: true, mutedUntil: Date.now(
 await client.conversation.arrange({ botIds: orderedBotIds });
 ```
 
-These actions update the bot preferences and stream to paired devices. `arrange` ranks the supplied chats and clears omitted ranks; pinning still takes precedence. Hide does not stop work or delete history. Mute suppresses backend notification events for that bot, including its private contexts and subagents. `mutedUntil` (milliseconds since epoch) ends a mute at that time; `null` mutes until changed. After expiry, notifications resume and lists report `isMuted: false`; an open sidebar watch refreshes the flag at its next change, so clients should also compare `mutedUntil` with the clock. Notification UI is not implemented.
+These actions update the bot preferences and stream to paired devices. `arrange` ranks the supplied chats and clears omitted ranks; pinning still takes precedence. Hide does not stop work or delete history. Mute suppresses backend notification events for that bot, including its private contexts and subagents. `mutedUntil` (milliseconds since epoch) ends a mute at that time; `null` mutes until changed. After expiry, notifications resume and lists report `isMuted: false`; an open sidebar watch refreshes the flag at its next change, so clients should also compare `mutedUntil` with the clock.
 
 ## Skills and MCP discovery
 
@@ -406,7 +406,7 @@ const { skills, mcp } = await client.bots.catalog({ botId });
 // Each skill: name, description, filePath, isModelInvocable.
 ```
 
-Discovery returns the bot's current catalog for the composer, including manual-only skills. It uses the same Pi loader as runtime configuration. It does not run a model or install anything. Composer rendering remains pending. Explicit invocation uses selected catalog names:
+Discovery returns the bot's current catalog for the composer, including manual-only skills. It uses the same Pi loader as runtime configuration. It does not run a model or install anything. Explicit invocation uses selected catalog names:
 
 ```typescript
 await client.conversation.submit({
@@ -431,7 +431,7 @@ MCP tool schemas are deferred. Pi's native `tool_search` loads matching definiti
 
 MCP source order is Pi's global `mcp.json`, `~/.agents/mcp.json`, configured MCP paths, bot `.agents/mcp.json`, then bot `.pi/mcp.json`. Shared sources require the bot's `mcp` inheritance flag. Each configured path may be a file or directory. Directories recursively scan `mcp.json` and `*.mcp.json`, skip `.git` and `node_modules`, follow symlinks without cycles, and sort resolved file paths. Later definitions replace the whole same-named entry. A malformed server override removes the earlier same-named entry and adds a diagnostic. Whole-file failures add diagnostics; the returned catalog can be partial.
 
-Use the standard `{ "mcpServers": { "name": { ... } } }` JSON shape. Discovery recognizes stdio commands and HTTP URLs, plus `enabled: false` or `disabled: true` on a complete definition. Stdio accepts `args`, `env`, and `cwd` (relative to the bot directory by default); Streamable HTTP accepts `headers`. Values are literal: shell substitutions and environment interpolation are not supported. `paths: []` clears additional sources, and omitted settings remain unchanged. Composer rendering remains pending.
+Use the standard `{ "mcpServers": { "name": { ... } } }` JSON shape. Discovery recognizes stdio commands and HTTP URLs, plus `enabled: false` or `disabled: true` on a complete definition. Stdio accepts `args`, `env`, and `cwd` (relative to the bot directory by default); Streamable HTTP accepts `headers`. Values are literal: shell substitutions and environment interpolation are not supported. `paths: []` clears additional sources, and omitted settings remain unchanged.
 
 Reference encrypted credentials by name with `envCredentials` for stdio or `headerCredentials` for HTTP:
 
@@ -475,7 +475,7 @@ for await (const state of watchNotifications(client, controller.signal)) {
 
 Events contain identifiers for the bot, conversation, entry or task, plus expiry where relevant. Fetch the selected chat or existing approval/question endpoint for details. The stream carries no tool arguments, question text, provider errors or message bodies. Each bot store reports its own events and the server merges them; mute is read from the app database, so private contexts and subagents follow their bot's mute. Hiding a chat does not mute it.
 
-Each connection starts with current pending attention and an empty recent list. Completion events missed while disconnected are not replayed. Clients can compare stable event identifiers across snapshots and decide whether to show an OS notification; foreground suppression, sound and mobile push remain client work. Cancelling the stream or revoking its device ends observation without stopping agent work.
+Each connection starts with current pending attention and an empty recent list. Completion events missed while disconnected are not replayed. Clients can compare stable event identifiers across snapshots and decide whether to show an OS notification. Cancelling the stream or revoking its device ends observation without stopping agent work.
 
 ## Instruction files and plugins
 
@@ -598,7 +598,7 @@ for await (const view of watchConversation(client, { botId }, controller.signal)
 }
 ```
 
-`view.inbox.items` contains Pi's pending submissions, in ID order. Input items carry `id`, `mode` (`steer` or `followUp`), and `content`; `id` matches the submit acknowledgement's `submissionId`. Pending writes use `mode: 'write'` and `entry`, for example a queued reset. Keep them separate from saved messages. Pi removes items when they are placed or withdrawn. The queue UI remains pending; the backend exposes editing, promotion and cancellation.
+`view.inbox.items` contains Pi's pending submissions, in ID order. Input items carry `id`, `mode` (`steer` or `followUp`), and `content`; `id` matches the submit acknowledgement's `submissionId`. Pending writes use `mode: 'write'` and `entry`, for example a queued reset. Keep them separate from saved messages. Pi removes items when they are placed or withdrawn. The backend exposes editing, promotion and cancellation.
 
 ```typescript
 await client.conversation.updateSubmission({ botId, submissionId, content: 'Updated request', skills: ['review'] });
@@ -612,7 +612,7 @@ Call `controller.abort()` when leaving the view. Disconnecting or cancelling sto
 
 To scroll back, call `conversation.history({ botId, conversationId, cursor: view.historyCursor, limit: 50 })` and continue with the returned `next` cursor. These pages are newest-first; reverse each page for chronological display. Private contexts and subagents load only when explicitly selected by conversation ID. They are details within the originating chat, not extra top-level sidebar chats.
 
-All paired devices have owner access to the selected bot's view. Peer messages default to existing bot conversations; the sidebar and attachment UI remain pending. Group rooms are excluded. Earlier disposable WebSocket checks verified the single-root transport before bot routing was added. Disposable bot integration checks cover tool approvals and SQLite recovery; live providers remain unverified.
+All paired devices have owner access to the selected bot's view. Peer messages default to existing bot conversations. Group rooms are excluded. Earlier disposable WebSocket checks verified the single-root transport before bot routing was added. Disposable bot integration checks cover tool approvals and SQLite recovery; live providers remain unverified.
 
 ## Submit and stop
 
@@ -702,7 +702,7 @@ One routine has at most one claimed occurrence at a time. `lastRun` reports the 
 
 After downtime, a saved overdue deadline runs once; missed repetitions are not replayed. Cron chooses the next future calendar time after completion. Intervals wait the specified minutes after completion. A scheduled one-shot disables itself after its receipt settles, including an unanswered result. Resuming a past one-shot explicitly requests it again. On restart, the harness resumes the saved phase and reuses the same submission instead of creating another input. External tool effects still follow Pi's replay guarantees.
 
-Waiting does not depend on a host timer surviving: after each commit, every bot store arms one host alarm at its earliest saved deadline (routine runs, approval and question expiry) plus a one-minute heartbeat while other work is live, and the alarm resumes that store. The native daemon must remain running; its alarm is an in-process timer. A Cloudflare host would back the same port with Durable Object alarms. The routine editor and live routine-list UI are not implemented.
+Waiting does not depend on a host timer surviving: after each commit, every bot store arms one host alarm at its earliest saved deadline (routine runs, approval and question expiry) plus a one-minute heartbeat while other work is live, and the alarm resumes that store. The native daemon must remain running; its alarm is an in-process timer. A Cloudflare host would back the same port with Durable Object alarms.
 
 Bots have `bot_routine_list`, `bot_routine_create`, `bot_routine_update`, `bot_routine_run` and `bot_routine_remove`. These call the same runtime routine service as RPC. Tool schemas are derived once from the public routine contracts. Tools derive the bot identity from Pi; they accept no bot or conversation ID. Private contexts and subagents manage their bot's main-chat routines, with the same permission hook.
 
@@ -756,4 +756,4 @@ For an HTML artifact, pass `spec: { html: '<h1>Hello</h1>' }` to the same create
 
 Pi owns the artifact index and version documents. Chat entries contain artifact references, not duplicated bodies; they do not enter model context. The selected live conversation exposes `artifactsRevision` so clients can refresh summaries and fetch an open artifact. Bodies are loaded through `get`, not sidebar or live subscriptions. Artifact tools return the content they explicitly read or write as ordinary tool results.
 
-Bots have `bot_artifact_list`, `bot_artifact_get`, `bot_artifact_blocks`, `bot_artifact_create`, and `bot_artifact_update`. They use their current Pi conversation and cannot supply another bot or conversation ID. Reads are trusted registrations; mutations require the configured approval policy and are not automatically replayed after interruption. Owner RPC authorizes the selected bot/conversation pair. The artifact renderer and editor are not implemented yet.
+Bots have `bot_artifact_list`, `bot_artifact_get`, `bot_artifact_blocks`, `bot_artifact_create`, and `bot_artifact_update`. They use their current Pi conversation and cannot supply another bot or conversation ID. Reads are trusted registrations; mutations require the configured approval policy and are not automatically replayed after interruption. Owner RPC authorizes the selected bot/conversation pair.

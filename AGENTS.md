@@ -17,7 +17,7 @@ Bot backend with a native daemon, device pairing, bot configuration, and authent
 - Each daemon has one owner and uses device pairing for access. Do not add users, organizations, memberships, roles, or password login. Paired devices issue grants through authenticated RPC; the local CLI uses the owner-only daemon socket before or after initial setup. Public transport cannot issue local grants. CLI commands reuse running services; only startup opens stores. Local UI integration is pending.
 - `apps/daemon` is startup, composition, transport and shutdown only. Product logic belongs in server; Pi integration belongs in runtime. Native implementations stay in their owning package. Follow the ownership table and dependency rules in the architecture reference; fix conflicting code instead of rewriting the rules.
 - Services have concrete domain ownership and receive whole service dependencies. Skill/MCP settings and discovery belong to those domains; a combined response does not justify a catchall service.
-- User-facing copy uses English keys in `packages/i18n/messages/en/`. Remove matching Portuguese keys when deleting or renaming a key.
+- User-facing copy uses English keys in `packages/i18n/messages/en/`.
 - Preserve architecture, lint, TypeScript, and Fallow rules. Changes to these contracts require the user's explicit request; never weaken them to pass a check.
 - Keep development data and credentials separate from production. User owns the dev servers. Ask before stopping them or starting new ones. If an existing dev terminal has crashed or exited, restart it in the same Paseo terminal to finish your task, and say so.
 - Run existing checks. Add tests only when the user asks.

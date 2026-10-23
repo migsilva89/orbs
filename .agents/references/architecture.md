@@ -132,6 +132,6 @@ Before adding infrastructure, inspect the installed library API and official exa
 
 Use Bun and the root dependency catalog: external dependencies use `catalog:`, workspace packages use `workspace:*`. Run `bun install` after manifest changes and retain the lockfile.
 
-Hosts initialize logging and locale explicitly. Shared packages must not assume Vite, Workers, HTTP ingest routes, locale URLs or cookies. User-facing text uses English i18n keys; remove matching Portuguese keys on rename/removal. Use Paraglide's declaration generation.
+Hosts initialize logging and locale explicitly. Shared packages must not assume Vite, Workers, HTTP ingest routes, locale URLs or cookies. User-facing text uses English i18n keys. Use Paraglide's declaration generation.
 
 Every source package has `check`, `lint` and `lint:fix`. Keep Oxlint, Fallow, TypeScript and CI enforcement intact; never weaken checks to fit code. Run the [quality gate](quality-gate.md). Add tests only when requested. Implementation status and detailed behavior belong in README/plans, not new architecture paragraphs.

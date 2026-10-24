@@ -1,8 +1,8 @@
-# 🤖 Openbots
+# 🤖 Orbs
 
 > Your own bots, on your own Mac. Chat with them from the web, your iPhone or the desktop app.
 
-Openbots runs a small daemon on your computer. Each bot is a persistent [Pi](https://github.com/earendil-works/pi) agent with its own conversation, tools, skills and memory, and it keeps working when you close the app. Your devices pair with the daemon once, then talk to it over your local network or Tailscale. There are no accounts and no cloud service in between.
+Orbs runs a small daemon on your computer. Each bot is a persistent [Pi](https://github.com/earendil-works/pi) agent with its own conversation, tools, skills and memory, and it keeps working when you close the app. Your devices pair with the daemon once, then talk to it over your local network or Tailscale. There are no accounts and no cloud service in between.
 
 ## ✨ Features
 
@@ -16,7 +16,7 @@ Openbots runs a small daemon on your computer. Each bot is a persistent [Pi](htt
 - ⏰ **Routines.** Schedule a bot to run on its own; results land in its chat.
 - 📊 **Artifacts.** Bots build documents, charts and HTML pages you can open and edit from the artifacts page.
 - 📱 **iOS app.** Scan the pairing QR code and chat on the go. Push notifications show the bot's own avatar.
-- 🍎 **macOS app.** Starts the daemon for you, pairs itself, and can also open Openbots running on another Mac.
+- 🍎 **macOS app.** Starts the daemon for you, pairs itself, and can also open Orbs running on another Mac.
 - 💾 **Backups.** One command snapshots every bot, its files and the database, and restores them later.
 
 ## 🧰 Built with
@@ -30,7 +30,7 @@ Openbots runs a small daemon on your computer. Each bot is a persistent [Pi](htt
 **1. Install**
 
 ```bash
-git clone https://github.com/nikuscs/openbots && cd openbots
+git clone https://github.com/nikuscs/orbs && cd orbs
 bun install
 cp .env.example .env
 ```
@@ -43,11 +43,11 @@ The defaults in `.env.example` work as they are.
 bun run dev:web
 ```
 
-This starts the daemon on port 47191 and the web app on http://localhost:47190. Dev data lives in `~/.config/openbots-dev`, apart from a real install in `~/.config/openbots`.
+This starts the daemon on port 47191 and the web app on http://localhost:47190. Dev data lives in `~/.config/orbs-dev`, apart from a real install in `~/.config/orbs`.
 
 **3. Pair your browser**
 
-While no device is paired, the daemon prints a pairing link and a QR code in the terminal. Open the link to pair this browser. To pair another device later, open **Settings → Devices** on a paired one, or run `openbots pair`.
+While no device is paired, the daemon prints a pairing link and a QR code in the terminal. Open the link to pair this browser. To pair another device later, open **Settings → Devices** on a paired one, or run `orbs pair`.
 
 **4. Connect a model**
 
@@ -70,25 +70,25 @@ This boots the iOS Simulator and starts the dev client. Scan the pairing QR code
 bun run dev:desktop
 ```
 
-The macOS app starts the daemon and web app if they are not running, then pairs itself. On first launch it asks where Openbots runs: **This Mac** or **Another Mac**.
+The macOS app starts the daemon and web app if they are not running, then pairs itself. On first launch it asks where Orbs runs: **This Mac** or **Another Mac**.
 
-### The `openbots` command
+### The `orbs` command
 
 Run `bun link` in `apps/daemon` once, then:
 
 ```bash
-openbots start                # Run in the foreground; Ctrl+C stops it
-openbots start --detach       # Run in the background
-openbots pair                 # Print a new pairing code, link and QR code
-openbots service register     # Start the daemon at every macOS login
-openbots service unregister   # Stop starting it at login
+orbs start                # Run in the foreground; Ctrl+C stops it
+orbs start --detach       # Run in the background
+orbs pair                 # Print a new pairing code, link and QR code
+orbs service register     # Start the daemon at every macOS login
+orbs service unregister   # Stop starting it at login
 ```
 
 `bun run --cwd apps/daemon backup` creates and restores backups. See the [API reference](.agents/references/api.md#daemon-and-storage) for details.
 
 ### Desktop release
 
-`bun run release:desktop` builds the macOS app, signs it with your Developer ID, notarizes it with Apple and writes `apps/desktop/artifacts/Openbots-<version>-macos-arm64.zip`. The version comes from `apps/desktop/package.json`. Set `DESKTOP_SIGNING_KEYCHAIN` (a dedicated keychain holding the Developer ID certificate) and `DESKTOP_SIGNING_IDENTITY` (its SHA-1) in `.env`. The keychain password and notary key come from `.env` or from a `credentials.json` next to the keychain; see `.env.example`.
+`bun run release:desktop` builds the macOS app, signs it with your Developer ID, notarizes it with Apple and writes `apps/desktop/artifacts/Orbs-<version>-macos-arm64.zip`. The version comes from `apps/desktop/package.json`. Set `DESKTOP_SIGNING_KEYCHAIN` (a dedicated keychain holding the Developer ID certificate) and `DESKTOP_SIGNING_IDENTITY` (its SHA-1) in `.env`. The keychain password and notary key come from `.env` or from a `credentials.json` next to the keychain; see `.env.example`.
 
 ## 🧪 Development
 

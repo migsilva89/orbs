@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "bin": {
-    "openbots": "./src/entry.native.ts"
+    "orbs": "./src/entry.native.ts"
   },
   "scripts": {
-    "dev": "DATA_DIR=$HOME/.config/openbots-dev DAEMON_HOST=0.0.0.0 DAEMON_PORT=47191 WEB_PUBLIC_URL=http://localhost:47190 bun --env-file=../../.env --watch src/entry.native.ts",
+    "dev": "DATA_DIR=$HOME/.config/orbs-dev DAEMON_HOST=0.0.0.0 DAEMON_PORT=47191 WEB_PUBLIC_URL=http://localhost:47190 bun --env-file=../../.env --watch src/entry.native.ts",
     "start": "bun --env-file=../../.env src/entry.native.ts",
     "backup": "bun --env-file=../../.env src/entry-backup.native.ts",
     "check": "tsrs --noEmit",

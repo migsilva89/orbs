@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const root = path.resolve(import.meta.dir, '..');
 const desktop = path.join(root, 'apps/desktop');
-const name = process.env.APP_NAME ?? 'Openbots';
+const name = process.env.APP_NAME ?? 'Orbs';
 const entitlements = ['allow-jit', 'allow-unsigned-executable-memory', 'disable-library-validation'];
 
 function fail(message: string): never {

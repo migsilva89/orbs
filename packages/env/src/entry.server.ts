@@ -3,8 +3,8 @@ import { z } from 'zod';
 
 export const serverEnvSchema = {
   // App
-  APP_NAME: z.string().trim().min(1).default('Openbots'),
-  DATA_DIR: z.string().trim().min(1).default('~/.config/openbots/'),
+  APP_NAME: z.string().trim().min(1).default('Orbs'),
+  DATA_DIR: z.string().trim().min(1).default('~/.config/orbs/'),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
 
   // Daemon

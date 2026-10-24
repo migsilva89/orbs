@@ -18,10 +18,10 @@ import type { RouterClient } from '@orpc/server';
 import type { router } from '@repo/server/server';
 
 const HELP = `Usage:
-  openbots start [--detach]
-  openbots pair [--url <origin>]
-  openbots service register
-  openbots service unregister
+  orbs start [--detach]
+  orbs pair [--url <origin>]
+  orbs service register
+  orbs service unregister
 
 Without a command, the daemon starts in the foreground.
 Service commands change startup at the next macOS login, not the running daemon.

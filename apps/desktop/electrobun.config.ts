@@ -1,7 +1,7 @@
 import type { ElectrobunConfig } from 'electrobun';
 
-const name = process.env.APP_NAME ?? 'Openbots';
-const identifier = process.env.DESKTOP_BUNDLE_ID ?? 'app.openbots.desktop';
+const name = process.env.APP_NAME ?? 'Orbs';
+const identifier = process.env.DESKTOP_BUNDLE_ID ?? 'app.orbs.desktop';
 
 export default {
   app: {

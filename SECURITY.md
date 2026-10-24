@@ -10,4 +10,4 @@ The latest commit on `main` receives security updates.
 
 ### Scope
 
-Openbots is a scaffold for a self-hosted bot app with daemon, desktop, and mobile clients. Device pairing and revocation, daemon isolation, API keys, socket authorization, file uploads, secret handling, and dependency security are in scope as those features are implemented. Each daemon has one owner.
+Orbs is a scaffold for a self-hosted bot app with daemon, desktop, and mobile clients. Device pairing and revocation, daemon isolation, API keys, socket authorization, file uploads, secret handling, and dependency security are in scope as those features are implemented. Each daemon has one owner.

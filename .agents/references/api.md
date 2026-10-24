@@ -1,16 +1,16 @@
-# Openbots backend reference
+# Orbs backend reference
 
 Only behavior the code does not make obvious. RPC names and inputs: `packages/contracts/src/rpc/rpc.router.ts`. Services: `packages/server/src/services/<domain>/` (product) and `packages/runtime/src/services/<domain>/` (Pi).
 
 ## Daemon and storage
 
 ```text
-DATA_DIR/                     default ~/.config/openbots/
+DATA_DIR/                     default ~/.config/orbs/
   agents/<botId>/             bot working folder, uploads in .attachments/ (not a sandbox)
   data/app.sqlite             app database
   data/credentials.key        key for the encrypted credentials table
   data/daemon.lock            one lock for every store
-  data/ipc/rpc.sock           owner-only socket, used by `openbots pair`
+  data/ipc/rpc.sock           owner-only socket, used by `orbs pair`
   data/bots/<botId>/runtime.sql   that bot's Pi store; the file is the unit of erasure
 ```
 

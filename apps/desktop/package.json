@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:macos": "bun --env-file=../../.env ../../scripts/desktop.ts bundle && DATA_DIR=$HOME/.config/openbots-dev DESKTOP_WEB_DEV=$(cd ../web && pwd) bun --env-file=../../.env electrobun dev",
+    "dev:macos": "bun --env-file=../../.env ../../scripts/desktop.ts bundle && DATA_DIR=$HOME/.config/orbs-dev DESKTOP_WEB_DEV=$(cd ../web && pwd) bun --env-file=../../.env electrobun dev",
     "build:macos": "bun --env-file=../../.env ../../scripts/desktop.ts bundle && bun --env-file=../../.env electrobun build --env=stable",
     "check": "electrobun prepare && tsrs --noEmit",
     "lint": "electrobun prepare && oxlint src/ electrobun.config.ts -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",

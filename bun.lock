@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "openbots",
+      "name": "orbs",
       "devDependencies": {
         "@expo/fingerprint": "catalog:mobile",
         "@vitest/coverage-v8": "catalog:",
@@ -21,7 +21,7 @@
       "name": "@repo/daemon",
       "version": "1.0.0",
       "bin": {
-        "openbots": "./src/entry.native.ts",
+        "orbs": "./src/entry.native.ts",
       },
       "dependencies": {
         "@orpc/client": "catalog:",

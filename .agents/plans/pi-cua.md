@@ -11,8 +11,8 @@ Out of scope for this plan: GUI computer use (click, type, screenshot), cloud or
 ## Facts this plan depends on
 
 - pi-cua is a Pi CLI extension. It adds `/space` and a `space` tool, routes the six built-in tools through `cua-spacesd`, and syncs a Git work tree to the Space and back.
-- Pi Durable 1.3.0 has no CLI extension adapter, so pi-cua cannot be installed as-is. Openbots must reproduce its routing with Durable APIs.
-- Durable already has the right seam. `CodingTools` run against an `ExecutionEnv` (`FileSystem` + `Shell`, exported from `@earendil-works/pi-durable/env`). Openbots builds it in one place: `runtimeEnvNative()` in `packages/runtime/src/services/runtime/runtime-env.utils.ts`, which returns a `NodeExecutionEnv` per `cwd`.
+- Pi Durable 1.3.0 has no CLI extension adapter, so pi-cua cannot be installed as-is. Orbs must reproduce its routing with Durable APIs.
+- Durable already has the right seam. `CodingTools` run against an `ExecutionEnv` (`FileSystem` + `Shell`, exported from `@earendil-works/pi-durable/env`). Orbs builds it in one place: `runtimeEnvNative()` in `packages/runtime/src/services/runtime/runtime-env.utils.ts`, which returns a `NodeExecutionEnv` per `cwd`.
 - `FileSystem.id` is the file namespace. Each container or remote host must report its own id, so Pi does not mix host and Space paths.
 - Durable ships only `NodeExecutionEnv`. A Space-backed environment is new code.
 - A Space runs `cua-spacesd` (port 3211). Spaces are created with `cua spaces create --on local --kind container|vm --runtime runc|gvisor|lume|qemu`. The registry is `~/.cua/spaces.json`; tokens live in a separate `0600` credentials file. `cua runtime doctor` and `cua runtime setup` check and install local runtimes.

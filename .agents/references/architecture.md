@@ -9,9 +9,9 @@
 5. No history, dates, feature status or workflows. Daemon, RPC and Pi behavior live in the [API reference](api.md).
 6. Before writing a file, read a few sibling files of the same kind and follow them.
 
-## 1. How Openbots works
+## 1. How Orbs works
 
-Openbots is a bot backend for one owner. A native daemon on the owner's computer runs each bot as a persistent Pi Durable agent. Web, iOS and macOS clients pair with the daemon and talk to it over oRPC.
+Orbs is a bot backend for one owner. A native daemon on the owner's computer runs each bot as a persistent Pi Durable agent. Web, iOS and macOS clients pair with the daemon and talk to it over oRPC.
 
 ### System
 
@@ -67,7 +67,7 @@ flowchart TB
 
 | File | Runs on | Intent |
 | --- | --- | --- |
-| daemon `src/entry.native.ts` | Bun | the `openbots` CLI: start, pair, service; opens stores and starts the listener |
+| daemon `src/entry.native.ts` | Bun | the `orbs` CLI: start, pair, service; opens stores and starts the listener |
 | daemon `src/entry-backup.native.ts` | Bun | offline backup create and restore |
 | server `src/entry.server.ts` | any host | `makeServices`, `coreHandler` and portable product services |
 | server `src/entry.native.ts` | Bun | database, backup, workspace, MCP discovery and credential-key factories |
@@ -85,7 +85,7 @@ flowchart TB
 - Exports start with their domain: `botActionSend`, `botQueryGet`, `BOT`. Factories are `make<Domain>Service`.
 - Name values for what they hold. Singular nouns for items, plural for collections, `At` for timestamps, units for durations (`timeoutMs`).
 - Booleans and predicates use positive `is`, `has`, `can` or `should`. Library-defined names keep their names at integration boundaries.
-- Openbots-owned Pi tools use the `bot_` prefix (`bot_message`, `bot_question`). Pi, MCP and plugin tools keep their provider names.
+- Orbs-owned Pi tools use the `bot_` prefix (`bot_message`, `bot_question`). Pi, MCP and plugin tools keep their provider names.
 
 ## 2. Project structure
 
@@ -145,7 +145,7 @@ packages/contracts/src/
 
 ```
 apps/daemon/src/
-├── entry.native.ts                     the openbots CLI and daemon entry
+├── entry.native.ts                     the orbs CLI and daemon entry
 ├── entry-backup.native.ts              the backup CLI
 ├── core/core.native.ts                 startup composition and shutdown order
 ├── core/core-<part>.native.ts          one transport concern: server, rpc, local socket, pairing, command
@@ -225,7 +225,7 @@ packages/
 ├── .env.example                        every env variable with its default
 ├── AGENTS.md                           agent instructions; CLAUDE.md links to it
 ├── DESIGN.md                           UI principles
-├── README.md                           what Openbots is, setup, scripts
+├── README.md                           what Orbs is, setup, scripts
 ├── scripts/<app>.ts                    one script per app, a subcommand per build, release or dev step
 ├── .agents/references/<name>.md        standing references: architecture, API, quality gate
 ├── .agents/docs/<name>.md              library notes: Pi Durable examples

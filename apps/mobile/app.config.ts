@@ -1,6 +1,7 @@
 import { m } from '@repo/i18n/messages';
 import { existsSync } from 'node:fs';
 import { z } from 'zod';
+import { version } from './package.json';
 import type { ExpoConfig } from 'expo/config';
 
 // One .env at the repo root for every app; shell variables still win.
@@ -46,7 +47,7 @@ export default (): ExpoConfig => ({
   name: variant.name,
   slug: appEnv.MOBILE_EAS_SLUG,
   scheme: `${appEnv.MOBILE_SCHEME}${variant.suffix}`,
-  version: '0.1.0',
+  version,
   orientation: 'default',
   userInterfaceStyle: 'automatic',
   ios: {

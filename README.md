@@ -86,9 +86,22 @@ orbs service unregister   # Stop starting it at login
 
 `bun run --cwd apps/daemon backup` creates and restores backups. See the [API reference](.agents/references/api.md#daemon-and-storage) for details.
 
-### Desktop release
+### Release
 
-`bun run release:desktop` builds the macOS app, signs it with your Developer ID, notarizes it with Apple and writes `apps/desktop/artifacts/Orbs-<version>-macos-arm64.zip`. The version comes from `apps/desktop/package.json`. Set `DESKTOP_SIGNING_KEYCHAIN` (a dedicated keychain holding the Developer ID certificate) and `DESKTOP_SIGNING_IDENTITY` (its SHA-1) in `.env`. The keychain password and notary key come from `.env` or from a `credentials.json` next to the keychain; see `.env.example`.
+```bash
+bun run release            # next patch: 0.0.1, 0.0.2, ...
+bun run release 0.2.0      # a specific version
+bun run release --draft    # publish the GitHub Release as a draft
+```
+
+This releases from a clean `main` that matches `origin/main`. It runs `check` and `lint`, sets the version in every `package.json`, commits and tags it, then builds from a clean checkout of the tag. It pushes `main` and the tag, and creates a GitHub Release with two files:
+
+- `Orbs-<version>-macos-arm64.zip`: the macOS app, signed with your Developer ID and notarized by Apple.
+- `Orbs-<version>-server.tar.gz`: the daemon and web app for a Mac without the desktop app. Run `bun server/daemon/entry.native.js start` and `bun server/web/src/application/server.bun.js`.
+
+The iOS app ships through EAS and TestFlight, not GitHub. `bun run release:desktop` builds only the macOS app, without tagging.
+
+Signing reads `DESKTOP_SIGNING_KEYCHAIN` (a dedicated keychain holding the Developer ID certificate) and `DESKTOP_SIGNING_IDENTITY` (its SHA-1) from `.env`. The keychain password and notary key come from `.env` or from a `credentials.json` next to the keychain; see `.env.example`.
 
 ## 🧪 Development
 

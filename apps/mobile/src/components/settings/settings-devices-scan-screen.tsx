@@ -13,7 +13,7 @@ import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
 import { BRAND_APP_NAME } from '@/services/brand/brand.constants';
 import { connectionPair } from '@/services/connection/connection.client';
-import { connectionCodeFromUrl } from '@/services/connection/connection.utils';
+import { connectionCodeFromUrl, connectionDeviceName } from '@/services/connection/connection.utils';
 import type { BarcodeScanningResult } from 'expo-camera';
 
 export function SettingsDevicesScanScreen() {
@@ -40,7 +40,7 @@ export function SettingsDevicesScanScreen() {
     setProblem(null);
     setIsPairing(true);
     try {
-      connect(await connectionPair({ payload: payload.data, name: m.mobile_device_name_default() }));
+      connect(await connectionPair({ payload: payload.data, name: connectionDeviceName() }));
       router.dismissTo('/');
     } catch {
       setProblem(m.connect_failed());

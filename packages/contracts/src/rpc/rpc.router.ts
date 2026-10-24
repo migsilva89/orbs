@@ -19,7 +19,6 @@ import { attachment, attachmentDownload, attachmentGet, attachmentList, attachme
 import {
   authGrant,
   authGrantStatus,
-  authPair,
   authPairResult,
   authRedeem,
   authRedeemResult,
@@ -79,7 +78,7 @@ import { conversationAnswerQuestion, conversationAnswerQuestionResult, conversat
 import { conversationReactions, conversationReactionsResult, conversationSetReaction, conversationSetReactionResult } from '../types/reaction.types';
 import { routine, routineCreate, routineList, routineRemoveResult, routineTarget, routineUpdate } from '../types/routine.types';
 import { secretConfigure, secretRemove, secretRules, secretSave, secretSettings, secretVoid } from '../types/secret.types';
-import { serverInfo } from '../types/server.types';
+import { serverConfigure, serverInfo } from '../types/server.types';
 import { skillCatalog, skillConfigure, skillDiscover, skillSettings } from '../types/skill.types';
 import { todo, todoCreate, todoList, todoRemoveResult, todoReorder, todoTarget, todoUpdate } from '../types/todo.types';
 import {
@@ -378,6 +377,11 @@ export const contract = {
     info: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
       .output(serverInfo),
+
+    configure: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(serverConfigure)
+      .output(serverInfo),
   },
 
   models: {
@@ -579,7 +583,6 @@ export const contract = {
   pairing: {
     create: oc
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(authPair)
       .output(authPairResult),
 
     bootstrap: oc
@@ -587,7 +590,6 @@ export const contract = {
         UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
         CONFLICT: errorSchemas.CONFLICT,
       })
-      .input(authPair)
       .output(authPairResult),
 
     redeem: oc

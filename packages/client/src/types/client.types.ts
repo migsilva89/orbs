@@ -7,9 +7,10 @@ export type Client = RouterContractClient<typeof contract>;
 
 export interface ClientOptions {
   serverId?: string;
-  connect: () => WebSocket;
+  connect: () => WebSocket | Promise<WebSocket>;
   token?: () => string | undefined | Promise<string | undefined>;
-  url?: string;
+  /** HTTP RPC base for file transfer; a function when the active address can change. */
+  url?: string | (() => string);
 }
 
 export interface HttpClientOptions extends Pick<ClientOptions, 'serverId' | 'token'> {

@@ -7,8 +7,9 @@ export async function authActionPair(deps: AuthServiceDeps, params: AuthPairPara
   const grant = await authActionGrant(deps, { issuedBy: params.issuedBy });
 
   const payload = btoa(JSON.stringify({
-    version: 1,
-    serverUrl: params.serverUrl,
+    version: 2,
+    serverId: params.serverId,
+    addresses: params.addresses,
     token: grant.token,
     expiresAt: grant.expiresAt,
   } satisfies AuthPairPayload)).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/u, '');

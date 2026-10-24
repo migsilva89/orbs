@@ -5,6 +5,8 @@ import type { DatabaseService } from '../services/database/database.service';
 import type { McpAuthService } from '../services/mcp/mcp-auth.service';
 import type { McpService } from '../services/mcp/mcp.service';
 import type { SecretService } from '../services/secret/secret.service';
+import type { ServerNetworkService } from '../services/server/server-network.service';
+import type { ServerService } from '../services/server/server.service';
 import type { SettingsService } from '../services/settings/settings.service';
 import type { WorkspaceService } from '../services/workspace/workspace.service';
 import type * as ServerTypes from '@repo/runtime/server';
@@ -22,10 +24,12 @@ export interface CoreServicesParams {
   pluginLoader: ServerTypes.PluginLoaderService;
   mcp: McpService;
   mcpAuth: ServerTypes.McpAuthService;
+  network: ServerNetworkService;
   providers: ServerTypes.ProviderService;
   runtime: Omit<ServerTypes.RuntimeServiceParams, 'permissions' | 'collaboration'>;
 }
 
 export interface CoreHandlerDeps {
   mcpAuth: McpAuthService;
+  server: ServerService;
 }

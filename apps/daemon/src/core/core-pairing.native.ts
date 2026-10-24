@@ -14,7 +14,14 @@ export function corePairingNative(services: Awaited<ReturnType<typeof makeServic
       return;
     }
 
-    const { qr, expiresAt } = await services.auth.actions.bootstrap({ isLocal: true, serverUrl });
+    const { id, addresses } = await services.server.queries.info();
+
+    const { qr, expiresAt } = await services.auth.actions.bootstrap({
+      serverId: id,
+      addresses,
+      isLocal: true,
+    });
+
     const link = new URL(`/connect#code=${encodeURIComponent(qr.payload)}`, serverUrl).href;
 
     process.stdout.write(`\nNo device is paired. Open this link or scan the code to pair the first device:\n\n${link}\n\n${renderUnicodeCompact(link)}\n`);

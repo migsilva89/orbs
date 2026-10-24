@@ -30,7 +30,7 @@ export function BotSettingsMcp({ bot, session }: BotSettingsMcpProps) {
       const returnUrl = Linking.createURL('mcp/done');
 
       return {
-        redirectUrl: new URL('/mcp/callback', session.connection.serverUrl).toString(),
+        redirectUrl: new URL('/mcp/callback', session.address().url).toString(),
         returnUrl,
         open: async (url) => {
           await WebBrowser.openAuthSessionAsync(url, returnUrl);

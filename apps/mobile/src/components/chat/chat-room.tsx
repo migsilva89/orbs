@@ -192,7 +192,7 @@ function ChatRoomView({ session, bot, bots, view, focusEntryId, replyToEntryId, 
 
   const empty = match(messages.length)
     .with(0, () => (
-      <View className="mx-5 mt-8 items-center gap-3">
+      <View className="absolute inset-0 items-center justify-center gap-3 px-5" pointerEvents="none">
         <Avatar
           animate
           avatar={bot.avatar}
@@ -220,7 +220,6 @@ function ChatRoomView({ session, bot, bots, view, focusEntryId, replyToEntryId, 
               questions={room.questions}
             />
           )}
-          header={empty}
           keyExtractor={(message) => message.id}
           ref={list}
           renderItem={(message) => renderMessage(message, messages, room.reactions)}
@@ -241,6 +240,7 @@ function ChatRoomView({ session, bot, bots, view, focusEntryId, replyToEntryId, 
           onLatest={() => router.setParams({ entryId: undefined })}
         />
       )}
+      {empty}
       <ChatHeader activity={activity} bot={bot} />
       <KeyboardSticky>
         <ChatComposer

@@ -2,7 +2,7 @@ import { Errors } from '@repo/errors/universal';
 import { match } from 'ts-pattern';
 import type { ServerConnectionParams, ServerQueryDeps } from '../../types/server.types';
 
-export function serverQueryValidateConnection({ info }: ServerQueryDeps, params: ServerConnectionParams) {
+export function serverQueryValidateConnection({ identity: info }: ServerQueryDeps, params: ServerConnectionParams) {
   match(params.protocolVersion === String(info.protocolVersion))
     .with(false, () => {
       throw new Errors.PROTOCOL_MISMATCH({ supportedVersion: info.protocolVersion, receivedVersion: params.protocolVersion });

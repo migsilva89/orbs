@@ -1,4 +1,6 @@
+import { m } from '@repo/i18n/client';
 import Constants from 'expo-constants';
+import { modelName } from 'expo-device';
 import { match } from 'ts-pattern';
 
 export function connectionCodeFromUrl(value: string | null): string | null {
@@ -16,4 +18,8 @@ export function connectionCodeFromUrl(value: string | null): string | null {
     })
     .with(false, () => null)
     .exhaustive();
+}
+
+export function connectionDeviceName(): string {
+  return modelName ?? m.mobile_device_name_default();
 }

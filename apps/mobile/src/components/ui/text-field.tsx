@@ -13,6 +13,9 @@ const textFieldVariants = cva({
   defaultVariants: { size: 'default' },
 });
 
+// iOS draws a one-line TextInput's text below center when the font sets a line height.
+const TEXT_FIELD_SINGLE_LINE = { lineHeight: undefined } as const;
+
 interface TextFieldProps extends TextInputProps, VariantProps<typeof textFieldVariants> {
   placeholderTone?: 'muted-foreground' | 'glass-muted' | 'destructive';
 }
@@ -27,7 +30,7 @@ export function TextField({ className, size, tone, placeholderTone = 'muted-fore
       selectionColor={selectionColor}
       {...props}
       className={cn(textFieldVariants({ size, tone: tone ?? inherited.tone }), className)}
-      style={[{ paddingVertical: 0, textAlignVertical: 'center' }, style]}
+      style={[{ paddingVertical: 0, textAlignVertical: 'center' }, props.multiline ? undefined : TEXT_FIELD_SINGLE_LINE, style]}
     />
   );
 }

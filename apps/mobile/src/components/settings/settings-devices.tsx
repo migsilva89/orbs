@@ -47,7 +47,7 @@ export function SettingsDevices({ connection }: SettingsDevicesProps) {
           </Item>
         ))}
       </ItemGroup>
-      <SettingsDevicesPair connection={connection} />
+      <SettingsDevicesPair />
     </BotDetailsSection>
   );
 }

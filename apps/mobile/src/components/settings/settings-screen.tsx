@@ -6,6 +6,7 @@ import { SettingsGeneral } from './settings-general';
 import { SettingsModels } from './settings-models';
 import { SettingsProviders } from './settings-providers';
 import { SettingsSecrets } from './settings-secrets';
+import { SettingsServer } from './settings-server';
 import { SettingsSources } from './settings-sources';
 import { SettingsTools } from './settings-tools';
 
@@ -28,6 +29,7 @@ export function SettingsScreen() {
         <SettingsTools />
         <SettingsSecrets />
         <SettingsSources />
+        <SettingsServer session={current} />
         <SettingsDevices connection={current.connection} />
       </ScrollView>
     ))

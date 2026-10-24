@@ -39,7 +39,7 @@ openbots service unregister        # Disable startup at the next macOS login
 
 Service registration is macOS-only. It writes a per-user LaunchAgent for the selected data directory, using the current Bun executable, source entrypoint, validated Openbots environment settings, and `PATH`. Keep that executable and checkout available. Different data directories have separate registrations. Register/unregister only changes the next login; neither command loads, unloads, starts, or stops the current daemon. Registration does not copy provider secrets or create a CLI device credential.
 
-The daemon listens on all IPv4 interfaces (`0.0.0.0`), using port 3000 by default, so it can accept LAN and Tailscale connections. Set `DAEMON_HOST` to bind a specific interface. `GET /health` returns `{ "status": "ok" }`. The `/rpc` WebSocket carries control and live updates. HTTP POST under `/rpc` carries file upload/download through the same authenticated oRPC router. Pairing redemption uses a single-use pairing token; other RPC calls authenticate a device credential. Other HTTP paths return 404. SIGINT/SIGTERM close connections and stop the listener. Health confirms HTTP handling only, not database or agent readiness.
+The daemon listens on all IPv4 interfaces (`0.0.0.0`), using port 3000 by default, so it can accept LAN and Tailscale connections. Set `DAEMON_HOST` to bind a specific interface. `GET /health` returns `{ "status": "ok", "app": "bots", "id": "<server id>" }`. The `/rpc` WebSocket carries control and live updates. HTTP POST under `/rpc` carries file upload/download through the same authenticated oRPC router. Pairing redemption uses a single-use pairing token; other RPC calls authenticate a device credential. Other HTTP paths return 404. SIGINT/SIGTERM close connections and stop the listener. Health confirms HTTP handling only, not database or agent readiness.
 
 `DATA_DIR` is the only configurable storage path and defaults to `~/.config/openbots/`. Bot records keep IDs, not home-directory paths; derive each working folder from the root and bot ID. The native host expands `~` and resolves relative overrides before using this layout:
 
@@ -80,7 +80,7 @@ The bundle preserves the server identity, paired devices, encrypted application 
 
 ## Server identity and protocol
 
-`server.info()` returns the authenticated daemon's stable `id` and `protocolVersion`. Startup creates `server.id` once in the shared settings table. Restarts preserve it; a new data directory gets a new ID. Copying the app database preserves the ID and device credentials, so treat a copy as a restore, not an independent daemon.
+`server.info()` returns the authenticated daemon's stable `id`, `protocolVersion` and `addresses`: loopback, then LAN, then Tailscale (MagicDNS name first) when `DAEMON_HOST` is a wildcard, then the owner's custom addresses. `server.configure({ customAddresses })` replaces the custom list, stored in settings as `server.addresses`. Clients probe `/health` on every address at once and use the first in list order whose `/health` reports the paired server ID; mobile repeats this on every reconnect, and each client merges the daemon's current list into its saved one. Startup creates `server.id` once in the shared settings table. Restarts preserve it; a new data directory gets a new ID. Copying the app database preserves the ID and device credentials, so treat a copy as a restore, not an independent daemon.
 
 ```typescript
 const client = makeClient({ connect, token });
@@ -249,9 +249,9 @@ Each daemon has one owner. Existing paired devices issue a pairing payload throu
 
 | RPC call | Access | Result |
 | --- | --- | --- |
-| `pairing.bootstrap({ serverUrl })` | Owner-only local Unix socket | Five-minute token, expiry, and QR payload/SVG |
+| `pairing.bootstrap()` | Owner-only local Unix socket | Five-minute token, expiry, and QR payload/SVG |
 | `pairing.redeem({ token, name })` | Pairing token | Device metadata and a new device token |
-| `pairing.create({ serverUrl })` | Device bearer token | Five-minute token, expiry, and `qr: { payload, svg }` |
+| `pairing.create()` | Device bearer token | Five-minute token, expiry, and `qr: { payload, svg }` |
 | `pairing.status({ token })` | Device bearer token | Grant expiry, issuer, and `claimedAt` (Unix milliseconds, or `null` while unclaimed) |
 | `devices.list()` | Device bearer token | Paired device IDs, names, and creation times |
 | `devices.revoke({ id })` | Device bearer token | Revokes that device and its unused pairing grants; may revoke itself |
@@ -265,7 +265,7 @@ const local = makeHttpClient({
   url: 'http://localhost/rpc',
   fetch: (url, init) => fetch(url, { ...init, unix: socketPath }),
 });
-const grant = await local.pairing.bootstrap({ serverUrl });
+const grant = await local.pairing.bootstrap();
 ```
 
 Display `grant.qr.svg`; the new device redeems its token through the normal network endpoint. The first successful pairing invalidates competing unused initial local grants. Later local grants retain their normal expiry and single-use behavior. The local owner can issue a fresh code even when every browser has lost its device credential; existing device credentials remain valid until revoked.
@@ -274,11 +274,11 @@ Send device credentials as `Authorization: Bearer <device-token>`. They remain v
 
 Claimed grants retain their timestamp after expiry. Unclaimed expired grants are removed when a new grant is issued. Revoking the issuing device removes its grant records, including claim timestamps; this is pairing status, not a permanent audit log.
 
-The pairing API renders `qr.svg` for immediate display. `qr.payload` is an unpadded URL-safe Base64 code containing `{ version: 1, serverUrl, token, expiresAt }`. Clients decode it with `authPairCode` and can render the code themselves. Base64 is an encoding, not encryption; treat the code as a temporary credential. Supply the address the new device can reach; the API normalizes the HTTP(S) origin and rejects credentials, paths, query strings, fragments, and wildcard bind addresses. Loopback addresses are allowed for pairing another browser on the same computer; the UI warns that these codes cannot connect another computer or phone. Scanning requires the app's future QR reader; this is not an app deep link.
+The pairing API renders `qr.svg` for immediate display. `qr.payload` is an unpadded URL-safe Base64 code containing `{ version: 2, serverId, addresses, token, expiresAt }`, with every address from `server.info`. Clients decode it with `authPairCode` and can render the code themselves. Base64 is an encoding, not encryption; treat the code as a temporary credential. The new device redeems the token through the first address that answers.
 
 Use HTTPS or the encrypted Tailscale path for remote pairing and requests. The native listener does not terminate TLS. The daemon accepts Bearer credentials, not cookies or query-string tokens; foreign browser origins are rejected. Request throttling is implemented through the limits service.
 
-Each web deployment connects to its configured `DAEMON_URL`, including pairing. TanStack Start renders initial data on the server and hydrates the browser query cache; chat loads one complete view before switching to live WebSocket updates. The web stores its device credential in a browser-readable, same-site cookie so SSR and WebSocket calls use the same token. HTTPS connections set the Secure flag. Existing same-origin local-storage credentials migrate once; the credential is never included in hydrated page data, and SSR responses are private and not cached.
+Each web deployment reaches the daemon through the addresses in its connection cookie: it probes them and proxies SSR and `/rpc` to the first that reports the paired server ID, so a forged cookie cannot point the proxy at another host. While pairing, a short-lived cookie holds the server ID and addresses from the pairing code. With no cookie, the proxy uses the daemon on `127.0.0.1:DAEMON_PORT`. `vite dev` always proxies to the local dev daemon. TanStack Start renders initial data on the server and hydrates the browser query cache; chat loads one complete view before switching to live WebSocket updates. The web stores its device credential in a browser-readable, same-site cookie so SSR and WebSocket calls use the same token. HTTPS connections set the Secure flag. The credential is never included in hydrated page data, and SSR responses are private and not cached.
 
 ## First RPC example
 
@@ -652,7 +652,6 @@ Before bot routing was added, a disposable WebSocket check with SQLite and Pi's 
 | `LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
 | `DAEMON_ALLOWED_ORIGINS` | empty | Comma-separated browser or webview origins, such as `https://bots.example.com`. Requests without an Origin, or with an IP-literal or `localhost` Origin, are always allowed. Add every hostname origin that serves the web app |
 | `WEB_PUBLIC_URL` | `http://127.0.0.1:47190` | Web app URL used in the startup pairing link |
-| `DAEMON_URL` | `http://127.0.0.1:3000` | Daemon URL used by web SSR and the `/rpc` proxy |
 | `WEB_HOST` | `127.0.0.1` | Web app bind address |
 | `WEB_PORT` | `47190` | Web app port |
 

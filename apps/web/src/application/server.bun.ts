@@ -1,6 +1,7 @@
 import { env } from '@repo/env/server';
 import { initNativeLogger, log } from '@repo/logger/server';
 import { join, posix, sep } from 'node:path';
+import { connectionHasAddresses, connectionTarget } from '@/services/connection/connection.utils';
 import type { RpcProxySocket } from '@/types/rpc.types';
 import type { ServerWebSocket, WebSocketOptions } from 'bun';
 
@@ -12,6 +13,7 @@ const ON_DEMAND_EXTENSIONS = ['.riv', '.wasm', '.zip'];
 const DOWNLOAD_EXTENSIONS = ['.zip', '.tar', '.gz'];
 const PRELOAD_MAX_BYTES = 5 * 1024 * 1024;
 const LOOPBACK_HOSTS = ['127.0.0.1', '::1', 'localhost'];
+const LOCAL_DAEMON = `http://127.0.0.1:${env.DAEMON_PORT}`;
 
 try {
   initNativeLogger(env.LOG_LEVEL);
@@ -77,7 +79,14 @@ try {
       const { pathname, search } = new URL(request.url);
 
       if (pathname === '/rpc' || pathname === '/health' || pathname === '/mcp/callback' || pathname.startsWith('/rpc/') || pathname.startsWith('/files/') || pathname.startsWith('/avatars/')) {
-        const target = new URL(pathname + search, env.DAEMON_URL);
+        const cookies = request.headers.get('cookie') ?? '';
+        const daemon = connectionHasAddresses(cookies) ? (await connectionTarget(cookies)).url : LOCAL_DAEMON;
+
+        if (!daemon) {
+          return new Response('No server address answered', { status: 502 });
+        }
+
+        const target = new URL(pathname + search, daemon);
         const headers = new Headers(request.headers);
         headers.delete('host');
 

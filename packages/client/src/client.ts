@@ -35,7 +35,8 @@ export function makeClient({ connect, token, serverId, url }: ClientOptions): Cl
 
   const http = match(url)
     .with(P.string, (base) => clientHttpLink(base, headers))
-    .otherwise(() => undefined);
+    .with(P.nullish, () => undefined)
+    .otherwise((base) => new DynamicLink(() => clientHttpLink(base(), headers)));
 
   return createORPCClient(new DynamicLink((_options, path) => match(path)
     .with(P.union(['attachments', P.union('upload', 'download')], ['avatars', 'upload']), () => match(http)

@@ -2,12 +2,13 @@ import { isAppError } from '@repo/errors/universal';
 import * as m from '@repo/i18n/messages';
 import { match, P } from 'ts-pattern';
 import type { CoreHandlerDeps } from '../types/core.types';
+import type { ServerHealth } from '@repo/contracts/universal';
 
 export function coreHandler(request: Request, deps: CoreHandlerDeps): Response | Promise<Response> {
   const url = new URL(request.url);
 
   return match({ method: request.method, path: url.pathname })
-    .with({ method: 'GET', path: '/health' }, () => Response.json({ status: 'ok', app: 'bots' }))
+    .with({ method: 'GET', path: '/health' }, async () => Response.json({ status: 'ok', app: 'bots', id: (await deps.server.queries.identity()).id } satisfies ServerHealth))
     .with({ method: 'GET', path: '/mcp/callback' }, () => coreMcpCallback(deps, url))
     .otherwise(() => new Response(null, { status: 404 }));
 }

@@ -1,5 +1,4 @@
 import { useSettingsDevices } from '@repo/client/react';
-import { env } from '@repo/env/client';
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
 import { Link, useHydrated } from '@tanstack/react-router';
@@ -24,8 +23,6 @@ export function SettingsDevices({ connection }: SettingsDevicesProps) {
   const devices = settings.devices.data ?? [];
   const hydrated = useHydrated();
   const date = new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium' });
-  const hostname = new URL(connection.serverUrl).hostname;
-  const isLoopback = hostname === 'localhost' || hostname === '[::1]' || hostname.startsWith('127.') || hostname.endsWith('.localhost');
 
   return (
     <SettingsPanel
@@ -84,14 +81,13 @@ export function SettingsDevices({ connection }: SettingsDevicesProps) {
               </Button>
             </div>
           ) : null}
-          {isLoopback ? <PanelDescription>{m.settings_devices_pair_loopback({ name: env.VITE_APP_NAME })}</PanelDescription> : null}
           <FormErrors error={settings.pairProblem} />
           <ButtonLoading
             className="self-start"
             loading={settings.isPairing}
             size="sm"
             variant="outline"
-            onClick={() => settings.pair(connection.serverUrl)}
+            onClick={settings.pair}
           >
             {settings.pairing ? m.settings_devices_pair_again() : m.settings_devices_pair_create()}
           </ButtonLoading>

@@ -6,8 +6,8 @@ interface KeyboardStickyProps {
   children: ReactNode;
 }
 
-// Bottom floating bars sit 20pt inside the home-indicator inset; above the keyboard they keep an 8pt gap.
-const KEYBOARD_STICKY_GAP = 28;
+// Bottom floating bars sit 8pt inside the home-indicator inset; above the keyboard they keep an 8pt gap.
+const KEYBOARD_STICKY_GAP = 16;
 
 /** Floating controls that ride on top of the keyboard; the keyboard covers the home-indicator inset. */
 export function KeyboardSticky({ children }: KeyboardStickyProps) {

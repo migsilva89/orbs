@@ -1,6 +1,6 @@
 import { createORPCClient } from '@orpc/client';
 import { RPCLink } from '@orpc/client/fetch';
-import { authPair, SERVER_PROTOCOL } from '@repo/contracts/universal';
+import { SERVER_PROTOCOL, serverOrigin } from '@repo/contracts/universal';
 import { env } from '@repo/env/server';
 import { Errors } from '@repo/errors/universal';
 import { log } from '@repo/logger/server';
@@ -77,7 +77,7 @@ export async function coreCommandNative(): Promise<void> {
 }
 
 async function coreCommandPairNative(url = env.WEB_PUBLIC_URL): Promise<void> {
-  const { serverUrl } = authPair.parse({ serverUrl: url });
+  const serverUrl = serverOrigin.parse(url);
   const unix = join(ROOT, 'data', 'ipc', 'rpc.sock');
 
   const client = createORPCClient<RouterClient<typeof router>>(new RPCLink({
@@ -87,7 +87,7 @@ async function coreCommandPairNative(url = env.WEB_PUBLIC_URL): Promise<void> {
     fetch: (request, init) => fetch(request, { ...init, unix }),
   }));
 
-  const { qr } = await client.pairing.bootstrap({ serverUrl });
+  const { qr } = await client.pairing.bootstrap();
   const link = new URL(`/connect#code=${encodeURIComponent(qr.payload)}`, serverUrl).href;
   process.stdout.write(`${qr.payload}\n\n${link}\n\n${renderUnicodeCompact(link)}\n`);
 }

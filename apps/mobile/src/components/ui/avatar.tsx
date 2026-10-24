@@ -63,7 +63,7 @@ export function Avatar({ avatar, name, size = 'default', animate = false, classN
   return (
     <View accessible accessibilityLabel={name} className={cn(avatarVariants({ size }), className)}>
       {match(avatar)
-        .with({ kind: 'image' }, ({ src }) => <Image className="size-full" resizeMode="cover" source={{ uri: connectionAvatarUri({ connection: session?.connection, src }) }} />)
+        .with({ kind: 'image' }, ({ src }) => <Image className="size-full" resizeMode="cover" source={{ uri: connectionAvatarUri({ session, src }) }} />)
         .with({ kind: 'color' }, ({ color }) => <View className="size-full" style={{ backgroundColor: color }} />)
         .with({ kind: 'emoji' }, ({ emoji, color }) => (
           <View className="size-full items-center justify-center" style={{ backgroundColor: color }}>

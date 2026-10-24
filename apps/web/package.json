@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "DAEMON_URL=http://127.0.0.1:47191 vite dev --port 47190 --strictPort",
+    "dev": "DAEMON_PORT=47191 vite dev --port 47190 --strictPort",
     "build": "vite build",
     "start": "bun --env-file=../../.env src/application/server.bun.ts",
     "check": "tsrs --noEmit",

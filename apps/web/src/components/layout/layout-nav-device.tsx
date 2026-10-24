@@ -21,7 +21,7 @@ interface LayoutNavDeviceProps {
 export function LayoutNavDevice({ connection }: LayoutNavDeviceProps) {
   const { isMobile } = Sidebar.useSidebar();
   const server = useQuery(rpc.server.info.queryOptions());
-  const host = new URL(connection.serverUrl).host;
+  const host = new URL((connection.addresses.find((address) => address.kind !== 'loopback') ?? connection.addresses[0]).url).host;
 
   const status = match(server)
     .with({ isError: true }, () => 'destructive' as const)

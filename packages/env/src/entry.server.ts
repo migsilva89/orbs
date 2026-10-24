@@ -10,7 +10,6 @@ export const serverEnvSchema = {
   // Daemon
   DAEMON_HOST: z.string().trim().min(1).default('0.0.0.0'),
   DAEMON_PORT: z.coerce.number().int().min(1).max(65535).default(3000),
-  DAEMON_URL: z.url({ protocol: /^https?$/ }).default('http://127.0.0.1:3000'),
   DAEMON_ALLOWED_ORIGINS: z.string().trim().default('')
     .transform((value) => value.split(',').map((origin) => origin.trim()).filter(Boolean)
       .map((origin) => URL.parse(origin)?.origin ?? origin)),

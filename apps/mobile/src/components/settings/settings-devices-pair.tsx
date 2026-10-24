@@ -11,14 +11,12 @@ import { Icon } from '@/components/ui/icon';
 import { ItemTitle } from '@/components/ui/item';
 import { LabelDescription } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import type { ConnectionSaved } from '@repo/contracts/universal';
 
 interface SettingsDevicesPairProps {
-  connection: ConnectionSaved;
   isTitleHidden?: boolean;
 }
 
-export function SettingsDevicesPair({ connection, isTitleHidden = false }: SettingsDevicesPairProps) {
+export function SettingsDevicesPair({ isTitleHidden = false }: SettingsDevicesPairProps) {
   const toast = useToast();
   const settings = useSettingsDevices();
 
@@ -55,7 +53,7 @@ export function SettingsDevicesPair({ connection, isTitleHidden = false }: Setti
               loading={settings.isPairing}
               size="sm"
               variant="ghost"
-              onPress={() => settings.pair(connection.serverUrl)}
+              onPress={settings.pair}
             >
               <Icon icon={RefreshCw} size="sm" />
               {m.settings_devices_pair_again()}
@@ -68,7 +66,7 @@ export function SettingsDevicesPair({ connection, isTitleHidden = false }: Setti
             <Button
               loading={settings.isPairing}
               size="sm"
-              onPress={() => settings.pair(connection.serverUrl)}
+              onPress={settings.pair}
             >
               <Icon icon={QrCode} size="sm" />
               {m.settings_devices_pair_create()}

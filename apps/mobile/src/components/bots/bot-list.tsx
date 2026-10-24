@@ -4,7 +4,7 @@ import { m } from '@repo/i18n/client';
 import { experimental_streamedQuery as streamedQuery, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { Bot, LayoutDashboard, Plus, QrCode, Star, UserRound } from 'lucide-react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SectionList, View } from 'react-native';
 import { match, P } from 'ts-pattern';
 import { ChatSearchResults } from '@/components/chat/chat-search-results';
@@ -24,8 +24,11 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
+import { useServerReachable } from '@/hooks/use-server-reachable';
+import { BOT_HOME } from '@/services/bot/bot-home.constants';
 import { botHomeSections } from '@/services/bot/bot-home.utils';
 import { BotHomeRow } from './bot-home-row';
+import { BotListOffline } from './bot-list-offline';
 import type { BotHomeGroup } from '@/types/bot-home.types';
 import type { ConnectionContextValue } from '@/types/connection-context.types';
 import type { ConversationListItem } from '@repo/contracts/universal';
@@ -45,6 +48,7 @@ function BotListContent({ session }: BotListContentProps) {
   const [search, setSearch] = useState('');
   const [collapsed, setCollapsed] = useState<BotHomeGroup[]>(['hidden']);
   const router = useRouter();
+  const isReachable = useServerReachable(session);
 
   const query = useQuery({
     ...session.rpc.conversation.list.queryOptions(),
@@ -55,6 +59,18 @@ function BotListContent({ session }: BotListContentProps) {
       initialValue: [],
     }),
   });
+
+  const isFetching = query.fetchStatus === 'fetching';
+
+  useEffect(() => {
+    if (isReachable || !isFetching) {
+      return;
+    }
+
+    const timer = setTimeout(() => void session.queryClient.cancelQueries({ queryKey: session.rpc.conversation.list.queryKey() }), BOT_HOME.reconnectTimeoutMs);
+
+    return () => clearTimeout(timer);
+  }, [isReachable, isFetching, session]);
 
   const { featured, sections } = botHomeSections({ chats: query.data ?? [], search });
   const isSearching = search.trim().length > 0;
@@ -134,8 +150,15 @@ function BotListContent({ session }: BotListContentProps) {
       scroll={false}
     >
       <View className="flex-1">
-        {match(query.status)
-          .with('pending', () => (
+        {match({ status: query.status, isReachable })
+          .with({ status: 'pending', isReachable: false }, () => (
+            <BotListOffline
+              host={new URL(session.address().url).host}
+              isRetrying={isFetching}
+              onRetry={() => void query.refetch()}
+            />
+          ))
+          .with({ status: 'pending' }, () => (
             <View accessibilityLabel={m.mobile_bots_loading()} className="pt-24">
               {[0, 1, 2, 3].map((row) => (
                 <Item key={row} size="chat">
@@ -148,7 +171,7 @@ function BotListContent({ session }: BotListContentProps) {
               ))}
             </View>
           ))
-          .with('error', () => (
+          .with({ status: 'error' }, () => (
             <View className="gap-4 px-5 pt-24">
               <Alert variant="destructive">
                 <AlertTitle>{m.mobile_bots_error_title()}</AlertTitle>
@@ -157,7 +180,7 @@ function BotListContent({ session }: BotListContentProps) {
               <Button onPress={() => void query.refetch()}>{m.mobile_retry()}</Button>
             </View>
           ))
-          .with('success', () => (
+          .with({ status: 'success' }, () => (
             <SectionList
               contentContainerClassName="grow pt-16 pb-32"
               keyboardDismissMode="on-drag"

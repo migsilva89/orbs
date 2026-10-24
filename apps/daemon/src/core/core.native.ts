@@ -15,7 +15,7 @@ import {
 } from '@repo/runtime/native';
 import { makeSecretBrokerService, makeSecretProxyService } from '@repo/secret-proxy/native';
 import { join } from 'node:path';
-import { credentialsKeyNative, makeAttachmentStorageService, makeAvatarImageService, makeDatabaseService, makeMcpService, makeWorkspaceService, workspacePathsNative } from '@repo/server/native';
+import { credentialsKeyNative, makeAttachmentStorageService, makeAvatarImageService, makeDatabaseService, makeMcpService, makeServerNetworkService, makeWorkspaceService, workspacePathsNative } from '@repo/server/native';
 import { makeCredentialsService, makeSecretService, makeServices, makeSettingsService } from '@repo/server/server';
 import { coreLocalNative } from './core-local.native';
 import { corePairingNative } from './core-pairing.native';
@@ -117,6 +117,7 @@ async function coreNativeServices(resources: AsyncDisposableStack) {
       credentials,
     }),
     mcpAuth,
+    network: makeServerNetworkService({ host: env.DAEMON_HOST, port: env.DAEMON_PORT }),
     providers,
     runtime: {
       appName: env.APP_NAME,

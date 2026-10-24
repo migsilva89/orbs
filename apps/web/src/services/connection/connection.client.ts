@@ -1,10 +1,9 @@
-import { makeHttpClient } from '@repo/client/client';
-import { connectionStored } from '@repo/contracts/universal';
+import { connectionAddressesMerge, makeHttpClient } from '@repo/client/client';
 import { createIsomorphicFn } from '@tanstack/react-start';
 import { CONNECTION } from './connection.constants';
-import { connectionCookie, connectionParse } from './connection.utils';
+import { connectionCookie, connectionPairingCookie, connectionParse } from './connection.utils';
 import type * as ConnectionTypes from '@/types/connection.types';
-import type { ConnectionSaved } from '@repo/contracts/universal';
+import type { ConnectionSaved, ServerAddress } from '@repo/contracts/universal';
 
 export const connectionRead = createIsomorphicFn()
   .server(async () => {
@@ -21,50 +20,47 @@ export const connectionForget = createIsomorphicFn()
   })
   .client(async () => {
     document.cookie = connectionCookie(null, location.protocol === 'https:');
-    localStorage.removeItem(CONNECTION.storageKey);
   });
 
-export function connectionMigrate(): void {
-  const saved = connectionStored.safeParse(localStorage.getItem(CONNECTION.storageKey)).data;
+export const connectionLearn = createIsomorphicFn()
+  .server(async (connection: ConnectionSaved, reported: ServerAddress[]) => {
+    const addresses = connectionAddressesMerge(connection.addresses, reported);
 
-  if (!saved || new URL(saved.serverUrl).origin !== location.origin) {
-    return;
-  }
+    if (JSON.stringify(addresses) === JSON.stringify(connection.addresses)) {
+      return;
+    }
 
-  if (!connectionParse(document.cookie)) {
-    document.cookie = connectionCookie(saved, location.protocol === 'https:');
-  }
+    const { getRequestProtocol, setCookie } = await import('@tanstack/react-start/server');
 
-  if (connectionParse(document.cookie)) {
-    localStorage.removeItem(CONNECTION.storageKey);
-  }
-}
+    setCookie(CONNECTION.storageKey, JSON.stringify({ ...connection, addresses }), {
+      path: '/',
+      sameSite: 'lax',
+      secure: getRequestProtocol() === 'https',
+      maxAge: CONNECTION.cookieMaxAgeSeconds,
+    });
+  })
+  .client(async (connection: ConnectionSaved, reported: ServerAddress[]) => {
+    const addresses = connectionAddressesMerge(connection.addresses, reported);
+
+    if (JSON.stringify(addresses) !== JSON.stringify(connection.addresses)) {
+      document.cookie = connectionCookie({ ...connection, addresses }, location.protocol === 'https:');
+    }
+  });
 
 export async function connectionPair({ payload, name }: ConnectionTypes.ConnectionPairParams) {
-  const url = CONNECTION.rpcPath;
-  const redeemed = await makeHttpClient({ url }).pairing.redeem({ token: payload.token, name });
+  const secure = location.protocol === 'https:';
+  document.cookie = connectionPairingCookie(payload, secure);
 
-  const connection: ConnectionSaved = {
-    serverUrl: location.origin,
-    deviceId: redeemed.device.id,
-    token: redeemed.token,
-  };
+  try {
+    const redeemed = await makeHttpClient({ url: CONNECTION.rpcPath }).pairing.redeem({ token: payload.token, name });
 
-  document.cookie = connectionCookie(connection, location.protocol === 'https:');
-
-  const server = await makeHttpClient({ url, token: () => redeemed.token }).server.info();
-
-  document.cookie = connectionCookie({ ...connection, serverId: server.id }, location.protocol === 'https:');
-  localStorage.removeItem(CONNECTION.storageKey);
-}
-
-export function connectionRpcUrl({ serverUrl }: ConnectionTypes.ConnectionUrlParams): string {
-  return new URL(CONNECTION.rpcPath, serverUrl).toString();
-}
-
-export function connectionSocketUrl({ serverUrl }: ConnectionTypes.ConnectionUrlParams): string {
-  const url = new URL(CONNECTION.rpcPath, serverUrl);
-  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
-
-  return url.toString();
+    document.cookie = connectionCookie({
+      serverId: payload.serverId,
+      addresses: payload.addresses,
+      deviceId: redeemed.device.id,
+      token: redeemed.token,
+    }, secure);
+  } finally {
+    document.cookie = connectionPairingCookie(null, secure);
+  }
 }

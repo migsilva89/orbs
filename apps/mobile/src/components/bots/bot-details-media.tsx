@@ -115,7 +115,7 @@ function BotDetailsMediaItem({ session, botId, file }: BotDetailsMediaItemProps)
           <Image
             className="size-full"
             resizeMode="cover"
-            source={connectionFileSource(session.connection, { botId, attachmentId: file.id })}
+            source={connectionFileSource(session, { botId, attachmentId: file.id })}
           />
         </ItemMedia>
       ) : (

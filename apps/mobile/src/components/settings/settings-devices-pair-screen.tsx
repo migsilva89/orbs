@@ -17,13 +17,13 @@ export function SettingsDevicesPairScreen() {
   const { session } = useConnection();
 
   return match(session)
-    .with(P.nonNullable, (current) => (
+    .with(P.nonNullable, () => (
       <ScrollView
         className="flex-1 bg-background"
         contentContainerClassName="gap-4 px-4 pt-4 pb-12"
         contentInsetAdjustmentBehavior="automatic"
       >
-        <SettingsDevicesPair isTitleHidden connection={current.connection} />
+        <SettingsDevicesPair isTitleHidden />
         <Card size="sm">
           <View className="flex-row items-center gap-2">
             <Icon icon={ScanQrCode} tone="muted" />

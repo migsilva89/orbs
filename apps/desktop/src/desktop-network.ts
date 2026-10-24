@@ -113,8 +113,13 @@ export async function desktopNetworkSelf(url: string, server: DesktopTypes.Deskt
   return resolved.some(({ address }) => local.has(desktopNetworkAddress(address)));
 }
 
+/** This Mac's network name without the Bonjour suffix, such as `studio-mac`. */
+export function desktopNetworkHost(): string {
+  return hostname().replace(/\.local$/u, '');
+}
+
 export function desktopNetworkAdvertise(port: number): () => void {
-  const name = `${DESKTOP_BUILD.name} on ${hostname().replace(/\.local$/u, '')}`;
+  const name = `${DESKTOP_BUILD.name} on ${desktopNetworkHost()}`;
   const child = Bun.spawn([DESKTOP.find.dnsSd, '-R', name, DESKTOP.find.service, 'local', String(port)], { stdout: 'ignore', stderr: 'ignore' });
 
   return () => child.kill();

@@ -31,6 +31,7 @@ export async function makeServices({
   pluginLoader,
   mcp,
   mcpAuth,
+  network,
   providers,
   runtime: runtimeOptions,
 }: CoreServicesParams) {
@@ -49,7 +50,7 @@ export async function makeServices({
   });
 
   try {
-    const server = makeServerService({ settings });
+    const server = makeServerService({ settings, network });
     await server.queries.info();
     const auth = makeAuthService({ database });
     const limits = makeLimitService({ settings });

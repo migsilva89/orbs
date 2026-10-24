@@ -27,6 +27,7 @@ export * from './hooks/use-chat-settings';
 export * from './hooks/use-rpc';
 export * from './hooks/use-settings-device-revoke';
 export * from './hooks/use-settings-devices';
+export * from './hooks/use-settings-server';
 export * from './hooks/use-settings-model-swap';
 export * from './hooks/use-settings-provider-logout';
 export * from './hooks/use-settings-provider-session';

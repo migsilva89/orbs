@@ -10,6 +10,7 @@ import { Form } from '@/components/ui/forms/form';
 import { FormInput } from '@/components/ui/forms/form-input';
 import { toasty } from '@/components/ui/sonner';
 import { connectionPair, connectionRead } from '@/services/connection/connection.client';
+import { connectionDeviceName } from '@/services/connection/connection.utils';
 import type { ConnectionPairForm } from '@repo/contracts/universal';
 
 export function ConnectForm() {
@@ -31,10 +32,13 @@ export function ConnectForm() {
     }
 
     if (code && document.documentElement.dataset.shell === 'desktop') {
-      form.setValue('name', m.connect_device_name_desktop());
       void form.handleSubmit(handleSubmit)();
     }
   });
+
+  useEffect(() => {
+    form.setValue('name', connectionDeviceName());
+  }, [form]);
 
   useEffect(() => {
     readCode();

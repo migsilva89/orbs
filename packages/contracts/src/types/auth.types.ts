@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { device } from './device.types';
+import { serverAddress } from './server.types';
 
 export const authToken = z.string().regex(/^[a-f0-9]{64}$/);
 
@@ -10,13 +11,6 @@ export const authRedeem = z.object({
 
 export const authGrantStatus = authRedeem.pick({ token: true });
 
-export const authPair = z.object({
-  serverUrl: z.url({ protocol: /^https?$/ }).max(512).transform((value) => new URL(value)).refine((url) => {
-    return !url.username && !url.password && !url.search && !url.hash && url.pathname === '/'
-      && !['0.0.0.0', '[::]'].includes(url.hostname);
-  }, 'Use a reachable HTTP or HTTPS server origin').transform((url) => url.origin),
-});
-
 export const authPairResult = z.object({
   token: authToken,
   expiresAt: z.number().int(),
@@ -24,8 +18,9 @@ export const authPairResult = z.object({
 });
 
 export const authPairPayload = z.object({
-  version: z.literal(1),
-  serverUrl: z.url({ protocol: /^https?$/ }),
+  version: z.literal(2),
+  serverId: z.uuid(),
+  addresses: z.array(serverAddress).min(1),
   token: authToken,
   expiresAt: z.number().int(),
 });
@@ -49,5 +44,4 @@ export const authGrant = z.object({
 });
 
 export type AuthRedeemInput = z.infer<typeof authRedeem>;
-export type AuthPairInput = z.infer<typeof authPair>;
 export type AuthPairPayload = z.infer<typeof authPairPayload>;

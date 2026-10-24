@@ -11,17 +11,20 @@ import { createTanstackStartPlugin } from './vite/tanstack-start.vite.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// Dev always runs the local dev daemon next to Vite; built web servers pick the paired daemon's address from the connection cookie.
+const DEV_DAEMON = `http://127.0.0.1:${env.DAEMON_PORT}`;
+
 export default defineConfig({
   clearScreen: false,
   envDir: '../..',
   server: {
     host: true,
     proxy: {
-      '/rpc': { target: env.DAEMON_URL, ws: true },
-      '/files': { target: env.DAEMON_URL },
-      '/avatars': { target: env.DAEMON_URL },
-      '/health': { target: env.DAEMON_URL },
-      '/mcp/callback': { target: env.DAEMON_URL },
+      '/rpc': { target: DEV_DAEMON, ws: true },
+      '/files': { target: DEV_DAEMON },
+      '/avatars': { target: DEV_DAEMON },
+      '/health': { target: DEV_DAEMON },
+      '/mcp/callback': { target: DEV_DAEMON },
     },
   },
   preview: {

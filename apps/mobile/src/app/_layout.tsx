@@ -75,6 +75,7 @@ function RootLayoutStack() {
           <Stack.Screen name="settings/devices/pair" options={{ headerShown: true, title: m.settings_devices_pair(), headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="settings/devices/scan" options={{ headerShown: true, title: m.mobile_scan_title(), headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="settings/devices/[deviceId]/revoke" options={DIALOG} />
+          <Stack.Screen name="settings/server/address" options={{ headerShown: true, title: m.mobile_address_title(), headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="settings/providers/[providerId]/logout" options={DIALOG} />
           <Stack.Screen name="bots/create" options={{ headerShown: true, title: m.rooms_bot_title(), headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="bots/[botId]/details" options={{ headerShown: true, title: '', headerBackButtonDisplayMode: 'minimal' }} />

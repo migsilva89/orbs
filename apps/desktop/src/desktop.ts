@@ -1,7 +1,7 @@
 import { m } from '@repo/i18n/client';
 import Electrobun, { ApplicationMenu, BrowserView, BrowserWindow, PATHS, Screen, Tray, Utils } from 'electrobun/main';
 import { DESKTOP_BUILD } from './desktop-build';
-import { desktopNetworkFind, desktopNetworkProbe, desktopNetworkSelf, desktopNetworkTailscale } from './desktop-network';
+import { desktopNetworkFind, desktopNetworkHost, desktopNetworkProbe, desktopNetworkSelf, desktopNetworkTailscale } from './desktop-network';
 import { desktopNotify } from './desktop-notify';
 import { desktopProcessRuns, desktopServerLeftovers, desktopServerPairLink, desktopServerStart } from './desktop-server';
 import { desktopLoginEnabled, desktopLoginSet, desktopSettingsPrompt, desktopSettingsRead, desktopSettingsWrite, desktopStateRead, desktopStateWrite } from './desktop-settings';
@@ -132,7 +132,7 @@ function desktopMainOpen(url: string): void {
   const window = new BrowserWindow({
     title: appName,
     url,
-    preload: `document.documentElement.dataset.shell = 'desktop'; window.__botsAddresses = ${JSON.stringify(server?.urls.filter((address) => address !== server?.url) ?? [])}; ${clipboardBridge} ${titleBarBridge} ${server && url.startsWith(server.url) ? pairBridge : ''} ${nativeMenuBlock}`,
+    preload: `document.documentElement.dataset.shell = 'desktop'; window.__botsAddresses = ${JSON.stringify(server?.urls.filter((address) => address !== server?.url) ?? [])}; window.__botsHost = ${JSON.stringify(desktopNetworkHost())}; ${clipboardBridge} ${titleBarBridge} ${server && url.startsWith(server.url) ? pairBridge : ''} ${nativeMenuBlock}`,
     frame: saved && desktopFrameVisible(saved) ? saved : desktopFrameDefault(),
     titleBarStyle: 'hiddenInset',
     trafficLightOffset: DESKTOP.mainWindow.trafficLights,

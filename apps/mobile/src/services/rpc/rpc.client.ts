@@ -1,26 +1,52 @@
 import { ORPCError } from '@orpc/client';
 import { createRouterUtils } from '@orpc/tanstack-query';
-import { makeClient } from '@repo/client/client';
+import { connectionAddressPick, connectionRpcUrl, connectionSocketUrl, makeClient } from '@repo/client/client';
 import { queryMutationCache } from '@repo/client/react';
 import { Errors } from '@repo/errors/universal';
 import { QueryCache, QueryClient } from '@tanstack/react-query';
 import { AppState } from 'react-native';
 import { match } from 'ts-pattern';
-import { connectionRpcUrl, connectionSocketUrl } from '@/services/connection/connection.client';
+import { connectionAddressesLearn } from '@/services/connection/connection.client';
 import type { RpcClientParams, RpcSession } from '@/types/rpc.types';
 
 export function rpcClientCreate({ connection, notify, onUnauthorized }: RpcClientParams): RpcSession {
   let socket: WebSocket | undefined;
   let isActive = AppState.currentState === 'active';
+  let isReachable = true;
+  let address = connection.addresses[0];
+  const reachabilityListeners = new Set<() => void>();
+
+  const rpcReachableSet = (next: boolean) => {
+    if (next === isReachable) {
+      return;
+    }
+
+    isReachable = next;
+    reachabilityListeners.forEach((listener) => listener());
+  };
 
   const client = makeClient({
     serverId: connection.serverId,
-    url: connectionRpcUrl(connection),
+    url: () => connectionRpcUrl(address),
     token: () => connection.token,
     connect: () => {
       return match(isActive)
-        .with(true, () => {
-          socket = new WebSocket(connectionSocketUrl(connection));
+        .with(true, async () => {
+          const { address: picked } = await connectionAddressPick(connection);
+
+          if (!picked) {
+            rpcReachableSet(false);
+            throw new Errors.CONFLICT({ internal: 'No server address answered' });
+          }
+
+          address = picked;
+          socket = new WebSocket(connectionSocketUrl(picked));
+          socket.addEventListener('open', () => {
+            rpcReachableSet(true);
+            void client.server.info().then((info) => connectionAddressesLearn({ connection, addresses: info.addresses }), () => undefined);
+          });
+          socket.addEventListener('close', () => rpcReachableSet(!isActive && isReachable));
+
           return socket;
         })
         .with(false, () => {
@@ -53,6 +79,15 @@ export function rpcClientCreate({ connection, notify, onUnauthorized }: RpcClien
     client,
     rpc: createRouterUtils(client),
     queryClient,
+    address: () => address,
+    reachability: {
+      isReachable: () => isReachable,
+      subscribe: (listener) => {
+        reachabilityListeners.add(listener);
+
+        return () => reachabilityListeners.delete(listener);
+      },
+    },
     pause() {
       isActive = false;
       void queryClient.cancelQueries();

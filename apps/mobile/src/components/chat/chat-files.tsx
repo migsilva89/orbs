@@ -14,7 +14,7 @@ function ChatFilesItem({ session, botId, file }: ChatFilesItemProps) {
   const name = file.filename ?? '';
 
   const source = file.url.startsWith(CHAT.attachmentScheme)
-    ? connectionFileSource(session.connection, { botId, attachmentId: file.url.slice(CHAT.attachmentScheme.length) })
+    ? connectionFileSource(session, { botId, attachmentId: file.url.slice(CHAT.attachmentScheme.length) })
     : { uri: file.url };
 
   return file.mediaType.startsWith('image/') ? <MessageImage name={name} source={source} /> : <MessageFile name={name} />;

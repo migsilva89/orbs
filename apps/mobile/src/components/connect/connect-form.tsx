@@ -10,12 +10,12 @@ import { LabelDescription } from '@/components/ui/label';
 import { useConnection } from '@/hooks/use-connection';
 import { useConnectionCode } from '@/hooks/use-connection-code';
 import { connectionPair, connectionRead } from '@/services/connection/connection.client';
-import { connectionCodeFromUrl } from '@/services/connection/connection.utils';
+import { connectionCodeFromUrl, connectionDeviceName } from '@/services/connection/connection.utils';
 
 export function ConnectForm() {
   const { connect } = useConnection();
   const { code, setCode, linkError } = useConnectionCode();
-  const [name, setName] = useState<string>(m.mobile_device_name_default());
+  const [name, setName] = useState(connectionDeviceName());
   const [codeError, setCodeError] = useState<string | null>(null);
   const [nameError, setNameError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

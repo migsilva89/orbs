@@ -13,6 +13,6 @@ export function useSettingsDevices() {
     pairing: pair.data ?? null,
     isPairing: pair.isPending,
     pairProblem: pair.isError ? m.settings_devices_pair_error() : null,
-    pair: (serverUrl: string) => pair.mutate({ serverUrl }),
+    pair: () => pair.mutate(),
   };
 }

@@ -44,6 +44,7 @@
     "expo-camera": "catalog:mobile",
     "expo-clipboard": "catalog:mobile",
     "expo-constants": "catalog:mobile",
+    "expo-device": "catalog:mobile",
     "expo-document-picker": "catalog:mobile",
     "expo-font": "catalog:mobile",
     "expo-glass-effect": "catalog:mobile",

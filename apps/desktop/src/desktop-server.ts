@@ -179,7 +179,7 @@ export async function desktopServerStart(settings: DesktopSettings): Promise<Des
         ...shared,
         WEB_HOST: host,
         WEB_PORT: String(port),
-        DAEMON_URL: desktopNetworkUrl(DESKTOP.localHost, daemonPort),
+        DAEMON_PORT: String(daemonPort),
       },
     });
 

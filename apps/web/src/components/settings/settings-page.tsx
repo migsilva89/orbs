@@ -9,6 +9,7 @@ import { SettingsGeneral } from '@/components/settings/settings-general';
 import { SettingsModels } from '@/components/settings/settings-models';
 import { SettingsProviders } from '@/components/settings/settings-providers';
 import { SettingsSecrets } from '@/components/settings/settings-secrets';
+import { SettingsServer } from '@/components/settings/settings-server';
 import { SettingsSources } from '@/components/settings/settings-sources';
 import { SettingsTools } from '@/components/settings/settings-tools';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,7 @@ export function SettingsPage({ connection }: SettingsPageProps) {
           <SettingsTools />
           <SettingsSecrets />
           <SettingsSources />
+          <SettingsServer />
           <SettingsDevices connection={connection} />
           <ClientOnly>
             <SettingsDesktop />

@@ -3,7 +3,7 @@ import { createFaviconLinks, createMetadata } from '@repo/tanstack-helpers/unive
 import { createRootRouteWithContext } from '@tanstack/react-router';
 import { match, P } from 'ts-pattern';
 import { LayoutRootDocument, LayoutRootError, LayoutRootNotFound } from '@/components/layout/layout-root';
-import { connectionForget, connectionRead } from '@/services/connection/connection.client';
+import { connectionForget, connectionLearn, connectionRead } from '@/services/connection/connection.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import { SEO_METADATA_DEFAULTS } from '@/services/seo/seo.constants';
 import appCss from '../application/styles.css?url';
@@ -18,13 +18,14 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     }
 
     try {
-      await context.queryClient.ensureQueryData(rpc.server.info.queryOptions());
+      const info = await context.queryClient.ensureQueryData(rpc.server.info.queryOptions());
+      await connectionLearn(connection, info.addresses);
 
       return {
         connection: {
           deviceId: connection.deviceId,
           serverId: connection.serverId,
-          serverUrl: connection.serverUrl,
+          addresses: connection.addresses,
         },
       };
     } catch (error) {

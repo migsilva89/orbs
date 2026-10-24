@@ -12,7 +12,7 @@ export function usePush() {
 
   useEffect(() => {
     if (session) {
-      void pushToken().then((token) => session.client.notifications.push({ token, url: session.connection.serverUrl })).catch(() => undefined);
+      void pushToken().then((token) => session.client.notifications.push({ token, url: session.address().url })).catch(() => undefined);
     }
   }, [session]);
 

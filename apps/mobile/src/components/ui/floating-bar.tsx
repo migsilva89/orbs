@@ -9,7 +9,7 @@ const floatingBarVariants = cva({
   base: 'absolute inset-x-5 flex-row items-center gap-3',
   variants: {
     // Bottom bars sit inside the home-indicator inset, close to the screen edge like iOS 26 toolbars.
-    edge: { top: 'top-2 justify-between', bottom: '-bottom-5' },
+    edge: { top: 'top-2 justify-between', bottom: '-bottom-2' },
   },
 });
 

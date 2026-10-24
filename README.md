@@ -84,7 +84,7 @@ openbots service register     # Start the daemon at every macOS login
 openbots service unregister   # Stop starting it at login
 ```
 
-`bun run --cwd apps/daemon backup` creates and restores backups. See the [API reference](.agents/references/api.md#offline-backup-and-restore) for details.
+`bun run --cwd apps/daemon backup` creates and restores backups. See the [API reference](.agents/references/api.md#daemon-and-storage) for details.
 
 ### Desktop release
 
@@ -100,7 +100,7 @@ bun run lint:dead   # Unused files, exports and dependencies
 
 Agent guidance lives in `AGENTS.md` and `.agents/`. Run `bun run agents:sync` after changing it: it links `CLAUDE.md`, `.claude/` and the worktree configs for Paseo, Orca, Conductor and T3 Code from `.agents/orchestrators/`.
 
-[Architecture](.agents/references/architecture.md) shows how the apps and packages fit together and where each kind of file goes. The [API reference](.agents/references/api.md) covers the daemon, RPC, storage and Pi behavior in depth.
+[Architecture](.agents/references/architecture.md) shows how the apps and packages fit together and where each kind of file goes. The [API reference](.agents/references/api.md) lists the daemon, RPC and Pi behavior the code does not make obvious.
 
 ## 📄 License
 

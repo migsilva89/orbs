@@ -314,7 +314,7 @@ export type SkillService = ReturnType<typeof makeSkillService>;
 
 ### Pi and domain integration
 
-Before adding infrastructure, inspect the installed library API and official examples. Use Pi's tools, extensions, documents, tasks, watches and recovery where they fit. State the concrete missing capability before implementing a replacement. See [Pi examples](../docs/pi-durable.md).
+Before adding infrastructure, inspect the installed library API and official examples. Use Pi's tools, extensions, documents, tasks, watches and recovery where they fit. State the concrete missing capability before implementing a replacement. Pi's README ships with the installed `@earendil-works/pi-durable` package.
 
 - Server owns product policy. Runtime implements it through Pi hooks and tasks. Install the permission hook last, including for custom and MCP tools.
 - Only explicitly trusted tool registrations bypass approval as reads. Names and MCP `readOnlyHint` annotations do not grant trust. Read-only denies other tools; Ask requests approval; Auto uses Jev only for untrusted calls and falls back to Ask; Full allows calls.
@@ -335,6 +335,22 @@ Before adding infrastructure, inspect the installed library API and official exa
 - Private contexts and subagents are lazy details of the originating chat, not top-level sidebar chats. Read their history and attach live watches only when selected.
 - Disconnect and cancel end observation, not accepted agent work. Stop is an explicit command. Never automatically retry commands; submit retries reuse the same Pi request ID.
 - Read history through Pi's pagination and opaque cursors. Clients display state; their lifecycle never owns agent execution.
+
+### Routing and screens
+
+- Every screen, panel and dialog is a route, so back, reload, deep links and notification targets work. Web routes live in `application/routes.ts`; mobile screens are Expo Router files registered in `app/_layout.tsx`.
+- What a view shows is a path segment (`/rooms/direct/$handle/routines`), not a search param. Search params carry transient options of one view, such as a message to focus or a handoff, validated by a contracts schema.
+- A dialog is a child route of the view that opens it. Web renders it through that view's `<Outlet />` and closes with `useDialogNavigation` back to the parent path; mobile sets `transparentModal` for confirmations or `formSheet` for sheets in `_layout.tsx`. Nest a dialog under the panel that opens it, so the panel stays matched behind it.
+- A panel in a fixed region, such as the web chat sidebar, is a child route; the region picks its content with `useMatchRoute`, because a route has one outlet.
+- Web and mobile use the same path for the same screen where they can (`…/todos`, `…/routines`, `…/media`).
+- Native system pickers, action sheets and context menus are controls, not screens, and need no route.
+
+### Mobile UI
+
+- Floating controls use `GlassSurface` or `GlassButton` (Liquid Glass with a flat fallback) inside `FloatingBar`, whose `EdgeFade` blends content behind it. Controls that follow the keyboard sit in `KeyboardSticky`.
+- Chat transcripts use `MessageList`, sized by the composer height from `useKeyboardChatComposerInset`.
+- The device credential lives in `expo-secure-store`.
+- A new native module needs a rebuild of the dev app; `scripts/mobile.ts` detects the native change and rebuilds before Metro starts.
 
 ### Shared tooling
 

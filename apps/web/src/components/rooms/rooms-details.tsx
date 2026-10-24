@@ -1,8 +1,8 @@
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useHydrated, useMatch } from '@tanstack/react-router';
-import { useState } from 'react';
+import { Link, useHydrated, useMatch, useMatchRoute } from '@tanstack/react-router';
+import { match } from 'ts-pattern';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { RoomsDetailsBot } from '@/components/rooms/rooms-details-bot';
 import { RoomsDetailsMedia } from '@/components/rooms/rooms-details-media';
@@ -11,41 +11,37 @@ import { RoomsSettingsMenu } from '@/components/rooms/rooms-settings-menu';
 import { RoutinesList } from '@/components/routines/routines-list';
 import { TodosList } from '@/components/todos/todos-list';
 import { Button } from '@/components/ui/button';
-import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle, ItemValue } from '@/components/ui/item';
+import { Item, ItemActions, ItemContent, ItemGroup, ItemLink, ItemMedia, ItemTitle, ItemValue } from '@/components/ui/item';
 import * as Sidebar from '@/components/ui/sidebar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { rpc } from '@/services/rpc/rpc.client';
-import IconPanelRight from '~icons/lucide/panel-right';
+import IconCalendarClock from '~icons/lucide/calendar-clock';
+import IconChevronLeft from '~icons/lucide/chevron-left';
+import IconChevronRight from '~icons/lucide/chevron-right';
+import IconImages from '~icons/lucide/images';
+import IconListTodo from '~icons/lucide/list-todo';
+import IconX from '~icons/lucide/x';
+import type { RoomsDetailsPage } from '@/types/rooms.types';
 import type { RoomsChat } from '@repo/client/client';
 import type { Bot } from '@repo/contracts/universal';
 
 export function RoomsDetails() {
   const direct = useMatch({ from: '/_chat/rooms/direct/$handle', shouldThrow: false });
-  const [tabAcrossChats, setTabAcrossChats] = useState('details');
   const botId = direct?.loaderData?.botId;
 
-  return botId ? (
-    <RoomsDetailsPanel
-      botId={botId}
-      key={botId}
-      tab={tabAcrossChats}
-      onTabChange={setTabAcrossChats}
-    />
-  ) : null;
+  return botId ? <RoomsDetailsPanel botId={botId} key={botId} /> : null;
 }
 
 interface RoomsDetailsPanelProps {
   botId: string
-  tab: string
-  onTabChange: (tab: string) => void
 }
 
-function RoomsDetailsPanel({ botId, tab, onTabChange }: RoomsDetailsPanelProps) {
+function RoomsDetailsPanel({ botId }: RoomsDetailsPanelProps) {
   const { data: bots } = useSuspenseQuery(rpc.bots.list.queryOptions());
   const { data: chats } = useSuspenseQuery(rpc.conversation.list.queryOptions());
-  const { isMobile, toggleSidebar } = Sidebar.useSidebar();
+  const { toggleSidebar } = Sidebar.useSidebar();
   const bot = bots.find((item) => item.id === botId);
   const chat = chats.find((item) => item.botId === botId);
+  const page = useRoomsDetailsPage(bot?.handle);
 
   if (!bot || !chat) {
     return null;
@@ -55,8 +51,23 @@ function RoomsDetailsPanel({ botId, tab, onTabChange }: RoomsDetailsPanelProps) 
     <Sidebar.Sidebar side="right" variant="panel">
       <div className="cursor-default electrobun-webkit-app-region-drag">
         <Sidebar.SidebarHeader className="items-center gap-1 text-center">
-          {isMobile ? null : (
-            <div className="self-end electrobun-webkit-app-region-no-drag">
+          <div className="flex w-full items-center justify-between">
+            <span className="electrobun-webkit-app-region-no-drag">
+              {page ? (
+                <Button
+                  asChild
+                  aria-label={m.rooms_details_back()}
+                  size="icon-sm"
+                  title={m.rooms_details_back()}
+                  variant="outline"
+                >
+                  <Link params={{ handle: bot.handle }} to="/rooms/direct/$handle">
+                    <IconChevronLeft className="size-4" />
+                  </Link>
+                </Button>
+              ) : null}
+            </span>
+            <span className="electrobun-webkit-app-region-no-drag">
               <Button
                 aria-label={m.rooms_details_close()}
                 size="icon-sm"
@@ -64,10 +75,10 @@ function RoomsDetailsPanel({ botId, tab, onTabChange }: RoomsDetailsPanelProps) 
                 variant="outline"
                 onClick={toggleSidebar}
               >
-                <IconPanelRight className="size-4" />
+                <IconX className="size-4" />
               </Button>
-            </div>
-          )}
+            </span>
+          </div>
           <div className="contents electrobun-webkit-app-region-no-drag">
             <RoomsSettingsMenu align="center" chat={chat}>
               <span className="mb-1">
@@ -79,38 +90,94 @@ function RoomsDetailsPanel({ botId, tab, onTabChange }: RoomsDetailsPanelProps) 
           </div>
         </Sidebar.SidebarHeader>
       </div>
-      <Tabs
-        className="min-h-0 flex-1 gap-0"
-        value={tab}
-        onValueChange={onTabChange}
-      >
-        <TabsList className="mx-auto mb-2" variant="muted">
-          <TabsTrigger value="details" variant="muted">
-            {m.rooms_tab_details()}
-          </TabsTrigger>
-          <TabsTrigger value="media" variant="muted">
-            {m.rooms_tab_media()}
-          </TabsTrigger>
-        </TabsList>
-        <Sidebar.SidebarContent>
-          <TabsContent className="flex flex-col gap-4 px-4 py-2" value="details">
-            <RoomsDetailsBot bot={bot} chat={chat} />
-            <RoomsDetailsSection title={m.rooms_todos()}>
-              <TodosList bot={bot} handle={bot.handle} />
-            </RoomsDetailsSection>
-            <RoomsDetailsSection title={m.rooms_routines()}>
-              <RoutinesList bot={bot} />
-            </RoomsDetailsSection>
-            <RoomsDetailsFacts bot={bot} chat={chat} />
-          </TabsContent>
-          <TabsContent value="media">
-            <RoomsDetailsMedia botId={bot.id} />
-          </TabsContent>
-        </Sidebar.SidebarContent>
-      </Tabs>
+      <Sidebar.SidebarContent>
+        <div className="flex flex-col gap-4 px-4 py-2">
+          <RoomsDetailsContent
+            bot={bot}
+            chat={chat}
+            page={page}
+          />
+        </div>
+      </Sidebar.SidebarContent>
       <Sidebar.SidebarRail />
     </Sidebar.Sidebar>
   );
+}
+
+function useRoomsDetailsPage(handle: string | undefined): RoomsDetailsPage | undefined {
+  const matchRoute = useMatchRoute();
+  const params = { handle: handle ?? '' };
+
+  if (matchRoute({
+    to: '/rooms/direct/$handle/todos',
+    params,
+    fuzzy: true,
+  })) {
+    return 'todos';
+  }
+
+  if (matchRoute({ to: '/rooms/direct/$handle/routines', params })) {
+    return 'routines';
+  }
+
+  return matchRoute({ to: '/rooms/direct/$handle/media', params }) ? 'media' : undefined;
+}
+
+interface RoomsDetailsContentProps {
+  bot: Bot
+  chat: RoomsChat
+  page: RoomsDetailsPage | undefined
+}
+
+function RoomsDetailsContent({ bot, chat, page }: RoomsDetailsContentProps) {
+  const handle = bot.handle;
+
+  const pages = [
+    { to: '/rooms/direct/$handle/todos', title: m.rooms_todos(), icon: <IconListTodo /> },
+    { to: '/rooms/direct/$handle/routines', title: m.rooms_routines(), icon: <IconCalendarClock /> },
+    { to: '/rooms/direct/$handle/media', title: m.rooms_tab_media(), icon: <IconImages /> },
+  ] as const;
+
+  return match(page)
+    .with('todos', () => (
+      <RoomsDetailsSection title={m.rooms_todos()}>
+        <TodosList bot={bot} handle={handle} />
+      </RoomsDetailsSection>
+    ))
+    .with('routines', () => (
+      <RoomsDetailsSection title={m.rooms_routines()}>
+        <RoutinesList bot={bot} />
+      </RoomsDetailsSection>
+    ))
+    .with('media', () => (
+      <RoomsDetailsSection title={m.rooms_tab_media()}>
+        <RoomsDetailsMedia botId={bot.id} />
+      </RoomsDetailsSection>
+    ))
+    .with(undefined, () => (
+      <>
+        <RoomsDetailsBot bot={bot} chat={chat} />
+        <ItemGroup variant="outline">
+          {pages.map((item) => (
+            <Item key={item.to} size="sm">
+              <ItemMedia>{item.icon}</ItemMedia>
+              <ItemContent className="min-w-0">
+                <ItemTitle>
+                  <ItemLink asChild>
+                    <Link params={{ handle }} to={item.to}>{item.title}</Link>
+                  </ItemLink>
+                </ItemTitle>
+              </ItemContent>
+              <ItemActions>
+                <ItemValue><IconChevronRight /></ItemValue>
+              </ItemActions>
+            </Item>
+          ))}
+        </ItemGroup>
+        <RoomsDetailsFacts bot={bot} chat={chat} />
+      </>
+    ))
+    .exhaustive();
 }
 
 interface RoomsDetailsFactsProps {

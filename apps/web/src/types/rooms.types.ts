@@ -5,3 +5,5 @@ export interface RoomsPairLinkParams {
   peer: Pick<Bot, 'handle'>;
   conversationId: number;
 }
+
+export type RoomsDetailsPage = 'todos' | 'routines' | 'media';

@@ -3,7 +3,7 @@ import { useChatSearch } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { experimental_streamedQuery as streamedQuery, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { Bot, LayoutDashboard, Plus, QrCode, Star, UserRound } from 'lucide-react-native';
+import { Bot, LayoutDashboard, Plus, Star, UserRound } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { SectionList, View } from 'react-native';
 import { match, P } from 'ts-pattern';
@@ -227,9 +227,6 @@ function BotListContent({ session }: BotListContentProps) {
         </FloatingBar>
         <KeyboardSticky>
           <FloatingBar edge="bottom">
-            <GlassButton accessibilityLabel={m.mobile_home_pair()} onPress={() => router.push('/settings/devices/pair')}>
-              <Icon icon={QrCode} size="action" />
-            </GlassButton>
             <SearchField
               accessibilityLabel={m.rooms_search()}
               className="flex-1"

@@ -15,7 +15,7 @@ export const Route = createFileRoute('/_chat/rooms/direct/$handle/todos/$todoId/
 function DirectBotTodoDeleteRoute() {
   const { handle } = Route.useParams();
   const { bot, todo } = Route.useLoaderData();
-  const { handleOpenChange } = useDialogNavigation({ to: '/rooms/direct/$handle', params: { handle } });
+  const { handleOpenChange } = useDialogNavigation({ to: '/rooms/direct/$handle/todos', params: { handle } });
 
   return (
     <TodosDeleteDialog

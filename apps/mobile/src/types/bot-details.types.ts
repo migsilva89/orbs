@@ -4,7 +4,7 @@ export interface BotDetailsRouteParams extends Record<string, string | string[] 
   botId: string;
 }
 
-export type BotDetailsTab = 'details' | 'media';
+export type BotDetailsPage = 'todos' | 'routines' | 'media';
 
 export interface BotDetailsSectionProps {
   bot: Bot;

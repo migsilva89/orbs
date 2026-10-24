@@ -1,7 +1,7 @@
 import { useChatListSync } from '@repo/client/react';
 import { chatSearch } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { createFileRoute, Outlet, redirect, useMatch } from '@tanstack/react-router';
 import { LayoutShellDashboard } from '@/components/layout/layout-shell-dashboard';
 import { RoomsDetails } from '@/components/rooms/rooms-details';
 import { RoomsSearch } from '@/components/rooms/rooms-search';
@@ -41,10 +41,12 @@ function RoomsLayout() {
   useRoomsPresence();
   useLayoutShortcuts();
   const { sidebars, connection } = Route.useLoaderData();
+  const room = useMatch({ from: '/_chat/rooms/direct/$handle', shouldThrow: false });
 
   return (
     <LayoutShellDashboard
       aside={<RoomsDetails />}
+      asidePathname={room?.pathname}
       connection={connection}
       sidebars={sidebars}
     >

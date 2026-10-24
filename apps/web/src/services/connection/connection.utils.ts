@@ -77,3 +77,7 @@ export function connectionDeviceName(): string {
 
   return browser && system ? m.connect_device_name_browser({ browser, system }) : m.connect_device_name_default();
 }
+
+export function connectionCodeFromLink(value: string): string {
+  return URL.canParse(value) ? new URLSearchParams(new URL(value).hash.slice(1)).get('code') ?? value : value;
+}

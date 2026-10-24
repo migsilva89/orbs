@@ -28,7 +28,7 @@ export function PromptDock({ drawer, children, onLayout }: PromptDockProps) {
   return (
     <FloatingBar className="flex-col items-stretch gap-2" edge="bottom" onLayout={onLayout}>
       {drawer}
-      <View className="flex-row items-end gap-3">{children}</View>
+      <View className="flex-row items-end gap-2">{children}</View>
     </FloatingBar>
   );
 }

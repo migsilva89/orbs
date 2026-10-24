@@ -17,7 +17,6 @@ const glassShapeVariants = cva({
 
 const glassVariants = cva({
   composes: glassShapeVariants,
-  base: 'shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-none',
   variants: { native: { false: 'bg-card', true: 'bg-transparent' } },
 });
 

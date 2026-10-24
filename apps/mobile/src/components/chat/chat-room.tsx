@@ -241,7 +241,7 @@ function ChatRoomView({ session, bot, bots, view, focusEntryId, replyToEntryId, 
         />
       )}
       {empty}
-      <ChatHeader activity={activity} bot={bot} />
+      <ChatHeader bot={bot} />
       <KeyboardSticky>
         <ChatComposer
           bot={bot}

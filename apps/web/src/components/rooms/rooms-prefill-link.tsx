@@ -1,5 +1,6 @@
 import { useChatDraft } from '@repo/client/web';
 import { Link } from '@tanstack/react-router';
+import { useSidebar } from '@/components/ui/sidebar';
 import { roomsLink } from '@/services/rooms/rooms.client';
 import type { Bot } from '@repo/contracts/universal';
 import type { ReactNode } from 'react';
@@ -12,6 +13,12 @@ interface RoomsPrefillLinkProps {
 
 export function RoomsPrefillLink({ bot, prompt, children }: RoomsPrefillLinkProps) {
   const draft = useChatDraft(bot.id);
+  const { setOpenMobile } = useSidebar();
 
-  return <Link {...roomsLink(bot)} onClick={() => draft.prefill(prompt)}>{children}</Link>;
+  function handleClick() {
+    draft.prefill(prompt);
+    setOpenMobile(false);
+  }
+
+  return <Link {...roomsLink(bot)} onClick={handleClick}>{children}</Link>;
 }

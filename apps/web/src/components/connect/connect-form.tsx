@@ -10,7 +10,7 @@ import { Form } from '@/components/ui/forms/form';
 import { FormInput } from '@/components/ui/forms/form-input';
 import { toasty } from '@/components/ui/sonner';
 import { connectionPair, connectionRead } from '@/services/connection/connection.client';
-import { connectionDeviceName } from '@/services/connection/connection.utils';
+import { connectionCodeFromLink, connectionDeviceName } from '@/services/connection/connection.utils';
 import type { ConnectionPairForm } from '@repo/contracts/universal';
 
 export function ConnectForm() {
@@ -54,7 +54,7 @@ export function ConnectForm() {
   }, [form, router]);
 
   async function handleSubmit({ code, name }: ConnectionPairForm) {
-    const payload = authPairCode.safeParse(code);
+    const payload = authPairCode.safeParse(connectionCodeFromLink(code));
 
     await match(payload)
       .with({ success: false }, () => {

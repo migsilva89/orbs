@@ -10,10 +10,11 @@ interface LayoutShellDashboardProps {
   connection: ConnectionInfo
   children: ReactNode
   aside?: ReactNode
+  asidePathname?: string
   sidebars: LayoutSidebarsOpen
 }
 
-export function LayoutShellDashboard({ children, aside, sidebars, connection }: LayoutShellDashboardProps) {
+export function LayoutShellDashboard({ children, aside, asidePathname, sidebars, connection }: LayoutShellDashboardProps) {
   const { pathname } = useLocation();
 
   return (
@@ -34,7 +35,7 @@ export function LayoutShellDashboard({ children, aside, sidebars, connection }: 
                 cookieName={LAYOUT_SIDEBAR_COOKIES.details}
                 defaultOpen={sidebars.details}
                 defaultWidth={320}
-                pathname={pathname}
+                pathname={asidePathname ?? pathname}
                 shortcut={null}
               >
                 <Sidebar.SidebarInset className="min-h-0 min-w-0 overflow-hidden">

@@ -10,7 +10,11 @@ export const routes = rootRoute('root.tsx', [
       route('/direct/$handle', 'rooms/rooms.direct.$handle.tsx', [
         route('/reset', 'rooms/rooms.direct.$handle.reset.tsx'),
         route('/with/$peer/$conversationId', 'rooms/rooms.direct.$handle.with.$peer.tsx'),
-        route('/todos/$todoId/delete', 'rooms/rooms.direct.$handle.todos.$todoId.delete.tsx'),
+        route('/todos', 'rooms/rooms.direct.$handle.todos.tsx', [
+          route('/$todoId/delete', 'rooms/rooms.direct.$handle.todos.$todoId.delete.tsx'),
+        ]),
+        route('/routines', 'rooms/rooms.direct.$handle.routines.tsx'),
+        route('/media', 'rooms/rooms.direct.$handle.media.tsx'),
       ]),
     ]),
     route('/bots', 'bots/bots.layout.tsx', [

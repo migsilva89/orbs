@@ -31,7 +31,7 @@ export function RoomsDetailsMedia({ botId }: RoomsDetailsMediaProps) {
 
   if (files.isPending || artifacts.isPending) {
     return (
-      <div className="flex flex-col gap-3 px-4 py-2">
+      <div className="flex flex-col gap-3">
         {[0, 1, 2].map((key) => <Skeleton className="h-8 w-full" key={key} />)}
       </div>
     );
@@ -50,7 +50,7 @@ export function RoomsDetailsMedia({ botId }: RoomsDetailsMediaProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4 px-4 py-2">
+    <div className="flex flex-col gap-4">
       <FormErrors error={files.isError || artifacts.isError ? m.rooms_media_error() : null} />
       {artifacts.data && artifacts.data.length > 0 ? (
         <RoomsDetailsSection title={m.artifacts_title()}>

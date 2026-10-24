@@ -79,6 +79,9 @@ function RootLayoutStack() {
           <Stack.Screen name="settings/providers/[providerId]/logout" options={DIALOG} />
           <Stack.Screen name="bots/create" options={{ headerShown: true, title: m.rooms_bot_title(), headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="bots/[botId]/details" options={{ headerShown: true, title: '', headerBackButtonDisplayMode: 'minimal' }} />
+          <Stack.Screen name="bots/[botId]/todos/index" options={{ headerShown: true, title: m.rooms_todos(), headerBackButtonDisplayMode: 'minimal' }} />
+          <Stack.Screen name="bots/[botId]/routines/index" options={{ headerShown: true, title: m.rooms_routines(), headerBackButtonDisplayMode: 'minimal' }} />
+          <Stack.Screen name="bots/[botId]/media" options={{ headerShown: true, title: m.rooms_tab_media(), headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="bots/[botId]/edit" options={{ headerShown: true, title: m.rooms_action_edit_bot(), headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="bots/[botId]/delete" options={DIALOG} />
           <Stack.Screen name="bots/[botId]/todos/[todoId]/delete" options={DIALOG} />

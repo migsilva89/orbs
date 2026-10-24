@@ -116,7 +116,7 @@ function release() {
   }
 
   console.log(`Building ${name} ${version}`);
-  run(['bun', 'run', 'build:macos'], { ...process.env, DESKTOP_VERSION: version });
+  run(['bun', 'run', '--cwd', 'apps/desktop', 'build:macos'], { ...process.env, DESKTOP_VERSION: version });
 
   const temp = mkdtempSync(path.join(tmpdir(), 'desktop-release-'));
   const resources = path.join(app, 'Contents/Resources');

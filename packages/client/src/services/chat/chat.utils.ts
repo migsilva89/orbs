@@ -1,4 +1,4 @@
-import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entrySubagentReport, REACTION, reactionMessage, REPLY, replyMessage, toolCallJson } from '@repo/contracts/universal';
+import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entrySubagentReport, REACTION, reactionMessage, REPLY, replyMessage, replySilent, toolCallJson } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { match, P } from 'ts-pattern';
 import { mentionSubmission } from '../mention/mention.client';
@@ -252,7 +252,7 @@ function chatAssistantEntry(messages: ChatTypes.ChatMessage[], entry: ChatTypes.
       ];
 
       const last = messages.at(-1);
-      const hasText = answer.content.some((part) => part.type === 'text' && part.text.trim() !== '');
+      const hasText = answer.content.some((part) => part.type === 'text' && part.text.trim() !== '' && !replySilent.safeParse(part.text).success);
 
       match(last)
         .with({ role: 'assistant', metadata: { authorId: bot.id } }, (current) => {
@@ -276,7 +276,7 @@ function chatAssistantEntry(messages: ChatTypes.ChatMessage[], entry: ChatTypes.
 
 function chatAssistantParts(content: readonly ChatTypes.ChatContentPart[], state: 'streaming' | 'done'): ChatTypes.ChatPart[] {
   return content.flatMap((part): ChatTypes.ChatPart[] => match(part)
-    .with({ type: 'text' }, ({ text }) => (text.trim() === '' ? [] : [{ type: 'text' as const, text, state }]))
+    .with({ type: 'text' }, ({ text }) => (text.trim() === '' || replySilent.safeParse(text).success ? [] : [{ type: 'text' as const, text, state }]))
     .with({ type: 'thinking', redacted: P.optional(P.not(true)) }, ({ thinking }) => (thinking.trim() === '' ? [] : [{ type: 'reasoning' as const, text: thinking, state }]))
     .with({ type: 'toolCall', name: REACTION.toolName }, () => [])
     .with({ type: 'toolCall' }, (call) => [{

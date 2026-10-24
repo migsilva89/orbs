@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
-export const REPLY = { entryKind: 'bots.reply-message' } as const;
+export const REPLY = { entryKind: 'bots.reply-message', silent: ['NO_REPLY', '<|eos|>'] } as const;
+
+/** Assistant text that means "nothing to say": the prompt's NO_REPLY or a model end token leaked as text. */
+export const replySilent = z.string().trim().pipe(z.enum(REPLY.silent));
 
 export const messageQuote = z.object({
   entryId: z.number().int().positive(),

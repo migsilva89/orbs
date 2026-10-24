@@ -1,4 +1,5 @@
 import { AssistantEntry } from '@earendil-works/pi-durable';
+import { replySilent } from '@repo/contracts/universal';
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeBot } from '../runtime/runtime.constants';
@@ -21,7 +22,7 @@ export async function collaborationAnswer(tx: Tx, answerId: EntryId) {
 
   return (entry?.model ?? []).flatMap((message) => match(message)
     .with({ role: 'assistant' }, ({ content }) => content.flatMap((part) => match(part)
-      .with({ type: 'text' }, ({ text }) => [text])
+      .with({ type: 'text' }, ({ text }) => (replySilent.safeParse(text).success ? [] : [text]))
       .otherwise(() => [])))
     .otherwise(() => [])).join('\n');
 }

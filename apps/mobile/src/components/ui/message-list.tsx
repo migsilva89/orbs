@@ -7,6 +7,8 @@ import type { SharedValue } from 'react-native-reanimated';
 
 /** Room left for the floating header above the first message. */
 const MESSAGE_LIST_TOP = 64;
+/** Room between the last message and the composer, clear of the bottom edge fade. */
+const MESSAGE_LIST_BOTTOM = 8;
 
 interface MessageListProps<Item> {
   ref?: Ref<LegendListRef>;
@@ -46,7 +48,7 @@ export function MessageList<Item>({
       initialScrollIndex={initialScrollIndex}
       recycleItems={false}
       ref={ref}
-      contentContainerStyle={{ paddingTop: MESSAGE_LIST_TOP }}
+      contentContainerStyle={{ paddingTop: MESSAGE_LIST_TOP, paddingBottom: MESSAGE_LIST_BOTTOM }}
       contentInsetEndAdjustment={composerInset}
       data={data}
       estimatedItemSize={120}

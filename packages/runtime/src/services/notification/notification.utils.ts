@@ -1,4 +1,5 @@
 import { AssistantEntry, GenerationTask } from '@earendil-works/pi-durable';
+import { replySilent } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { questionDocument } from '../question/question.constants';
 import { runtimeToolApproval } from '../runtime/runtime.constants';
@@ -34,7 +35,7 @@ function notificationIsFinalReply(entry: PiDurableTypes.EntryRecord) {
       const content = model[0].content;
 
       const hasText = content.some((part) => match(part)
-        .with({ type: 'text' }, ({ text }) => text.trim().length > 0)
+        .with({ type: 'text' }, ({ text }) => text.trim().length > 0 && !replySilent.safeParse(text).success)
         .otherwise(() => false));
 
       const hasTool = content.some((part) => match(part)

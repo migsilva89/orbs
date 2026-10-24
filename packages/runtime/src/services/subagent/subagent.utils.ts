@@ -1,4 +1,5 @@
 import { AgentDoc, AssistantEntry, configure } from '@earendil-works/pi-durable';
+import { replySilent } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { COLLABORATION } from '../collaboration/collaboration.constants';
 import { runtimeBot } from '../runtime/runtime.constants';
@@ -32,7 +33,7 @@ export async function subagentAnswer(tx: PiDurableTypes.Tx, answerId: PiDurableT
 
   return (entry?.model ?? []).flatMap((message) => match(message)
     .with({ role: 'assistant' }, ({ content }) => content.flatMap((part) => match(part)
-      .with({ type: 'text' }, ({ text }) => [text])
+      .with({ type: 'text' }, ({ text }) => (replySilent.safeParse(text).success ? [] : [text]))
       .otherwise(() => [])))
     .otherwise(() => [])).join('\n');
 }

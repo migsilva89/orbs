@@ -1,5 +1,5 @@
 import { AssistantEntry, UserEntry } from '@earendil-works/pi-durable';
-import { ATTACHMENT, attachmentMessage, REPLY, replyMessage } from '@repo/contracts/universal';
+import { ATTACHMENT, attachmentMessage, REPLY, replyMessage, replySilent } from '@repo/contracts/universal';
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import type { ConversationIndexDocument, ConversationIndexPreview, ConversationIndexSummary } from '../../types/conversation-index.types';
@@ -22,6 +22,7 @@ export function conversationIndexMessage(entry: PiDurableTypes.EntryRecord): Con
 
           return match(preview)
             .with('', () => null)
+            .when(() => value.role === 'assistant' && replySilent.safeParse(preview).success, () => null)
             .otherwise(() => ({ entryId: entry.id, role: value.role, preview, createdAt: value.timestamp }));
         })
         .otherwise(() => null);

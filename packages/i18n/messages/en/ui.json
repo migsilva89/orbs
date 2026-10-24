@@ -40,7 +40,7 @@
   "ui_tool_bot_history_description": "Read a bounded page of visible messages in this conversation. Use the returned cursor to continue.",
   "ui_tool_bot_search_description": "Search visible message text in this conversation. Each call scans a bounded page; continue with the returned cursor, even when no matches are returned.",
   "ui_tool_bot_react_description": "React to a message with one emoji, like a tapback. Any emoji works; common ones are 😂 for something funny, ❤️ for warmth, 👍 for a plan you agree with. Defaults to the owner's latest message; other message IDs come from bot_history. Set isPresent to false to take a reaction back. Use it the way a person would, now and then, never as a status signal, and never mention or explain it.",
-  "ui_tool_bot_react_prompt": "A reaction can be the whole reply: when a thanks, an ok or feedback needs no words, react with one emoji (bot_react) and end your turn without writing any text. Otherwise react only now and then, when a person would.",
+  "ui_tool_bot_react_prompt": "A reaction can be the whole reply: when a thanks, an ok or feedback needs no words, react with one emoji (bot_react) and reply with exactly NO_REPLY. Otherwise react only now and then, when a person would.",
   "ui_html_preview": "HTML preview",
   "ui_html_source": "Source",
   "ui_html_page": "Page",

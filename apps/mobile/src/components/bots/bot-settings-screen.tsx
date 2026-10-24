@@ -1,10 +1,12 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
+import { botAvatarEmoji } from '@repo/client/client';
 import { useBotUpdate } from '@repo/client/react';
-import { botForm } from '@repo/contracts/universal';
+import { botAvatar, botForm } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
-import { Stack, usePreventRemove, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, usePreventRemove, useRouter } from 'expo-router';
 import { CalendarClock, ListTodo, ScrollText, Trash2 } from 'lucide-react-native';
+import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ScrollView, View } from 'react-native';
 import { match, P } from 'ts-pattern';
@@ -24,6 +26,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Icon } from '@/components/ui/icon';
 import { useChatReturn } from '@/hooks/use-chat-return';
 import { useConnection } from '@/hooks/use-connection';
+import type { BotAvatarRouteParams } from '@/types/bot-avatar.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type { Bot, BotForm } from '@repo/contracts/universal';
 
@@ -73,6 +76,7 @@ interface BotSettingsScreenFormProps {
 
 function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenFormProps) {
   const router = useRouter();
+  const { avatarEmoji } = useLocalSearchParams<BotAvatarRouteParams>();
   const returnToChat = useChatReturn();
   const [primary, primaryForeground] = useCSSVariable(['--color-primary', '--color-primary-foreground']).map(String);
 
@@ -92,6 +96,20 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
       inherit: bot.inherit,
     },
   });
+
+  useEffect(() => {
+    if (!avatarEmoji) {
+      return;
+    }
+
+    const avatar = botAvatar.safeParse(botAvatarEmoji({ avatar: form.getValues('avatar'), emoji: avatarEmoji }));
+
+    if (avatar.success) {
+      form.setValue('avatar', avatar.data, { shouldDirty: true });
+    }
+
+    router.setParams({ avatarEmoji: undefined });
+  }, [avatarEmoji, form, router]);
 
   const { isDirty } = form.formState;
 
@@ -146,7 +164,7 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
         >
-          <BotSettingsProfile isDisabled={isBusy} />
+          <BotSettingsProfile emojiRoute={{ pathname: '/bots/[botId]/edit/emoji', params: { botId: bot.id } }} isDisabled={isBusy} />
           <BotDetailsSection
             icon={ScrollText}
             title={m.rooms_bot_instructions()}

@@ -1,10 +1,11 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
-import { botDefaultSettings } from '@repo/client/client';
+import { botAvatarEmoji, botDefaultSettings } from '@repo/client/client';
 import { useBotCreate } from '@repo/client/react';
-import { botForm } from '@repo/contracts/universal';
+import { botAvatar, botForm } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ScrollView, View } from 'react-native';
 import { match, P } from 'ts-pattern';
@@ -13,6 +14,7 @@ import { BotSettingsModel } from '@/components/bots/bot-settings-model';
 import { BotSettingsProfile } from '@/components/bots/bot-settings-profile';
 import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
+import type { BotAvatarRouteParams } from '@/types/bot-avatar.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type { BotSettings } from '@repo/client/client';
 
@@ -52,6 +54,7 @@ interface BotCreateScreenFormProps {
 
 function BotCreateScreenForm({ session, settings }: BotCreateScreenFormProps) {
   const router = useRouter();
+  const { avatarEmoji } = useLocalSearchParams<BotAvatarRouteParams>();
   const [primary, primaryForeground] = useCSSVariable(['--color-primary', '--color-primary-foreground']).map(String);
 
   const form = useForm({
@@ -67,6 +70,20 @@ function BotCreateScreenForm({ session, settings }: BotCreateScreenFormProps) {
       thinkingLevel: settings?.thinkingLevel ?? 'medium',
     },
   });
+
+  useEffect(() => {
+    if (!avatarEmoji) {
+      return;
+    }
+
+    const avatar = botAvatar.safeParse(botAvatarEmoji({ avatar: form.getValues('avatar'), emoji: avatarEmoji }));
+
+    if (avatar.success) {
+      form.setValue('avatar', avatar.data, { shouldDirty: true });
+    }
+
+    router.setParams({ avatarEmoji: undefined });
+  }, [avatarEmoji, form, router]);
 
   const create = useBotCreate({ onCreated: (bot) => router.replace({ pathname: '/chat/[botId]', params: { botId: bot.id } }) });
 
@@ -92,7 +109,7 @@ function BotCreateScreenForm({ session, settings }: BotCreateScreenFormProps) {
           keyboardShouldPersistTaps="handled"
         >
           <Text tone="muted" variant="small">{m.rooms_bot_description()}</Text>
-          <BotSettingsProfile isDisabled={create.isPending} />
+          <BotSettingsProfile emojiRoute="/bots/create/emoji" isDisabled={create.isPending} />
           <BotSettingsModel isDisabled={create.isPending} session={session} />
           {create.problem ? <Text tone="destructive" variant="small">{create.problem}</Text> : null}
         </ScrollView>

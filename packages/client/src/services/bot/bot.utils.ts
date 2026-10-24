@@ -1,10 +1,11 @@
-import { COLOR_BY_ID } from '@repo/avatar-blobs/skins';
+import { COLOR_BY_ID, COLORS } from '@repo/avatar-blobs/skins';
 import { getLocale, m } from '@repo/i18n/client';
 import { match, P } from 'ts-pattern';
 import { BOT, BOT_BUBBLE_TEXT, BOT_MODEL_BRAND_PREFIXES, BOT_MODEL_VERSION_PATTERN, BOT_PROVIDER_BRAND_PREFIXES } from './bot.constants';
 import type * as BotTypes from '../../types/bot.types';
 import type { ChatActivity, ChatUsage } from '../../types/chat.types';
 import type { ExpressionId } from '@repo/avatar-blobs/expressions';
+import type { ColorId } from '@repo/avatar-blobs/skins';
 import type * as UniversalTypes from '@repo/contracts/universal';
 
 export function botSkillName({ name }: BotTypes.BotSkillNameParams): string {
@@ -73,6 +74,31 @@ export function botDefaultSettings({ models, thinkingLevel }: BotTypes.BotDefaul
   return match(newest)
     .with(P.nonNullable, (model) => botChooseModel({ model, thinkingLevel }))
     .otherwise(() => ({ modelProvider: '', modelId: '', thinkingLevel }));
+}
+
+// The palette colour an avatar shows: a blob's colour, or the swatch matching an emoji's background.
+export function botAvatarColor({ avatar }: BotTypes.BotAvatarColorParams): ColorId | null {
+  return match(avatar)
+    .with({ kind: 'blob' }, ({ color }) => color)
+    .with({ kind: 'emoji' }, ({ color }) => COLORS.find((item) => item.hex === color)?.id ?? null)
+    .with(P.nullish, () => BOT.defaultAvatar.color)
+    .otherwise(() => null);
+}
+
+// A swatch recolours an emoji's background; any other avatar becomes a blob in that colour.
+export function botAvatarRecolor({ avatar, color }: BotTypes.BotAvatarRecolorParams): BotTypes.BotAvatar {
+  return match(avatar)
+    .with({ kind: 'emoji' }, (emoji) => ({ ...emoji, color: COLOR_BY_ID.get(color)?.hex ?? emoji.color }))
+    .with({ kind: 'blob' }, (blob) => ({ ...blob, color }))
+    .otherwise(() => ({ ...BOT.defaultAvatar, color }));
+}
+
+export function botAvatarEmoji({ avatar, emoji }: BotTypes.BotAvatarEmojiParams): BotTypes.BotAvatar {
+  const color = COLOR_BY_ID.get(botAvatarColor({ avatar }) ?? BOT.defaultAvatar.color) ?? COLORS[0];
+
+  return match(avatar)
+    .with({ kind: 'emoji' }, (current) => ({ ...current, emoji }))
+    .otherwise(() => ({ kind: 'emoji' as const, emoji, color: color.hex }));
 }
 
 export function botBlobPresentation({ avatar, activity }: BotTypes.BotBlobPresentationParams): BotTypes.BotBlobPresentation {

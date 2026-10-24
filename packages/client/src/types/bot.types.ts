@@ -45,6 +45,20 @@ export interface BotBubble {
   foreground: 'white' | 'black';
 }
 
+export interface BotAvatarColorParams {
+  avatar: BotAvatar | undefined;
+}
+
+export interface BotAvatarRecolorParams {
+  avatar: BotAvatar | undefined;
+  color: ColorId;
+}
+
+export interface BotAvatarEmojiParams {
+  avatar: BotAvatar | undefined;
+  emoji: string;
+}
+
 export interface BotBlobPresentationParams {
   avatar: BotAvatar | undefined;
   activity: ChatActivity;

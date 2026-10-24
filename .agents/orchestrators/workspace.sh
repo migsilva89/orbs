@@ -54,7 +54,14 @@ setup_main() {
   bun install < /dev/null || { error "bun install failed"; exit 1; }
   bun run agents:sync < /dev/null || warn "agents:sync failed"
 
-  # 3. State file
+  # 3. Plans are local and git-ignored: share the source checkout's folder
+  if [ -n "$SOURCE_PATH" ] && [ "$SOURCE_PATH" != "$PWD" ] && [ -d "$SOURCE_PATH/.agents/plans" ] && [ ! -L .agents/plans ]; then
+    rm -rf .agents/plans
+    ln -s "$SOURCE_PATH/.agents/plans" .agents/plans
+    success "Linked .agents/plans"
+  fi
+
+  # 4. State file
   cat > .agents/state.md <<EOF
 # Workspace: $(basename "$PWD")
 
@@ -70,7 +77,7 @@ Dev ports are fixed, so only one worktree can run \`dev\` at a time.
 Setup: $(date -Iseconds)
 EOF
 
-  # 4. Orca has no terminal config: open the dev terminal through its CLI
+  # 5. Orca has no terminal config: open the dev terminal through its CLI
   if [ "$TOOL" = "orca" ] && command -v orca >/dev/null 2>&1; then
     orca terminal create --worktree current --title "dev" --command "./.agents/orchestrators/workspace.sh run" >/dev/null 2>&1 || warn "Failed to create the dev terminal"
   fi

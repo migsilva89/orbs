@@ -7,12 +7,14 @@ import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { Card } from '@/components/ui/card';
 import { FormField } from '@/components/ui/form-field';
 import type { BotForm } from '@repo/contracts/universal';
+import type { Href } from 'expo-router';
 
 interface BotSettingsProfileProps {
+  emojiRoute: Href;
   isDisabled: boolean;
 }
 
-export function BotSettingsProfile({ isDisabled }: BotSettingsProfileProps) {
+export function BotSettingsProfile({ emojiRoute, isDisabled }: BotSettingsProfileProps) {
   const form = useFormContext<BotForm>();
   const [name, avatar] = useWatch({ control: form.control, name: ['name', 'avatar'] });
 
@@ -23,6 +25,7 @@ export function BotSettingsProfile({ isDisabled }: BotSettingsProfileProps) {
     >
       <Card size="lg">
         <BotAvatarPicker
+          emojiRoute={emojiRoute}
           isDisabled={isDisabled}
           name={name || m.rooms_bot_default_name()}
           value={avatar ?? null}

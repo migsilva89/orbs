@@ -1,30 +1,35 @@
 import { EXPRESSIONS } from '@repo/avatar-blobs/expressions';
 import { BODIES, COLORS } from '@repo/avatar-blobs/skins';
-import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS, BOT } from '@repo/client/client';
+import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS, BOT, botAvatarColor, botAvatarRecolor } from '@repo/client/client';
 import { useBotAvatarPick } from '@repo/client/native';
 import { m } from '@repo/i18n/client';
-import { ChevronLeft, ChevronRight, ImageUp } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { ChevronLeft, ChevronRight, ImageUp, Smile } from 'lucide-react-native';
 import { AccessibilityInfo, Pressable, View } from 'react-native';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import type { BotAvatar } from '@repo/client/client';
+import type { Href } from 'expo-router';
 
 interface BotAvatarPickerProps {
   name: string;
   value: BotAvatar;
+  emojiRoute: Href;
   isDisabled?: boolean;
   onChange: (avatar: BotAvatar) => void;
 }
 
-export function BotAvatarPicker({ name, value, isDisabled = false, onChange }: BotAvatarPickerProps) {
+export function BotAvatarPicker({ name, value, emojiRoute, isDisabled = false, onChange }: BotAvatarPickerProps) {
   function cycle<T extends { id: string }>(items: readonly T[], currentId: string, step: number): T {
     const index = items.findIndex((item) => item.id === currentId);
 
     return items[(index + step + items.length) % items.length] ?? items[0];
   }
 
+  const router = useRouter();
   const blob = value?.kind === 'blob' ? value : BOT.defaultAvatar;
+  const color = botAvatarColor({ avatar: value });
   const photo = useBotAvatarPick();
 
   const change = (label: string, next: BotAvatar) => {
@@ -83,25 +88,36 @@ export function BotAvatarPicker({ name, value, isDisabled = false, onChange }: B
           <Pressable
             accessibilityLabel={AVATAR_COLOR_LABELS[id]()}
             accessibilityRole="radio"
-            accessibilityState={{ selected: value?.kind !== 'image' && blob.color === id, disabled: isDisabled }}
-            className={value?.kind !== 'image' && blob.color === id ? 'size-6.5 items-center justify-center rounded-full border-2 border-foreground' : 'size-6.5 items-center justify-center'}
+            accessibilityState={{ selected: color === id, disabled: isDisabled }}
+            className={color === id ? 'size-6.5 items-center justify-center rounded-full border-2 border-foreground' : 'size-6.5 items-center justify-center'}
             disabled={isDisabled}
             key={id}
-            onPress={() => change(AVATAR_COLOR_LABELS[id](), { ...blob, color: id })}
+            onPress={() => change(AVATAR_COLOR_LABELS[id](), botAvatarRecolor({ avatar: value, color: id }))}
           >
             <View className="size-4.5 rounded-full border border-border" style={{ backgroundColor: hex }} />
           </Pressable>
         ))}
       </View>
-      <Button
-        disabled={isDisabled || photo.isPending}
-        size="sm"
-        variant="ghost"
-        onPress={() => void photo.pick().then((avatar) => avatar && onChange(avatar), () => undefined)}
-      >
-        <Icon icon={ImageUp} size="sm" />
-        {m.avatars_upload()}
-      </Button>
+      <View className="flex-row gap-1">
+        <Button
+          disabled={isDisabled || photo.isPending}
+          size="sm"
+          variant="ghost"
+          onPress={() => void photo.pick().then((avatar) => avatar && onChange(avatar), () => undefined)}
+        >
+          <Icon icon={ImageUp} size="sm" />
+          {m.avatars_upload()}
+        </Button>
+        <Button
+          disabled={isDisabled}
+          size="sm"
+          variant="ghost"
+          onPress={() => router.push(emojiRoute)}
+        >
+          <Icon icon={Smile} size="sm" />
+          {m.avatars_emoji()}
+        </Button>
+      </View>
     </View>
   );
 }

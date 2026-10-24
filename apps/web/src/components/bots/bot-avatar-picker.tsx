@@ -1,11 +1,12 @@
 import { EXPRESSIONS } from '@repo/avatar-blobs/expressions';
 import { BODIES, COLORS } from '@repo/avatar-blobs/skins';
-import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS, BOT } from '@repo/client/client';
+import { AVATAR_BODY_LABELS, AVATAR_COLOR_LABELS, AVATAR_EXPRESSION_LABELS, BOT, botAvatarColor, botAvatarEmoji, botAvatarRecolor } from '@repo/client/client';
 import { useBotAvatarUpload } from '@repo/client/react';
 import { AVATAR } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { useRef } from 'react';
 import { BotAvatar } from '@/components/bots/bot-avatar';
+import { BotAvatarEmoji } from '@/components/bots/bot-avatar-emoji';
 import { Button } from '@/components/ui/button';
 import { useBotAvatarFlash } from '@/hooks/use-bot-avatar-flash';
 import IconChevronLeft from '~icons/lucide/chevron-left';
@@ -32,6 +33,7 @@ export function BotAvatarPicker({ name, value, onChange, disabled = false }: Bot
 
   const blob = value?.kind === 'blob' ? value : BOT.defaultAvatar;
   const { moving, label, flash } = useBotAvatarFlash();
+  const color = botAvatarColor({ avatar: value });
   const upload = useBotAvatarUpload();
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -97,27 +99,29 @@ export function BotAvatarPicker({ name, value, onChange, disabled = false }: Bot
         {COLORS.map(({ id, hex }) => (
           <button
             aria-label={AVATAR_COLOR_LABELS[id]()}
-            aria-pressed={value?.kind !== 'image' && blob.color === id}
+            aria-pressed={color === id}
             className="relative -ml-1 size-5 rounded-full ring-2 ring-background transition-transform outline-none first:ml-0 hover:z-10 hover:scale-125 focus-visible:z-10 focus-visible:ring-ring aria-pressed:z-10 aria-pressed:scale-125 aria-pressed:shadow-sm"
             key={id}
             style={{ backgroundColor: hex }}
             title={AVATAR_COLOR_LABELS[id]()}
             type="button"
-            onClick={() => flash(AVATAR_COLOR_LABELS[id](), () => onChange({ ...blob, color: id }))}
+            onClick={() => flash(AVATAR_COLOR_LABELS[id](), () => onChange(botAvatarRecolor({ avatar: value, color: id })))}
           />
         ))}
       </fieldset>
-      <Button
-        className="mt-3"
-        disabled={disabled || upload.isPending}
-        size="sm"
-        type="button"
-        variant="ghost"
-        onClick={() => fileInput.current?.click()}
-      >
-        <IconImageUp />
-        {m.avatars_upload()}
-      </Button>
+      <div className="mt-3 flex gap-1">
+        <Button
+          disabled={disabled || upload.isPending}
+          size="sm"
+          type="button"
+          variant="ghost"
+          onClick={() => fileInput.current?.click()}
+        >
+          <IconImageUp />
+          {m.avatars_upload()}
+        </Button>
+        <BotAvatarEmoji disabled={disabled} onPick={(emoji) => onChange(botAvatarEmoji({ avatar: value, emoji }))} />
+      </div>
       <input
         hidden
         accept={AVATAR.mediaTypes.join(',')}

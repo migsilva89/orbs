@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { Pressable, View } from 'react-native';
 import Animated, { cancelAnimation, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { match } from 'ts-pattern';
+import { cn } from '@/lib/cn';
 import { Icon } from './icon';
 import { Text } from './text';
 import type { OTPInputProps, SlotProps } from 'input-otp-native';
@@ -17,7 +18,7 @@ const inputOtpSlotVariants = cva({
       middle: '',
       last: 'rounded-r-lg',
     },
-    isActive: { true: 'z-10 border-ring ring-[3px] ring-ring/50' },
+    isActive: { true: 'border-ring ring-[3px] ring-ring/50' },
     invalid: { true: 'border-destructive/80' },
   },
   compoundVariants: [{ isActive: true, invalid: true, class: 'ring-destructive/20 dark:ring-destructive/40' }],
@@ -79,11 +80,11 @@ function inputOtpSlotPosition(index: number, count: number): InputOtpSlotProps['
 function InputOtpSlot({ slot, position, invalid }: InputOtpSlotProps) {
   return (
     <Pressable
-      className={inputOtpSlotVariants({
+      className={cn(inputOtpSlotVariants({
         position,
         isActive: slot.isActive,
         invalid,
-      })}
+      }))}
       onPress={slot.focus}
     >
       {slot.char ? <Text variant="pin-slot">{slot.char}</Text> : null}

@@ -86,25 +86,6 @@ export function ConnectForm() {
 
   return (
     <View className="w-full max-w-68 gap-4 self-center">
-      {needsAddress ? (
-        <FormInput
-          required
-          autoCapitalize="none"
-          autoCorrect={false}
-          editable={!isPairing}
-          error={addressError}
-          hint={m.connect_address_hint()}
-          inputMode="url"
-          label={m.connect_address()}
-          placeholder={m.connect_address_placeholder()}
-          testID="connect-address"
-          value={addressText}
-          onChangeText={(value) => {
-            setAddressText(value);
-            setAddressError(null);
-          }}
-        />
-      ) : null}
       <View className="gap-2">
         <Label
           required
@@ -129,10 +110,31 @@ export function ConnectForm() {
             setCode(value);
             setCodeError(null);
           }}
-          onComplete={(value: string) => void handleSubmit(value)}
+          onComplete={(value: string) => match(pastedTarget.current ?? target ?? address)
+            .with(P.nonNullable, () => void handleSubmit(value))
+            .otherwise(() => undefined)}
         />
         {codeError ? <LabelDescription accessibilityRole="alert" variant="error">{codeError}</LabelDescription> : null}
       </View>
+      {needsAddress ? (
+        <FormInput
+          required
+          autoCapitalize="none"
+          autoCorrect={false}
+          editable={!isPairing}
+          error={addressError}
+          hint={m.connect_address_hint()}
+          inputMode="url"
+          label={m.connect_address()}
+          placeholder={m.connect_address_placeholder()}
+          testID="connect-address"
+          value={addressText}
+          onChangeText={(value) => {
+            setAddressText(value);
+            setAddressError(null);
+          }}
+        />
+      ) : null}
       <FormInput
         required
         editable={!isPairing}

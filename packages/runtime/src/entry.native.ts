@@ -1,11 +1,11 @@
 export { makeStorageService } from './services/storage/storage.service';
 export { makeStorageLockService } from './services/storage/storage-lock.service';
-export { makeSkillLoaderService } from './services/skill/skill.service';
-export { makeMcpClientService } from './services/mcp/mcp.service';
+export { makeSkillLoaderService } from './services/skill/skill-loader.service';
+export { makeMcpClientService } from './services/mcp/mcp-client.service';
 export { makeMcpAuthService } from './services/mcp-auth/mcp-auth.service';
 export { makeProviderService } from './services/provider/provider.service';
 export { runtimeEnvNative } from './services/runtime/runtime-env.utils';
-export { makePluginLoaderService } from './services/plugin/plugin.service';
-export { makeInstructionLoaderService } from './services/instruction/instruction.service';
+export { makePluginLoaderService } from './services/plugin/plugin-loader.service';
+export { makeInstructionLoaderService } from './services/instruction/instruction-loader.service';
 export { makeAlarmService } from './services/alarm/alarm.service';
-export { makeImageService } from './services/image/image.service';
+export { createNodePhotonImages as makeImageService } from '@earendil-works/pi-durable/images/node';

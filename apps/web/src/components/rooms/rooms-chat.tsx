@@ -1,5 +1,5 @@
 import { CHAT, mentionQuote } from '@repo/client/client';
-import { chatViewOptions, useChatRoom } from '@repo/client/react';
+import { chatQueries, useChatRoom } from '@repo/client/react';
 import { useChatQuote, useChatRead } from '@repo/client/web';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
@@ -146,7 +146,7 @@ interface RoomsChatProps {
 }
 
 export function RoomsChat({ bot, bots, chat }: RoomsChatProps) {
-  const { data: view } = useQuery(chatViewOptions(RPC_CONTEXT, { botId: bot.id }));
+  const { data: view } = useQuery(chatQueries.view(RPC_CONTEXT, { botId: bot.id }));
 
   return view ? (
     <RoomsChatView

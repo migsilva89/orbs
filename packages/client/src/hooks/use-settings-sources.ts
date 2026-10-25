@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
 
-/** Skill, instruction, plugin and MCP paths the daemon loads; each list saves on every change. */
 export function useSettingsSources() {
   const queryClient = useQueryClient();
   const { rpc } = useRpc();

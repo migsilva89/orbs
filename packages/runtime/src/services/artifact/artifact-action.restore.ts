@@ -1,13 +1,11 @@
 import { artifactDocument } from './artifact.constants';
 import { artifactAppendVersion, artifactAssertCurrent, artifactCopy, artifactGet, artifactReadVersion } from './artifact.utils';
-import type { ArtifactRestoreParams, ArtifactServiceDeps } from '../../types/artifact.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { ArtifactContextParams, ArtifactRestoreParams, ArtifactServiceDeps } from '../../types/artifact.types';
 import type { Artifact } from '@repo/contracts/universal';
 
 export async function artifactActionRestore(
   { harness }: ArtifactServiceDeps,
-  params: ArtifactRestoreParams,
-  context: Context,
+  { context, ...params }: ArtifactRestoreParams & ArtifactContextParams,
 ): Promise<Artifact> {
   return harness.commit(async (tx) => {
     const record = artifactGet(await tx.doc(artifactDocument, params.conversationId), params.artifactId);

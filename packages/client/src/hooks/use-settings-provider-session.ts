@@ -5,7 +5,6 @@ import { SETTINGS } from '../services/settings/settings.constants';
 import { useRpc } from './use-rpc';
 import type { ProviderSession } from '@repo/contracts/universal';
 
-/** Follows one provider login: polls while pending, answers its prompts, and refreshes the provider list once it ends. */
 export function useSettingsProviderSession(started: ProviderSession) {
   const queryClient = useQueryClient();
   const { rpc } = useRpc();

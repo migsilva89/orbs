@@ -1,4 +1,22 @@
+import type { Context } from '@earendil-works/chord/context';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
+
+export interface SubagentToolParams {
+  api: PiDurableTypes.ToolExecutionApi;
+  context: Context;
+}
+
+export interface SubagentRunParams extends SubagentToolParams {
+  message: string;
+}
+
+export interface SubagentStatusParams extends SubagentToolParams {
+  name?: string;
+}
+
+export interface SubagentStopParams extends SubagentToolParams {
+  name: string;
+}
 
 export interface SubagentMessageParams {
   name: string;

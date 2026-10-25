@@ -11,5 +11,4 @@ export const todoDocument = defineDoc<TodoDocument>({
   checkpointWhen: () => false,
 });
 
-/** Open todos shown in the system prompt; the rest stay reachable through `bot_todo_list`. */
 export const TODO_PROMPT_LIMIT = 20;

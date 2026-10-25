@@ -1,78 +1,5 @@
-import type { JSX } from 'react';
-import type { LiteralUnion } from 'type-fest';
+import type * as TanstackMetadataTypes from './types/tanstack-metadata.types';
 
-type StringNumber = string | number
-
-type Meta = JSX.IntrinsicElements['meta']
-
-type ViewportWidthHeightValues = 'device-width' | 'device-height'
-
-export interface TanstackMetadataViewport {
-  width?: ViewportWidthHeightValues
-  height?: ViewportWidthHeightValues
-  'initial-scale'?: StringNumber
-  'minimum-scale'?: StringNumber
-  'maximum-scale'?: StringNumber
-  'user-scalable'?: 'yes' | 'no' | '1' | '0'
-  'viewport-fit'?: 'auto' | 'contain' | 'cover'
-}
-
-export interface TanstackMetadataImage {
-  width?: number
-  height?: number
-  url?: string
-  alt?: string
-  format?: LiteralUnion<'jpg' | 'png' | 'webp' | 'gif', string>
-}
-
-type OpenGraphType = 'website' | 'article' | 'book' | 'profile' | 'product' | 'place' | 'event'
-
-type TwitterCard = 'summary' | 'summary_large_image'
-
-export interface TanstackMetadataMsApplication {
-  tileColor?: string
-  config?: string
-}
-
-export interface TanstackMetadataOpenGraph {
-  url?: string
-  type?: LiteralUnion<OpenGraphType, string>
-  locale?: string
-  siteName?: string
-}
-
-export interface TanstackMetadataTwitter {
-  site?: string
-  creator?: string
-  card?: LiteralUnion<TwitterCard, string>
-}
-
-export interface TanstackMetadata {
-  charSet?: LiteralUnion<'utf-8', string>
-  title?: string
-  titleTemplate?: string
-  description?: string
-  viewport?: TanstackMetadataViewport
-  author?: string
-  robots?: string
-  keywords?: string
-  themeColor?: string
-  applicationName?: string
-  appleWebAppTitle?: string
-  appleWebAppCapable?: boolean
-  appleWebAppStatusBarStyle?: 'default' | 'black' | 'black-translucent'
-  msApplication?: TanstackMetadataMsApplication
-  images?: TanstackMetadataImage[]
-  openGraph?: TanstackMetadataOpenGraph
-  twitter?: TanstackMetadataTwitter
-}
-
-export interface TanstackMetadataParams {
-  defaults?: TanstackMetadata
-  metadata?: TanstackMetadata
-}
-
-/** Resolve page title through template substitution. */
 function resolveTitle(title?: string, template?: string): string | undefined {
   if (!title) {
     return undefined;
@@ -85,15 +12,13 @@ function resolveTitle(title?: string, template?: string): string | undefined {
   return template.replace('%s', title);
 }
 
-/** Append a meta tag if content exists. */
-function addMetaTag(meta: Meta[], keyType: 'name' | 'property', keyName: string, content?: string) {
+function addMetaTag(meta: TanstackMetadataTypes.TanstackMetadataMeta[], keyType: 'name' | 'property', keyName: string, content?: string) {
   if (content && content.trim() !== '') {
     meta.push({ [keyType]: keyName, content });
   }
 }
 
-/** Append image metadata for OpenGraph and Twitter cards. */
-function addImageMetadata(meta: Meta[], images?: TanstackMetadataImage[]) {
+function addImageMetadata(meta: TanstackMetadataTypes.TanstackMetadataMeta[], images?: TanstackMetadataTypes.TanstackMetadataImage[]) {
   if (!images?.length) {
     return;
   }
@@ -118,12 +43,11 @@ function addImageMetadata(meta: Meta[], images?: TanstackMetadataImage[]) {
   }
 }
 
-/** Build TanStack meta array from defaults and per-route overrides. */
-export function createMetadata(params: TanstackMetadataParams = {}): Meta[] {
+export function createMetadata(params: TanstackMetadataTypes.TanstackMetadataParams = {}): TanstackMetadataTypes.TanstackMetadataMeta[] {
   const defaults = params.defaults ?? {};
   const metadata = params.metadata ?? {};
 
-  const merged: TanstackMetadata = {
+  const merged: TanstackMetadataTypes.TanstackMetadata = {
     ...defaults,
     ...metadata,
     viewport: {
@@ -142,7 +66,7 @@ export function createMetadata(params: TanstackMetadataParams = {}): Meta[] {
 
   const isUsingDefaultTitle = metadata.title === undefined && merged.title === defaults.title;
   const title = isUsingDefaultTitle ? merged.title : resolveTitle(merged.title, merged.titleTemplate);
-  const meta: Meta[] = [];
+  const meta: TanstackMetadataTypes.TanstackMetadataMeta[] = [];
 
   if (merged.charSet) {
     meta.push({ charSet: merged.charSet });

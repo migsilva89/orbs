@@ -11,6 +11,10 @@
     "./server": {
       "types": "./src/entry.server.ts",
       "default": "./src/entry.server.ts"
+    },
+    "./types": {
+      "types": "./src/types/env-server.types.ts",
+      "default": "./src/types/env-server.types.ts"
     }
   },
   "scripts": {

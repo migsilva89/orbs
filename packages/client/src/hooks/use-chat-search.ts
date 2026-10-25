@@ -4,7 +4,6 @@ import { ROOMS } from '../services/rooms/rooms.constants';
 import { roomsSearchResults } from '../services/rooms/rooms.utils';
 import { useRpc } from './use-rpc';
 
-/** Searches every chat's messages for `query` after a short pause in typing, grouped by chat. */
 export function useChatSearch(query: string, isEnabled = true) {
   const { rpc } = useRpc();
   const { data: chats = [] } = useQuery(rpc.conversation.list.queryOptions());

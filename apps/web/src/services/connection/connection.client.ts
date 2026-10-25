@@ -55,7 +55,7 @@ export async function connectionPair({ entry, name }: ConnectionTypes.Connection
   document.cookie = connectionPairingCookie(entry.target, secure);
 
   try {
-    const redeemed = await makeHttpClient({ url: CONNECTION.rpcPath }).pairing.redeem({ pin: entry.pin, name });
+    const redeemed = await makeHttpClient(() => ({ url: CONNECTION.rpcPath })).pairing.redeem({ pin: entry.pin, name });
 
     document.cookie = connectionCookie({
       serverId: redeemed.serverId,

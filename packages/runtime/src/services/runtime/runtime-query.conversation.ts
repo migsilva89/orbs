@@ -1,14 +1,12 @@
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeBot, runtimeBotConversations } from './runtime.constants';
-import type { RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeContextInput, RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { ConversationId } from '@earendil-works/pi-durable';
 
 export async function runtimeQueryConversation(
   { harness }: Pick<RuntimeServiceDeps, 'harness'>,
-  { botId, conversationId: selectedId }: RuntimeConversationParams,
-  context: Context,
+  { botId, conversationId: selectedId, context }: RuntimeConversationParams & RuntimeContextInput,
 ) {
   const binding = await harness.snapshot(runtimeBotConversations, botId, context);
 
@@ -18,6 +16,7 @@ export async function runtimeQueryConversation(
       throw new Errors.NOT_FOUND({ resource: 'bot', resourceId: botId });
     });
 
+  // SAFETY: a selected ID is only a lookup key; the identity check below rejects any conversation outside this bot.
   const conversationId = (selectedId ?? rootId) as ConversationId;
   const identity = await harness.snapshot(runtimeBot, conversationId, context);
 

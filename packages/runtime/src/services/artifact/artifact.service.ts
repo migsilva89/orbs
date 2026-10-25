@@ -1,6 +1,5 @@
 import { artifactActionCreate } from './artifact-action.create';
 import { artifactActionRestore } from './artifact-action.restore';
-import { artifactActionSaveState } from './artifact-action.save-state';
 import { artifactActionUpdate } from './artifact-action.update';
 import { artifactBlocksCatalog } from './artifact-blocks.utils';
 import { artifactQueryGet } from './artifact-query.get';
@@ -12,16 +11,16 @@ import type { Context } from '@earendil-works/chord/context';
 export function makeArtifactService(deps: ArtifactTypes.ArtifactServiceDeps) {
   return {
     actions: {
-      create: (params: ArtifactTypes.ArtifactCreateParams, context: Context) => artifactActionCreate(deps, params, context),
-      update: (params: ArtifactTypes.ArtifactUpdateParams, context: Context) => artifactActionUpdate(deps, params, context),
-      saveState: (params: ArtifactTypes.ArtifactSaveStateParams, context: Context) => artifactActionSaveState(deps, params, context),
-      restore: (params: ArtifactTypes.ArtifactRestoreParams, context: Context) => artifactActionRestore(deps, params, context),
+      create: (params: ArtifactTypes.ArtifactCreateParams, context: Context) => artifactActionCreate(deps, { ...params, context }),
+      update: (params: ArtifactTypes.ArtifactUpdateParams, context: Context) => artifactActionUpdate(deps, { ...params, context }),
+      saveState: (params: ArtifactTypes.ArtifactSaveStateParams, context: Context) => artifactActionUpdate(deps, { ...params, context }),
+      restore: (params: ArtifactTypes.ArtifactRestoreParams, context: Context) => artifactActionRestore(deps, { ...params, context }),
     },
     queries: {
-      list: (params: ArtifactTypes.ArtifactListParams, context: Context) => artifactQueryList(deps, params, context),
-      get: (params: ArtifactTypes.ArtifactGetParams, context: Context) => artifactQueryGet(deps, params, context),
-      versions: (params: ArtifactTypes.ArtifactVersionsParams, context: Context) => artifactQueryVersions(deps, params, context),
-      blocks: () => artifactBlocksCatalog(),
+      list: (params: ArtifactTypes.ArtifactListParams, context: Context) => artifactQueryList(deps, { ...params, context }),
+      get: (params: ArtifactTypes.ArtifactGetParams, context: Context) => artifactQueryGet(deps, { ...params, context }),
+      versions: (params: ArtifactTypes.ArtifactVersionsParams, context: Context) => artifactQueryVersions(deps, { ...params, context }),
+      blocks: () => artifactBlocksCatalog,
     },
   };
 }

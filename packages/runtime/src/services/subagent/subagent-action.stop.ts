@@ -1,14 +1,9 @@
 import { match, P } from 'ts-pattern';
 import { subagentAgents } from './subagent.constants';
 import { subagentDetails, subagentReply } from './subagent.utils';
-import type { Context } from '@earendil-works/chord/context';
-import type { ToolExecutionApi } from '@earendil-works/pi-durable';
+import type { SubagentStopParams } from '../../types/subagent.types';
 
-export async function subagentActionStop(
-  api: ToolExecutionApi,
-  name: string,
-  context: Context,
-) {
+export async function subagentActionStop({ api, name, context }: SubagentStopParams) {
   const agents = (await api.snapshot(subagentAgents, api.conversationId, context))?.agents ?? {};
 
   const agent = match(Object.hasOwn(agents, name))

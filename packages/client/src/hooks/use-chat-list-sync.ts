@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { watchConversations } from '../conversations';
 import { useRpc } from './use-rpc';
 
-/** Keeps the cached chat list and sidebar sections live from the daemon's conversation watch while mounted. */
 export function useChatListSync() {
   const queryClient = useQueryClient();
   const { client, rpc } = useRpc();

@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
 import type { RoomsArrangeParams } from '../types/rooms.types';
 
-/** Saves the order, pin state and section of the given chats, updating the cached list at once so the move shows before the server answers. */
 export function useChatArrange() {
   const queryClient = useQueryClient();
   const { rpc } = useRpc();

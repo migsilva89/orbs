@@ -1,6 +1,6 @@
-import { artifactBlocks, artifactComponents } from '@repo/contracts/universal';
+import { artifactBlocks } from '@repo/contracts/universal';
 import * as m from '@repo/i18n/messages';
-import { z } from 'zod';
+import { artifactBlockSchemas } from '../../types/artifact.types';
 
 const descriptions = {
   ui_artifact_block_stack_description: m.ui_artifact_block_stack_description,
@@ -32,14 +32,10 @@ const descriptions = {
   ui_artifact_block_notes_description: m.ui_artifact_block_notes_description,
 };
 
-const blocks = artifactBlocks.parse(Object.fromEntries(Object.entries(artifactComponents).map(([name, component]) => [
+export const artifactBlocksCatalog = artifactBlocks.parse(Object.fromEntries(Object.entries(artifactBlockSchemas).map(([name, block]) => [
   name,
   {
-    description: descriptions[component.description](),
-    props: z.toJSONSchema(component.props, { io: 'input' }),
+    description: descriptions[block.description](),
+    props: block.props,
   },
 ])));
-
-export function artifactBlocksCatalog() {
-  return blocks;
-}

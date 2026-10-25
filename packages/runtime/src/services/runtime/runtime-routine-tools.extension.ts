@@ -10,23 +10,19 @@ import {
   routineToolTargetParameters,
   routineToolUpdate,
   routineToolUpdateParameters,
-} from '../../types/runtime-routine.types';
-import { runtimeQueryConversation } from './runtime-query.conversation';
-import { runtimeBot } from './runtime.constants';
-import type { RuntimeRoutineToolsDeps } from '../../types/runtime-routine.types';
-import type { Context } from '@earendil-works/chord/context';
-import type { ToolExecutionApi } from '@earendil-works/pi-durable';
-import type { Routine } from '@repo/contracts/universal';
+} from '../../types/routine-tool.types';
+import { runtimeToolBotTarget, runtimeToolOutput } from './runtime-tool.utils';
+import type { RoutineToolDeps } from '../../types/routine-tool.types';
 
-export function runtimeRoutineToolsExtension(deps: RuntimeRoutineToolsDeps) {
+export function runtimeRoutineToolsExtension(deps: RoutineToolDeps) {
   const list = defineTool({
     name: 'bot_routine_list',
     description: m.ui_tool_bot_routine_list_description(),
     parameters: Type.Object({}, { additionalProperties: false }),
     replay: 'safe',
     execute: async (_params, api, context) => {
-      const target = await runtimeRoutineTarget(deps, api, context);
-      return runtimeRoutineOutput(await deps.routines.queries.list(target, context));
+      const target = await runtimeToolBotTarget(deps, api, context);
+      return runtimeToolOutput(await deps.routines.queries.list(target, context));
     },
   });
 
@@ -37,8 +33,8 @@ export function runtimeRoutineToolsExtension(deps: RuntimeRoutineToolsDeps) {
     replay: 'unsafe',
     execute: async (params, api, context) => {
       const input = routineToolCreate.parse(params);
-      const target = await runtimeRoutineTarget(deps, api, context);
-      return runtimeRoutineOutput(await deps.routines.actions.create({ ...input, ...target }, context));
+      const target = await runtimeToolBotTarget(deps, api, context);
+      return runtimeToolOutput(await deps.routines.actions.create({ ...input, ...target }, context));
     },
   });
 
@@ -49,8 +45,8 @@ export function runtimeRoutineToolsExtension(deps: RuntimeRoutineToolsDeps) {
     replay: 'unsafe',
     execute: async (params, api, context) => {
       const input = routineToolUpdate.parse(params);
-      const target = await runtimeRoutineTarget(deps, api, context);
-      return runtimeRoutineOutput(await deps.routines.actions.update({ ...input, ...target }, context));
+      const target = await runtimeToolBotTarget(deps, api, context);
+      return runtimeToolOutput(await deps.routines.actions.update({ ...input, ...target }, context));
     },
   });
 
@@ -61,8 +57,8 @@ export function runtimeRoutineToolsExtension(deps: RuntimeRoutineToolsDeps) {
     replay: 'unsafe',
     execute: async (params, api, context) => {
       const input = routineToolTarget.parse(params);
-      const target = await runtimeRoutineTarget(deps, api, context);
-      return runtimeRoutineOutput(await deps.routines.actions.run({ ...input, ...target }, context));
+      const target = await runtimeToolBotTarget(deps, api, context);
+      return runtimeToolOutput(await deps.routines.actions.run({ ...input, ...target }, context));
     },
   });
 
@@ -73,9 +69,8 @@ export function runtimeRoutineToolsExtension(deps: RuntimeRoutineToolsDeps) {
     replay: 'unsafe',
     execute: async (params, api, context) => {
       const input = routineToolTarget.parse(params);
-      const target = await runtimeRoutineTarget(deps, api, context);
+      const target = await runtimeToolBotTarget(deps, api, context);
 
-      // Read it first: the output names what was removed, so the chat can show it.
       const removed = match((await deps.routines.queries.list(target, context)).find((routine) => routine.id === input.routineId))
         .with(P.nonNullable, (routine) => routine)
         .otherwise(() => {
@@ -84,7 +79,7 @@ export function runtimeRoutineToolsExtension(deps: RuntimeRoutineToolsDeps) {
 
       await deps.routines.actions.remove({ ...input, ...target }, context);
 
-      return runtimeRoutineOutput(removed);
+      return runtimeToolOutput(removed);
     },
   });
 
@@ -92,21 +87,4 @@ export function runtimeRoutineToolsExtension(deps: RuntimeRoutineToolsDeps) {
     extension: defineExtension({ name: 'bots.routine-tools', tools: [list, create, update, run, remove] }),
     readOnlyTools: [list],
   };
-}
-
-async function runtimeRoutineTarget(deps: RuntimeRoutineToolsDeps, api: ToolExecutionApi, context: Context) {
-  const identity = await api.snapshot(runtimeBot, api.conversationId, context);
-
-  const botId = match(identity?.botId)
-    .with(P.string, (id) => id)
-    .otherwise(() => {
-      throw new Errors.FORBIDDEN();
-    });
-
-  const conversation = await runtimeQueryConversation(deps, { botId }, context);
-  return { botId, conversationId: conversation.id };
-}
-
-function runtimeRoutineOutput(value: Routine | Routine[]) {
-  return { output: [{ type: 'text' as const, text: JSON.stringify(value) }] };
 }

@@ -1,8 +1,13 @@
+import type { Context } from '@earendil-works/chord/context';
 import type * as PiTypes from '@earendil-works/pi-durable';
 import type * as ContractTypes from '@repo/contracts/universal';
 
 export interface RoutineServiceDeps {
   harness: PiTypes.Harness;
+}
+
+export interface RoutineContextParams {
+  context: Context;
 }
 
 export type RoutineRecord = ContractTypes.Routine & {
@@ -20,7 +25,6 @@ export interface RoutineConversationParams {
   conversationId: PiTypes.ConversationId;
 }
 
-/** `id` is set only when clear-history carries a routine into a fresh store. */
 export type RoutineCreateParams = ContractTypes.RoutineCreateInput & RoutineConversationParams & { id?: string };
 export type RoutineUpdateParams = ContractTypes.RoutineUpdateInput & RoutineConversationParams;
 export type RoutineTargetParams = ContractTypes.RoutineTarget & RoutineConversationParams;

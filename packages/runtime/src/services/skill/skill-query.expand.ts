@@ -14,23 +14,23 @@ export function skillQueryExpand(deps: SkillLoaderServiceDeps, { names, content,
       const blocks = [...new Set(selected)].map((name) => skillExpandBlock(catalog.get(name), name));
       return { content: `${blocks.join('\n\n')}\n\n${content}` };
     });
-}
 
-function skillExpandBlock(skill: Skill | undefined, name: string) {
-  return match(skill)
-    .with(P.nullish, () => {
-      throw new Errors.NOT_FOUND({ resource: 'skill', resourceId: name });
-    })
-    .otherwise((resolved) => {
-      try {
-        const body = stripFrontmatter(readFileSync(resolved.filePath, 'utf-8')).trim();
-        return `<skill name="${resolved.name}" location="${resolved.filePath}">\nReferences are relative to ${resolved.baseDir}.\n\n${body}\n</skill>`;
-      } catch (cause) {
-        throw new Errors.NOT_FOUND({
-          resource: 'skill',
-          resourceId: name,
-          cause,
-        });
-      }
-    });
+  function skillExpandBlock(skill: Skill | undefined, name: string) {
+    return match(skill)
+      .with(P.nullish, () => {
+        throw new Errors.NOT_FOUND({ resource: 'skill', resourceId: name });
+      })
+      .otherwise((resolved) => {
+        try {
+          const body = stripFrontmatter(readFileSync(resolved.filePath, 'utf-8')).trim();
+          return `<skill name="${resolved.name}" location="${resolved.filePath}">\nReferences are relative to ${resolved.baseDir}.\n\n${body}\n</skill>`;
+        } catch (cause) {
+          throw new Errors.NOT_FOUND({
+            resource: 'skill',
+            resourceId: name,
+            cause,
+          });
+        }
+      });
+  }
 }

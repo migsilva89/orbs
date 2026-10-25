@@ -1,5 +1,5 @@
 import { chatLive, chatMessages, roomsMessageText } from '@repo/client/client';
-import { chatViewOptions } from '@repo/client/react';
+import { chatQueries } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { BotAvatar } from '@/components/bots/bot-avatar';
@@ -24,7 +24,7 @@ interface RoomsSubagentDialogProps {
 
 export function RoomsSubagentDialog({ botId, bot, conversationId, name, task, onOpenChange }: RoomsSubagentDialogProps) {
   const { data: bots } = useSuspenseQuery(rpc.bots.list.queryOptions());
-  const { data: view } = useQuery(chatViewOptions(RPC_CONTEXT, { botId, conversationId }));
+  const { data: view } = useQuery(chatQueries.view(RPC_CONTEXT, { botId, conversationId }));
   const { data: pending = [] } = useQuery(rpc.tools.pending.queryOptions({ input: { botId } }));
   const { data: questions = [] } = useQuery(rpc.conversation.questions.queryOptions({ input: { botId, conversationId } }));
   const approvals = pending.filter((approval) => approval.conversationId === conversationId);

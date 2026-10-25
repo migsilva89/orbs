@@ -3,7 +3,7 @@ import { todoCreate, todoTarget, todoUpdate } from '@repo/contracts/universal';
 import { z } from 'zod';
 import type { RuntimeServiceDeps } from './runtime.types';
 
-export type RuntimeTodoToolsDeps = Pick<RuntimeServiceDeps, 'harness' | 'todos'>;
+export type TodoToolDeps = Pick<RuntimeServiceDeps, 'harness' | 'todos'>;
 
 export const todoToolCreate = todoCreate.omit({ botId: true }).strict();
 export const todoToolUpdate = todoUpdate.omit({ botId: true }).strict();

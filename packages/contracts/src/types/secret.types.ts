@@ -1,9 +1,7 @@
 import { z } from 'zod';
 
-/** An environment variable name: commands read the placeholder as `$NAME`. */
 export const secretName = z.string().trim().regex(/^[A-Z][A-Z0-9_]{0,63}$/);
 
-/** A public host, or `*.example.com` for its subdomains. */
 export const secretHost = z.string().trim().toLowerCase().max(253).regex(/^(?:\*\.)?(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/);
 
 export const secretRule = z.object({
@@ -16,7 +14,6 @@ export const secretRules = z.array(secretRule).max(100);
 export const secretSave = secretRule.extend({ value: z.string().min(1).max(16384) });
 export const secretRemove = secretRule.pick({ name: true });
 
-/** How bash commands get secrets: a placeholder proxy (built-in or Varlock), or the real value in the environment. */
 export const secretMode = z.enum(['proxy', 'varlock', 'env']);
 export const secretSettings = z.object({ mode: secretMode });
 export const secretConfigure = secretSettings.partial();

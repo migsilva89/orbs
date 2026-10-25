@@ -1,10 +1,9 @@
 import { Errors } from '@repo/errors/universal';
 import { match } from 'ts-pattern';
 import { runtimeBotToolsExtension } from './runtime-bot-tools.extension';
-import type { RuntimeRegisterBotToolsDeps, RuntimeRegisterBotToolsParams } from '../../types/runtime-bot-tools.types';
+import type { RuntimeBotToolsRegisterDeps, RuntimeBotToolsRegisterParams } from '../../types/runtime-bot-tools.types';
 
-/** Shared bot-management tools; every bot store installs them when it opens, so register before restoring bots. */
-export function runtimeActionRegisterBotTools(deps: RuntimeRegisterBotToolsDeps, { bots }: RuntimeRegisterBotToolsParams) {
+export function runtimeActionRegisterBotTools(deps: RuntimeBotToolsRegisterDeps, { bots }: RuntimeBotToolsRegisterParams) {
   match(deps.extensions.some((extension) => extension.name === 'bots.bot-tools'))
     .with(true, () => {
       throw new Errors.INTERNAL_ERROR({ internal: 'Bot tools are already registered.' });

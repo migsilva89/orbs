@@ -5,7 +5,6 @@ import { useChatReactions } from './use-chat-reactions';
 import { useRpc } from './use-rpc';
 import type { ChatMessageReactionParams } from '../types/chat.types';
 
-/** Reactions on one message: the owner's emojis and a toggle, for screens that show a single entry. */
 export function useChatMessageReaction({ botId, conversationId, entryId }: ChatMessageReactionParams) {
   const { rpc } = useRpc();
 

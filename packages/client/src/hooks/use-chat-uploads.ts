@@ -6,10 +6,6 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { useRpc } from './use-rpc';
 import type { RoomsAttachmentsParams, RoomsSourcedAttachment } from '../types/rooms.types';
 
-/**
- * Composer attachments for one bot: checks type, size and count, uploads each file, and deletes uploads the owner removed.
- * Apps pass their own file source and show `onProblem` messages for refused files.
- */
 export function useChatUploads<Source>({ botId, describe, preview, read, release, onFailed, onProblem }: RoomsAttachmentsParams<Source>) {
   const { rpc } = useRpc();
   const [attachments, setAttachments] = useState<RoomsSourcedAttachment<Source>[]>([]);
@@ -122,7 +118,6 @@ export function useChatUploads<Source>({ botId, describe, preview, read, release
     add,
     remove,
     retry,
-    /** Removes sent attachments without deleting their uploads. */
     clear: (ids: string[]) => drop(attachments.flatMap((item) => (item.id && ids.includes(item.id) ? [item.key] : []))),
     readyIds: attachments.flatMap((item) => (item.id && item.status === 'ready' ? [item.id] : [])),
     uploading: attachments.some((item) => item.status === 'uploading'),

@@ -3,7 +3,6 @@ import { SECRET_PROXY } from './secret-proxy.constants';
 import { secretProxyPlaceholder } from './secret-proxy.utils';
 import type { SecretProxyServiceDeps } from '../../types/secret-proxy.types';
 
-/** Placeholders for every stored secret, plus the proxy and CA variables common HTTP clients read. */
 export async function secretProxyQueryEnv({ source, state, folder }: SecretProxyServiceDeps): Promise<Record<string, string>> {
   const rules = await source.queries.rules();
   const { server } = state;

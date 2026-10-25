@@ -2,13 +2,11 @@ import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { conversationIndex } from './conversation-index.constants';
 import { conversationIndexFind, conversationIndexLatest } from './conversation-index.utils';
-import type { ConversationIndexDeps, ConversationIndexRestoreParams } from '../../types/conversation-index.types';
-import type { Context } from '@earendil-works/chord/context';
+import type * as ConversationIndexTypes from '../../types/conversation-index.types';
 
 export async function conversationIndexActionRestore(
-  { harness, conversations }: ConversationIndexDeps,
-  { botId, conversationId }: ConversationIndexRestoreParams,
-  context: Context,
+  { harness, conversations }: ConversationIndexTypes.ConversationIndexDeps,
+  { botId, conversationId, context }: ConversationIndexTypes.ConversationIndexRestoreParams & ConversationIndexTypes.ConversationIndexContextParams,
 ) {
   return match(conversations.has(conversationId))
     .with(true, () => undefined)
@@ -29,7 +27,6 @@ export async function conversationIndexActionRestore(
         };
       }, context);
 
-      // Observe new commits before scanning; restoration must not overwrite a newer preview.
       conversations.add(conversationId);
 
       try {

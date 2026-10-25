@@ -1,30 +1,7 @@
 import { lerp, r2, TAU } from './math';
 import { PROFILE_SAMPLES, PROFILES } from './profiles';
-import type { ProfileName } from './profiles';
-
-export interface Point {
-  x: number
-  y: number
-}
-
-/**
- * A radial profile r(theta) plus a pose.
- *
- * Every profile is sampled at the SAME angles, so the points of any two bodies match one to one
- * and morphing is a linear interpolation of radii. That is what keeps transitions clean without a
- * path-morphing library.
- */
-export interface Silhouette {
-  radii: number[]
-  /** profile rotation, in radians */
-  rot: number
-  /** centre offset, in ball radii */
-  cx: number
-  cy: number
-  /** squash and stretch, applied in screen space (after rotation) */
-  sx: number
-  sy: number
-}
+import type { ProfileName } from './types/profile.types';
+import type { Silhouette, SilhouettePoint } from './types/silhouette.types';
 
 const ANGLES = Array.from({ length: PROFILE_SAMPLES }, (_, i) => (i / PROFILE_SAMPLES) * TAU);
 const COS = ANGLES.map(Math.cos);
@@ -61,7 +38,6 @@ export function blend(a: Silhouette, b: Silhouette, t: number): Silhouette {
     dst.radii[i] = lerp(a.radii[i] ?? 1, b.radii[i] ?? 1, t);
   }
 
-  // Shortest way round, so +170deg to -170deg does not spin a full turn.
   let dRot = b.rot - a.rot;
 
   while (dRot > Math.PI) {
@@ -80,8 +56,7 @@ export function blend(a: Silhouette, b: Silhouette, t: number): Silhouette {
   return dst;
 }
 
-/** Projects the silhouette to screen points; `scale` is the ball radius in viewBox units. `out` is reused across frames. */
-export function toPoints(s: Silhouette, scale: number, out: Point[] = []): Point[] {
+export function toPoints(s: Silhouette, scale: number, out: SilhouettePoint[] = []): SilhouettePoint[] {
   const cr = Math.cos(s.rot);
   const sr = Math.sin(s.rot);
 
@@ -89,7 +64,6 @@ export function toPoints(s: Silhouette, scale: number, out: Point[] = []): Point
     const r = s.radii[i] ?? 1;
     const x = r * (COS[i] ?? 0);
     const y = r * (SIN[i] ?? 0);
-    // rotation, then squash in screen space, then translation
     const rx = x * cr - y * sr;
     const ry = x * sr + y * cr;
     const p = out[i] ?? { x: 0, y: 0 };
@@ -102,11 +76,7 @@ export function toPoints(s: Silhouette, scale: number, out: Point[] = []): Point
   return out;
 }
 
-/**
- * Closed polyline to Catmull-Rom cubics. With 64 points centred tangents are enough: the outline
- * stays smooth to the pixel even at 600 px, and the string stays short.
- */
-export function closedPath(pts: Point[], tension = 1 / 6): string {
+export function closedPath(pts: SilhouettePoint[], tension = 1 / 6): string {
   const n = pts.length;
 
   if (n < 3) {
@@ -131,11 +101,7 @@ export function closedPath(pts: Point[], tension = 1 / 6): string {
   return `${d}Z`;
 }
 
-/**
- * Any polygon to a radial profile, by casting rays from (cx, cy). Builds the bodies that are not
- * naturally r(theta), like the tapered bar of the "!". Runs once at load, never in the render loop.
- */
-export function profileFromPolygon(poly: Point[], cx: number, cy: number): number[] {
+export function profileFromPolygon(poly: SilhouettePoint[], cx: number, cy: number): number[] {
   const radii = Array.from({ length: PROFILE_SAMPLES }, () => 0);
   const n = poly.length;
 
@@ -170,15 +136,13 @@ export function profileFromPolygon(poly: Point[], cx: number, cy: number): numbe
   return radii;
 }
 
-/** Convex hull of two circles: the tapered bar of the upright "!". */
-export function hullOfCircles(x1: number, y1: number, r1: number, x2: number, y2: number, r2v: number, steps = 96): Point[] {
+export function hullOfCircles(x1: number, y1: number, r1: number, x2: number, y2: number, r2v: number, steps = 96): SilhouettePoint[] {
   const dx = x2 - x1;
   const dy = y2 - y1;
   const dist = Math.hypot(dx, dy) || 1e-6;
-  // angle of the common outer tangents
   const base = Math.atan2(dy, dx);
   const spread = Math.acos(Math.max(-1, Math.min(1, (r1 - r2v) / dist)));
-  const pts: Point[] = [];
+  const pts: SilhouettePoint[] = [];
 
   for (let i = 0; i <= steps / 2; i++) {
     const a = base + spread + ((TAU - 2 * spread) * i) / (steps / 2);
@@ -193,12 +157,6 @@ export function hullOfCircles(x1: number, y1: number, r1: number, x2: number, y2
   return pts;
 }
 
-/**
- * Profile radius in any direction, interpolated between the two nearest samples. Re-anchors what
- * sits "on" the body (the eyes, the notification dot) once the silhouette is no longer a circle:
- * without it an eye placed at 0.62 radius leaves a body whose edge is at 0.55 in that direction,
- * and the mask clips it.
- */
 export function radiusAtAngle(radii: number[], angle: number): number {
   const n = radii.length;
   const t = ((((angle / TAU) % 1) + 1) % 1) * n;
@@ -206,7 +164,6 @@ export function radiusAtAngle(radii: number[], angle: number): number {
   return lerp(radii[i % n] ?? 1, radii[(i + 1) % n] ?? 1, t - i);
 }
 
-/** Superellipse |x/sx|^n + |y/sy|^n = 1: n = 2 is an ellipse, n near 4 the squircle. */
 export function superellipseProfile(n: number, sx = 1, sy = 1): number[] {
   return ANGLES.map((_, i) => {
     const c = Math.abs((COS[i] ?? 0) / sx) ** n;
@@ -215,10 +172,6 @@ export function superellipseProfile(n: number, sx = 1, sy = 1): number[] {
   });
 }
 
-/**
- * Radial profile of a UNION of discs: the farthest ray/circle intersection. Exact as long as the
- * origin is inside the union, which gives the cloud its bumps without a path boolean.
- */
 export function unionOfCirclesProfile(circles: { x: number; y: number; r: number }[]): number[] {
   const out = Array.from({ length: PROFILE_SAMPLES }, () => 0);
 
@@ -247,20 +200,14 @@ export function unionOfCirclesProfile(circles: { x: number; y: number; r: number
   return out;
 }
 
-/**
- * Rounded polygon as a Minkowski sum with a disc: each edge is pushed out by `rc` and each vertex
- * becomes an arc of radius `rc`, so vertices go at the wanted radius MINUS rc. Expects a clockwise
- * polygon in screen space (y down).
- */
-function roundedPolygon(verts: Point[], rc: number, arcSteps = 10): Point[] {
+function roundedPolygon(verts: SilhouettePoint[], rc: number, arcSteps = 10): SilhouettePoint[] {
   const n = verts.length;
-  const out: Point[] = [];
+  const out: SilhouettePoint[] = [];
 
-  const normal = (a: Point, b: Point) => {
+  const normal = (a: SilhouettePoint, b: SilhouettePoint) => {
     const dx = b.x - a.x;
     const dy = b.y - a.y;
     const len = Math.hypot(dx, dy) || 1;
-    // clockwise with y down: the outward normal is (dy, -dx)
     return Math.atan2(-dx / len, dy / len);
   };
 
@@ -289,12 +236,10 @@ function roundedPolygon(verts: Point[], rc: number, arcSteps = 10): Point[] {
   return out;
 }
 
-/** Regular polygon with rounded corners, inscribed in `radius`. */
 export function regularPolygonProfile(sides: number, radius: number, rc: number, rotationDeg = 0): number[] {
   const rot = (rotationDeg * Math.PI) / 180;
 
   const verts = Array.from({ length: sides }, (_, i) => {
-    // clockwise on screen: theta grows with y pointing down
     const a = rot + (i / sides) * TAU;
     return { x: Math.cos(a) * (radius - rc), y: Math.sin(a) * (radius - rc) };
   });
@@ -302,8 +247,7 @@ export function regularPolygonProfile(sides: number, radius: number, rc: number,
   return profileFromPolygon(roundedPolygon(verts, rc), 0, 0);
 }
 
-/** Exact closed polyline: keeps straight segments, unlike `closedPath`. */
-export function polyPath(pts: Point[], scale = 1): string {
+export function polyPath(pts: SilhouettePoint[], scale = 1): string {
   if (pts.length < 3) {
     return '';
   }
@@ -317,7 +261,6 @@ export function polyPath(pts: Point[], scale = 1): string {
   return `${d}Z`;
 }
 
-/** Capsule (stadium) centred on the origin: the exact outline of the bot's eyes. */
 export function capsulePath(w: number, h: number): string {
   const hw = Math.max(w, 0.01) / 2;
   const hh = Math.max(h, 0.01) / 2;

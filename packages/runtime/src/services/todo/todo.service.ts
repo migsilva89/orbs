@@ -9,13 +9,13 @@ import type { Context } from '@earendil-works/chord/context';
 export function makeTodoService(deps: TodoTypes.TodoServiceDeps) {
   return {
     actions: {
-      create: (params: TodoTypes.TodoCreateParams, context: Context) => todoActionCreate(deps, params, context),
-      update: (params: TodoTypes.TodoUpdateParams, context: Context) => todoActionUpdate(deps, params, context),
-      reorder: (params: TodoTypes.TodoReorderParams, context: Context) => todoActionReorder(deps, params, context),
-      remove: (params: TodoTypes.TodoTargetParams, context: Context) => todoActionRemove(deps, params, context),
+      create: (params: TodoTypes.TodoCreateParams, context: Context) => todoActionCreate(deps, { ...params, context }),
+      update: (params: TodoTypes.TodoUpdateParams, context: Context) => todoActionUpdate(deps, { ...params, context }),
+      reorder: (params: TodoTypes.TodoReorderParams, context: Context) => todoActionReorder(deps, { ...params, context }),
+      remove: (params: TodoTypes.TodoTargetParams, context: Context) => todoActionRemove(deps, { ...params, context }),
     },
     queries: {
-      list: (params: TodoTypes.TodoConversationParams, context: Context) => todoQueryList(deps, params, context),
+      list: (params: TodoTypes.TodoConversationParams, context: Context) => todoQueryList(deps, { ...params, context }),
     },
   };
 }

@@ -6,7 +6,6 @@ import { useRpc } from './use-rpc';
 import type { SettingsProviderStatus } from '../types/settings.types';
 import type { Provider, ProviderAuthType, ProviderSession } from '@repo/contracts/universal';
 
-/** AI provider sign-in: connected and available providers, and the login still running or failed; finished ones show in the list instead. */
 export function useSettingsProviders() {
   const { rpc } = useRpc();
   const list = useQuery(rpc.providers.list.queryOptions());

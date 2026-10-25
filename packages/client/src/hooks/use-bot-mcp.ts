@@ -8,11 +8,6 @@ import type { BotMcpParams } from '../types/bot.types';
 import type { SettingsProviderStatus } from '../types/settings.types';
 import type { McpCatalog } from '@repo/contracts/universal';
 
-/**
- * A bot's MCP servers and their OAuth login. Opening it connects the bot's servers once, so new servers show their real
- * state. The daemon finishes the login on its own callback page, so the app only opens the provider's page and polls
- * until the server reports a login; pasting the callback address is the fallback.
- */
 export function useBotMcp({ botId, login: target }: BotMcpParams) {
   const { rpc } = useRpc();
   const queryClient = useQueryClient();

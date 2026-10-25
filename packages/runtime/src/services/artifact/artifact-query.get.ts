@@ -1,15 +1,13 @@
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
-import { artifactContent, artifactContentKey, artifactDocument } from './artifact.constants';
-import { artifactCopy, artifactGet, artifactPointer } from './artifact.utils';
-import type { ArtifactGetParams, ArtifactServiceDeps } from '../../types/artifact.types';
-import type { Context } from '@earendil-works/chord/context';
+import { artifactContent, artifactDocument } from './artifact.constants';
+import { artifactContentKey, artifactCopy, artifactGet, artifactPointer } from './artifact.utils';
+import type { ArtifactContextParams, ArtifactGetParams, ArtifactServiceDeps } from '../../types/artifact.types';
 import type { Artifact } from '@repo/contracts/universal';
 
 export async function artifactQueryGet(
   { harness }: ArtifactServiceDeps,
-  params: ArtifactGetParams,
-  context: Context,
+  { context, ...params }: ArtifactGetParams & ArtifactContextParams,
 ): Promise<Artifact> {
   const record = artifactGet(await harness.snapshot(artifactDocument, params.conversationId, context), params.artifactId);
   const pointer = artifactPointer(record, params.version);

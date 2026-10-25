@@ -3,7 +3,6 @@ import { NOTIFICATION_PRESENCE } from '../services/notification/notification.con
 import { useRpc } from './use-rpc';
 import type { NotificationPresenceParams } from '../types/notification.types';
 
-/** Tells the daemon this device is open and when it was last used, so a notification goes to one device only. */
 export function useNotificationPresence({ platform, isOpen, idleMs }: NotificationPresenceParams) {
   const { client } = useRpc();
 

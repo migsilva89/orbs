@@ -2,7 +2,6 @@ import { defineExtension, hook, section, ToolTask } from '@earendil-works/pi-dur
 import * as m from '@repo/i18n/messages';
 import type { RuntimeSecretsParams } from '../../types/runtime.types';
 
-/** Lists stored secrets in the system prompt, and replaces their values in every tool result before the model or the transcript sees it. */
 export function runtimeSecretsExtension({ secrets }: RuntimeSecretsParams) {
   return defineExtension({
     name: 'bots.secrets',

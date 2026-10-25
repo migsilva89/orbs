@@ -3,10 +3,6 @@ import * as m from '@repo/i18n/messages';
 import { match } from 'ts-pattern';
 import { TODO_PROMPT_LIMIT, todoDocument } from './todo.constants';
 
-/**
- * Shows the open todos in the system prompt. Pi resends a section only when its text changes, so an unchanged list
- * keeps the prompt cache warm, and an empty list omits the section.
- */
 export const todoExtension = defineExtension({
   name: 'bots.todos',
   sections: [section('todos', async (input, context) => {

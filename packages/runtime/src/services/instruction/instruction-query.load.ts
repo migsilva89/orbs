@@ -7,8 +7,6 @@ import { match, P } from 'ts-pattern';
 import { INSTRUCTION } from './instruction.constants';
 import type { InstructionLoaderServiceDeps, InstructionLoadParams, InstructionLoadResult } from '../../types/instruction.types';
 
-// Pi loadProjectContextFiles always loads agentDir then walks every cwd ancestor
-// to the filesystem root, with no scope option. Filtering still reads parent files.
 export async function instructionQueryLoad(
   { root }: InstructionLoaderServiceDeps,
   { botId, paths, isInherited }: InstructionLoadParams,
@@ -26,7 +24,7 @@ export async function instructionQueryLoad(
 
   const results = await Promise.all(sources.map(async (source) => {
     const diagnostics: InstructionLoadResult['diagnostics'] = [];
-    const files = await instructionQueryLoadSource(instructionQueryLoadResolve(root, source.path), source.isOptional, diagnostics);
+    const files = await instructionQueryLoadSource(instructionQueryLoadResolve(source.path), source.isOptional, diagnostics);
     return { files, diagnostics };
   }));
 
@@ -53,93 +51,86 @@ export async function instructionQueryLoad(
   }
 
   return { files, diagnostics };
-}
 
-async function instructionQueryLoadSource(
-  path: string,
-  isOptional: boolean,
-  diagnostics: InstructionLoadResult['diagnostics'],
-): Promise<InstructionLoadResult['files']> {
-  try {
-    const entry = await stat(path);
+  async function instructionQueryLoadSource(
+    path: string,
+    isOptional: boolean,
+    issues: InstructionLoadResult['diagnostics'],
+  ): Promise<InstructionLoadResult['files']> {
+    try {
+      const entry = await stat(path);
 
-    return await match(entry.isDirectory())
-      .with(true, () => instructionQueryLoadDirectory(path, isOptional, diagnostics))
-      .with(false, () => match(entry.isFile())
-        .with(true, () => instructionQueryLoadFile(path, diagnostics))
-        .with(false, () => {
-          diagnostics.push({ path, message: INSTRUCTION.message });
-          return [];
+      return await match(entry.isDirectory())
+        .with(true, () => instructionQueryLoadDirectory(path, isOptional, issues))
+        .with(false, () => match(entry.isFile())
+          .with(true, () => instructionQueryLoadFile(path, issues))
+          .with(false, () => {
+            issues.push({ path, message: INSTRUCTION.message });
+            return [];
+          })
+          .exhaustive())
+        .exhaustive();
+    } catch (error) {
+      match({ isOptional, error })
+        .with({ isOptional: true, error: { code: 'ENOENT' } }, () => undefined)
+        .otherwise(() => issues.push({ path, message: INSTRUCTION.message }));
+      return [];
+    }
+  }
+
+  async function instructionQueryLoadDirectory(
+    directory: string,
+    isOptional: boolean,
+    issues: InstructionLoadResult['diagnostics'],
+  ): Promise<InstructionLoadResult['files']> {
+    const names = INSTRUCTION.names.values();
+    return instructionNext();
+
+    async function instructionNext(): Promise<InstructionLoadResult['files']> {
+      return match(names.next().value)
+        .with(P.string, async (name) => {
+          const path = join(directory, name);
+
+          const entry = await stat(path).catch((error: unknown) => match(error)
+            .with({ code: 'ENOENT' }, () => undefined)
+            .otherwise(() => {
+              throw error;
+            }));
+
+          return match(entry?.isFile())
+            .with(true, () => instructionQueryLoadFile(path, issues))
+            .otherwise(() => instructionNext());
         })
-        .exhaustive())
-      .exhaustive();
-  } catch (error) {
-    match(isOptional && instructionQueryLoadMissing(error))
-      .with(true, () => undefined)
-      .with(false, () => diagnostics.push({ path, message: INSTRUCTION.message }))
-      .exhaustive();
-    return [];
+        .otherwise(() => {
+          match(isOptional)
+            .with(true, () => undefined)
+            .with(false, () => issues.push({ path: directory, message: INSTRUCTION.message }))
+            .exhaustive();
+          return [];
+        });
+    }
   }
-}
 
-async function instructionQueryLoadDirectory(
-  directory: string,
-  isOptional: boolean,
-  diagnostics: InstructionLoadResult['diagnostics'],
-): Promise<InstructionLoadResult['files']> {
-  const names = INSTRUCTION.names.values();
-  return next();
-
-  async function next(): Promise<InstructionLoadResult['files']> {
-    return match(names.next().value)
-      .with(P.string, async (name) => {
-        const path = join(directory, name);
-
-        const entry = await stat(path).catch((error: unknown) => match(error)
-          .with({ code: 'ENOENT' }, () => undefined)
-          .otherwise(() => {
-            throw error;
-          }));
-
-        return match(entry?.isFile())
-          .with(true, () => instructionQueryLoadFile(path, diagnostics))
-          .otherwise(() => next());
-      })
-      .otherwise(() => {
-        match(isOptional)
-          .with(true, () => undefined)
-          .with(false, () => diagnostics.push({ path: directory, message: INSTRUCTION.message }))
-          .exhaustive();
-        return [];
-      });
+  async function instructionQueryLoadFile(
+    path: string,
+    issues: InstructionLoadResult['diagnostics'],
+  ): Promise<InstructionLoadResult['files']> {
+    try {
+      const canonical = await realpath(path);
+      return [{
+        path: canonical,
+        content: await readFile(canonical, 'utf8'),
+      }];
+    } catch {
+      issues.push({ path, message: INSTRUCTION.message });
+      return [];
+    }
   }
-}
 
-async function instructionQueryLoadFile(
-  path: string,
-  diagnostics: InstructionLoadResult['diagnostics'],
-): Promise<InstructionLoadResult['files']> {
-  try {
-    const canonical = await realpath(path);
-    return [{
-      path: canonical,
-      content: await readFile(canonical, 'utf8'),
-    }];
-  } catch {
-    diagnostics.push({ path, message: INSTRUCTION.message });
-    return [];
+  function instructionQueryLoadResolve(path: string) {
+    return resolve(root, match(path)
+      .with('~', () => homedir())
+      .when((value) => value.startsWith('~/'), (value) => join(homedir(), value.slice(2)))
+      .otherwise((value) => value));
   }
-}
-
-function instructionQueryLoadResolve(root: string, path: string) {
-  return resolve(root, match(path)
-    .with('~', () => homedir())
-    .when((value) => value.startsWith('~/'), (value) => join(homedir(), value.slice(2)))
-    .otherwise((value) => value));
-}
-
-function instructionQueryLoadMissing(error: unknown) {
-  return match(error)
-    .with({ code: 'ENOENT' }, () => true)
-    .otherwise(() => false);
 }

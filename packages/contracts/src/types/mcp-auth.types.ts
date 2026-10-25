@@ -7,7 +7,6 @@ export const mcpAuthTarget = z.object({
 
 export const mcpAuthStart = mcpAuthTarget.extend({
   redirectUrl: z.string().trim().min(1).max(4096),
-  /** Where the callback page sends the browser after login: an app link that closes a native login sheet, or a page on the redirect URL's origin. */
   returnUrl: z.string().trim().max(4096).optional(),
 });
 

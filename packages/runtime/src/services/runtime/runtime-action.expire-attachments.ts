@@ -1,15 +1,14 @@
 import { runtimeAttachments } from './runtime-attachment.constants';
 import { runtimeAttachmentIsExpired } from './runtime-attachment.utils';
 import { runtimeQueryConversation } from './runtime-query.conversation';
-import type { RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeContextInput, RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
 
 export async function runtimeActionExpireAttachments(
   deps: RuntimeServiceDeps,
-  params: RuntimeConversationParams,
-  context: Context,
+  params: RuntimeConversationParams & RuntimeContextInput,
 ) {
-  const conversation = await runtimeQueryConversation(deps, params, context);
+  const { context } = params;
+  const conversation = await runtimeQueryConversation(deps, params);
 
   return conversation.commit(async (tx) => {
     const document = await tx.doc(runtimeAttachments, conversation.id);

@@ -9,13 +9,13 @@ import type { Context } from '@earendil-works/chord/context';
 export function makeRoutineService(deps: RoutineTypes.RoutineServiceDeps) {
   return {
     actions: {
-      create: (params: RoutineTypes.RoutineCreateParams, context: Context) => routineActionCreate(deps, params, context),
-      update: (params: RoutineTypes.RoutineUpdateParams, context: Context) => routineActionUpdate(deps, params, context),
-      run: (params: RoutineTypes.RoutineTargetParams, context: Context) => routineActionRun(deps, params, context),
-      remove: (params: RoutineTypes.RoutineTargetParams, context: Context) => routineActionRemove(deps, params, context),
+      create: (params: RoutineTypes.RoutineCreateParams, context: Context) => routineActionCreate(deps, { ...params, context }),
+      update: (params: RoutineTypes.RoutineUpdateParams, context: Context) => routineActionUpdate(deps, { ...params, context }),
+      run: (params: RoutineTypes.RoutineTargetParams, context: Context) => routineActionRun(deps, { ...params, context }),
+      remove: (params: RoutineTypes.RoutineTargetParams, context: Context) => routineActionRemove(deps, { ...params, context }),
     },
     queries: {
-      list: (params: RoutineTypes.RoutineConversationParams, context: Context) => routineQueryList(deps, params, context),
+      list: (params: RoutineTypes.RoutineConversationParams, context: Context) => routineQueryList(deps, { ...params, context }),
     },
   };
 }

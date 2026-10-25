@@ -11,10 +11,10 @@ import {
   botToolSwapModelsParameters,
   botToolUpdate,
   botToolUpdateParameters,
-} from '../../types/runtime-bot-tools.types';
+} from '../../types/bot-tool.types';
 import { runtimeQueryModels } from './runtime-query.models';
+import { runtimeToolOutput } from './runtime-tool.utils';
 import type { RuntimeBotToolsDeps } from '../../types/runtime-bot-tools.types';
-import type { Bot, BotCatalog, BotSwapModelsResult } from '@repo/contracts/universal';
 
 export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
   const get = defineTool({
@@ -24,7 +24,7 @@ export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
     replay: 'safe',
     execute: async (params) => {
       const input = botToolGet.parse(params);
-      return runtimeBotToolsOutput(await deps.bots.queries.get(input));
+      return runtimeToolOutput(await deps.bots.queries.get(input));
     },
   });
 
@@ -35,7 +35,7 @@ export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
     replay: 'unsafe',
     execute: async (params) => {
       const input = botCreate.parse(botToolCreate.parse(params));
-      return runtimeBotToolsOutput(await deps.bots.actions.create(input));
+      return runtimeToolOutput(await deps.bots.actions.create(input));
     },
   });
 
@@ -46,7 +46,7 @@ export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
     replay: 'unsafe',
     execute: async (params) => {
       const input = botToolUpdate.parse(params);
-      return runtimeBotToolsOutput(await deps.bots.actions.update(input));
+      return runtimeToolOutput(await deps.bots.actions.update(input));
     },
   });
 
@@ -57,7 +57,7 @@ export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
     replay: 'unsafe',
     execute: async (params) => {
       const input = botToolSwapModels.parse(params);
-      return runtimeBotToolsOutput(await deps.bots.actions.swapModels(input));
+      return runtimeToolOutput(await deps.bots.actions.swapModels(input));
     },
   });
 
@@ -68,7 +68,7 @@ export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
     replay: 'safe',
     execute: async (params) => {
       const input = botToolGet.parse(params);
-      return runtimeBotToolsOutput(await deps.bots.queries.catalog(input));
+      return runtimeToolOutput(await deps.bots.queries.catalog(input));
     },
   });
 
@@ -77,7 +77,7 @@ export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
     description: m.ui_tool_bot_model_list_description(),
     parameters: Type.Object({}, { additionalProperties: false }),
     replay: 'safe',
-    execute: async () => runtimeBotToolsOutput(await runtimeQueryModels(deps)),
+    execute: async () => runtimeToolOutput(await runtimeQueryModels(deps)),
   });
 
   return {
@@ -87,8 +87,4 @@ export function runtimeBotToolsExtension(deps: RuntimeBotToolsDeps) {
     }),
     readOnlyTools: [get, catalog, models],
   };
-}
-
-function runtimeBotToolsOutput(value: Bot | BotCatalog | BotSwapModelsResult | Awaited<ReturnType<typeof runtimeQueryModels>>) {
-  return { output: [{ type: 'text' as const, text: JSON.stringify(value) }] };
 }

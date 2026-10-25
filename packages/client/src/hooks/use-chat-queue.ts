@@ -3,7 +3,6 @@ import { useMutation } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
 import type { ChatQueueParams } from '../types/chat.types';
 
-/** Queued inputs: send one now in place of the running reply, or remove one before the bot reads it. */
 export function useChatQueue({ botId, conversationId, onOutgoingChange }: ChatQueueParams) {
   const { rpc } = useRpc();
   const interrupt = useMutation(rpc.conversation.updateSubmission.mutationOptions());

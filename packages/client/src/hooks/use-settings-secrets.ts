@@ -4,7 +4,6 @@ import { SETTINGS } from '../services/settings/settings.constants';
 import { useRpc } from './use-rpc';
 import type { SecretMode } from '@repo/contracts/universal';
 
-/** Stored secret names and hosts, never values, and how bash commands get them. */
 export function useSettingsSecrets() {
   const queryClient = useQueryClient();
   const { rpc } = useRpc();

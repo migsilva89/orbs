@@ -2,16 +2,15 @@ import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeAttachments } from './runtime-attachment.constants';
 import { runtimeQueryConversation } from './runtime-query.conversation';
-import type { RuntimeAttachmentsQueryParams } from '../../types/attachment.types';
-import type { RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeAttachmentsQueryParams } from '../../types/runtime-attachment.types';
+import type { RuntimeContextInput, RuntimeServiceDeps } from '../../types/runtime.types';
 
 export async function runtimeQueryAttachments(
   deps: RuntimeServiceDeps,
-  params: RuntimeAttachmentsQueryParams,
-  context: Context,
+  params: RuntimeAttachmentsQueryParams & RuntimeContextInput,
 ) {
-  const conversation = await runtimeQueryConversation(deps, params, context);
+  const { context } = params;
+  const conversation = await runtimeQueryConversation(deps, params);
 
   const files = Object.values((await deps.harness.snapshot(runtimeAttachments, conversation.id, context))?.files ?? {})
     .sort((left, right) => right.createdAt - left.createdAt || right.id.localeCompare(left.id));

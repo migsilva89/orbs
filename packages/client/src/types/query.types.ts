@@ -1,8 +1,7 @@
 import type { QueryKey } from '@tanstack/react-query';
 
-/** What a mutation shows and refreshes; each app's query client handles it once instead of every hook. */
 export interface QueryMutationMeta {
-  [key: string]: unknown;
+  [key: string]: string | QueryKey[] | undefined;
   error?: string;
   success?: string;
   invalidates?: QueryKey[];

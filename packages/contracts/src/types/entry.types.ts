@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-/** Entry kinds a client renders. Pi writes the `pi.*` kinds; the host writes peer and subagent entries. */
 export const ENTRY = {
   user: 'pi.user',
   assistant: 'pi.assistant',
@@ -16,7 +15,6 @@ export const entryPeerMessage = z.object({
   fromBotId: z.uuid(),
   toBotId: z.uuid(),
   deliveryId: z.number().int().positive(),
-  /** How many bots this request has passed through, starting at 1 for the first peer message. Messages saved before hops were counted have none. */
   hops: z.number().int().positive().optional(),
 });
 

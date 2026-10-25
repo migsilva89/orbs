@@ -15,7 +15,6 @@ export interface McpEntry {
   name: string;
   source: string;
   config: z.infer<typeof mcpServer>;
-  /** Read from the bot's own folder, which the bot can write. Such servers never get stored OAuth tokens. */
   isBotLocal: boolean;
   sourceFingerprint?: string;
 }
@@ -35,7 +34,6 @@ export interface McpConnection {
   ready: Promise<void>;
   hasToolChanges: boolean;
   error?: string;
-  /** The server answered 401 and no stored token could fix it. */
   needsLogin?: boolean;
 }
 

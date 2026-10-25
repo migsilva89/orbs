@@ -1,16 +1,11 @@
 import { GenerationTask, InboxDoc, LiveDoc } from '@earendil-works/pi-durable';
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
-import type { RuntimeServiceDeps } from '../../types/runtime.types';
-import type { JsonValue } from '@earendil-works/chord';
-import type { Context } from '@earendil-works/chord/context';
-import type * as PiDurableTypes from '@earendil-works/pi-durable';
+import type { RuntimeRetryParams, RuntimeServiceDeps } from '../../types/runtime.types';
 
 export async function runtimeActionRetry(
   { harness }: RuntimeServiceDeps,
-  conversationId: PiDurableTypes.ConversationId,
-  taskId: PiDurableTypes.TaskId<JsonValue>,
-  context: Context,
+  { conversationId, taskId, context }: RuntimeRetryParams,
 ) {
   await harness.commit(async (tx) => {
     const tasks = await tx.scanTasks({
@@ -29,14 +24,13 @@ export async function runtimeActionRetry(
         throw new Errors.CONFLICT();
       });
 
-    match(live.run !== undefined || inbox.items.some((item) => item.mode === 'write' && 'head' in item.entry))
+    match(live.run !== undefined || inbox.items.some((item) => item.mode === 'write' && Object.hasOwn(item.entry, 'head')))
       .with(true, () => {
         throw new Errors.CONFLICT();
       })
       .with(false, () => undefined)
       .exhaustive();
 
-    // Pi has no retry action. Start its native generation against saved context, without duplicating input.
     live.run = {
       taskId: await tx.createTask(GenerationTask, {}, { conversationId, ownership: { kind: 'conversation' } }),
       inputs: [],

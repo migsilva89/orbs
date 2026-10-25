@@ -3,7 +3,6 @@ import type * as ToolTypes from './tool.types';
 import type * as UniversalTypes from '@repo/contracts/universal';
 import type { UIMessage } from 'ai';
 
-/** How the owner answers a tool approval; `always` also approves the tool for this bot from now on. */
 export type ChatApprovalDecision = 'approve' | 'always' | 'deny';
 
 export type ChatActivity = 'idle' | 'queued' | 'thinking' | 'working' | 'writing' | 'compacting' | 'failed';
@@ -104,7 +103,6 @@ export interface ChatReactionsParams {
   botId: string;
   conversationId: number;
   entryIds: number[];
-  /** The view's `interactionsRevision`; a change refetches reactions other devices or bots added. */
   revision?: number;
 }
 
@@ -120,7 +118,6 @@ export interface ChatAnswerProblemParams {
 }
 
 export interface ChatQueueParams extends Required<UniversalTypes.ConversationTarget> {
-  /** Drops a removed message's optimistic bubble; it never reaches the transcript to settle it. */
   onOutgoingChange: ChatSendParams['onOutgoingChange'];
 }
 
@@ -128,14 +125,11 @@ export interface ChatSendParams {
   botId: string;
   conversationId: number;
   latestEntryId: number;
-  /** Adds and settles the optimistic outgoing messages the transcript shows until the server echoes them. */
   onOutgoingChange: (change: (items: ChatOutgoing[]) => ChatOutgoing[]) => void;
-  /** Clears the platform's input once a confirmed `/reset` succeeds; the draft stays while its confirmation is open. */
   onResetDone: () => void;
 }
 
 export interface ChatSendInput {
-  /** Composer text with mentions as markdown links, as `mentionSubmission` expects. */
   text: string;
   attachmentIds: string[];
   replyToEntryId?: number;
@@ -184,7 +178,6 @@ export interface ChatFileTypeParams {
   mediaType?: string;
 }
 
-/** A file chosen in a native picker, read later from its local uri. */
 export interface ChatPicked {
   uri: string;
   name: string;
@@ -194,6 +187,5 @@ export interface ChatPicked {
 
 export interface ChatAttachmentsPlatformParams {
   botId: string;
-  /** Shows why a file was refused or failed to upload. */
   onProblem: (message: string) => void;
 }

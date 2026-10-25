@@ -3,7 +3,7 @@ import { artifactCreate, artifactGet, artifactUpdateFields } from '@repo/contrac
 import { z } from 'zod';
 import type { ArtifactService } from '../services/artifact/artifact.service';
 
-export interface RuntimeArtifactToolsDeps {
+export interface ArtifactToolDeps {
   artifacts: ArtifactService;
 }
 

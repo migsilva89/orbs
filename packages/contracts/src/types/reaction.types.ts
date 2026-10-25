@@ -1,11 +1,9 @@
 import { z } from 'zod';
-import { conversationTarget } from './conversation.types';
 
 export const REACTION = {
   docKind: 'bots.entry-reaction',
   entryKind: 'bots.reaction-message',
   toolName: 'bot_react',
-  /** The owner can take a reaction back this long before the bot hears about it. */
   deliverMs: 2000,
   maxPerEntry: 20,
   maxEmoji: 64,
@@ -19,33 +17,3 @@ export const reactionEmoji = z.string().min(1).max(REACTION.maxEmoji).refine((va
 
   return graphemes.length === 1 && reactionEmojiPattern.test(value);
 });
-
-export const conversationSetReaction = conversationTarget.extend({
-  entryId: z.number().int().positive(),
-  emoji: reactionEmoji,
-  isPresent: z.boolean(),
-});
-
-export const conversationBotReaction = z.object({
-  botId: z.uuid(),
-  emojis: z.array(reactionEmoji).max(REACTION.maxPerEntry),
-});
-
-export const conversationReaction = z.object({
-  entryId: z.number().int().positive(),
-  emojis: z.array(reactionEmoji).max(REACTION.maxPerEntry),
-  botReactions: z.array(conversationBotReaction),
-});
-
-export const conversationSetReactionResult = conversationReaction;
-
-export const conversationReactions = conversationTarget.extend({
-  entryIds: z.array(z.number().int().positive()).max(100).refine((ids) => new Set(ids).size === ids.length),
-});
-
-export const conversationReactionsResult = z.array(conversationReaction);
-
-export type ConversationSetReactionInput = z.infer<typeof conversationSetReaction>;
-export type ConversationReactionsInput = z.infer<typeof conversationReactions>;
-export type ConversationBotReaction = z.infer<typeof conversationBotReaction>;
-export type ConversationReaction = z.infer<typeof conversationReaction>;

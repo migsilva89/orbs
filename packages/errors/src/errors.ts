@@ -1,36 +1,13 @@
 import { ORPCError } from '@orpc/client';
-import { z } from 'zod';
+import { errorsCauseMessageSchema } from './types/errors.types';
+import type * as ErrorsTypes from './types/errors.types';
 
-export interface AppErrorSchema {
-  message: string;
-  status?: number;
-  data?: z.ZodType<object>;
-  internal?: string;
-  reportable?: boolean;
-}
-
-type InferSchemaData<S extends AppErrorSchema> = S extends { data: z.ZodType<infer D> } ? D : Record<string, never>;
-
-interface ThrowOptions {
-  internal?: string;
-  cause?: unknown;
-}
-
-export interface AppError<TCode extends string = string, TData = unknown> {
-  readonly code: TCode;
-  readonly message: string;
-  readonly data: TData;
+abstract class BaseAppError<TCode extends string, TData> extends ORPCError<TCode, TData> implements ErrorsTypes.ErrorsInstance<TCode, TData> {
   readonly reportable: boolean;
   readonly internal: string;
-  readonly cause?: unknown;
-}
+  override readonly cause?: ErrorsTypes.ErrorsCause;
 
-abstract class BaseAppError<TCode extends string, TData> extends ORPCError<TCode, TData> implements AppError<TCode, TData> {
-  readonly reportable: boolean;
-  readonly internal: string;
-  override readonly cause?: unknown;
-
-  constructor(code: TCode, schema: AppErrorSchema, data: TData, options: ThrowOptions) {
+  constructor(code: TCode, schema: ErrorsTypes.ErrorsDefinition, data: TData, options: ErrorsTypes.ErrorsThrowOptions) {
     super(code, {
       message: schema.message,
       data,
@@ -45,7 +22,7 @@ abstract class BaseAppError<TCode extends string, TData> extends ORPCError<TCode
   }
 }
 
-function extractCauseMessage(cause: unknown): string | null {
+function extractCauseMessage(cause: ErrorsTypes.ErrorsCause): string | null {
   if (!cause) {
     return null;
   }
@@ -54,7 +31,7 @@ function extractCauseMessage(cause: unknown): string | null {
     return cause.message;
   }
 
-  const message = z.string().safeParse(cause);
+  const message = errorsCauseMessageSchema.safeParse(cause);
 
   if (message.success) {
     return message.data;
@@ -63,20 +40,19 @@ function extractCauseMessage(cause: unknown): string | null {
   return null;
 }
 
-function buildInternalMessage(baseMessage: string, cause: unknown): string {
+function buildInternalMessage(baseMessage: string, cause: ErrorsTypes.ErrorsCause): string {
   const causeMessage = extractCauseMessage(cause);
   return causeMessage ? `${baseMessage}: ${causeMessage}` : baseMessage;
 }
 
-function defineError<K extends string, S extends AppErrorSchema>(code: K, schema: S) {
-  type Data = InferSchemaData<S>;
-  return class extends BaseAppError<K, Data> {
+function defineError<K extends string, S extends ErrorsTypes.ErrorsDefinition>(code: K, schema: S) {
+  return class extends BaseAppError<K, ErrorsTypes.ErrorsSchemaData<S>> {
     constructor(input?: object) {
-      // SAFETY: the public generated constructor type permits only schema data fields plus ThrowOptions.
-      const { internal, cause, ...data } = (input ?? {}) as ThrowOptions & Record<string, unknown>;
+      // SAFETY: the public generated constructor type permits only schema data fields plus ErrorsThrowOptions.
+      const { internal, cause, ...data } = (input ?? {}) as ErrorsTypes.ErrorsThrowOptions & ErrorsTypes.ErrorsSchemaData<S>;
 
-      // SAFETY: removing every ThrowOptions key leaves exactly the schema-derived Data payload.
-      super(code, schema, data as Data, {
+      // SAFETY: removing every ErrorsThrowOptions key leaves exactly the schema-derived ErrorsSchemaData payload.
+      super(code, schema, data as ErrorsTypes.ErrorsSchemaData<S>, {
         internal,
         cause,
       });
@@ -84,13 +60,9 @@ function defineError<K extends string, S extends AppErrorSchema>(code: K, schema
   };
 }
 
-type ErrorClass<K extends string, S extends AppErrorSchema> = new (
-  input?: S extends { data: z.ZodType } ? InferSchemaData<S> & ThrowOptions : ThrowOptions | undefined,
-) => ORPCError<K, InferSchemaData<S>> & AppError<K, InferSchemaData<S>>;
-
-export function createErrors<T extends Record<string, AppErrorSchema>>(schemas: T) {
-  // SAFETY: the loop below assigns one generated ErrorClass for every own key of schemas before this object escapes.
-  const errors = {} as { [K in keyof T]: ErrorClass<K & string, T[K]> };
+export function createErrors<T extends Record<string, ErrorsTypes.ErrorsDefinition>>(schemas: T) {
+  // SAFETY: the loop below assigns one generated ErrorsClass for every own key of schemas before this object escapes.
+  const errors = {} as { [K in keyof T]: ErrorsTypes.ErrorsClass<K & string, T[K]> };
 
   for (const code in schemas) {
     if (Object.hasOwn(schemas, code)) {
@@ -102,7 +74,7 @@ export function createErrors<T extends Record<string, AppErrorSchema>>(schemas: 
   return errors;
 }
 
-export function createErrorStatusMap<T extends Record<string, AppErrorSchema>>(schemas: T) {
+export function createErrorStatusMap<T extends Record<string, ErrorsTypes.ErrorsDefinition>>(schemas: T) {
   const statusMap: Partial<Record<keyof T, number>> = {};
 
   for (const code in schemas) {
@@ -116,6 +88,6 @@ export function createErrorStatusMap<T extends Record<string, AppErrorSchema>>(s
   return statusMap;
 }
 
-export function isBaseAppError(error: unknown): error is AppError {
+export function isBaseAppError(error: unknown): error is ErrorsTypes.ErrorsInstance {
   return error instanceof BaseAppError;
 }

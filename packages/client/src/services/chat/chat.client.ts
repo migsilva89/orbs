@@ -8,81 +8,81 @@ import type { ChatHistoryParams } from '../../types/chat.types';
 import type { RpcContextValue } from '../../types/rpc.types';
 import type * as UniversalTypes from '@repo/contracts/universal';
 
-export function chatViewOptions({ client, rpc }: RpcContextValue, target: UniversalTypes.ConversationTarget) {
-  return queryOptions({
-    queryKey: rpc.conversation.watch.queryKey({ input: target }),
-    queryFn: streamedQuery({
-      streamFn: ({ signal }) => watchConversation(client, target, signal),
-      refetchMode: 'append',
-      reducer: (_view: UniversalTypes.ConversationView | null, next: UniversalTypes.ConversationView) => next,
-      initialValue: null,
-    }),
-    staleTime: 0,
-  });
-}
+export const chatQueries = {
+  view({ client, rpc }: RpcContextValue, target: UniversalTypes.ConversationTarget) {
+    return queryOptions({
+      queryKey: rpc.conversation.watch.queryKey({ input: target }),
+      queryFn: streamedQuery({
+        streamFn: ({ signal }) => watchConversation(client, target, signal),
+        refetchMode: 'append',
+        reducer: (_view: UniversalTypes.ConversationView | null, next: UniversalTypes.ConversationView) => next,
+        initialValue: null,
+      }),
+      staleTime: 0,
+    });
+  },
 
-/** The live chat list; each frame also refreshes the cached sidebar sections the chats are grouped in. */
-export function chatListOptions({ client, rpc }: RpcContextValue) {
-  return queryOptions({
-    queryKey: rpc.conversation.list.queryKey(),
-    queryFn: streamedQuery({
-      async *streamFn({ client: queryClient, signal }) {
-        for await (const { conversations, sections } of watchConversations(client, signal)) {
-          queryClient.setQueryData(rpc.sidebarSections.list.queryKey(), sections);
-          yield conversations;
-        }
-      },
-      refetchMode: 'append',
-      reducer: (_chats: UniversalTypes.ConversationListItem[], next: UniversalTypes.ConversationListItem[]) => next,
-      initialValue: [],
-    }),
-  });
-}
+  list({ client, rpc }: RpcContextValue) {
+    return queryOptions({
+      queryKey: rpc.conversation.list.queryKey(),
+      queryFn: streamedQuery({
+        async *streamFn({ client: queryClient, signal }) {
+          for await (const { conversations, sections } of watchConversations(client, signal)) {
+            queryClient.setQueryData(rpc.sidebarSections.list.queryKey(), sections);
+            yield conversations;
+          }
+        },
+        refetchMode: 'append',
+        reducer: (_chats: UniversalTypes.ConversationListItem[], next: UniversalTypes.ConversationListItem[]) => next,
+        initialValue: [],
+      }),
+    });
+  },
 
-/** The first conversation frame as a one-shot read, for server rendering before the live watch takes over. */
-export function chatInitialViewOptions(rpcs: RpcContextValue, target: UniversalTypes.ConversationTarget) {
-  return queryOptions({
-    ...chatViewOptions(rpcs, target),
-    queryFn: ({ signal }) => readConversation(rpcs.client, target, signal),
-  });
-}
+  initialView(rpcs: RpcContextValue, target: UniversalTypes.ConversationTarget) {
+    return queryOptions({
+      ...chatQueries.view(rpcs, target),
+      queryFn: ({ signal }) => readConversation(rpcs.client, target, signal),
+    });
+  },
 
-export function chatNotificationsOptions({ client, rpc }: RpcContextValue) {
-  return queryOptions({
-    queryKey: rpc.conversation.watchNotifications.queryKey(),
-    queryFn: streamedQuery({
-      streamFn: ({ signal }) => watchNotifications(client, signal),
-      refetchMode: 'append',
-      reducer: (_state: UniversalTypes.NotificationState | null, next: UniversalTypes.NotificationState) => next,
-      initialValue: null,
-    }),
-    staleTime: 0,
-  });
-}
+  notifications({ client, rpc }: RpcContextValue) {
+    return queryOptions({
+      queryKey: rpc.conversation.watchNotifications.queryKey(),
+      queryFn: streamedQuery({
+        streamFn: ({ signal }) => watchNotifications(client, signal),
+        refetchMode: 'append',
+        reducer: (_state: UniversalTypes.NotificationState | null, next: UniversalTypes.NotificationState) => next,
+        initialValue: null,
+      }),
+      staleTime: 0,
+    });
+  },
 
-export function chatHistoryOptions({ rpc }: RpcContextValue, { botId, conversationId, cursor }: ChatHistoryParams) {
-  return rpc.conversation.history.infiniteOptions({
-    input: (pageCursor: ChatHistoryParams['cursor']) => ({
-      botId,
-      conversationId,
-      cursor: pageCursor,
-      limit: CHAT.historyPageSize,
-    }),
-    initialPageParam: cursor,
-    getNextPageParam: (page) => page.next,
-    enabled: false,
-  });
-}
+  history({ rpc }: RpcContextValue, { botId, conversationId, cursor }: ChatHistoryParams) {
+    return rpc.conversation.history.infiniteOptions({
+      input: (pageCursor: ChatHistoryParams['cursor']) => ({
+        botId,
+        conversationId,
+        cursor: pageCursor,
+        limit: CHAT.historyPageSize,
+      }),
+      initialPageParam: cursor,
+      getNextPageParam: (page) => page.next,
+      enabled: false,
+    });
+  },
 
-export function chatContextsWatchOptions({ client, rpc }: RpcContextValue, target: UniversalTypes.ConversationTarget) {
-  return queryOptions({
-    queryKey: rpc.conversation.watchContexts.queryKey({ input: target }),
-    queryFn: streamedQuery({
-      streamFn: ({ signal }) => watchConversationContexts(client, target, signal),
-      refetchMode: 'append',
-      reducer: (_state: UniversalTypes.ConversationContextWatchState | null, next: UniversalTypes.ConversationContextWatchState) => next,
-      initialValue: null,
-    }),
-    staleTime: 0,
-  });
-}
+  contextsWatch({ client, rpc }: RpcContextValue, target: UniversalTypes.ConversationTarget) {
+    return queryOptions({
+      queryKey: rpc.conversation.watchContexts.queryKey({ input: target }),
+      queryFn: streamedQuery({
+        streamFn: ({ signal }) => watchConversationContexts(client, target, signal),
+        refetchMode: 'append',
+        reducer: (_state: UniversalTypes.ConversationContextWatchState | null, next: UniversalTypes.ConversationContextWatchState) => next,
+        initialValue: null,
+      }),
+      staleTime: 0,
+    });
+  },
+};

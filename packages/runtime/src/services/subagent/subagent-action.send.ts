@@ -2,15 +2,9 @@ import { match, P } from 'ts-pattern';
 import { subagentReporter } from './subagent-reporter.task';
 import { SUBAGENT, subagentAgents, subagentCall } from './subagent.constants';
 import { subagentDetails, subagentPendingReporters, subagentReply } from './subagent.utils';
-import type { SubagentMessageParams, SubagentReporterInput } from '../../types/subagent.types';
-import type { Context } from '@earendil-works/chord/context';
-import type { ToolExecutionApi } from '@earendil-works/pi-durable';
+import type { SubagentMessageParams, SubagentReporterInput, SubagentToolParams } from '../../types/subagent.types';
 
-export async function subagentActionSend(
-  api: ToolExecutionApi,
-  params: SubagentMessageParams,
-  context: Context,
-) {
+export async function subagentActionSend({ api, context, ...params }: SubagentMessageParams & SubagentToolParams) {
   const { maxBackgroundAgents } = SUBAGENT;
 
   const result = await api.commit(async (tx) => {

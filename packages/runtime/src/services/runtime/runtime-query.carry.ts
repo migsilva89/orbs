@@ -1,15 +1,15 @@
 import { match, P } from 'ts-pattern';
 import { runtimeCarry } from '../../types/runtime.types';
-import { artifactContent, artifactContentKey, artifactDocument } from '../artifact/artifact.constants';
+import { artifactContent, artifactDocument } from '../artifact/artifact.constants';
+import { artifactContentKey } from '../artifact/artifact.utils';
 import { routineDocument } from '../routine/routine.constants';
 import { todoDocument } from '../todo/todo.constants';
 import { runtimeQueryConversation } from './runtime-query.conversation';
 import type { RuntimeCarry, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 
-/** Read what a history clear keeps from the bot's main chat before its store is deleted. */
 export async function runtimeQueryCarry(deps: RuntimeServiceDeps, context: Context): Promise<RuntimeCarry> {
-  const { id } = await runtimeQueryConversation(deps, { botId: deps.botId }, context);
+  const { id } = await runtimeQueryConversation(deps, { botId: deps.botId, context });
   const routines = await deps.harness.snapshot(routineDocument, id, context);
   const artifacts = await deps.harness.snapshot(artifactDocument, id, context);
   const todos = await deps.harness.snapshot(todoDocument, id, context);

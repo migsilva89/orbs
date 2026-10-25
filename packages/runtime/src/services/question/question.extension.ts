@@ -24,7 +24,11 @@ const ask = defineTool({
     isMultiSelect: Type.Optional(Type.Boolean({ description: 'Let the owner pick more than one choice.' })),
   }),
   replay: 'safe',
-  execute: (params, api, context) => questionActionAsk(params, api, context),
+  execute: (input, api, context) => questionActionAsk({
+    input,
+    api,
+    context,
+  }),
 });
 
 const askSecret = defineTool({
@@ -35,7 +39,11 @@ const askSecret = defineTool({
     hosts: Type.Array(Type.String(), { description: m.ui_tool_bot_secret_hosts_description() }),
   }),
   replay: 'safe',
-  execute: ({ name, hosts }, api, context) => questionActionAsk({ text: m.ui_tool_bot_secret_question({ name }), secret: { name, hosts } }, api, context),
+  execute: ({ name, hosts }, api, context) => questionActionAsk({
+    input: { text: m.ui_tool_bot_secret_question({ name }), secret: { name, hosts } },
+    api,
+    context,
+  }),
 });
 
 export function questionExtension() {

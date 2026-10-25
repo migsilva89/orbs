@@ -1,6 +1,7 @@
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
-import { mcpAuthExchange, mcpAuthPrune, mcpAuthServerUrl } from './mcp-auth.utils';
+import { mcpAuthCallbackExchange } from './mcp-auth-callback.utils';
+import { mcpAuthPrune, mcpAuthServerUrl } from './mcp-auth.utils';
 import type * as McpAuthTypes from '../../types/mcp-auth.types';
 
 export async function mcpAuthActionComplete(
@@ -17,5 +18,5 @@ export async function mcpAuthActionComplete(
     .with({ deviceId: P.not(params.deviceId) }, () => {
       throw new Errors.FORBIDDEN();
     })
-    .otherwise((session) => mcpAuthExchange(deps, url, session, params.callbackUrl));
+    .otherwise((session) => mcpAuthCallbackExchange(deps, url, session, params.callbackUrl));
 }

@@ -1,7 +1,7 @@
 import { useKeyboardChatComposerInset } from '@legendapp/list/keyboard';
 import { botBubble, CHAT, roomsMessageText, roomsReactionGroups, roomsTimeLabel } from '@repo/client/client';
 import { useChatUnread } from '@repo/client/native';
-import { chatViewOptions, useChatPendingSync, useChatReaction, useChatRoom } from '@repo/client/react';
+import { chatQueries, useChatPendingSync, useChatReaction, useChatRoom } from '@repo/client/react';
 import { getLocale, m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -63,7 +63,7 @@ interface ChatRoomContentProps {
 
 function ChatRoomContent({ session, botId, focusEntryId, replyToEntryId, quote, prefill }: ChatRoomContentProps) {
   const bots = useQuery(session.rpc.bots.list.queryOptions());
-  const view = useQuery(chatViewOptions(session, { botId }));
+  const view = useQuery(chatQueries.view(session, { botId }));
   const bot = bots.data?.find((item) => item.id === botId);
 
   return (

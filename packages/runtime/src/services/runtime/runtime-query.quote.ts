@@ -2,20 +2,18 @@ import { AssistantEntry, UserEntry } from '@earendil-works/pi-durable';
 import { ATTACHMENT, attachmentMessage, REPLY, replyMessage } from '@repo/contracts/universal';
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
-import type { RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
-import type { ConversationId, EntryId } from '@earendil-works/pi-durable';
-import type { MessageQuote } from '@repo/contracts/universal';
+import type { RuntimeQuoteParams, RuntimeServiceDeps } from '../../types/runtime.types';
+import type { EntryId } from '@earendil-works/pi-durable';
+import type { ReplyQuote } from '@repo/contracts/universal';
 
 export async function runtimeQueryQuote(
   { harness }: RuntimeServiceDeps,
-  conversationId: ConversationId,
-  entryId: number | null | undefined,
-  context: Context,
-): Promise<MessageQuote | undefined> {
+  { conversationId, entryId, context }: RuntimeQuoteParams,
+): Promise<ReplyQuote | undefined> {
   return match(entryId)
     .with(P.nullish, () => undefined)
     .otherwise((id) => harness.commit(async (tx) => {
+      // SAFETY: an entry ID is only a lookup key; the match below rejects entries outside this conversation.
       const entry = match(await tx.entry(id as EntryId))
         .with({ conversationId }, (value) => value)
         .otherwise(() => {

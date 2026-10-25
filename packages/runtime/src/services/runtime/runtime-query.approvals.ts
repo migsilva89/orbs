@@ -1,15 +1,13 @@
 import { match, P } from 'ts-pattern';
 import { runtimeQueryConversation } from './runtime-query.conversation';
 import { runtimeToolApproval } from './runtime.constants';
-import type { RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeContextInput, RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
 
 export async function runtimeQueryApprovals(
   deps: RuntimeServiceDeps,
-  params: RuntimeConversationParams,
-  context: Context,
+  { botId, context }: RuntimeConversationParams & RuntimeContextInput,
 ) {
-  await runtimeQueryConversation(deps, { botId: params.botId }, context);
+  await runtimeQueryConversation(deps, { botId, context });
   const graph = await deps.harness.taskGraph(context);
 
   try {
@@ -27,7 +25,7 @@ export async function runtimeQueryApprovals(
     return documents.flatMap(({ document, conversationId }) => (
       match(document?.approval)
         .with({
-          botId: params.botId,
+          botId,
           status: 'pending',
           expiresAt: P.number.gt(Date.now()),
         }, (approval) => [{ ...approval, conversationId }])

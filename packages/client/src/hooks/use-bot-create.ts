@@ -5,7 +5,6 @@ import { useRpc } from './use-rpc';
 import type { BotCreateParams } from '../types/bot.types';
 import type { BotForm } from '@repo/contracts/universal';
 
-/** Creates a bot from the shared bot form, filling an empty handle from the name, and refreshes the bot list before handing the bot to the app. */
 export function useBotCreate({ onCreated }: BotCreateParams) {
   const queryClient = useQueryClient();
   const { rpc } = useRpc();

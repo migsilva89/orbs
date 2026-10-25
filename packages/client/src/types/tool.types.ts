@@ -3,20 +3,18 @@ import type { ToolEvent } from './tool-event.types';
 import type { Bot, ToolCallArtifact, ToolCallSubagent } from '@repo/contracts/universal';
 import type { DynamicToolUIPart } from 'ai';
 
-/** A tool call in a message, for clients that do not depend on the AI SDK. */
-export type ToolPart = DynamicToolUIPart;
-
 export interface ToolSubagent extends ToolCallSubagent {
   conversationId?: number;
 }
 
-/** A bot this bot messaged, and the conversation the message landed in once known. */
 export interface ToolPeer {
   peer: Bot;
   conversationId: number | undefined;
 }
 
 type ToolMessagePart = ChatMessage['parts'][number];
+
+export type ToolPart = Extract<ToolMessagePart, { type: 'dynamic-tool' }>;
 
 export type ToolTextPart = Extract<ToolMessagePart, { type: 'text' }>;
 
@@ -63,7 +61,6 @@ export interface ToolIdentity {
 
 export interface ToolBlocksParams {
   parts: ChatMessage['parts'];
-  /** Drops thinking and tool calls, as the owner's hide-verbose setting asks; events stay. */
   hideVerbose?: boolean;
 }
 

@@ -29,7 +29,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         },
       };
     } catch (error) {
-      return match(connectionLostReason(error))
+      return match(error instanceof Error ? connectionLostReason(error) : null)
         .with(P.nonNullable, async (reason) => {
           await connectionForget();
           context.queryClient.clear();

@@ -1,19 +1,20 @@
 import { match } from 'ts-pattern';
 import { runtimeQueryConversation } from './runtime-query.conversation';
 import { runtimeToolApproval } from './runtime.constants';
-import type { RuntimeApprovalAnswer, RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeApprovalAnswer, RuntimeContextInput, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { TaskId } from '@earendil-works/pi-durable';
 
 export async function runtimeActionApprove(
   deps: RuntimeServiceDeps,
-  params: RuntimeApprovalAnswer,
-  context: Context,
+  params: RuntimeApprovalAnswer & RuntimeContextInput,
 ) {
-  await runtimeQueryConversation(deps, { botId: params.botId }, context);
+  const { context } = params;
+  await runtimeQueryConversation(deps, { botId: params.botId, context });
+  // SAFETY: an approval ID is only a lookup key; it is accepted only for a running tool task with this bot's pending approval.
+  const taskId = params.id as TaskId;
 
   return deps.harness.commit(async (tx) => {
-    const task = await tx.task(params.id as TaskId);
+    const task = await tx.task(taskId);
 
     return match(task)
       .with({
@@ -21,7 +22,7 @@ export async function runtimeActionApprove(
         abortRequested: false,
         state: { status: 'running' },
       }, async () => {
-        const doc = await tx.doc(runtimeToolApproval, params.id as TaskId);
+        const doc = await tx.doc(runtimeToolApproval, taskId);
         const now = Date.now();
 
         return match(doc.approval)

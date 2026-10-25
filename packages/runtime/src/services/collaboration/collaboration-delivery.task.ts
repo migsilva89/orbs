@@ -1,16 +1,10 @@
-import { ConversationBusy, defineTask } from '@earendil-works/pi-durable';
+import { defineTask } from '@earendil-works/pi-durable';
 import { match, P } from 'ts-pattern';
+import { collaborationActionDeliver } from './collaboration-action.deliver';
 import { COLLABORATION } from './collaboration.constants';
-import { collaborationAnswer, collaborationFailureNote, collaborationPeerNote } from './collaboration.utils';
+import { collaborationFailureNote } from './collaboration.utils';
 import type * as CollaborationTypes from '../../types/collaboration.types';
-import type { Context } from '@earendil-works/chord/context';
-import type { Harness } from '@earendil-works/pi-durable';
 
-/**
- * Lives in the sender's store and submits into the recipient's store. A rerun after a crash submits again with the
- * same request ID; Pi returns the admitted submission, so the recipient sees the message once. The request ID holds
- * the sender's store ID, so task IDs that restart after a history clear never repeat an old delivery.
- */
 export function collaborationDeliveryTask({ directory }: Pick<CollaborationTypes.CollaborationDeps, 'directory'>) {
   return defineTask<CollaborationTypes.CollaborationDeliveryInput, CollaborationTypes.CollaborationDeliveryState, CollaborationTypes.CollaborationResult>({
     name: COLLABORATION.delivery,
@@ -22,7 +16,11 @@ export function collaborationDeliveryTask({ directory }: Pick<CollaborationTypes
         const store = await directory.harness(input.recipientId).catch(() => null);
 
         const result = await match(store)
-          .with(P.nonNullable, (harness) => collaborationDeliver(harness, task.id, input, context))
+          .with(P.nonNullable, (harness) => collaborationActionDeliver({ harness }, {
+            taskId: task.id,
+            input,
+            context,
+          }))
           .otherwise(() => ({ status: 'unanswered' as const, reason: 'Recipient bot is unavailable.' }));
 
         await api.commit(() => match(input.mode)
@@ -66,51 +64,4 @@ export function collaborationDeliveryTask({ directory }: Pick<CollaborationTypes
     },
     abort: (_task, api, context) => api.commit(() => ({ status: 'terminal', outcome: { status: 'aborted' } }), context),
   });
-}
-
-async function collaborationDeliver(
-  harness: Harness,
-  taskId: number,
-  input: CollaborationTypes.CollaborationDeliveryInput,
-  context: Context,
-): Promise<CollaborationTypes.CollaborationResult> {
-  const recipient = await harness.conversation(input.recipientConversationId, context);
-  const whenBusy = match(input.mode).with('ask', () => 'reject' as const).with('send', () => 'followUp' as const).exhaustive();
-
-  return match(recipient)
-    .with(P.nonNullable, async (conversation): Promise<CollaborationTypes.CollaborationResult> => {
-      try {
-        const submission = await conversation.submit({
-          type: 'input',
-          content: `${collaborationPeerNote(input)}\n\n${input.message}`,
-          requestId: `bots.delivery:${input.requestId}`,
-          whenBusy,
-          entry: { kind: COLLABORATION.message,
-            data: {
-              fromBotId: input.senderId,
-              toBotId: input.recipientId,
-              deliveryId: taskId,
-              hops: input.hops,
-            } },
-        }, context);
-
-        const settled = await submission.wait(context);
-
-        return await match(settled)
-          .with({ status: 'done', type: 'input' }, async ({ answer }) => ({
-            status: 'answered' as const,
-            answerId: answer,
-            text: await harness.commit((tx) => collaborationAnswer(tx, answer), context),
-          }))
-          .with({ status: 'unanswered' }, ({ reason }) => ({ status: 'unanswered' as const, reason }))
-          .otherwise(() => ({ status: 'unanswered' as const, reason: 'No answer was produced.' }));
-      } catch (error) {
-        return match(error)
-          .with(P.instanceOf(ConversationBusy), () => ({ status: 'unanswered' as const, reason: 'Recipient is busy; use bot_message to queue work.' }))
-          .otherwise((cause) => {
-            throw cause;
-          });
-      }
-    })
-    .otherwise(() => ({ status: 'unanswered' as const, reason: 'Recipient conversation is unavailable.' }));
 }

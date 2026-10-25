@@ -6,7 +6,6 @@ export const SERVER_PROTOCOL = {
   serverIdHeader: 'x-bots-server-id',
 } as const;
 
-/** An HTTP or HTTPS origin another device can dial: no path, credentials or wildcard host. */
 export const serverOrigin = z.url({ protocol: /^https?$/ }).max(512).transform((value) => new URL(value)).refine((url) => {
   return !url.username && !url.password && !url.search && !url.hash && url.pathname === '/'
     && !['0.0.0.0', '[::]'].includes(url.hostname);
@@ -14,7 +13,6 @@ export const serverOrigin = z.url({ protocol: /^https?$/ }).max(512).transform((
 
 export const serverAddressKind = z.enum(['loopback', 'lan', 'tailscale', 'custom']);
 
-/** One way to reach a daemon. Clients try addresses in list order. */
 export const serverAddress = z.object({
   url: serverOrigin,
   kind: serverAddressKind,

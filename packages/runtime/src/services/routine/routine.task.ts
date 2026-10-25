@@ -1,7 +1,7 @@
 import { defineTask } from '@earendil-works/pi-durable';
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
-import { routineNextRunAt } from './routine-schedule.utils';
+import { routineScheduleNextRunAt } from './routine-schedule.utils';
 import { routineWait } from './routine-wait.utils';
 import { routineDocument } from './routine.constants';
 import type { RoutineTaskInput, RoutineTaskState } from '../../types/routine.types';
@@ -92,7 +92,7 @@ export const routineTask = defineTask<RoutineTaskInput, RoutineTaskState, null>(
                     routine.nextRunAt = null;
                   })
                   .otherwise(() => {
-                    routine.nextRunAt = routineNextRunAt(routine.schedule, finishedAt);
+                    routine.nextRunAt = routineScheduleNextRunAt(routine.schedule, finishedAt);
                   });
               })
               .with(false, () => undefined)

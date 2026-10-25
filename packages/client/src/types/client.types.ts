@@ -9,11 +9,10 @@ export interface ClientOptions {
   serverId?: string;
   connect: () => WebSocket | Promise<WebSocket>;
   token?: () => string | undefined | Promise<string | undefined>;
-  /** HTTP RPC base for file transfer; a function when the active address can change. */
   url?: string | (() => string);
 }
 
-export interface HttpClientOptions extends Pick<ClientOptions, 'serverId' | 'token'> {
+export interface ClientHttpOptions extends Pick<ClientOptions, 'serverId' | 'token'> {
   url: string;
   fetch?: RPCLinkOptions<ClientContext>['fetch'];
 }

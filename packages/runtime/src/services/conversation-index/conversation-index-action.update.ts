@@ -1,12 +1,10 @@
 import { match, P } from 'ts-pattern';
 import { conversationIndex } from './conversation-index.constants';
-import type { ConversationIndexServiceDeps, ConversationIndexUpdate } from '../../types/conversation-index.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { ConversationIndexServiceDeps, ConversationIndexUpdateParams } from '../../types/conversation-index.types';
 
 export function conversationIndexActionUpdate(
   { harness }: ConversationIndexServiceDeps,
-  messages: ConversationIndexUpdate[],
-  context: Context,
+  { messages, context }: ConversationIndexUpdateParams,
 ) {
   return harness.commit(async (tx) => {
     const index = await tx.doc(conversationIndex);

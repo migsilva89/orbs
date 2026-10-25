@@ -2,7 +2,6 @@ import { m } from '@repo/i18n/client';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
 
-/** Paired devices and a fresh pairing code for adding another one. */
 export function useSettingsDevices() {
   const { rpc } = useRpc();
   const devices = useQuery(rpc.devices.list.queryOptions());

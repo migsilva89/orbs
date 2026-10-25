@@ -34,7 +34,11 @@ export function collaborationExtension({ policy, directory }: CollaborationDeps)
     description: m.ui_tool_bot_ask_description(),
     parameters,
     replay: 'safe',
-    execute: (params, api, context) => collaborationActionSend(deps, { ...params, mode: 'ask' }, api, context),
+    execute: (params, api, context) => collaborationActionSend(deps, {
+      input: { ...params, mode: 'ask' },
+      api,
+      context,
+    }),
   });
 
   const messageBot = defineTool({
@@ -42,7 +46,11 @@ export function collaborationExtension({ policy, directory }: CollaborationDeps)
     description: m.ui_tool_bot_message_description(),
     parameters,
     replay: 'safe',
-    execute: (params, api, context) => collaborationActionSend(deps, { ...params, mode: 'send' }, api, context),
+    execute: (params, api, context) => collaborationActionSend(deps, {
+      input: { ...params, mode: 'send' },
+      api,
+      context,
+    }),
   });
 
   return {

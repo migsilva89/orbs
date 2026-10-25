@@ -38,7 +38,7 @@ export function providerAbort(session: ProviderTypes.ProviderLoginRecord) {
     .with('pending', () => {
       session.status = 'cancelled';
       session.prompt = undefined;
-      session.pending?.reject(new Error('Login cancelled'));
+      session.pending?.reject(new Errors.CONFLICT({ internal: 'Login cancelled' }));
       session.pending = undefined;
       clearTimeout(session.timeout);
       match(session.abort.signal.aborted)
@@ -59,7 +59,7 @@ export function providerFinish(
     .with('pending', () => {
       session.status = status;
       session.prompt = undefined;
-      session.pending?.reject(new Error('Login cancelled'));
+      session.pending?.reject(new Errors.CONFLICT({ internal: 'Login cancelled' }));
       session.pending = undefined;
       clearTimeout(session.timeout);
       match({ status, aborted: session.abort.signal.aborted })

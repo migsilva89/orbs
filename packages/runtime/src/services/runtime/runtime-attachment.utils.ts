@@ -1,7 +1,7 @@
 import { ATTACHMENT, attachmentMessage } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { RUNTIME_ATTACHMENT_ENTRY } from './runtime-attachment.constants';
-import type { UserInput } from '@earendil-works/pi-durable';
+import type { InputEntry, UserInput } from '@earendil-works/pi-durable';
 import type { Attachment } from '@repo/contracts/universal';
 
 function runtimeAttachmentPath(conversationId: number, file: Pick<Attachment, 'id' | 'name'>) {
@@ -12,7 +12,7 @@ export function runtimeAttachmentIsExpired(file: Attachment, now = Date.now()) {
   return !file.isRetained && file.createdAt + ATTACHMENT.pendingTtlMs <= now;
 }
 
-export function runtimeAttachmentMessage(entry: unknown) {
+export function runtimeAttachmentMessage(entry: InputEntry | undefined) {
   return match(entry)
     .with({ kind: RUNTIME_ATTACHMENT_ENTRY, data: P.nonNullable }, ({ data }) => match(attachmentMessage.safeParse(data))
       .with({ success: true }, ({ data: value }) => value)

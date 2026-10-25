@@ -2,7 +2,6 @@ import { useChatUploads } from './use-chat-uploads';
 import type { ChatAttachmentsPlatformParams } from '../types/chat.types';
 import type * as ReactTypes from 'react';
 
-/** Composer attachments for the browser: files from the picker, drag and drop, or paste, with object-url previews. */
 export function useChatAttachmentsWeb({ botId, onProblem }: ChatAttachmentsPlatformParams) {
   const files = useChatUploads<File>({
     botId,

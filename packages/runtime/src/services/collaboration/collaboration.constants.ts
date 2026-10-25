@@ -10,7 +10,6 @@ export const collaborationCall = defineDoc({
   checkpointWhen: () => false,
 });
 
-/** Random ID of the sender's store. A history clear starts a new store, so old peer bindings and request IDs never match it. */
 export const collaborationStore = defineDoc<CollaborationTypes.CollaborationStore>({
   kind: 'bots.bot-store',
   version: 1,
@@ -19,7 +18,6 @@ export const collaborationStore = defineDoc<CollaborationTypes.CollaborationStor
   checkpointWhen: () => false,
 });
 
-/** Recipient-store binding keyed by `senderId:senderStoreId:sourceConversationId`. */
 export const collaborationTemporaryBinding = defineDocFamily<CollaborationTypes.CollaborationTemporaryBinding, null>({
   kind: 'bots.bot-temporary-binding',
   version: 1,

@@ -1,5 +1,5 @@
 import { botBubble, roomsMessageText } from '@repo/client/client';
-import { chatViewOptions, useChatPendingSync, useChatRoom } from '@repo/client/react';
+import { chatQueries, useChatPendingSync, useChatRoom } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -43,7 +43,7 @@ interface ChatSubagentScreenContentProps extends ChatSubagentScreenProps {
 function ChatSubagentScreenContent({ session, botId, conversationId, name, task }: ChatSubagentScreenContentProps) {
   const router = useRouter();
   const bots = useQuery(session.rpc.bots.list.queryOptions());
-  const view = useQuery(chatViewOptions(session, { botId, conversationId }));
+  const view = useQuery(chatQueries.view(session, { botId, conversationId }));
 
   return (
     <Screen padding="none" scroll={false}>

@@ -2,7 +2,6 @@ import { m } from '@repo/i18n/client';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
 
-/** The daemon's addresses, and the custom ones the owner adds or removes. */
 export function useSettingsServer() {
   const { rpc } = useRpc();
   const info = useQuery(rpc.server.info.queryOptions());

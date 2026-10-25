@@ -2,16 +2,15 @@ import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeAttachments } from './runtime-attachment.constants';
 import { runtimeQueryConversation } from './runtime-query.conversation';
-import type { RuntimeAttachmentIdParams } from '../../types/attachment.types';
-import type { RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeAttachmentIdParams } from '../../types/runtime-attachment.types';
+import type { RuntimeContextInput, RuntimeServiceDeps } from '../../types/runtime.types';
 
 export async function runtimeActionRemoveAttachment(
   deps: RuntimeServiceDeps,
-  params: RuntimeAttachmentIdParams,
-  context: Context,
+  params: RuntimeAttachmentIdParams & RuntimeContextInput,
 ) {
-  const conversation = await runtimeQueryConversation(deps, params, context);
+  const { context } = params;
+  const conversation = await runtimeQueryConversation(deps, params);
 
   return conversation.commit(async (tx) => {
     const document = await tx.doc(runtimeAttachments, conversation.id);

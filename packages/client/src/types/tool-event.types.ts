@@ -7,7 +7,6 @@ export type ToolEventTodoAction = 'create' | 'update' | 'complete' | 'remove';
 
 export type ToolEventBotAction = 'create' | 'update' | 'models';
 
-/** The Lucide glyph an event shows before its name; each platform maps it to its own icon component. */
 export type ToolEventIcon =
   | 'alarm-clock-plus'
   | 'alarm-clock'
@@ -18,14 +17,12 @@ export type ToolEventIcon =
   | 'circle-check'
   | 'list-x';
 
-/** Which event a tool call becomes, before its output is read. */
 export type ToolEventSource =
   | { kind: 'peers' }
   | { kind: 'routine'; action: ToolEventRoutineAction }
   | { kind: 'todo'; action: Exclude<ToolEventTodoAction, 'complete'> }
   | { kind: 'bot'; action: ToolEventBotAction };
 
-/** Messages to other bots; back-to-back ones share one event. */
 export interface ToolEventPeers {
   kind: 'peers';
   key: string;
@@ -48,7 +45,6 @@ export interface ToolEventTodo {
   todo: ToolCallTodo;
 }
 
-/** A bot created or changed; `name` is unknown when the output does not carry it. */
 export interface ToolEventBot {
   kind: 'bot';
   key: string;
@@ -57,5 +53,4 @@ export interface ToolEventBot {
   name: string | undefined;
 }
 
-/** Something a bot did with its own tools, shown as one line in the chat whether or not verbose details are hidden. */
 export type ToolEvent = ToolEventPeers | ToolEventRoutine | ToolEventTodo | ToolEventBot;

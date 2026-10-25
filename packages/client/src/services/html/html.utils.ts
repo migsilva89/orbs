@@ -1,4 +1,4 @@
-import type { HtmlReplySegment } from '../../types/html.types';
+import type { HtmlBridgeMessage, HtmlReplySegment } from '../../types/html.types';
 
 export function htmlReplyContent(content: string): string | undefined {
   if (/^(?:[\t ]*\r?\n)*(?: {4}|\t)/.test(content)) {
@@ -19,7 +19,6 @@ export function htmlReplyContent(content: string): string | undefined {
   return undefined;
 }
 
-/** The page's own name, from its `<title>` or first heading, for a preview card. */
 export function htmlTitle(html: string): string | undefined {
   const heading = /<title[^>]*>([\s\S]*?)<\/title>|<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i.exec(html);
 
@@ -29,9 +28,8 @@ export function htmlTitle(html: string): string | undefined {
 }
 
 function htmlBootstrap() {
-  // A native WebView has no parent frame; it reports through the React Native bridge instead.
-  const htmlPost = (message: unknown) => {
-    const native = Reflect.get(window, 'ReactNativeWebView');
+  const htmlPost = (message: HtmlBridgeMessage) => {
+    const native = window.ReactNativeWebView;
 
     if (native) {
       native.postMessage(JSON.stringify(message));
@@ -97,7 +95,6 @@ export function htmlDocument(html: string) {
 </head><body>${html}</body></html>`;
 }
 
-/** Splits a reply into markdown and complete HTML fences, so each fence can render as a live preview. */
 export function htmlReplySegments(content: string): HtmlReplySegment[] {
   const fences = [...content.matchAll(/^(`{3,}|~{3,})[\t ]*(?:html|htm)\b[^\n]*\n[\s\S]*?\n\1[\t ]*$/gim)];
   const segments: HtmlReplySegment[] = [];

@@ -3,9 +3,8 @@ import { REACTION } from '@repo/contracts/universal';
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeReactions } from './runtime-reaction.constants';
-import type { RuntimeReactionTaskInput, RuntimeReactionTaskState } from '../../types/reaction.types';
+import type { RuntimeReactionTaskInput, RuntimeReactionTaskState } from '../../types/runtime-reaction.types';
 
-/** Tells the bot about the owner's reaction once the undo window passes, if the reaction is still there. */
 export const runtimeReactionTask = defineTask<RuntimeReactionTaskInput, RuntimeReactionTaskState, null>({
   name: 'bots.reaction',
   version: 1,

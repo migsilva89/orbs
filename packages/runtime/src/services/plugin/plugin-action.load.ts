@@ -2,7 +2,7 @@ import { createRegistry } from '@earendil-works/pi-durable';
 import { pathToFileURL } from 'node:url';
 import { match, P } from 'ts-pattern';
 import { pluginExtension } from '../../types/plugin.types';
-import { pluginScan } from './plugin-files.utils';
+import { pluginFilesScan } from './plugin-files.utils';
 import { PLUGIN } from './plugin.constants';
 import type * as PluginTypes from '../../types/plugin.types';
 
@@ -10,7 +10,7 @@ export async function pluginActionLoad(
   deps: PluginTypes.PluginLoaderServiceDeps,
   params: PluginTypes.PluginLoadParams,
 ): Promise<PluginTypes.PluginLoadResult> {
-  const { plugins, diagnostics } = await pluginScan(deps, params);
+  const { plugins, diagnostics } = await pluginFilesScan(deps, params);
   const loaded = await Promise.all(plugins.map((plugin) => pluginImport(plugin)));
 
   return {
@@ -25,9 +25,9 @@ export async function pluginActionLoad(
       .with(P.not(P.nullish), (extension) => ({ extension, diagnostic: undefined }))
       .otherwise(async () => {
         try {
-          const exported: unknown = (await import(pathToFileURL(plugin.path).href)).default;
+          const imported = await import(pathToFileURL(plugin.path).href);
 
-          return match(pluginExtension.safeParse(exported))
+          return match(pluginExtension.safeParse(imported.default))
             .with({ success: true }, ({ data }) => {
               try {
                 createRegistry().install(data);

@@ -9,6 +9,7 @@ export async function runtimeActionRequestApproval(
   { harness }: Pick<RuntimeServiceDeps, 'harness'>,
   { call, taskId, timeoutMs, context }: RuntimeApprovalRequest,
 ): Promise<boolean> {
+  // SAFETY: tool call arguments are a JSON object, and copyJson keeps that object shape.
   const input = copyJson(call.arguments, { omitUndefinedProperties: true }) as JsonObject;
 
   const approval = await harness.commit(async (tx) => {

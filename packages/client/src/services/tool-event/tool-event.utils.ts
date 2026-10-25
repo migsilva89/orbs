@@ -5,10 +5,6 @@ import { TOOL_EVENT_ICONS, TOOL_EVENTS } from './tool-event.constants';
 import type { ToolEvent } from '../../types/tool-event.types';
 import type { DynamicToolUIPart } from 'ai';
 
-/**
- * The chat event a tool call stands for. Messages to other bots show while they run; the rest show once their output
- * names what changed, so a running or failed call stays a tool row.
- */
 export function toolEvent(part: DynamicToolUIPart): ToolEvent | undefined {
   const key = part.toolCallId;
   const output = part.state === 'output-available' ? part.output : undefined;
@@ -36,7 +32,6 @@ export function toolEvent(part: DynamicToolUIPart): ToolEvent | undefined {
     .otherwise(() => undefined);
 }
 
-/** Adds an event to a run of events; back-to-back messages to other bots share one line. */
 export function toolEventsAppend(events: ToolEvent[], event: ToolEvent): ToolEvent[] {
   const last = events.at(-1);
 

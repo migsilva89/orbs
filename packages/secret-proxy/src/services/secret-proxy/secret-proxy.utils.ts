@@ -10,7 +10,6 @@ export function secretProxyAllows(rule: SecretRule, host: string) {
   return rule.hosts.some((pattern) => (pattern.startsWith('*.') ? host.endsWith(pattern.slice(1)) : host === pattern));
 }
 
-/** The proxy listens on every interface; only this machine may use it. */
 export function secretProxyIsLocal(address: string | undefined) {
   return SECRET_PROXY.loopback.some((loopback) => loopback === address);
 }

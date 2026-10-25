@@ -1,7 +1,7 @@
 import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entrySubagentReport, REACTION, REPLY, replyMessage, replySilent, toolCallJson } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { match, P } from 'ts-pattern';
-import { mentionSubmission } from '../mention/mention.client';
+import { mentionSubmission } from '../mention/mention.utils';
 import { CHAT, CHAT_FILE_TYPES } from './chat.constants';
 import type * as ChatTypes from '../../types/chat.types';
 import type * as UniversalTypes from '@repo/contracts/universal';
@@ -10,7 +10,7 @@ export function chatMessages({ entries, bot, bots }: ChatTypes.ChatMessagesParam
   const botsById = new Map(bots.map((item) => [item.id, item]));
   const messages: ChatTypes.ChatMessage[] = [];
 
-  const chatQuoteName = (quote: UniversalTypes.MessageQuote) => match(quote.role)
+  const chatQuoteName = (quote: UniversalTypes.ReplyQuote) => match(quote.role)
     .with('user', () => m.rooms_chat_you())
     .with('assistant', () => botsById.get(quote.botId ?? bot.id)?.name ?? bot.name)
     .exhaustive();
@@ -33,7 +33,6 @@ export function chatMessages({ entries, bot, bots }: ChatTypes.ChatMessagesParam
           createdAt,
         })))
         .otherwise(() => undefined))
-      // A reaction is only the bot's cue; the chat shows it as a badge on the message it reacts to.
       .with(REACTION.entryKind, () => undefined)
       .with(ATTACHMENT.entryKind, () => match(attachmentMessage.safeParse(entry.data))
         .with({ success: true }, ({ data }) => messages.push(chatOwnerMessage(entry, {
@@ -74,7 +73,6 @@ export function chatMessages({ entries, bot, bots }: ChatTypes.ChatMessagesParam
   return messages;
 }
 
-/** Only the exchange between two bots: the asker's messages and the replies that follow each one, without the owner's own chat. */
 export function chatPairMessages(messages: ChatTypes.ChatMessage[], askerId: string): ChatTypes.ChatMessage[] {
   let isPair = false;
 
@@ -384,12 +382,10 @@ function chatUsageAdd(current: ChatTypes.ChatUsage | null, usage: ChatTypes.Chat
   };
 }
 
-/** The distinct conversation entry ids behind `messages`, for per-entry lookups such as reactions. */
 export function chatEntryIds(messages: ChatTypes.ChatMessage[]): number[] {
   return [...new Set(messages.flatMap((message) => (message.metadata?.entryId ? [message.metadata.entryId] : [])))];
 }
 
-/** Why an approval or question answer did not land: it is no longer pending, or sending failed. */
 export function chatAnswerProblem({ isGone, isError }: ChatTypes.ChatAnswerProblemParams): string | null {
   return match({ isGone, isError })
     .with({ isGone: true }, () => m.rooms_chat_approval_gone())
@@ -397,14 +393,12 @@ export function chatAnswerProblem({ isGone, isError }: ChatTypes.ChatAnswerProbl
     .otherwise(() => null);
 }
 
-/** The `/reset` command in composer text, so an app can open its confirmation before clearing the input. */
 export function chatResetCommand(text: string): ChatTypes.ChatResetCommand | null {
   const { command } = mentionSubmission({ text });
 
   return command?.name === 'reset' ? { handoff: command.arguments || undefined } : null;
 }
 
-/** Media type from the picker, or guessed from the file extension when the picker gives none. */
 export function chatFileType({ name, mediaType }: ChatTypes.ChatFileTypeParams): string {
   const extension = name.split('.').at(-1)?.toLowerCase();
 

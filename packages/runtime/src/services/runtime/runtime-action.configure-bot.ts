@@ -1,17 +1,14 @@
 import { configure, defineExtension } from '@earendil-works/pi-durable';
 import { match } from 'ts-pattern';
-import { runtimeModelRef } from './runtime-models.utils';
+import { runtimeModelRef } from './runtime-model.utils';
 import { runtimePluginsInstall } from './runtime-plugins.utils';
 import { RUNTIME_HTML_GUIDE, runtimeBot, runtimeBotConversations } from './runtime.constants';
-import type { RuntimeBotParams, RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeBotParams, RuntimeContextInput, RuntimeServiceDeps } from '../../types/runtime.types';
 
 export async function runtimeActionConfigureBot(
   { appName, harness, registry, extensions, readOnlyTools, index }: RuntimeServiceDeps,
-  bot: RuntimeBotParams,
-  context: Context,
+  { context, ...bot }: RuntimeBotParams & RuntimeContextInput,
 ) {
-  // Persisted Pi extension id; renaming would drop already admitted tools.
   const botTools = defineExtension({ name: `bots.resources.${bot.id}`, tools: bot.tools });
   runtimePluginsInstall(registry, bot.plugins);
   registry.install(botTools);

@@ -7,12 +7,12 @@ export type { CollaborationBotParams, CollaborationPolicy, CollaborationRecipien
 export type { ToolRegistration } from '@earendil-works/pi-durable';
 export { mcpDocument, mcpServer } from './types/mcp.types';
 export type { McpClientParams, McpConfig, McpEntry, McpSource } from './types/mcp.types';
-export type { McpClientService } from './services/mcp/mcp.service';
+export type { McpClientService } from './services/mcp/mcp-client.service';
 export type { McpAuthService } from './services/mcp-auth/mcp-auth.service';
 export type { McpAuthCallbackParams } from './types/mcp-auth.types';
-export type { ProviderService } from './services/provider/provider.service';
+export type { ProviderService } from './types/provider.types';
 export type { SkillExpandParams, SkillExpandResult, SkillLoadParams, SkillLoadResult } from './types/skill.types';
-export type { SkillLoaderService } from './services/skill/skill.service';
-export type { PluginLoaderService } from './services/plugin/plugin.service';
-export type { InstructionLoaderService } from './services/instruction/instruction.service';
+export type { SkillLoaderService } from './services/skill/skill-loader.service';
+export type { PluginLoaderService } from './services/plugin/plugin-loader.service';
+export type { InstructionLoaderService } from './services/instruction/instruction-loader.service';
 export { notificationItemKey } from './services/notification/notification.utils';

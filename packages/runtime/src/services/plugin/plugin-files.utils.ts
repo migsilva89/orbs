@@ -5,7 +5,7 @@ import { PLUGIN } from './plugin.constants';
 import { pluginIsModule, pluginName, pluginResolve } from './plugin.utils';
 import type * as PluginTypes from '../../types/plugin.types';
 
-export async function pluginScan({ root }: PluginTypes.PluginLoaderServiceDeps, params: PluginTypes.PluginLoadParams): Promise<PluginTypes.PluginScan> {
+export async function pluginFilesScan({ root }: PluginTypes.PluginLoaderServiceDeps, params: PluginTypes.PluginLoadParams): Promise<PluginTypes.PluginScan> {
   const directory = join(root, 'agents', params.botId);
   const localPaths = [join(directory, '.pi/plugins'), join(directory, '.agents/plugins')];
 
@@ -60,22 +60,28 @@ async function pluginFiles(path: string, diagnostics: PluginTypes.PluginScan['di
               const isDirectory = child.isDirectory()
               || (child.isSymbolicLink() && (await stat(childPath)).isDirectory());
 
-              return await match(isDirectory)
-                .with(true, async () => await pluginIndex(childPath))
+              const paths = await match(isDirectory)
+                .with(true, async () => await pluginFilesIndex(childPath))
                 .with(false, async () => match(pluginIsModule(child.name))
                   .with(true, async () => [await realpath(childPath)])
                   .with(false, () => [])
                   .exhaustive())
                 .exhaustive();
+
+              return { paths, issues: [] };
             } catch (error) {
-              match(error)
-                .with({ code: 'ENOENT' }, () => undefined)
-                .otherwise(() => diagnostics.push({ path: childPath, message: PLUGIN.messages.read }));
-              return [];
+              return {
+                paths: [],
+                issues: match(error)
+                  .with({ code: 'ENOENT' }, () => [])
+                  .otherwise(() => [{ path: childPath, message: PLUGIN.messages.read }]),
+              };
             }
           }));
 
-        return results.flat();
+        diagnostics.push(...results.flatMap((result) => result.issues));
+
+        return results.flatMap((result) => result.paths);
       })
       .exhaustive();
   } catch (error) {
@@ -86,7 +92,7 @@ async function pluginFiles(path: string, diagnostics: PluginTypes.PluginScan['di
   }
 }
 
-async function pluginIndex(directory: string): Promise<string[]> {
+async function pluginFilesIndex(directory: string): Promise<string[]> {
   const files = await Promise.all(PLUGIN.indexes.map(async (file) => {
     const path = join(directory, file);
 

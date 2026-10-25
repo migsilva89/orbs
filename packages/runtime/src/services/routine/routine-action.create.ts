@@ -1,14 +1,16 @@
 import { match, P } from 'ts-pattern';
-import { routineNextRunAt } from './routine-schedule.utils';
+import { routineScheduleNextRunAt } from './routine-schedule.utils';
 import { routineDocument } from './routine.constants';
 import { routineTask } from './routine.task';
 import { routineCopy } from './routine.utils';
-import type { RoutineCreateParams, RoutineRecord, RoutineServiceDeps } from '../../types/routine.types';
-import type { Context } from '@earendil-works/chord/context';
+import type * as RoutineTypes from '../../types/routine.types';
 
-export async function routineActionCreate({ harness }: RoutineServiceDeps, params: RoutineCreateParams, context: Context) {
+export async function routineActionCreate(
+  { harness }: RoutineTypes.RoutineServiceDeps,
+  { context, ...params }: RoutineTypes.RoutineCreateParams & RoutineTypes.RoutineContextParams,
+) {
   const now = Date.now();
-  const nextRunAt = routineNextRunAt(params.schedule, now);
+  const nextRunAt = routineScheduleNextRunAt(params.schedule, now);
   const id = params.id ?? crypto.randomUUID();
 
   const result = await harness.commit(async (tx) => {
@@ -23,7 +25,7 @@ export async function routineActionCreate({ harness }: RoutineServiceDeps, param
           background: true,
         });
 
-        const record: RoutineRecord = {
+        const record: RoutineTypes.RoutineRecord = {
           ...params,
           id,
           taskId,

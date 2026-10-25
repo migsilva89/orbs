@@ -10,14 +10,14 @@ export async function routineWait(api: RoutineTaskRuntime, routineId: string, ch
 
   try {
     const changed = new Promise<void>((resolve) => {
-      const observe = (revision: number | undefined) => match(revision === checkpoint.revision)
+      const routineWaitObserve = (revision: number | undefined) => match(revision === checkpoint.revision)
         .with(true, () => undefined)
         .with(false, () => resolve())
         .exhaustive();
 
-      observe(watch?.value?.routines[routineId]?.revision);
+      routineWaitObserve(watch?.value?.routines[routineId]?.revision);
       watch?.start(async (value) => {
-        observe(value?.routines[routineId]?.revision);
+        routineWaitObserve(value?.routines[routineId]?.revision);
       });
     });
 

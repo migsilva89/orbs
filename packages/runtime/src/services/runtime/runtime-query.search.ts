@@ -3,17 +3,16 @@ import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeHistoryPage } from './runtime-history.utils';
 import { runtimeQueryConversation } from './runtime-query.conversation';
-import type { RuntimeSearchParams } from '../../types/history.types';
-import type { RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeHistorySearchParams } from '../../types/runtime-history.types';
+import type { RuntimeContextInput, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { ConversationSearchPage } from '@repo/contracts/universal';
 
 export async function runtimeQuerySearch(
   deps: RuntimeServiceDeps,
-  params: RuntimeSearchParams,
-  context: Context,
+  params: RuntimeHistorySearchParams & RuntimeContextInput,
 ): Promise<ConversationSearchPage> {
-  const conversation = await runtimeQueryConversation(deps, params, context);
+  const { context } = params;
+  const conversation = await runtimeQueryConversation(deps, params);
 
   try {
     const page = await conversation.entries({ order: 'descending' }, params.limit ?? 50, params.cursor, context);

@@ -1,10 +1,12 @@
 import { ARTIFACT } from '@repo/contracts/universal';
-import type { RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeContextInput, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { ConversationId, Cursor } from '@earendil-works/pi-durable';
 import type { ArtifactBotListInput, ArtifactSummary } from '@repo/contracts/universal';
 
-export async function runtimeQueryListBotArtifacts(deps: RuntimeServiceDeps, params: ArtifactBotListInput, context: Context): Promise<ArtifactSummary[]> {
+export async function runtimeQueryListBotArtifacts(
+  deps: RuntimeServiceDeps,
+  { context, ...params }: ArtifactBotListInput & RuntimeContextInput,
+): Promise<ArtifactSummary[]> {
   async function runtimeConversations(cursor?: Cursor): Promise<ConversationId[]> {
     const page = await deps.harness.commit((tx) => tx.scanConversations({}, ARTIFACT.listLimit, cursor), context);
     const ids = page.items.map((record) => record.id);

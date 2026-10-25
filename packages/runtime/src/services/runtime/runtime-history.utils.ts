@@ -1,11 +1,13 @@
-import { AssistantEntry, UserEntry } from '@earendil-works/pi-durable';
+import { AssistantEntry, StorageRequestError, UserEntry } from '@earendil-works/pi-durable';
 import { ATTACHMENT, attachmentMessage, REPLY, replyMessage } from '@repo/contracts/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { COLLABORATION } from '../collaboration/collaboration.constants';
-import type { Cursor, EntryRecord, Page } from '@earendil-works/pi-durable';
+import type { Context } from '@earendil-works/chord/context';
+import type * as PiDurableTypes from '@earendil-works/pi-durable';
 import type { ConversationHistoryMessage, ConversationSearchPage } from '@repo/contracts/universal';
 
-export function runtimeHistoryPage(page: Page<EntryRecord, Cursor>, query?: string): ConversationSearchPage {
+export function runtimeHistoryPage(page: PiDurableTypes.Page<PiDurableTypes.EntryRecord, PiDurableTypes.Cursor>, query?: string): ConversationSearchPage {
   const needle = query?.toLowerCase();
 
   return {
@@ -22,7 +24,7 @@ export function runtimeHistoryPage(page: Page<EntryRecord, Cursor>, query?: stri
   };
 }
 
-function runtimeHistoryMessage(entry: EntryRecord): ConversationHistoryMessage | undefined {
+function runtimeHistoryMessage(entry: PiDurableTypes.EntryRecord): ConversationHistoryMessage | undefined {
   return match(entry)
     .with({ kind: P.union(UserEntry.kind, AssistantEntry.kind, COLLABORATION.message, COLLABORATION.reply) }, (value) => (
       match(value.model?.[0])
@@ -62,7 +64,7 @@ export function runtimeHistoryOutput(page: ConversationSearchPage) {
 }
 
 function runtimeHistoryVisible(
-  entry: EntryRecord,
+  entry: PiDurableTypes.EntryRecord,
   role: 'user' | 'assistant',
   text: string,
   createdAt: number,
@@ -80,4 +82,22 @@ function runtimeHistoryVisible(
       }))
       .otherwise(() => ({})),
   };
+}
+
+export async function runtimeHistoryEntries(
+  api: PiDurableTypes.ToolExecutionApi,
+  limit: number | undefined,
+  cursor: PiDurableTypes.Cursor | undefined,
+  context: Context,
+) {
+  try {
+    return await api.commit((tx) => tx.scanEntries({
+      conversationId: api.conversationId,
+      order: 'descending',
+    }, limit ?? 50, cursor), context);
+  } catch (error) {
+    throw match(error)
+      .with(P.instanceOf(StorageRequestError), (cause) => new Errors.VALIDATION_ERROR({ fields: {}, cause }))
+      .otherwise((cause) => cause);
+  }
 }

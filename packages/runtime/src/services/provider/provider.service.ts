@@ -10,7 +10,7 @@ import { providerQuerySession } from './provider-query.session';
 import { providerClose } from './provider.utils';
 import type * as ProviderTypes from '../../types/provider.types';
 
-export async function makeProviderService() {
+export async function makeProviderService(): Promise<ProviderTypes.ProviderService> {
   registerBunOAuthFlows();
   const models = await ModelRuntime.create();
   const deps: ProviderTypes.ProviderServiceDeps = { models, sessions: new Map() };
@@ -18,18 +18,16 @@ export async function makeProviderService() {
   return {
     models,
     actions: {
-      login: (params: ProviderTypes.ProviderLoginParams) => providerActionLogin(deps, params),
-      complete: (params: ProviderTypes.ProviderCompleteParams) => providerActionComplete(deps, params),
-      cancel: (params: ProviderTypes.ProviderCancelParams) => providerActionCancel(deps, params),
-      logout: (params: ProviderTypes.ProviderLogoutParams) => providerActionLogout(deps, params),
-      cancelDevice: (params: ProviderTypes.ProviderCancelDeviceParams) => providerActionCancelDevice(deps, params),
+      login: (params) => providerActionLogin(deps, params),
+      complete: (params) => providerActionComplete(deps, params),
+      cancel: (params) => providerActionCancel(deps, params),
+      logout: (params) => providerActionLogout(deps, params),
+      cancelDevice: (params) => providerActionCancelDevice(deps, params),
     },
     queries: {
-      list: (params: ProviderTypes.ProviderListParams) => providerQueryList(deps, params),
-      session: (params: ProviderTypes.ProviderSessionParams) => providerQuerySession(deps, params),
+      list: (params) => providerQueryList(deps, params),
+      session: (params) => providerQuerySession(deps, params),
     },
     close: () => providerClose(deps),
   };
 }
-
-export type ProviderService = Awaited<ReturnType<typeof makeProviderService>>;

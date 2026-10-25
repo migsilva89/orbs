@@ -29,7 +29,7 @@ export async function notificationQueryWatch(deps: NotificationTypes.Notificatio
       .with(true, () => {
         queued.push({ publication, commitContext });
         match(isAttached)
-          .with(true, () => enqueue(() => applyQueued()))
+          .with(true, () => notificationEnqueue(() => notificationApplyQueued()))
           .with(false, () => undefined)
           .exhaustive();
       })
@@ -37,7 +37,7 @@ export async function notificationQueryWatch(deps: NotificationTypes.Notificatio
       .exhaustive();
   });
 
-  const enqueue = (task: () => Promise<void>) => {
+  const notificationEnqueue = (task: NotificationTypes.NotificationTask) => {
     work = work
       .then(() => match(isStopped)
         .with(true, () => undefined)
@@ -47,11 +47,11 @@ export async function notificationQueryWatch(deps: NotificationTypes.Notificatio
         failure = match(error)
           .with(P.instanceOf(Error), (value) => value)
           .otherwise((value) => new Errors.INTERNAL_ERROR({ cause: value }));
-        await stop();
+        await notificationStop();
       });
   };
 
-  const publishPending = async (commitContext: Context) => {
+  const notificationPublishPending = async (commitContext: Context) => {
     const pending = await notificationPendingItems(deps, tasks, context);
     match(isStopped)
       .with(true, () => undefined)
@@ -63,7 +63,7 @@ export async function notificationQueryWatch(deps: NotificationTypes.Notificatio
       .exhaustive();
   };
 
-  const applyQueued = async () => {
+  const notificationApplyQueued = async () => {
     const batch = queued.splice(0);
 
     await match({ isStopped, empty: batch.length === 0 })
@@ -88,13 +88,13 @@ export async function notificationQueryWatch(deps: NotificationTypes.Notificatio
           });
 
         await match(attention.shouldRebuild)
-          .with(true, () => publishPending(batch.at(-1)?.commitContext ?? context))
+          .with(true, () => notificationPublishPending(batch.at(-1)?.commitContext ?? context))
           .with(false, () => undefined)
           .exhaustive();
       });
   };
 
-  let stop = async (): Promise<PiDurableTypes.WatchEnd> => {
+  let notificationStop = async (): Promise<PiDurableTypes.WatchEnd> => {
     isStopped = true;
     unsubscribe();
 
@@ -104,7 +104,7 @@ export async function notificationQueryWatch(deps: NotificationTypes.Notificatio
   try {
     const graph = await harness.watchTaskGraph(context);
 
-    stop = async () => {
+    notificationStop = async () => {
       isStopped = true;
       unsubscribe();
       stopping ??= graph.stop();
@@ -115,9 +115,9 @@ export async function notificationQueryWatch(deps: NotificationTypes.Notificatio
     try {
       tasks = graph.value;
       toolIds = notificationToolTaskIds(tasks);
-      await publishPending(context);
+      await notificationPublishPending(context);
       isAttached = true;
-      enqueue(() => applyQueued());
+      notificationEnqueue(() => notificationApplyQueued());
 
       graph.start(async (value, _ops, commitContext) => {
         tasks = value;
@@ -126,21 +126,21 @@ export async function notificationQueryWatch(deps: NotificationTypes.Notificatio
           .with(true, () => undefined)
           .with(false, () => {
             toolIds = next;
-            enqueue(() => publishPending(commitContext));
+            notificationEnqueue(() => notificationPublishPending(commitContext));
           })
           .exhaustive();
       });
 
       const closed = graph.closed.then(async (end) => {
-        await stop();
+        await notificationStop();
         return match(failure)
           .with(P.nonNullable, (error) => ({ reason: 'listener_error' as const, error }))
           .otherwise(() => end);
       });
 
-      return { state, closed, stop };
+      return { state, closed, stop: notificationStop };
     } catch (error) {
-      await stop();
+      await notificationStop();
       throw error;
     }
   } catch (error) {

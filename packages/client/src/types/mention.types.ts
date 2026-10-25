@@ -2,7 +2,6 @@ import type { Bot } from '@repo/contracts/universal';
 
 export interface MentionTarget {
   kind: 'skill' | 'command' | 'bot' | 'quote';
-  /** The skill or command name, the bot ID, or the quoted entry ID. */
   name: string;
 }
 

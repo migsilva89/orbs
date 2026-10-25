@@ -16,7 +16,6 @@ export interface StorageCarryParams extends StorageBotParams {
   carry: JsonObject;
 }
 
-/** Per-bot Pi store files. A pending carry file survives a crash between clearing a store and refilling it. */
 export interface StorageService {
   open(params: StorageBotParams): Promise<Storage>;
   reset(params: StorageBotParams): Promise<void>;

@@ -1,5 +1,5 @@
 import { match, P } from 'ts-pattern';
-import { pluginScan } from './plugin-files.utils';
+import { pluginFilesScan } from './plugin-files.utils';
 import type { PluginLoaderServiceDeps, PluginLoadParams } from '../../types/plugin.types';
 import type { PluginCatalog } from '@repo/contracts/universal';
 
@@ -7,7 +7,7 @@ export async function pluginQueryDiscover(
   deps: PluginLoaderServiceDeps,
   params: PluginLoadParams,
 ): Promise<PluginCatalog> {
-  const { plugins, diagnostics } = await pluginScan(deps, params);
+  const { plugins, diagnostics } = await pluginFilesScan(deps, params);
 
   for (const plugin of plugins) {
     match(deps.failures.get(plugin.path))

@@ -45,3 +45,21 @@ export interface ProviderLoginRecord {
   done: Promise<void>;
   error?: string;
 }
+
+export type ProviderSettle = () => void;
+
+export interface ProviderService {
+  models: ModelRuntime;
+  actions: {
+    login(params: ProviderLoginParams): UniversalTypes.ProviderSession;
+    complete(params: ProviderCompleteParams): UniversalTypes.ProviderSession;
+    cancel(params: ProviderCancelParams): void;
+    logout(params: ProviderLogoutParams): Promise<void>;
+    cancelDevice(params: ProviderCancelDeviceParams): void;
+  };
+  queries: {
+    list(params: ProviderListParams): UniversalTypes.ProviderList;
+    session(params: ProviderSessionParams): UniversalTypes.ProviderSession;
+  };
+  close(): Promise<void>;
+}

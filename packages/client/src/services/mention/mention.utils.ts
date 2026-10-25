@@ -40,7 +40,6 @@ export function mentionSubmission({ text }: MentionTypes.MentionTextParams): Men
   };
 }
 
-/** Matches `@handle` as a whole word, so `me@handle.dev` and `@handle-two` do not count. */
 export function mentionHandle(handle: string): RegExp {
   const notInsideAWord = String.raw`(?<![\p{L}\p{N}_.-])`;
   const notInsideALongerHandle = String.raw`(?![\p{L}\p{N}_-])`;
@@ -48,14 +47,12 @@ export function mentionHandle(handle: string): RegExp {
   return new RegExp(`${notInsideAWord}@${handle}${notInsideALongerHandle}`, 'iu');
 }
 
-/** The mention the caret is typing, such as `@ali` or `$rev`, for composers without rich text. */
 export function mentionQuery({ text, cursor }: MentionTypes.MentionQueryParams): MentionTypes.MentionQuery | undefined {
   const typed = /(?:^|\s)([@$/])([^\s@$/]*)$/u.exec(text.slice(0, cursor));
 
   return typed?.[1] ? { char: typed[1], query: typed[2], start: cursor - typed[2].length - 1 } : undefined;
 }
 
-/** Turns the picked mention labels back into links, so a plain-text composer submits what the rich editor does. */
 export function mentionLinks({ text, items }: MentionTypes.MentionLinksParams): string {
   return items.reduce((value, item) => {
     const label = new RegExp(`(?<!\\S)${item.label.replaceAll(/[$()*+./?[\\\]^{|}]/gu, String.raw`\$&`)}(?!\\S)`, 'gu');
@@ -64,7 +61,6 @@ export function mentionLinks({ text, items }: MentionTypes.MentionLinksParams): 
   }, text);
 }
 
-/** Names bot mentions and links plain `@handle` text outside code, so a plain markdown renderer can style them as tags. */
 export function mentionMarkdown({ text, bots }: MentionTypes.MentionMarkdownParams): string {
   if (bots.length === 0) {
     return text;
@@ -88,7 +84,6 @@ export function mentionMarkdown({ text, bots }: MentionTypes.MentionMarkdownPara
     }))).join('');
 }
 
-/** A quote of part of a message, as a pill: the selected text on one line, short enough for a link label. */
 export function mentionQuote({ text, entryId }: MentionTypes.MentionQuoteParams): MentionTypes.MentionItem {
   return {
     href: mentionHref({ kind: 'quote', name: String(entryId) }),

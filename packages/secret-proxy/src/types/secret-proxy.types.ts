@@ -1,9 +1,8 @@
-import type { SecretSource, SecretValueParams } from './secret.types';
+import type { SecretSource } from './secret.types';
 import type { CompletedRequest, Mockttp, requestSteps } from 'mockttp';
 
 export interface SecretProxyServiceParams {
   source: SecretSource;
-  /** Folder for the public CA bundle; never holds a secret value. */
   folder: string;
 }
 
@@ -14,13 +13,10 @@ export interface SecretProxyServiceDeps extends SecretProxyServiceParams {
 export interface SecretProxyState {
   server: Mockttp | null;
   starting: Promise<void> | null;
-  /** Real values swapped into each in-flight request, so its response can be scrubbed. */
-  swapped: Map<string, SecretSwap[]>;
+  swapped: Map<string, SecretProxySwap[]>;
 }
 
-export type SecretPlaceholderParams = SecretValueParams;
-
-export interface SecretSwap {
+export interface SecretProxySwap {
   placeholder: string;
   value: string;
 }

@@ -1,16 +1,15 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { chatHistoryOptions } from '../services/chat/chat.client';
+import { chatQueries } from '../services/chat/chat.client';
 import { chatActivity, chatEntryIds, chatFailure, chatLive, chatMessages, chatOutgoingMessages, chatQueued } from '../services/chat/chat.utils';
 import { useChatReactions } from './use-chat-reactions';
 import { useRpc } from './use-rpc';
 import type { ChatRoomParams } from '../types/chat.types';
 
-/** Everything a chat transcript shows for a live view: older history, the live run, pending answers, outgoing messages and reactions. */
 export function useChatRoom({ bot, bots, view, outgoing }: ChatRoomParams) {
   const rpcs = useRpc();
   const { conversationId } = view;
 
-  const history = useInfiniteQuery(chatHistoryOptions(rpcs, {
+  const history = useInfiniteQuery(chatQueries.history(rpcs, {
     botId: bot.id,
     conversationId,
     cursor: view.historyCursor,

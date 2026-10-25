@@ -3,8 +3,8 @@ import { secretProxyActionStop } from './secret-proxy-action.stop';
 import { secretProxyQueryEnv } from './secret-proxy-query.env';
 import { secretProxyPlaceholder } from './secret-proxy.utils';
 import type * as SecretProxyTypes from '../../types/secret-proxy.types';
+import type { SecretValueParams } from '../../types/secret.types';
 
-/** A local HTTPS proxy: commands hold placeholders, and real values are swapped in only on requests to allowed hosts. */
 export function makeSecretProxyService(params: SecretProxyTypes.SecretProxyServiceParams) {
   const deps: SecretProxyTypes.SecretProxyServiceDeps = {
     ...params,
@@ -18,7 +18,7 @@ export function makeSecretProxyService(params: SecretProxyTypes.SecretProxyServi
     },
     queries: {
       env: () => secretProxyQueryEnv(deps),
-      placeholder: ({ name }: SecretProxyTypes.SecretPlaceholderParams) => secretProxyPlaceholder(name),
+      placeholder: ({ name }: SecretValueParams) => secretProxyPlaceholder(name),
     },
   };
 }

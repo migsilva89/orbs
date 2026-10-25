@@ -34,11 +34,11 @@ import { runtimeActionUpdateArtifact } from './runtime-action.update-artifact';
 import { runtimeActionUpdateRoutine } from './runtime-action.update-routine';
 import { runtimeActionUpdateSubmission } from './runtime-action.update-submission';
 import { runtimeActionUpdateTodo } from './runtime-action.update-todo';
-import { runtimeBotOpen } from './runtime-bot.utils';
+import { runtimeBotCall, runtimeBotOpen } from './runtime-bot.utils';
 import { runtimeChatToolsExtension } from './runtime-chat-tools.extension';
 import { runtimeCodingTools } from './runtime-coding-tools.extension';
 import { runtimeDirectory } from './runtime-directory.utils';
-import { runtimeModels } from './runtime-models.utils';
+import { runtimeModels } from './runtime-model.utils';
 import { runtimeQueryApprovals } from './runtime-query.approvals';
 import { runtimeQueryArtifact } from './runtime-query.artifact';
 import { runtimeQueryArtifactVersions } from './runtime-query.artifact-versions';
@@ -70,15 +70,13 @@ import { runtimeSecretsExtension } from './runtime-secrets.extension';
 import { runtimeSkills } from './runtime-skills.extension';
 import { runtimeWatchMerge } from './runtime-watch-merge.utils';
 import { RUNTIME_ALARM_HEARTBEAT_MS } from './runtime.constants';
-import type * as AttachmentTypes from '../../types/attachment.types';
 import type { ConversationIndexSummary } from '../../types/conversation-index.types';
-import type { RuntimeSearchParams } from '../../types/history.types';
-import type { RuntimeRegisterBotToolsParams } from '../../types/runtime-bot-tools.types';
+import type { RuntimeBotToolsRegisterParams } from '../../types/runtime-bot-tools.types';
 import type * as RuntimeTypes from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 import type * as UniversalTypes from '@repo/contracts/universal';
 
-export async function makeRuntimeService({
+export function makeRuntimeService({
   appName,
   storage,
   alarm,
@@ -99,7 +97,6 @@ export async function makeRuntimeService({
   const toolSearch = createToolSearchExtension();
   const subagents = subagentExtension();
 
-  // One model limiter and one extension list for every bot store.
   const shared: RuntimeTypes.RuntimeSharedDeps = {
     appName,
     storage,
@@ -132,7 +129,6 @@ export async function makeRuntimeService({
     ownTools: [collaboration.extension, questions.extension, chatTools.extension, subagents].flatMap((extension) => extension.tools ?? []),
   };
 
-  // An alarm reopens a bot whose store closed, so its routines and deadlines still run.
   const unlisten = alarm.listen(({ botId }) => {
     void directory.bot(botId).then((bot) => bot.wake()).catch((error: unknown) => {
       log.error({
@@ -148,88 +144,80 @@ export async function makeRuntimeService({
     .with({ type: 'closed', isFailed: true }, ({ botId }) => alarm.set({ botId, at: Date.now() + RUNTIME_ALARM_HEARTBEAT_MS }))
     .otherwise(() => undefined));
 
-  const inBot = <P extends { botId: string }, R>(run: (deps: RuntimeTypes.RuntimeServiceDeps, params: P, context: Context) => Promise<R> | R) => (
-    async (params: P, context: Context = BACKGROUND_CONTEXT) => run((await directory.bot(params.botId)).deps, params, context)
-  );
-
-  const configureBot = async (bot: RuntimeTypes.RuntimeBotParams, context: Context = BACKGROUND_CONTEXT) => {
-    directory.register(bot.id);
-    const { deps } = await directory.bot(bot.id);
-    const conversationId = await runtimeActionConfigureBot(deps, bot, context);
-    await runtimeActionCarryOver({ ...deps, storage }, { conversationId }, context);
-
-    return conversationId;
-  };
-
   return {
     actions: {
-      restoreArtifact: inBot(runtimeActionRestoreArtifact),
-      saveArtifactState: inBot(runtimeActionSaveArtifactState),
-      updateArtifact: inBot(runtimeActionUpdateArtifact),
-      createArtifact: inBot(runtimeActionCreateArtifact),
-      registerBotTools: (params: RuntimeRegisterBotToolsParams) => runtimeActionRegisterBotTools(shared, params),
-      removeRoutine: inBot(runtimeActionRemoveRoutine),
-      runRoutine: inBot(runtimeActionRunRoutine),
-      updateRoutine: inBot(runtimeActionUpdateRoutine),
-      createRoutine: inBot(runtimeActionCreateRoutine),
-      createTodo: inBot(runtimeActionCreateTodo),
-      updateTodo: inBot(runtimeActionUpdateTodo),
-      removeTodo: inBot(runtimeActionRemoveTodo),
-      reorderTodos: inBot(runtimeActionReorderTodos),
-      answerQuestion: inBot(runtimeActionAnswerQuestion),
-      setReaction: inBot(runtimeActionSetReaction),
-      executeCommand: inBot(runtimeActionExecuteCommand),
-      approve: inBot(runtimeActionApprove),
-      configureBot,
-      /** Close the bot's store and delete it. Pi has no delete API; the store file is the unit of erasure. */
+      restoreArtifact: runtimeBotCall(directory, runtimeActionRestoreArtifact),
+      saveArtifactState: runtimeBotCall(directory, runtimeActionSaveArtifactState),
+      updateArtifact: runtimeBotCall(directory, runtimeActionUpdateArtifact),
+      createArtifact: runtimeBotCall(directory, runtimeActionCreateArtifact),
+      registerBotTools: (params: RuntimeBotToolsRegisterParams) => runtimeActionRegisterBotTools(shared, params),
+      removeRoutine: runtimeBotCall(directory, runtimeActionRemoveRoutine),
+      runRoutine: runtimeBotCall(directory, runtimeActionRunRoutine),
+      updateRoutine: runtimeBotCall(directory, runtimeActionUpdateRoutine),
+      createRoutine: runtimeBotCall(directory, runtimeActionCreateRoutine),
+      createTodo: runtimeBotCall(directory, runtimeActionCreateTodo),
+      updateTodo: runtimeBotCall(directory, runtimeActionUpdateTodo),
+      removeTodo: runtimeBotCall(directory, runtimeActionRemoveTodo),
+      reorderTodos: runtimeBotCall(directory, runtimeActionReorderTodos),
+      answerQuestion: runtimeBotCall(directory, runtimeActionAnswerQuestion),
+      setReaction: runtimeBotCall(directory, runtimeActionSetReaction),
+      executeCommand: runtimeBotCall(directory, runtimeActionExecuteCommand),
+      approve: runtimeBotCall(directory, runtimeActionApprove),
+      configureBot: async (bot: RuntimeTypes.RuntimeBotParams, context: Context = BACKGROUND_CONTEXT) => {
+        directory.register(bot.id);
+        const { deps } = await directory.bot(bot.id);
+        const conversationId = await runtimeActionConfigureBot(deps, { ...bot, context });
+        await runtimeActionCarryOver({ ...deps, storage }, { conversationId, context });
+
+        return conversationId;
+      },
       removeBot: async ({ botId }: UniversalTypes.BotGetInput) => {
         directory.unregister(botId);
         await directory.close(botId, () => storage.remove({ botId }));
       },
-      /** Save routines, todos and artifacts, then delete the bot's store. The next `configureBot` opens a fresh one and refills it. */
       clearBot: async ({ botId }: UniversalTypes.BotGetInput, context: Context = BACKGROUND_CONTEXT) => {
         const { deps } = await directory.bot(botId);
         await storage.saveCarry({ botId, carry: await runtimeQueryCarry(deps, context) });
         await directory.close(botId, () => storage.reset({ botId }));
       },
-      submit: inBot(runtimeActionSubmit),
-      updateSubmission: inBot(runtimeActionUpdateSubmission),
-      addAttachment: inBot(runtimeActionAddAttachment),
-      removeAttachment: inBot(runtimeActionRemoveAttachment),
-      retainAttachments: inBot(runtimeActionRetainAttachments),
-      expireAttachments: inBot(runtimeActionExpireAttachments),
-      stop: inBot((deps, params: RuntimeTypes.RuntimeConversationParams, context) => (
-        runtimeQueryConversation(deps, params, context).then((conversation) => conversation.abort(context))
+      submit: runtimeBotCall<RuntimeTypes.RuntimeSubmitParams, Awaited<ReturnType<typeof runtimeActionSubmit>>>(directory, runtimeActionSubmit),
+      updateSubmission: runtimeBotCall(directory, runtimeActionUpdateSubmission),
+      addAttachment: runtimeBotCall(directory, runtimeActionAddAttachment),
+      removeAttachment: runtimeBotCall(directory, runtimeActionRemoveAttachment),
+      retainAttachments: runtimeBotCall(directory, runtimeActionRetainAttachments),
+      expireAttachments: runtimeBotCall(directory, runtimeActionExpireAttachments),
+      stop: runtimeBotCall(directory, (deps, params: RuntimeTypes.RuntimeConversationParams & RuntimeTypes.RuntimeContextInput) => (
+        runtimeQueryConversation(deps, params).then((conversation) => conversation.abort(params.context))
       )),
     },
     queries: {
-      artifactBlocks: () => artifactBlocksCatalog(),
-      artifactVersions: inBot(runtimeQueryArtifactVersions),
-      artifact: inBot(runtimeQueryArtifact),
-      artifacts: inBot(runtimeQueryListArtifacts),
-      botArtifacts: inBot(runtimeQueryListBotArtifacts),
-      search: inBot((deps, params: RuntimeSearchParams, context) => runtimeQuerySearch(deps, params, context)),
-      routines: inBot(runtimeQueryListRoutines),
-      todos: inBot(runtimeQueryListTodos),
-      questions: inBot(runtimeQueryQuestions),
-      reactions: inBot(runtimeQueryReactions),
-      attachment: inBot((deps, params: AttachmentTypes.RuntimeAttachmentIdParams, context) => runtimeQueryAttachment(deps, params, context)),
-      attachments: inBot((deps, params: AttachmentTypes.RuntimeAttachmentsQueryParams, context) => runtimeQueryAttachments(deps, params, context)),
-      attachmentTarget: inBot(runtimeQueryAttachmentTarget),
-      contextUsage: inBot(runtimeQueryContextUsage),
-      usage: inBot(runtimeQueryUsage),
-      contexts: inBot(runtimeQueryContexts),
-      hasEntry: inBot(runtimeQueryHasEntry),
+      artifactBlocks: () => artifactBlocksCatalog,
+      artifactVersions: runtimeBotCall(directory, runtimeQueryArtifactVersions),
+      artifact: runtimeBotCall(directory, runtimeQueryArtifact),
+      artifacts: runtimeBotCall(directory, runtimeQueryListArtifacts),
+      botArtifacts: runtimeBotCall(directory, runtimeQueryListBotArtifacts),
+      search: runtimeBotCall(directory, runtimeQuerySearch),
+      routines: runtimeBotCall(directory, runtimeQueryListRoutines),
+      todos: runtimeBotCall(directory, runtimeQueryListTodos),
+      questions: runtimeBotCall(directory, runtimeQueryQuestions),
+      reactions: runtimeBotCall(directory, runtimeQueryReactions),
+      attachment: runtimeBotCall(directory, runtimeQueryAttachment),
+      attachments: runtimeBotCall(directory, runtimeQueryAttachments),
+      attachmentTarget: runtimeBotCall(directory, runtimeQueryAttachmentTarget),
+      contextUsage: runtimeBotCall(directory, runtimeQueryContextUsage),
+      usage: runtimeBotCall(directory, runtimeQueryUsage),
+      contexts: runtimeBotCall(directory, runtimeQueryContexts),
+      hasEntry: runtimeBotCall(directory, runtimeQueryHasEntry),
       conversations: async (context: Context = BACKGROUND_CONTEXT): Promise<ConversationIndexSummary[]> => {
         const lists = await Promise.all(directory.opened().map((bot) => bot.deps.index.queries.list(context)));
         return lists.flat();
       },
-      submission: inBot(runtimeQuerySubmission),
+      submission: runtimeBotCall(directory, runtimeQuerySubmission),
       commands: () => runtimeQueryCommands(),
-      approvals: inBot(runtimeQueryApprovals),
+      approvals: runtimeBotCall(directory, runtimeQueryApprovals),
       models: () => runtimeQueryModels(shared),
       validateModel: (params: RuntimeTypes.RuntimeModelParams) => runtimeQueryValidateModel(shared, params),
-      history: inBot(runtimeQueryHistory),
+      history: runtimeBotCall(directory, runtimeQueryHistory),
     },
     watchConversations: (context: Context = BACKGROUND_CONTEXT) => {
       const lists = new Map<string, ConversationIndexSummary[]>();
@@ -279,7 +267,6 @@ export async function makeRuntimeService({
               recent.delete(botId);
             });
           draft.pending = [...pending.values()].flat();
-          // Remember only items still visible somewhere, so the set stays as small as the recent windows.
           const visible = [...draft.recent, ...[...recent.values()].flat()].map(notificationItemKey);
           seen.clear();
 
@@ -290,8 +277,8 @@ export async function makeRuntimeService({
         context,
       });
     },
-    watchContexts: inBot(runtimeQueryWatchContexts),
-    watch: inBot(runtimeQueryWatch),
+    watchContexts: runtimeBotCall(directory, runtimeQueryWatchContexts),
+    watch: runtimeBotCall(directory, runtimeQueryWatch),
     resume: () => {
       for (const bot of directory.opened()) {
         bot.wake();
@@ -305,4 +292,4 @@ export async function makeRuntimeService({
   };
 }
 
-export type RuntimeService = Awaited<ReturnType<typeof makeRuntimeService>>;
+export type RuntimeService = ReturnType<typeof makeRuntimeService>;

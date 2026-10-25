@@ -5,17 +5,11 @@ import { clamp, easings } from './math';
 import { mixHex } from './skins';
 import { POSES, stateDef } from './states';
 import { HALF_VIEWBOX, RADIUS } from './viewbox';
-import type { ArcRender } from './decor';
-import type { BotFrame } from './engine';
-import type { BotExpression } from './expressions';
-import type { StateId } from './states';
+import type { AvatarAttrs, AvatarLook, AvatarSvgNode } from './types/avatar.types';
+import type { DecorArcRender } from './types/decor.types';
+import type { EngineFrame } from './types/engine.types';
 
-/*
- * Draws a `BotEngine` frame into an <svg> with plain DOM calls, framework-free. The layers are bloub's
- * BloubBot output, in its order: defs (eye mask, arc gradients), back arcs, dots when behind,
- * body, dots when in front, notification dot, front arcs. The eyes are holes in the mask, not
- * shapes on top, which is what clips them against the silhouette.
- */
+export type { AvatarSvgNode } from './types/avatar.types';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const PAPER = '#f9f9f9';
@@ -23,23 +17,13 @@ const BOX = HALF_VIEWBOX * 2;
 const FRAME_BOX = { x: -HALF_VIEWBOX, y: -HALF_VIEWBOX, width: BOX, height: BOX };
 const ARC_GROUP = { fill: 'none', 'stroke-linecap': 'round' };
 
-type Attrs = Record<string, string | number>;
-
-/** One SVG element of a frame: what the painter syncs into the DOM and what a server renders as markup. */
-export interface AvatarSvgNode {
-  tag: string
-  attrs: Attrs
-  children: AvatarSvgNode[]
-}
-
-function svgNode(tag: string, attrs: Attrs = {}, children: AvatarSvgNode[] = []): AvatarSvgNode {
+function svgNode(tag: string, attrs: AvatarAttrs = {}, children: AvatarSvgNode[] = []): AvatarSvgNode {
   return { tag, attrs, children };
 }
 
-/** A frame as an SVG tree, pure, so a server can render the first frame before any script runs. */
-export function avatarSvg(frame: BotFrame, ink: string, uid: string): AvatarSvgNode[] {
+export function avatarSvg(frame: EngineFrame, ink: string, uid: string): AvatarSvgNode[] {
   const maskId = `${uid}-mask`;
-  const stroke = (arc: ArcRender): Attrs => ({ stroke: `url(#${uid}-${arc.id})`, 'stroke-width': arc.width, opacity: arc.opacity });
+  const stroke = (arc: DecorArcRender): AvatarAttrs => ({ stroke: `url(#${uid}-${arc.id})`, 'stroke-width': arc.width, opacity: arc.opacity });
 
   const mask = svgNode('mask', {
     id: maskId,
@@ -76,7 +60,7 @@ export function avatarSvg(frame: BotFrame, ink: string, uid: string): AvatarSvgN
 
   const dots = svgNode('g', {}, frame.dots.map((dot) => {
     const fill = dot.color ?? (dot.depth === undefined ? ink : mixHex(PAPER, ink, dot.depth));
-    const placed: Attrs = dot.d ? { d: dot.d, transform: `translate(${dot.x} ${dot.y}) rotate(${dot.rot ?? 0}) scale(${RADIUS})` } : { cx: dot.x, cy: dot.y, r: dot.r };
+    const placed: AvatarAttrs = dot.d ? { d: dot.d, transform: `translate(${dot.x} ${dot.y}) rotate(${dot.rot ?? 0}) scale(${RADIUS})` } : { cx: dot.x, cy: dot.y, r: dot.r };
 
     return svgNode(dot.d ? 'path' : 'circle', {
       fill,
@@ -85,7 +69,6 @@ export function avatarSvg(frame: BotFrame, ink: string, uid: string): AvatarSvgN
     });
   }));
 
-  // No paper under the body: the eye holes stay transparent and show whatever surface is behind.
   const body = svgNode('g', { opacity: frame.bodyAlpha }, [
     svgNode('g', { mask: `url(#${maskId})` }, [svgNode('rect', { ...FRAME_BOX, fill: ink })]),
   ]);
@@ -104,19 +87,17 @@ export function avatarSvg(frame: BotFrame, ink: string, uid: string): AvatarSvgN
   ];
 }
 
-/** One SVG node as markup, for renderers that take an SVG string instead of DOM nodes. */
 export function avatarMarkup(node: AvatarSvgNode): string {
   const attrs = Object.entries(node.attrs).map(([key, value]) => `${key}="${value}"`).join(' ');
 
   return `<${node.tag} ${attrs}>${node.children.map(avatarMarkup).join('')}</${node.tag}>`;
 }
 
-/** The readable pose of a look, as reduced motion and the first paint show it. */
-export function avatarStill(look: Pick<AvatarLook, 'state' | 'radii' | 'expression'>): BotFrame {
+export function avatarStill(look: Pick<AvatarLook, 'state' | 'radii' | 'expression'>): EngineFrame {
   return new BotEngine(RADIUS, look.state, look.radii, look.expression).sample(POSES[look.state]);
 }
 
-function syncAttrs(node: Element, attrs: Attrs) {
+function syncAttrs(node: Element, attrs: AvatarAttrs) {
   for (const [name, value] of Object.entries(attrs)) {
     const text = String(value);
 
@@ -125,7 +106,6 @@ function syncAttrs(node: Element, attrs: Attrs) {
     }
   }
 
-  // A node reused for another layer (the dots and the body swap places) must not keep the old layer's attributes.
   for (const name of node.getAttributeNames()) {
     if (!(name in attrs)) {
       node.removeAttribute(name);
@@ -133,11 +113,6 @@ function syncAttrs(node: Element, attrs: Attrs) {
   }
 }
 
-/**
- * Nodes are matched by POSITION: `sample()` returns fresh arrays every frame, so matching by identity
- * recreated every SVG node at the screen's rate. Here nodes live and only attributes move, and the
- * nodes a server rendered for the first frame are adopted, not redrawn.
- */
 function syncChildren(parent: Element, nodes: AvatarSvgNode[]) {
   for (const [index, node] of nodes.entries()) {
     let current = parent.children.item(index);
@@ -163,19 +138,6 @@ function syncChildren(parent: Element, nodes: AvatarSvgNode[]) {
   }
 }
 
-export interface AvatarLook {
-  state: StateId
-  radii: number[] | null
-  expression: BotExpression | null
-  ink: string
-  /** cap on the drawing rate, never on the clock; 0 draws at the screen's rate */
-  fps: number
-}
-
-/**
- * One live avatar: its engine, clock, pointer and render loop. A drawn frame costs a style
- * recalculation, a layout and a paint, so the loop only runs while someone can see the bot.
- */
 export class AvatarPlayer {
   private readonly svg: SVGSVGElement;
   private readonly uid: string;
@@ -190,7 +152,6 @@ export class AvatarPlayer {
   private pointer: { x: number; y: number } | null = null;
   private aiming = false;
   private turnSince = 0;
-  // IntersectionObserver covers both ways of being unseen: scrolled away, and an unrendered ancestor.
   private readonly observer = new IntersectionObserver((entries) => {
     this.onscreen = entries.at(-1)?.isIntersecting ?? this.onscreen;
     this.wake();
@@ -203,7 +164,6 @@ export class AvatarPlayer {
     document.addEventListener('visibilitychange', this.wake);
   }
 
-  /** The first call creates the engine on these settings; later ones morph to them, as the engine does. */
   update(look: AvatarLook) {
     this.look = look;
     this.engine ??= new BotEngine(RADIUS, look.state, look.radii, look.expression);
@@ -213,7 +173,6 @@ export class AvatarPlayer {
     this.draw();
   }
 
-  /** Still avatars and reduced motion never get a player: they are the `avatarStill` markup alone. */
   setFollow(follow: boolean) {
     this.follow = follow;
 
@@ -250,7 +209,6 @@ export class AvatarPlayer {
     }
   };
 
-  /** The loop restarts with `last = 0`, so a resume's first frame has dt 0 instead of the jump a stale timestamp would cause. */
   private run() {
     if (this.raf) {
       return;
@@ -265,11 +223,6 @@ export class AvatarPlayer {
     this.raf = 0;
   }
 
-  /*
-   * The clock always advances, the drawing does not: a skipped frame loses no animation time, it
-   * only draws less often. The budget compares the bot's clock, not `ms`, so an automatic pause
-   * does not count as lag to catch up.
-   */
   private tick = (ms: number) => {
     this.raf = requestAnimationFrame(this.tick);
     const dt = this.last ? Math.min((ms - this.last) / 1000, 0.064) : 0;

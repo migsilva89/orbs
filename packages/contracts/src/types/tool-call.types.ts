@@ -4,7 +4,6 @@ import { bot } from './bot.types';
 import { routine } from './routine.types';
 import { todo } from './todo.types';
 
-/** Shapes of Pi tool call inputs and outputs as clients render them. */
 export const toolCallJson = z.record(z.string(), z.json());
 
 export const toolCallText = z.string();
@@ -29,24 +28,24 @@ const toolCallArtifactSummary = artifactSummary.pick({
   version: true,
 });
 
-/** A tool output that is the JSON text of one value, read with `schema`; text that is not JSON fails `schema`. */
-function toolCallJsonOutput<T extends z.ZodType>(schema: T) {
-  return z.preprocess((text) => {
+const toolCallJsonOutput = z.union([
+  z.string().transform((text) => {
     try {
-      return typeof text === 'string' ? JSON.parse(text) : text;
+      return JSON.parse(text);
     } catch {
       return text;
     }
-  }, schema);
-}
+  }),
+  z.json(),
+]);
 
-export const toolCallArtifact = toolCallJsonOutput(toolCallArtifactSummary);
+export const toolCallArtifact = toolCallJsonOutput.pipe(toolCallArtifactSummary);
 
-export const toolCallRoutine = toolCallJsonOutput(routine.pick({ id: true, name: true }));
+export const toolCallRoutine = toolCallJsonOutput.pipe(routine.pick({ id: true, name: true }));
 
-export const toolCallTodo = toolCallJsonOutput(todo.pick({ id: true, title: true }));
+export const toolCallTodo = toolCallJsonOutput.pipe(todo.pick({ id: true, title: true }));
 
-export const toolCallBot = toolCallJsonOutput(bot.pick({ id: true, name: true }));
+export const toolCallBot = toolCallJsonOutput.pipe(bot.pick({ id: true, name: true }));
 
 export const toolCallSubagent = z.object({
   operation: z.enum(['run', 'spawn', 'send']),

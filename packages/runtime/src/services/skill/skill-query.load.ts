@@ -1,11 +1,8 @@
 import { formatSkillsForPrompt } from '@earendil-works/pi-coding-agent';
-import { conversationContent } from '@repo/contracts/universal';
 import { log } from '@repo/logger/server';
-import { z } from 'zod';
+import { skillArgumentsSchema } from '../../types/skill.types';
 import { skillQueryResolve } from './skill-query.resolve';
 import type { SkillLoaderServiceDeps, SkillLoadParams, SkillLoadResult } from '../../types/skill.types';
-
-const argumentsSchema = z.record(z.string(), z.json()).parse(z.toJSONSchema(conversationContent));
 
 export function skillQueryLoad(deps: SkillLoaderServiceDeps, params: SkillLoadParams): SkillLoadResult {
   const { skills, diagnostics } = skillQueryResolve(deps, params);
@@ -25,7 +22,7 @@ export function skillQueryLoad(deps: SkillLoaderServiceDeps, params: SkillLoadPa
       description: skill.description,
       filePath: skill.filePath,
       isModelInvocable: !skill.disableModelInvocation,
-      argumentsSchema,
+      argumentsSchema: skillArgumentsSchema,
       argumentHint: skill.argumentHint,
     })),
   };

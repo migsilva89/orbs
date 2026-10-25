@@ -1,24 +1,9 @@
-import { toolCallArtifact, toolCallPeerDetails, toolCallSubagent, toolCallSubagentDetails } from '@repo/contracts/universal';
-import { match, P } from 'ts-pattern';
+import { toolCallArtifact, toolCallSubagent, toolCallSubagentDetails } from '@repo/contracts/universal';
 import { toolEvent, toolEventsAppend } from '../tool-event/tool-event.utils';
-import { TOOL_ARTIFACT_NAMES, TOOL_MCP_NAME, TOOL_PATH_KEYS, TOOL_PEER_NAMES, TOOL_PRESENTATIONS, TOOL_PREVIEW_KEYS, TOOL_QUESTIONS, TOOL_SUBAGENT } from './tool.constants';
-import { toolInputText, toolInputTexts, toolReadableName } from './tool.utils';
+import { TOOL_ARTIFACT_NAMES, TOOL_QUESTIONS, TOOL_SUBAGENT } from './tool.constants';
 import type * as ToolTypes from '../../types/tool.types';
-import type { Bot, ToolCallArtifact } from '@repo/contracts/universal';
-import type { DynamicToolUIPart } from 'ai';
 
 export function toolBlocks({ parts, hideVerbose = false }: ToolTypes.ToolBlocksParams): ToolTypes.ToolBlock[] {
-  function toolArtifact(part: DynamicToolUIPart): ToolCallArtifact | undefined {
-    return TOOL_ARTIFACT_NAMES.has(part.toolName) && part.state === 'output-available' ? toolCallArtifact.safeParse(part.output).data : undefined;
-  }
-
-  function toolSubagent(part: DynamicToolUIPart): ToolTypes.ToolSubagent | undefined {
-    const input = part.toolName === TOOL_SUBAGENT ? toolCallSubagent.safeParse(part.input).data : undefined;
-    const details = toolCallSubagentDetails.safeParse(part.toolMetadata?.details).data;
-
-    return input ? { ...input, conversationId: details?.conversationId } : undefined;
-  }
-
   const all = parts.reduce<ToolTypes.ToolBlock[]>((blocks, part, index) => {
     const last = blocks.at(-1);
 
@@ -38,13 +23,15 @@ export function toolBlocks({ parts, hideVerbose = false }: ToolTypes.ToolBlocksP
       return blocks;
     }
 
-    const artifact = toolArtifact(part);
+    const artifact = TOOL_ARTIFACT_NAMES.has(part.toolName) && part.state === 'output-available' ? toolCallArtifact.safeParse(part.output).data : undefined;
 
     if (artifact) {
       return [...blocks, { kind: 'artifact', index, artifact }];
     }
 
-    const subagent = toolSubagent(part);
+    const subagentInput = part.toolName === TOOL_SUBAGENT ? toolCallSubagent.safeParse(part.input).data : undefined;
+    const subagentDetails = toolCallSubagentDetails.safeParse(part.toolMetadata?.details).data;
+    const subagent = subagentInput ? { ...subagentInput, conversationId: subagentDetails?.conversationId } : undefined;
 
     if (subagent) {
       return [...blocks, { kind: 'subagent', index, part, subagent }];
@@ -68,75 +55,4 @@ export function toolBlocks({ parts, hideVerbose = false }: ToolTypes.ToolBlocksP
   }
 
   return all.filter((block) => block.kind !== 'reasoning' && block.kind !== 'tools');
-}
-
-/** The distinct bots that `bot_message` and `bot_ask` calls reached, each with its conversation once the daemon accepted the message. */
-export function toolPeers(parts: DynamicToolUIPart[], bots: Bot[]): ToolTypes.ToolPeer[] {
-  const peers = parts.flatMap((part) => {
-    const details = TOOL_PEER_NAMES.has(part.toolName) ? toolCallPeerDetails.safeParse(part.toolMetadata?.details).data : undefined;
-    const peer = bots.find((bot) => bot.id === (details?.recipientId ?? toolInputText({ input: part.input, key: 'botId' })));
-
-    return peer ? [{ peer, conversationId: details?.recipientConversationId }] : [];
-  });
-
-  return [...new Map(peers.map((item) => [item.peer.id, item])).values()];
-}
-
-export function toolIdentity(part: Pick<DynamicToolUIPart, 'toolName'>): ToolTypes.ToolIdentity {
-  const mcp = TOOL_MCP_NAME.exec(part.toolName);
-
-  return { name: mcp?.[1] ?? part.toolName, identifier: part.toolName, isMcp: Boolean(mcp) };
-}
-
-export function toolPresentation(part: Pick<DynamicToolUIPart, 'toolName'>): ToolTypes.ToolPresentation {
-  const identity = toolIdentity(part);
-  const known = identity.isMcp ? undefined : TOOL_PRESENTATIONS.get(identity.name);
-
-  return {
-    label: known?.label() ?? toolReadableName(identity.name),
-    icon: known?.icon ?? (identity.isMcp ? 'mcp' : 'tool'),
-  };
-}
-
-export function toolPreview(part: DynamicToolUIPart): string | undefined {
-  const texts = toolInputTexts(part);
-  const preferred = TOOL_PREVIEW_KEYS.map((key) => texts.find((text) => text.key === key)).find(Boolean) ?? texts.at(0);
-  const line = preferred?.value.split('\n')[0];
-
-  if (!preferred || !TOOL_PATH_KEYS.has(preferred.key)) {
-    return line;
-  }
-
-  return line
-    ?.split('/')
-    .filter(Boolean)
-    .at(-1);
-}
-
-export function toolOutputText(part: DynamicToolUIPart): string | undefined {
-  return match(part)
-    .with({ state: 'output-error' }, ({ errorText }) => errorText)
-    .with({ state: 'output-available', output: P.string }, ({ output }) => output.trimEnd() || undefined)
-    .with({ state: 'output-available' }, ({ output }) => JSON.stringify(output, null, 2))
-    .otherwise(() => undefined);
-}
-
-export function toolCollapsed({ part, grouped, expanded }: ToolTypes.ToolCollapsedParams): boolean {
-  return grouped && !expanded && part.state !== 'approval-requested';
-}
-
-export function toolRunning(part: DynamicToolUIPart): boolean {
-  return part.state === 'input-streaming' || part.state === 'input-available' || part.state === 'approval-responded';
-}
-
-export function toolGroupState({ parts }: ToolTypes.ToolGroupStateParams): DynamicToolUIPart['state'] {
-  if (parts.some(toolRunning)) {
-    return 'input-available';
-  }
-
-  if (parts.some((part) => part.state === 'output-error')) {
-    return 'output-error';
-  }
-
-  return 'output-available';
 }

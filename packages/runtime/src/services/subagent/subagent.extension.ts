@@ -47,7 +47,11 @@ export function subagentExtension() {
         replay: 'safe',
         execute: async (args, api, context) => match(args)
           .with({ operation: 'run', message: P.string }, ({ message }) => (
-            subagentActionRun(api, message, context)
+            subagentActionRun({
+              api,
+              message,
+              context,
+            })
           ))
           .with({ operation: 'run' }, () => subagentReply('run needs a message.', undefined, true))
           .with({
@@ -55,10 +59,12 @@ export function subagentExtension() {
             name: P.string,
             message: P.string,
           }, ({ name, message }) => (
-            subagentActionSpawn(api, {
+            subagentActionSpawn({
+              api,
               name,
               message,
-            }, context)
+              context,
+            })
           ))
           .with({ operation: 'spawn' }, () => subagentReply('spawn needs a name and message.', undefined, true))
           .with({
@@ -66,14 +72,20 @@ export function subagentExtension() {
             name: P.string,
             message: P.string,
           }, ({ name, message }) => (
-            subagentActionSend(api, {
+            subagentActionSend({
+              api,
               name,
               message,
               whenBusy: args.whenBusy,
-            }, context)
+              context,
+            })
           ))
           .with({ operation: 'send' }, () => subagentReply('send needs a name and message.', undefined, true))
-          .with({ operation: 'status' }, ({ name }) => subagentQueryStatus(api, name, context))
+          .with({ operation: 'status' }, ({ name }) => subagentQueryStatus({
+            api,
+            name,
+            context,
+          }))
           .exhaustive(),
       }),
       defineTool({
@@ -81,7 +93,11 @@ export function subagentExtension() {
         description: m.ui_tool_bot_subagent_stop_description(),
         parameters: Type.Object({ name: subagentName }),
         replay: 'unsafe',
-        execute: ({ name }, api, context) => subagentActionStop(api, name, context),
+        execute: ({ name }, api, context) => subagentActionStop({
+          api,
+          name,
+          context,
+        }),
       }),
     ],
   });

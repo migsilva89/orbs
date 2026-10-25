@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
 
-/** Marks a chat read through an entry, skipping the call when the cached chat is already read that far. */
 export function useChatMarkRead(botId: string) {
   const queryClient = useQueryClient();
   const { rpc } = useRpc();

@@ -1,5 +1,16 @@
+import { artifactComponents } from '@repo/contracts/universal';
+import { z } from 'zod';
+import type { Context } from '@earendil-works/chord/context';
 import type * as PiTypes from '@earendil-works/pi-durable';
 import type * as ContractTypes from '@repo/contracts/universal';
+
+export const artifactBlockSchemas = Object.fromEntries(Object.entries(artifactComponents).map(([name, component]) => [
+  name,
+  {
+    description: component.description,
+    props: z.toJSONSchema(component.props, { io: 'input' }),
+  },
+]));
 
 export interface ArtifactServiceDeps {
   harness: PiTypes.Harness;
@@ -10,8 +21,11 @@ export interface ArtifactConversationParams {
   conversationId: PiTypes.ConversationId;
 }
 
+export interface ArtifactContextParams {
+  context: Context;
+}
+
 export type ArtifactListParams = ArtifactConversationParams;
-/** `id` is set only when clear-history carries an artifact into a fresh store. */
 export type ArtifactCreateParams = ContractTypes.ArtifactCreateInput & ArtifactConversationParams & { id?: string };
 export type ArtifactGetParams = ContractTypes.ArtifactGetInput & ArtifactConversationParams;
 export type ArtifactUpdateParams = ContractTypes.ArtifactUpdateInput & ArtifactConversationParams;

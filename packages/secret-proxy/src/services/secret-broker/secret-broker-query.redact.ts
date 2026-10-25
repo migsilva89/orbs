@@ -1,8 +1,7 @@
 import { SECRET_BROKER } from './secret-broker.constants';
-import type { SecretBrokerServiceDeps, SecretRedactParams } from '../../types/secret-broker.types';
+import type { SecretBrokerRedactParams, SecretBrokerServiceDeps } from '../../types/secret-broker.types';
 
-/** Replaces any stored secret value in tool output with its placeholder, whatever the mode. */
-export async function secretBrokerQueryRedact({ source, proxy }: SecretBrokerServiceDeps, { text }: SecretRedactParams) {
+export async function secretBrokerQueryRedact({ source, proxy }: SecretBrokerServiceDeps, { text }: SecretBrokerRedactParams) {
   const rules = await source.queries.rules();
   const values = await Promise.all(rules.map(async ({ name }) => ({ name, value: await source.queries.value({ name }) })));
 

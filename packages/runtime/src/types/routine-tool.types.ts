@@ -3,7 +3,7 @@ import { routineCreate, routineTarget, routineUpdate } from '@repo/contracts/uni
 import { z } from 'zod';
 import type { RuntimeServiceDeps } from './runtime.types';
 
-export type RuntimeRoutineToolsDeps = Pick<RuntimeServiceDeps, 'harness' | 'routines'>;
+export type RoutineToolDeps = Pick<RuntimeServiceDeps, 'harness' | 'routines'>;
 
 export const routineToolCreate = routineCreate.omit({ botId: true }).strict();
 export const routineToolUpdate = routineUpdate.omit({ botId: true }).strict();

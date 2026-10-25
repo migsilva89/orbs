@@ -2,10 +2,14 @@ import { resolveElementProps, validateSpec } from '@json-render/core';
 import { ARTIFACT, artifactComponents, artifactSpec } from '@repo/contracts/universal';
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
-import { artifactContent, artifactContentKey, artifactVersionEntry } from './artifact.constants';
+import { artifactContent, artifactVersionEntry } from './artifact.constants';
 import type { ArtifactDocument, ArtifactRecord, ArtifactVersionPointer } from '../../types/artifact.types';
 import type { ConversationId, Tx } from '@earendil-works/pi-durable';
 import type { Artifact, ArtifactSpec, ArtifactSummary } from '@repo/contracts/universal';
+
+export function artifactContentKey(artifactId: string, version: number) {
+  return `${artifactId}:${version}`;
+}
 
 export function artifactGet(doc: ArtifactDocument | null | undefined, artifactId: string): ArtifactRecord {
   return match(doc?.artifacts[artifactId])
@@ -131,7 +135,6 @@ function artifactStructuredSpecIssues(spec: Extract<ArtifactSpec, { root: string
     .exhaustive();
 }
 
-// json-render validates references and props, but does not reject child cycles.
 function artifactHasTree(spec: Extract<ArtifactSpec, { root: string }>): boolean {
   const seen = new Set<string>();
   const pending = [{ id: spec.root, depth: 1 }];

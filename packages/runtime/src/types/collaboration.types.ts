@@ -1,4 +1,11 @@
+import { z } from 'zod';
+import type { Context } from '@earendil-works/chord/context';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
+
+export const collaborationDeliveryTarget = z.object({
+  recipientConversationId: z.number(),
+  recipientName: z.string(),
+});
 
 export interface CollaborationBot {
   id: string;
@@ -12,7 +19,6 @@ export interface CollaborationBotParams {
 
 export interface CollaborationRecipientParams extends CollaborationBotParams {
   recipientId: string;
-  /** Hops the current request already took; 0 when the owner wrote last. */
   hops: number;
 }
 
@@ -29,7 +35,6 @@ export interface CollaborationPolicy {
   };
 }
 
-/** Resolves another bot's Pi store; peer delivery crosses stores through stable request IDs. */
 export interface CollaborationDirectory {
   harness(botId: string): Promise<PiDurableTypes.Harness>;
 }
@@ -71,13 +76,31 @@ export interface CollaborationSendParams {
   context?: 'existing' | 'temporary';
 }
 
-export interface CollaborationTargetParams {
+export interface CollaborationContextParams {
+  context: Context;
+}
+
+export interface CollaborationSendCall extends CollaborationContextParams {
+  input: CollaborationSendParams;
+  api: PiDurableTypes.ToolExecutionApi;
+}
+
+export interface CollaborationHarnessDeps {
+  harness: PiDurableTypes.Harness;
+}
+
+export interface CollaborationTargetParams extends CollaborationContextParams {
   senderId: string;
   senderStoreId: string;
   sourceConversationId: PiDurableTypes.ConversationId;
   recipientId: string;
-  context?: 'existing' | 'temporary';
+  target?: 'existing' | 'temporary';
   temporaryTtlMs: number;
+}
+
+export interface CollaborationDeliverParams extends CollaborationContextParams {
+  taskId: number;
+  input: CollaborationDeliveryInput;
 }
 
 export interface CollaborationTemporaryBinding extends PiDurableTypes.JsonObject {
@@ -94,7 +117,6 @@ export interface CollaborationTemporaryContext extends PiDurableTypes.JsonObject
   archivedAt: number | null;
 }
 
-/** Sender-side pointers to temporary contexts that live in recipient stores. */
 export interface CollaborationTemporaryLinks extends PiDurableTypes.JsonObject {
   links: { recipientId: string; conversationId: PiDurableTypes.ConversationId; createdAt: number }[];
 }

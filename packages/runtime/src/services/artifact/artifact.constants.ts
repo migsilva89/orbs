@@ -24,7 +24,3 @@ export const artifactContent = defineDocFamily<ArtifactContent, null>({
 });
 
 export const artifactVersionEntry = defineEntry<ArtifactVersionData>(ARTIFACT.entryKind);
-
-export function artifactContentKey(artifactId: string, version: number) {
-  return `${artifactId}:${version}`;
-}

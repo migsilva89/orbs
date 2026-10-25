@@ -3,8 +3,6 @@ import { match, P } from 'ts-pattern';
 import { runtimeActionRequestApproval } from './runtime-action.request-approval';
 import { runtimeBot } from './runtime.constants';
 import type { RuntimeToolsDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
-import type { Conversation } from '@earendil-works/pi-durable';
 
 export function runtimeToolsExtension({ harness, readOnlyTools, ownTools, permissions }: RuntimeToolsDeps) {
   return defineExtension({
@@ -27,7 +25,19 @@ export function runtimeToolsExtension({ harness, readOnlyTools, ownTools, permis
               arguments: call.arguments,
               isReadOnly: tool !== undefined && readOnlyTools.includes(tool),
               isOwn: tool !== undefined && ownTools.includes(tool),
-              getRequest: () => runtimeToolsRequest(conversation, context),
+              getRequest: async () => {
+                const view = await conversation?.context(context);
+                const message = [...(view?.messages ?? [])].reverse().find((item) => item.role === 'user');
+
+                return match(message?.content)
+                  .with(P.string, (text) => text)
+                  .with(P.array(), (parts) => parts.flatMap((part) => (
+                    match(part)
+                      .with({ type: 'text' }, ({ text }) => [text])
+                      .otherwise(() => [])
+                  )).join('\n'))
+                  .otherwise(() => '');
+              },
             };
 
             const decision = await permissions.authorize(input, context);
@@ -58,18 +68,4 @@ export function runtimeToolsExtension({ harness, readOnlyTools, ownTools, permis
       },
     })],
   });
-}
-
-async function runtimeToolsRequest(conversation: Conversation | undefined, context: Context): Promise<string> {
-  const view = await conversation?.context(context);
-  const message = [...(view?.messages ?? [])].reverse().find((item) => item.role === 'user');
-
-  return match(message?.content)
-    .with(P.string, (text) => text)
-    .with(P.array(), (parts) => parts.flatMap((part) => (
-      match(part)
-        .with({ type: 'text' }, ({ text }) => [text])
-        .otherwise(() => [])
-    )).join('\n'))
-    .otherwise(() => '');
 }

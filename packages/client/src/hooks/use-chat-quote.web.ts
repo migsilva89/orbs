@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { ROOMS } from '../services/rooms/rooms.constants';
 import type { RoomsQuoteSelection } from '../types/rooms.types';
 
-/** Text the owner selected inside one message bubble, offered for quoting after a short pause. */
 export function useChatQuote() {
   const [selection, setSelection] = useState<RoomsQuoteSelection | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);

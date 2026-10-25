@@ -3,16 +3,12 @@ import { useMutation, useMutationState } from '@tanstack/react-query';
 import { generateId } from 'ai';
 import { useEffect, useEffectEvent, useRef } from 'react';
 import { chatResetCommand } from '../services/chat/chat.utils';
-import { mentionSubmission } from '../services/mention/mention.client';
+import { mentionSubmission } from '../services/mention/mention.utils';
 import { useRpc } from './use-rpc';
 import type { ChatSendInput, ChatSendParams, ChatSendResult } from '../types/chat.types';
 import type { CommandExecuteInput } from '@repo/contracts/universal';
 import type { MutationState } from '@tanstack/react-query';
 
-/**
- * Sends composer text as a message or command. `/reset` returns `{ kind: 'reset' }` for the app to open its confirmation;
- * a failed send rethrows so the app can restore its draft, and retrying the same message reuses its request id.
- */
 export function useChatSend({ botId, conversationId, latestEntryId, onOutgoingChange, onResetDone }: ChatSendParams) {
   const { rpc } = useRpc();
   const pending = useRef<{ key: string; id: string } | null>(null);

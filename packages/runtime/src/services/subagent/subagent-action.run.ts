@@ -1,14 +1,9 @@
 import { match, P } from 'ts-pattern';
 import { SUBAGENT } from './subagent.constants';
 import { subagentAnswer, subagentCreateChild, subagentDetails, subagentReply } from './subagent.utils';
-import type { Context } from '@earendil-works/chord/context';
-import type { ToolExecutionApi } from '@earendil-works/pi-durable';
+import type { SubagentRunParams } from '../../types/subagent.types';
 
-export async function subagentActionRun(
-  api: ToolExecutionApi,
-  message: string,
-  context: Context,
-) {
+export async function subagentActionRun({ api, message, context }: SubagentRunParams) {
   const child = await api.commit(async (tx) => {
     await tx.conversation(api.conversationId);
     await tx.task(api.taskId);

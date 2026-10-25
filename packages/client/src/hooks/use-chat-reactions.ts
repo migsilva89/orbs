@@ -4,7 +4,6 @@ import { CHAT } from '../services/chat/chat.constants';
 import { useRpc } from './use-rpc';
 import type { ChatReactionsParams } from '../types/chat.types';
 
-/** Reactions for `entryIds`, fetched in pages and keyed by entry id; refetched when the view's interactions revision changes. */
 export function useChatReactions({ botId, conversationId, entryIds, revision }: ChatReactionsParams) {
   const { rpc } = useRpc();
   const queryClient = useQueryClient();

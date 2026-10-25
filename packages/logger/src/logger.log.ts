@@ -1,13 +1,12 @@
 import { log as eventLog } from 'evlog';
 import { storage } from './context';
-
-type LogPayload = { tag: string; message: string; error?: unknown } & Record<string, unknown>;
+import type { LoggerErrorDetails, LoggerFields, LoggerPayload } from './types/logger.types';
 
 function toLogError(error: Error) {
   // SAFETY: Error subclasses may expose these optional fields; every field is checked before typed use.
-  const details = error as Error & { code?: unknown; data?: unknown; internal?: unknown; cause?: unknown };
+  const details = error as LoggerErrorDetails;
 
-  const result: Record<string, unknown> = {
+  const result: LoggerFields = {
     name: error.name,
     message: error.message,
     stack: error.stack,
@@ -37,7 +36,7 @@ function toLogError(error: Error) {
 }
 
 const log = {
-  debug(payload: LogPayload) {
+  debug(payload: LoggerPayload) {
     const { tag, message, ...fields } = payload;
     const requestLogger = storage.getStore();
 
@@ -52,13 +51,13 @@ const log = {
       ...fields,
     });
   },
-  error(payload: LogPayload) {
+  error(payload: LoggerPayload) {
     const { tag, message, error, ...fields } = payload;
     const requestLogger = storage.getStore();
     const errArg = error instanceof Error ? error : message;
 
     if (requestLogger) {
-      const requestFields: Record<string, unknown> = { tag, message, ...fields };
+      const requestFields: LoggerFields = { tag, message, ...fields };
 
       if (error !== undefined && !(error instanceof Error)) {
         requestFields.error = error;
@@ -68,14 +67,14 @@ const log = {
       return;
     }
 
-    const eventFields: Record<string, unknown> = { tag, message, ...fields };
+    const eventFields: LoggerFields = { tag, message, ...fields };
 
     if (error !== undefined) {
       eventFields.error = error instanceof Error ? toLogError(error) : error;
     }
     eventLog.error(eventFields);
   },
-  info(payload: LogPayload) {
+  info(payload: LoggerPayload) {
     const { tag, message, ...fields } = payload;
     const requestLogger = storage.getStore();
 
@@ -90,7 +89,7 @@ const log = {
       ...fields,
     });
   },
-  warn(payload: LogPayload) {
+  warn(payload: LoggerPayload) {
     const { tag, message, ...fields } = payload;
     const requestLogger = storage.getStore();
 

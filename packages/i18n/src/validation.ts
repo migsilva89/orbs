@@ -1,13 +1,12 @@
 import { match, P } from 'ts-pattern';
-import { z } from 'zod';
+// oxlint-disable-next-line arch/no-local-schema-construction -- bootZodErrors sets zod's global error map for hosts to call at startup; it builds no schema
+import { config } from 'zod';
 import { m } from './paraglide/messages.js';
-
-type ZodRawIssue = z.core.$ZodRawIssue
-type ValidationParams = Record<string, string | number>
+import type { core } from 'zod';
 
 const numericOrigin = P.union('number', 'int');
 
-function issueToKey(issue: ZodRawIssue): string | undefined {
+function issueToKey(issue: core.$ZodRawIssue): string | undefined {
   return match(issue)
     .with({ code: 'invalid_type', expected: P.union('number', 'int') }, () => 'validation_number')
     .with({ code: 'too_small', origin: numericOrigin }, () => 'validation_number')
@@ -28,16 +27,9 @@ function issueToKey(issue: ZodRawIssue): string | undefined {
     .otherwise(() => undefined);
 }
 
-/**
- * Boot Zod's global error map to return i18n keys instead of English messages.
- * Call once at app startup.
- *
- * ```ts
- * bootZodErrors()
- * ```
- */
 export function bootZodErrors() {
-  z.config({
+  // oxlint-disable-next-line arch/no-local-schema-construction -- bootZodErrors sets zod's global error map for hosts to call at startup; it builds no schema
+  config({
     customError: issueToKey,
   });
 }
@@ -49,7 +41,7 @@ export function deriveLabel(name: string): string {
     .replace(/^./, (c) => c.toUpperCase());
 }
 
-function validationMessage(key: string, params: ValidationParams): string {
+export function expandValidationError(key: string, params: Record<string, string | number>): string {
   const p = {
     field: Object.hasOwn(params, 'field') ? String(params.field) : '',
     minimum: Object.hasOwn(params, 'minimum') ? String(params.minimum) : '',
@@ -73,23 +65,9 @@ function validationMessage(key: string, params: ValidationParams): string {
     .otherwise(() => key);
 }
 
-/**
- * Expand an i18n validation key into a translated message.
- *
- * If the key is recognized, returns the translated string with the field label interpolated.
- * If not recognized, returns the key as-is (it's likely already a human-readable message).
- */
-export function expandValidationError(key: string, params: Record<string, string>): string {
-  return validationMessage(key, params);
-}
-
-/**
- * Resolve a validation message key to a human-readable string.
- * Looks up `validation_{key}` in the i18n bundle, falls back to humanizing the snake_case key.
- */
 export function resolveValidationMessage(message: string, args?: Record<string, string | number>): string {
   const key = message.startsWith('validation_') ? message : `validation_${message}`;
-  const resolved = validationMessage(key, args ?? {});
+  const resolved = expandValidationError(key, args ?? {});
 
   return resolved === key ? message.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase()) : resolved;
 }

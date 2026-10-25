@@ -20,7 +20,7 @@ export function providerQueryList(
             .otherwise(() => []),
           ...match(provider.auth.apiKey)
             .with(P.nullish, () => [])
-            .when((apiKey) => 'login' in apiKey, () => ['api_key' as const])
+            .when((apiKey) => apiKey.login !== undefined, () => ['api_key' as const])
             .otherwise(() => []),
         ],
         ...match(provider.auth.oauth?.loginLabel)

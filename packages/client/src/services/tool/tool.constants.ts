@@ -13,7 +13,6 @@ export const TOOL_QUESTION = 'bot_question';
 
 export const TOOL_SECRET = 'bot_secret';
 
-/** Tools whose question card stands in for the tool row until the owner answers. */
 export const TOOL_QUESTIONS = new Set([TOOL_QUESTION, TOOL_SECRET]);
 
 export const TOOL_SUBAGENT = 'bot_subagent';

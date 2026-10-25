@@ -1,0 +1,24 @@
+import { Type } from '@earendil-works/pi-ai';
+import { botCreate, botGet, botSwapModels, botUpdate } from '@repo/contracts/universal';
+import { z } from 'zod';
+
+export const botToolCreate = botCreate.omit({ permission: true }).strict();
+export const botToolUpdate = botUpdate.omit({ permission: true }).strict();
+export const botToolGet = botGet.strict();
+export const botToolSwapModels = botSwapModels.strict();
+
+export const botToolCreateParameters = Type.Unsafe<z.infer<typeof botToolCreate>>(
+  z.toJSONSchema(botToolCreate, { io: 'input' }),
+);
+
+export const botToolUpdateParameters = Type.Unsafe<z.infer<typeof botToolUpdate>>(
+  z.toJSONSchema(botToolUpdate, { io: 'input' }),
+);
+
+export const botToolGetParameters = Type.Unsafe<z.infer<typeof botToolGet>>(
+  z.toJSONSchema(botToolGet, { io: 'input' }),
+);
+
+export const botToolSwapModelsParameters = Type.Unsafe<z.infer<typeof botToolSwapModels>>(
+  z.toJSONSchema(botToolSwapModels, { io: 'input' }),
+);

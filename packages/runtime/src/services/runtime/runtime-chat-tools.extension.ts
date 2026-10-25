@@ -1,20 +1,16 @@
-import { defineExtension, defineTool, section, StorageRequestError } from '@earendil-works/pi-durable';
+import { defineExtension, defineTool, section } from '@earendil-works/pi-durable';
 import { REACTION } from '@repo/contracts/universal';
-import { Errors } from '@repo/errors/universal';
 import * as m from '@repo/i18n/messages';
-import { match, P } from 'ts-pattern';
 import {
   runtimeHistoryToolPage,
   runtimeHistoryToolPageParameters,
   runtimeHistoryToolSearch,
   runtimeHistoryToolSearchParameters,
-} from '../../types/history.types';
-import { runtimeReactTool, runtimeReactToolParameters } from '../../types/reaction.types';
-import { runtimeHistoryOutput, runtimeHistoryPage } from './runtime-history.utils';
+} from '../../types/runtime-history.types';
+import { runtimeReactionTool, runtimeReactionToolParameters } from '../../types/runtime-reaction.types';
+import { runtimeHistoryEntries, runtimeHistoryOutput, runtimeHistoryPage } from './runtime-history.utils';
 import { runtimeReactionSetBot } from './runtime-reaction.utils';
-import type { Context } from '@earendil-works/chord/context';
-import type { Cursor, ToolExecutionApi } from '@earendil-works/pi-durable';
-import type { ConversationReaction } from '@repo/contracts/universal';
+import { runtimeToolOutput } from './runtime-tool.utils';
 
 export function runtimeChatToolsExtension() {
   const history = defineTool({
@@ -24,7 +20,7 @@ export function runtimeChatToolsExtension() {
     replay: 'safe',
     execute: async (params, api, context) => {
       const input = runtimeHistoryToolPage.parse(params);
-      return runtimeHistoryOutput(runtimeHistoryPage(await runtimeChatEntries(api, input.limit, input.cursor, context)));
+      return runtimeHistoryOutput(runtimeHistoryPage(await runtimeHistoryEntries(api, input.limit, input.cursor, context)));
     },
   });
 
@@ -35,17 +31,17 @@ export function runtimeChatToolsExtension() {
     replay: 'safe',
     execute: async (params, api, context) => {
       const input = runtimeHistoryToolSearch.parse(params);
-      return runtimeHistoryOutput(runtimeHistoryPage(await runtimeChatEntries(api, input.limit, input.cursor, context), input.query));
+      return runtimeHistoryOutput(runtimeHistoryPage(await runtimeHistoryEntries(api, input.limit, input.cursor, context), input.query));
     },
   });
 
   const react = defineTool({
     name: REACTION.toolName,
     description: m.ui_tool_bot_react_description(),
-    parameters: runtimeReactToolParameters,
+    parameters: runtimeReactionToolParameters,
     replay: 'unsafe',
     execute: async (params, api, context) => {
-      return runtimeReactionOutput(await runtimeReactionSetBot(api, runtimeReactTool.parse(params), context));
+      return runtimeToolOutput(await runtimeReactionSetBot(api, runtimeReactionTool.parse(params), context));
     },
   });
 
@@ -57,21 +53,4 @@ export function runtimeChatToolsExtension() {
     }),
     readOnlyTools: [history, search, react],
   };
-}
-
-async function runtimeChatEntries(api: ToolExecutionApi, limit: number | undefined, cursor: Cursor | undefined, context: Context) {
-  try {
-    return await api.commit((tx) => tx.scanEntries({
-      conversationId: api.conversationId,
-      order: 'descending',
-    }, limit ?? 50, cursor), context);
-  } catch (error) {
-    throw match(error)
-      .with(P.instanceOf(StorageRequestError), (cause) => new Errors.VALIDATION_ERROR({ fields: {}, cause }))
-      .otherwise((cause) => cause);
-  }
-}
-
-function runtimeReactionOutput(value: ConversationReaction) {
-  return { output: [{ type: 'text' as const, text: JSON.stringify(value) }] };
 }

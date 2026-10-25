@@ -1,14 +1,12 @@
 import { match, P } from 'ts-pattern';
 import { artifactDocument } from './artifact.constants';
 import { artifactAppendVersion, artifactCopy, artifactReadVersion } from './artifact.utils';
-import type { ArtifactCreateParams, ArtifactRecord, ArtifactServiceDeps } from '../../types/artifact.types';
-import type { Context } from '@earendil-works/chord/context';
+import type * as ArtifactTypes from '../../types/artifact.types';
 import type { Artifact } from '@repo/contracts/universal';
 
 export async function artifactActionCreate(
-  { harness }: ArtifactServiceDeps,
-  params: ArtifactCreateParams,
-  context: Context,
+  { harness }: ArtifactTypes.ArtifactServiceDeps,
+  { context, ...params }: ArtifactTypes.ArtifactCreateParams & ArtifactTypes.ArtifactContextParams,
 ): Promise<Artifact> {
   const now = Date.now();
   const id = params.id ?? crypto.randomUUID();
@@ -22,7 +20,7 @@ export async function artifactActionCreate(
         return artifactCopy(existing, spec);
       })
       .otherwise(async () => {
-        const record: ArtifactRecord = {
+        const record: ArtifactTypes.ArtifactRecord = {
           id,
           botId: params.botId,
           conversationId: params.conversationId,

@@ -6,20 +6,25 @@ import { runtimeQueryQuote } from './runtime-query.quote';
 import { runtimeReactions } from './runtime-reaction.constants';
 import { runtimeReactionTask } from './runtime-reaction.task';
 import { runtimeReactionTarget, runtimeReactionToggle, runtimeReactionView } from './runtime-reaction.utils';
-import type { RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeContextInput, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { EntryId } from '@earendil-works/pi-durable';
 import type { ConversationReaction, ConversationSetReactionInput } from '@repo/contracts/universal';
 
 export async function runtimeActionSetReaction(
   deps: RuntimeServiceDeps,
-  params: ConversationSetReactionInput,
-  context: Context,
+  params: ConversationSetReactionInput & RuntimeContextInput,
 ): Promise<ConversationReaction> {
-  const conversation = await runtimeQueryConversation(deps, params, context);
-  const quote = params.isPresent ? await runtimeQueryQuote(deps, conversation.id, params.entryId, context) : undefined;
+  const { context } = params;
+  const conversation = await runtimeQueryConversation(deps, params);
+
+  const quote = params.isPresent ? await runtimeQueryQuote(deps, {
+    conversationId: conversation.id,
+    entryId: params.entryId,
+    context,
+  }) : undefined;
 
   const reaction = await conversation.commit(async (tx) => {
+    // SAFETY: an entry ID is only a lookup key; runtimeReactionTarget rejects entries outside this conversation.
     return match(runtimeReactionTarget(await tx.entry(params.entryId as EntryId), conversation.id))
       .with(P.nullish, () => {
         throw new Errors.NOT_FOUND({ resource: 'entry', resourceId: params.entryId });

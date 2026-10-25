@@ -7,7 +7,6 @@ import { chatFileType } from '../services/chat/chat.utils';
 import { useChatUploads } from './use-chat-uploads';
 import type { ChatAttachmentsPlatformParams, ChatPicked } from '../types/chat.types';
 
-/** Composer attachments for iOS and Android: photos and files from the system pickers, read from their local uri on upload. */
 export function useChatAttachmentsNative({ botId, onProblem }: ChatAttachmentsPlatformParams) {
   const files = useChatUploads<ChatPicked>({
     botId,

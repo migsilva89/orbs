@@ -1,11 +1,10 @@
 import { match, P } from 'ts-pattern';
 import { todoDocument } from './todo.constants';
 import { todoCopy } from './todo.utils';
-import type { TodoCreateParams, TodoServiceDeps } from '../../types/todo.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { TodoContextParams, TodoCreateParams, TodoServiceDeps } from '../../types/todo.types';
 import type { Todo } from '@repo/contracts/universal';
 
-export async function todoActionCreate({ harness }: TodoServiceDeps, params: TodoCreateParams, context: Context) {
+export async function todoActionCreate({ harness }: TodoServiceDeps, { context, ...params }: TodoCreateParams & TodoContextParams) {
   return harness.commit(async (tx) => {
     const doc = await tx.doc(todoDocument, params.conversationId);
     const id = params.id ?? doc.nextId;

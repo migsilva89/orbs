@@ -1,126 +1,8 @@
+import type * as TanstackJsonLdTypes from './types/tanstack-json-ld.types';
 // oxlint-disable max-lines -- Single source of truth for all JSON-LD schema factories; intentionally co-located.
 import type * as SchemaDtsTypes from 'schema-dts';
 
-export type TanstackJsonLdSchema = SchemaDtsTypes.WithContext<SchemaDtsTypes.Thing>
-
-export interface TanstackJsonLdOrganizationContactPoint {
-  email?: string
-  telephone?: string
-  contactType?: string
-  areaServed?: string | string[]
-  availableLanguage?: string | string[]
-}
-
-export interface TanstackJsonLdOrganizationParams {
-  id?: string
-  name: string
-  legalName?: string
-  url: string
-  logo?: string
-  description?: string
-  sameAs?: string[]
-  aggregateRating?: TanstackJsonLdAggregateRatingParams
-  reviews?: TanstackJsonLdProductReview[]
-  contactPoints?: TanstackJsonLdOrganizationContactPoint[]
-}
-
-export interface TanstackJsonLdWebApplicationParams {
-  id?: string
-  name: string
-  url: string
-  description: string
-  applicationCategory?: string
-  operatingSystem?: string
-}
-
-export interface TanstackJsonLdWebSiteParams {
-  id?: string
-  name: string
-  url: string
-  description?: string
-  inLanguage?: string
-  publisherId?: string
-}
-
-export interface TanstackJsonLdSoftwareApplicationParams {
-  id?: string
-  name: string
-  url: string
-  description: string
-  applicationCategory?: string
-  operatingSystem?: string
-  offers?: SchemaDtsTypes.Offer[]
-}
-
-export interface TanstackJsonLdFaqItem {
-  title: string
-  content: string
-}
-
-export interface TanstackJsonLdHowToStep {
-  name: string
-  text: string
-}
-
-export interface TanstackJsonLdHowToParams {
-  name: string
-  description?: string
-  steps: TanstackJsonLdHowToStep[]
-}
-
-export interface TanstackJsonLdAggregateRatingParams {
-  ratingValue: number
-  reviewCount: number
-  bestRating?: number
-  worstRating?: number
-}
-
-export interface TanstackJsonLdProductReview {
-  author: string
-  rating: number
-  date: string
-  title?: string
-  content: string
-}
-
-export interface TanstackJsonLdAuthorParams {
-  name: string
-  url?: string
-  avatar?: string
-}
-
-export interface TanstackJsonLdArticleParams {
-  headline: string
-  description: string
-  url: string
-  siteName: string
-  siteUrl: string
-  siteLogo?: string
-  datePublished?: string
-  dateModified?: string
-  author?: TanstackJsonLdAuthorParams
-  image?: string
-  wordCount?: number
-  keywords?: string[]
-  language?: string
-}
-
-export interface TanstackJsonLdBreadcrumbItem {
-  name: string
-  url: string
-}
-
-export interface TanstackJsonLdWebPageParams {
-  name: string
-  description: string
-  url: string
-  siteName: string
-  siteUrl: string
-  datePublished?: string
-  dateModified?: string
-}
-
-export function toReviewSchema(review: TanstackJsonLdProductReview): SchemaDtsTypes.Review {
+export function toReviewSchema(review: TanstackJsonLdTypes.TanstackJsonLdProductReview): SchemaDtsTypes.Review {
   return {
     '@type': 'Review',
     author: { '@type': 'Person', name: review.author },
@@ -131,8 +13,9 @@ export function toReviewSchema(review: TanstackJsonLdProductReview): SchemaDtsTy
   };
 }
 
-/** Build an Organization schema. */
-export function createOrganizationSchema(params: TanstackJsonLdOrganizationParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.Organization> {
+export function createOrganizationSchema(
+  params: TanstackJsonLdTypes.TanstackJsonLdOrganizationParams,
+): SchemaDtsTypes.WithContext<SchemaDtsTypes.Organization> {
   const reviewSchemas = params.reviews?.map(toReviewSchema);
 
   const contactPointSchemas = params.contactPoints?.map((contact) => ({
@@ -168,8 +51,7 @@ export function createOrganizationSchema(params: TanstackJsonLdOrganizationParam
   };
 }
 
-/** Build a WebSite schema. */
-export function createWebSiteSchema(params: TanstackJsonLdWebSiteParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.WebSite> {
+export function createWebSiteSchema(params: TanstackJsonLdTypes.TanstackJsonLdWebSiteParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.WebSite> {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -186,8 +68,9 @@ export function createWebSiteSchema(params: TanstackJsonLdWebSiteParams): Schema
   };
 }
 
-/** Build a WebApplication schema. */
-export function createWebApplicationSchema(params: TanstackJsonLdWebApplicationParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.WebApplication> {
+export function createWebApplicationSchema(
+  params: TanstackJsonLdTypes.TanstackJsonLdWebApplicationParams,
+): SchemaDtsTypes.WithContext<SchemaDtsTypes.WebApplication> {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
@@ -206,9 +89,8 @@ export function createWebApplicationSchema(params: TanstackJsonLdWebApplicationP
   };
 }
 
-/** Build a SoftwareApplication schema. */
 export function createSoftwareApplicationSchema(
-  params: TanstackJsonLdSoftwareApplicationParams,
+  params: TanstackJsonLdTypes.TanstackJsonLdSoftwareApplicationParams,
 ): SchemaDtsTypes.WithContext<SchemaDtsTypes.SoftwareApplication> {
   return {
     '@context': 'https://schema.org',
@@ -223,8 +105,7 @@ export function createSoftwareApplicationSchema(
   };
 }
 
-/** Build an FAQPage schema. */
-export function createFaqSchema(faqs: TanstackJsonLdFaqItem[]): SchemaDtsTypes.WithContext<SchemaDtsTypes.FAQPage> {
+export function createFaqSchema(faqs: TanstackJsonLdTypes.TanstackJsonLdFaqItem[]): SchemaDtsTypes.WithContext<SchemaDtsTypes.FAQPage> {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -239,8 +120,7 @@ export function createFaqSchema(faqs: TanstackJsonLdFaqItem[]): SchemaDtsTypes.W
   };
 }
 
-/** Build a HowTo schema. */
-export function createHowToSchema(params: TanstackJsonLdHowToParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.HowTo> {
+export function createHowToSchema(params: TanstackJsonLdTypes.TanstackJsonLdHowToParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.HowTo> {
   const steps: SchemaDtsTypes.HowToStep[] = params.steps.map((step, index) => ({
     '@type': 'HowToStep',
     position: index + 1,
@@ -257,8 +137,9 @@ export function createHowToSchema(params: TanstackJsonLdHowToParams): SchemaDtsT
   };
 }
 
-/** Build a standalone AggregateRating schema. */
-export function createAggregateRatingSchema(params: TanstackJsonLdAggregateRatingParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.AggregateRating> {
+export function createAggregateRatingSchema(
+  params: TanstackJsonLdTypes.TanstackJsonLdAggregateRatingParams,
+): SchemaDtsTypes.WithContext<SchemaDtsTypes.AggregateRating> {
   return {
     '@context': 'https://schema.org',
     '@type': 'AggregateRating',
@@ -269,8 +150,7 @@ export function createAggregateRatingSchema(params: TanstackJsonLdAggregateRatin
   };
 }
 
-/** Build an Article schema. */
-export function createArticleSchema(params: TanstackJsonLdArticleParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.Article> {
+export function createArticleSchema(params: TanstackJsonLdTypes.TanstackJsonLdArticleParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.Article> {
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -305,16 +185,14 @@ export function createArticleSchema(params: TanstackJsonLdArticleParams): Schema
   };
 }
 
-/** Build a BlogPosting schema. */
-export function createBlogPostingSchema(params: TanstackJsonLdArticleParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.BlogPosting> {
+export function createBlogPostingSchema(params: TanstackJsonLdTypes.TanstackJsonLdArticleParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.BlogPosting> {
   return {
     ...createArticleSchema(params),
     '@type': 'BlogPosting',
   };
 }
 
-/** Build breadcrumb schema from ordered items. */
-export function createBreadcrumbSchema(items: TanstackJsonLdBreadcrumbItem[]): SchemaDtsTypes.WithContext<SchemaDtsTypes.BreadcrumbList> {
+export function createBreadcrumbSchema(items: TanstackJsonLdTypes.TanstackJsonLdBreadcrumbItem[]): SchemaDtsTypes.WithContext<SchemaDtsTypes.BreadcrumbList> {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -327,13 +205,7 @@ export function createBreadcrumbSchema(items: TanstackJsonLdBreadcrumbItem[]): S
   };
 }
 
-export interface TanstackJsonLdItemListItem {
-  name: string
-  position: number
-}
-
-/** Build an ItemList schema from ranked items. */
-export function createItemListSchema(items: readonly TanstackJsonLdItemListItem[]): SchemaDtsTypes.WithContext<SchemaDtsTypes.ItemList> {
+export function createItemListSchema(items: readonly TanstackJsonLdTypes.TanstackJsonLdItemListItem[]): SchemaDtsTypes.WithContext<SchemaDtsTypes.ItemList> {
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -345,8 +217,7 @@ export function createItemListSchema(items: readonly TanstackJsonLdItemListItem[
   };
 }
 
-/** Build a WebPage schema. */
-export function createWebPageSchema(params: TanstackJsonLdWebPageParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.WebPage> {
+export function createWebPageSchema(params: TanstackJsonLdTypes.TanstackJsonLdWebPageParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.WebPage> {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
@@ -363,59 +234,8 @@ export function createWebPageSchema(params: TanstackJsonLdWebPageParams): Schema
   };
 }
 
-/** Serialize multiple schemas into one JSON-LD script payload. */
-export function createJsonLd(schemas: readonly TanstackJsonLdSchema[]): string {
+export function createJsonLd(schemas: readonly TanstackJsonLdTypes.TanstackJsonLdSchema[]): string {
   return JSON.stringify(schemas.length === 1 ? schemas[0] : schemas);
-}
-
-export type TanstackJsonLdReturnCategory = 'finite' | 'unlimited' | 'none' | 'seasonal'
-export type TanstackJsonLdReturnFees = 'free' | 'customer' | 'origin'
-export type TanstackJsonLdReturnMethod = 'mail' | 'inStore' | 'kiosk'
-
-export interface TanstackJsonLdQuantitativeDays {
-  minDays?: number
-  maxDays?: number
-}
-
-export interface TanstackJsonLdOfferShipping {
-  rate?: { value: number; currency?: string }
-  countries: string[]
-  handlingTime?: TanstackJsonLdQuantitativeDays
-  transitTime?: TanstackJsonLdQuantitativeDays
-}
-
-export interface TanstackJsonLdOfferReturn {
-  countries: string[]
-  category?: TanstackJsonLdReturnCategory
-  returnDays?: number
-  returnMethod?: TanstackJsonLdReturnMethod
-  returnFees?: TanstackJsonLdReturnFees
-}
-
-export interface TanstackJsonLdPricingTier {
-  name: string
-  price: number
-  currency?: string
-  billingPeriod?: string
-  description?: string
-  priceValidUntil?: string
-  sku?: string
-  url?: string
-}
-
-export interface TanstackJsonLdProductParams {
-  name: string
-  description: string
-  image?: string | string[]
-  brandName?: string
-  url?: string
-  sku?: string
-  category?: string
-  pricing: TanstackJsonLdPricingTier[]
-  aggregateRating?: TanstackJsonLdAggregateRatingParams
-  reviews?: TanstackJsonLdProductReview[]
-  shipping?: TanstackJsonLdOfferShipping
-  returnPolicy?: TanstackJsonLdOfferReturn
 }
 
 const RETURN_CATEGORY_URLS = {
@@ -423,19 +243,19 @@ const RETURN_CATEGORY_URLS = {
   unlimited: 'https://schema.org/MerchantReturnUnlimitedWindow',
   none: 'https://schema.org/MerchantReturnNotPermitted',
   seasonal: 'https://schema.org/MerchantReturnUnspecified',
-} as const satisfies Record<TanstackJsonLdReturnCategory, string>;
+} as const satisfies Record<TanstackJsonLdTypes.TanstackJsonLdReturnCategory, string>;
 
 const RETURN_METHOD_URLS = {
   mail: 'https://schema.org/ReturnByMail',
   inStore: 'https://schema.org/ReturnInStore',
   kiosk: 'https://schema.org/ReturnAtKiosk',
-} as const satisfies Record<TanstackJsonLdReturnMethod, string>;
+} as const satisfies Record<TanstackJsonLdTypes.TanstackJsonLdReturnMethod, string>;
 
 const RETURN_FEES_URLS = {
   free: 'https://schema.org/FreeReturn',
   customer: 'https://schema.org/ReturnFeesCustomerResponsibility',
   origin: 'https://schema.org/OriginalShippingFees',
-} as const satisfies Record<TanstackJsonLdReturnFees, string>;
+} as const satisfies Record<TanstackJsonLdTypes.TanstackJsonLdReturnFees, string>;
 
 const BILLING_PERIOD_UNIT_CODES = {
   day: 'DAY',
@@ -445,7 +265,7 @@ const BILLING_PERIOD_UNIT_CODES = {
   year: 'ANN',
 } as const;
 
-function toShippingDetailsSchemas(shipping: TanstackJsonLdOfferShipping): SchemaDtsTypes.OfferShippingDetails[] {
+function toShippingDetailsSchemas(shipping: TanstackJsonLdTypes.TanstackJsonLdOfferShipping): SchemaDtsTypes.OfferShippingDetails[] {
   const currency = shipping.rate?.currency ?? 'USD';
   const value = shipping.rate?.value ?? 0;
   const handling = shipping.handlingTime;
@@ -486,7 +306,7 @@ function toShippingDetailsSchemas(shipping: TanstackJsonLdOfferShipping): Schema
   }));
 }
 
-function toMerchantReturnPolicySchema(returnPolicy: TanstackJsonLdOfferReturn): SchemaDtsTypes.MerchantReturnPolicy {
+function toMerchantReturnPolicySchema(returnPolicy: TanstackJsonLdTypes.TanstackJsonLdOfferReturn): SchemaDtsTypes.MerchantReturnPolicy {
   const category = returnPolicy.category ?? 'finite';
   const isFinite = category === 'finite';
 
@@ -500,8 +320,7 @@ function toMerchantReturnPolicySchema(returnPolicy: TanstackJsonLdOfferReturn): 
   };
 }
 
-/** Build a Product schema. */
-export function createProductSchema(params: TanstackJsonLdProductParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.Product> {
+export function createProductSchema(params: TanstackJsonLdTypes.TanstackJsonLdProductParams): SchemaDtsTypes.WithContext<SchemaDtsTypes.Product> {
   const oneYearFromNow = new Date();
   oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
   const defaultPriceValidUntil = oneYearFromNow.toISOString().split('T')[0];

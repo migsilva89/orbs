@@ -32,7 +32,7 @@ export async function conversationIndexQueryWatch({ harness }: ConversationIndex
       });
     });
 
-    const stop = async () => {
+    const conversationIndexStop = async () => {
       const [end] = await Promise.all([
         index.stop(),
         graph.stop(),
@@ -42,11 +42,11 @@ export async function conversationIndexQueryWatch({ harness }: ConversationIndex
     };
 
     const closed = Promise.race([index.closed, graph.closed]).then(async (end) => {
-      await stop();
+      await conversationIndexStop();
       return end;
     });
 
-    return { state, closed, stop };
+    return { state, closed, stop: conversationIndexStop };
   } catch (error) {
     await index.stop();
     throw error;

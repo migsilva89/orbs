@@ -6,10 +6,6 @@ import { CONNECTION } from './connection.constants';
 import type { ConnectionPick, ConnectionTarget } from '../../types/connection.types';
 import type { ConnectionLostReason, ServerAddress } from '@repo/contracts/universal';
 
-/**
- * Probes every address at once and returns the first one, in list order, where the paired daemon answers.
- * `isMismatch` means no address reached the paired daemon but one reached a different daemon.
- */
 export async function connectionAddressPick({ serverId, addresses }: ConnectionTarget): Promise<ConnectionPick> {
   const probes = addresses.map((address) => fetch(new URL(CONNECTION.healthPath, address.url), { signal: AbortSignal.timeout(CONNECTION.probeTimeoutMs) })
     .then(async (response) => serverHealth.safeParse(await response.json()).data?.id ?? null)
@@ -28,7 +24,6 @@ export async function connectionAddressPick({ serverId, addresses }: ConnectionT
   };
 }
 
-/** The daemon's current addresses, then any the user added on this device alone. */
 export function connectionAddressesMerge(saved: ServerAddress[], reported: ServerAddress[]): ServerAddress[] {
   const known = new Set(reported.map((address) => address.url));
 
@@ -46,8 +41,7 @@ export function connectionSocketUrl(address: Pick<ServerAddress, 'url'>): string
   return url.toString();
 }
 
-/** Why the daemon refused this device's saved connection, or null when the error is something else. */
-export function connectionLostReason(error: unknown): ConnectionLostReason | null {
+export function connectionLostReason(error: Error): ConnectionLostReason | null {
   return match(error)
     .when((value) => value instanceof ORPCError && value.code === 'UNAUTHORIZED', () => 'revoked' as const)
     .when((value) => value instanceof ORPCError && value.code === 'SERVER_MISMATCH', () => 'replaced' as const)

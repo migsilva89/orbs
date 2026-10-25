@@ -2,7 +2,6 @@ import { m } from '@repo/i18n/client';
 import { useMutation } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
 
-/** Uploads a picked photo as a bot avatar; the result goes into the bot form like any other avatar. */
 export function useBotAvatarUpload() {
   const { rpc } = useRpc();
 

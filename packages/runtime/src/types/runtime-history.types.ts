@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { RuntimeConversationParams } from './runtime.types';
 import type { Cursor } from '@earendil-works/pi-durable';
 
-export interface RuntimeSearchParams extends RuntimeConversationParams {
+export interface RuntimeHistorySearchParams extends RuntimeConversationParams {
   query: string;
   limit?: number;
   cursor?: Cursor;

@@ -3,7 +3,6 @@ import { chatReadPicked } from '../services/chat/chat.native';
 import { useBotAvatarUpload } from './use-bot-avatar-upload';
 import type { BotAvatarImage } from '@repo/contracts/universal';
 
-/** Picks a square photo from the library and uploads it as a bot avatar; resolves null when the owner cancels. */
 export function useBotAvatarPick() {
   const upload = useBotAvatarUpload();
 

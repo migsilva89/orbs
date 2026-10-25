@@ -5,12 +5,12 @@ import { match, P } from 'ts-pattern';
 import { runtimeQueryConversation } from './runtime-query.conversation';
 import { runtimeRun } from './runtime-run.utils';
 import { runtimeWatchChanges } from './runtime-watch.utils';
-import type { RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeContextInput, RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { ConversationState } from '@repo/contracts/universal';
 
-export async function runtimeQueryWatch(deps: RuntimeServiceDeps, params: RuntimeConversationParams, context: Context) {
-  const conversation = await runtimeQueryConversation(deps, params, context);
+export async function runtimeQueryWatch(deps: RuntimeServiceDeps, params: RuntimeConversationParams & RuntimeContextInput) {
+  const { context } = params;
+  const conversation = await runtimeQueryConversation(deps, params);
 
   const live = match(await deps.harness.watchDoc(LiveDoc, conversation.id, context))
     .with(P.nonNullable, (watch) => watch)
@@ -35,7 +35,6 @@ export async function runtimeQueryWatch(deps: RuntimeServiceDeps, params: Runtim
       inbox: structuredClone(inbox.value ?? { items: [] }),
     });
 
-    // Subscribe before reading the tail; entries committed during attachment must not be missed.
     const unsubscribe = deps.harness.subscribeCommits((publication, commitContext) => {
       state.change(commitContext, (draft) => runtimeWatchChanges(draft, publication.changes));
     });
@@ -74,7 +73,7 @@ export async function runtimeQueryWatch(deps: RuntimeServiceDeps, params: Runtim
         });
       });
 
-      const stop = async () => {
+      const runtimeWatchStop = async () => {
         const [end] = await Promise.all([
           live.stop(),
           inbox.stop(),
@@ -85,12 +84,12 @@ export async function runtimeQueryWatch(deps: RuntimeServiceDeps, params: Runtim
 
       const closed = Promise.race([live.closed, inbox.closed]).then(async (end) => {
         unsubscribe();
-        await stop();
+        await runtimeWatchStop();
 
         return end;
       });
 
-      return { state, closed, stop };
+      return { state, closed, stop: runtimeWatchStop };
     } catch (error) {
       unsubscribe();
       await inbox.stop();

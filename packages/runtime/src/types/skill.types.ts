@@ -1,5 +1,9 @@
+import { conversationContent } from '@repo/contracts/universal';
+import { z } from 'zod';
 import type { LoadSkillsResult, Skill } from '@earendil-works/pi-coding-agent';
 import type * as UniversalTypes from '@repo/contracts/universal';
+
+export const skillArgumentsSchema = z.record(z.string(), z.json()).parse(z.toJSONSchema(conversationContent));
 
 export interface SkillLoaderServiceDeps {
   root: string;

@@ -1,13 +1,8 @@
 import { match, P } from 'ts-pattern';
 import { runtimeCarry } from '../../types/runtime.types';
-import type { RuntimeCarryOverDeps, RuntimeCarryOverParams } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeCarryOverDeps, RuntimeCarryOverParams, RuntimeContextInput } from '../../types/runtime.types';
 
-/**
- * Finish a history clear: recreate the saved routines, todos and artifacts in the fresh store with their IDs, then drop the
- * carry file. Creation skips IDs that already exist, so a crash here simply reruns on the next configuration.
- */
-export async function runtimeActionCarryOver(deps: RuntimeCarryOverDeps, { conversationId }: RuntimeCarryOverParams, context: Context) {
+export async function runtimeActionCarryOver(deps: RuntimeCarryOverDeps, { conversationId, context }: RuntimeCarryOverParams & RuntimeContextInput) {
   const saved = await deps.storage.readCarry({ botId: deps.botId });
 
   await match(saved)

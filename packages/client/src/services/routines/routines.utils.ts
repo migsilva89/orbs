@@ -51,7 +51,6 @@ export function routinesScheduleText({ schedule, locale }: RoutinesScheduleTextP
     .exhaustive();
 }
 
-/** A starting schedule when the owner switches a routine to another kind: in an hour, hourly, or daily at 9. */
 export function routinesScheduleDefault(kind: string): RoutineSchedule {
   return match(kind)
     .returnType<RoutineSchedule>()

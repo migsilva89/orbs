@@ -1,4 +1,4 @@
-import { adaptOAuthProvider, authorizeMcp, McpOAuthAuthorizationRequiredError, McpOAuthProvider } from '@earendil-works/pi-mcp/oauth';
+import { adaptOAuthProvider, McpOAuthAuthorizationRequiredError, McpOAuthProvider } from '@earendil-works/pi-mcp/oauth';
 import { Errors, isAppError } from '@repo/errors/universal';
 import { createHash } from 'node:crypto';
 import { match, P } from 'ts-pattern';
@@ -76,16 +76,15 @@ export async function mcpAuthResetLogin(
     await match(record)
       .with(undefined, async () => undefined)
       .with(P.nonNullable, async (stored) => {
-        const next: Record<string, unknown> = { ...stored };
-        delete next.oauthState;
-        delete next.codeVerifier;
-
-        await match(stored.redirectUrl === redirectUrl)
-          .with(true, async () => undefined)
-          .with(false, async () => {
-            delete next.clientInformation;
-          })
-          .exhaustive();
+        const next = {
+          ...stored,
+          oauthState: undefined,
+          codeVerifier: undefined,
+          ...match(stored.redirectUrl === redirectUrl)
+            .with(true, () => ({}))
+            .with(false, () => ({ clientInformation: undefined }))
+            .exhaustive(),
+        };
 
         await deps.credentials.actions.set({
           key: mcpAuthCredentialKey(serverUrl),
@@ -96,7 +95,7 @@ export async function mcpAuthResetLogin(
   });
 }
 
-export function mcpAuthInvalid(field: string, cause?: unknown) {
+export function mcpAuthInvalid(field: string, cause?: ErrorOptions['cause']) {
   return new Errors.VALIDATION_ERROR({ fields: { [field]: { message: 'validation_oauth' } }, cause });
 }
 
@@ -330,121 +329,6 @@ export function mcpAuthAbort(deps: McpAuthTypes.McpAuthServiceState, serverUrl: 
     });
 }
 
-function mcpAuthSameRedirect(issued: string, callback: string): boolean {
-  try {
-    const expected = new URL(issued);
-    const received = new URL(callback);
-
-    return match({
-      protocol: received.protocol === expected.protocol,
-      host: received.host === expected.host,
-      path: received.pathname === expected.pathname,
-    })
-      .with({
-        protocol: true,
-        host: true,
-        path: true,
-      }, () => true)
-      .otherwise(() => false);
-  } catch {
-    return false;
-  }
-}
-
-function mcpAuthParseCallback(
-  redirectUrl: string,
-  state: string,
-  callbackUrl: string,
-): McpAuthTypes.McpAuthCallback {
-  match(mcpAuthSameRedirect(redirectUrl, callbackUrl))
-    .with(false, () => {
-      throw mcpAuthInvalid('callbackUrl');
-    })
-    .with(true, () => undefined)
-    .exhaustive();
-
-  try {
-    const callback = new URL(callbackUrl);
-    const error = callback.searchParams.get('error');
-    const code = callback.searchParams.get('code');
-    const received = callback.searchParams.get('state');
-    const iss = callback.searchParams.get('iss') ?? undefined;
-
-    return match({
-      error,
-      code,
-      received,
-    })
-      .with({ error: P.string }, () => {
-        throw mcpAuthInvalid('callbackUrl');
-      })
-      .with({ received: P.not(state) }, () => {
-        throw mcpAuthInvalid('callbackUrl');
-      })
-      .with({ code: P.union(P.nullish, '') }, () => {
-        throw mcpAuthInvalid('callbackUrl');
-      })
-      .with({ code: P.string }, ({ code: authorizationCode }) => ({ code: authorizationCode, iss }))
-      .exhaustive();
-  } catch (error) {
-    throw isAppError(error) ? error : mcpAuthInvalid('callbackUrl', error);
-  }
-}
-
-/** Trades the authorization code from a callback URL for tokens and ends the pending login. */
-export async function mcpAuthExchange(
-  deps: McpAuthTypes.McpAuthServiceState,
-  url: string,
-  session: McpAuthTypes.McpAuthPending,
-  callbackUrl: string,
-): Promise<McpAuthTypes.McpAuthCompleteResult> {
-  match(session)
-    .when((pending) => pending.isCompleting === true || pending.state === undefined, () => {
-      throw new Errors.CONFLICT();
-    })
-    .otherwise(() => undefined);
-
-  const callback = mcpAuthParseCallback(session.redirectUrl, session.state ?? '', callbackUrl);
-
-  session.isCompleting = true;
-
-  const cached = mcpAuthBind(deps, url, session.redirectUrl);
-
-  try {
-    const result = await authorizeMcp(cached.oauth, {
-      serverUrl: url,
-      authorizationCode: callback.code,
-      iss: callback.iss,
-      signal: mcpAuthNetworkSignal(session.controller),
-    });
-
-    session.controller.signal.throwIfAborted();
-
-    return match(result)
-      .with('AUTHORIZED', () => {
-        mcpAuthDropSession(deps, url, session);
-        return { status: 'authorized' as const };
-      })
-      .with('REDIRECT', () => {
-        throw mcpAuthInvalid('callbackUrl');
-      })
-      .exhaustive();
-  } catch (error) {
-    throw match(session.controller.signal.aborted)
-      .with(true, () => new Errors.CONFLICT({ cause: error }))
-      .with(false, () => (isAppError(error) ? error : mcpAuthInvalid('callbackUrl', error)))
-      .exhaustive();
-  } finally {
-    match(deps.pending.get(url) === session)
-      .with(true, () => {
-        session.isCompleting = false;
-      })
-      .with(false, () => undefined)
-      .exhaustive();
-  }
-}
-
-/** An app link (`scheme://host/…`), or a page on the redirect URL's own origin; never another website, so the callback is not an open redirect. */
 export function mcpAuthReturnUrl(value: string | undefined, redirectUrl: string): string | undefined {
   return match(value)
     .with(undefined, () => undefined)

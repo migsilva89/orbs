@@ -38,7 +38,6 @@ export function questionPendingView(question: QuestionRecord): QuestionPending {
 }
 
 export function questionAnswerValidate(question: QuestionRecord, answer: QuestionAnswer): void {
-  // A secret question takes the saved secret or a skip; any other question never takes a secret.
   const isSecretAnswer = answer.kind === 'secret';
 
   if (answer.kind !== 'skip' && isSecretAnswer !== Boolean(question.secret)) {

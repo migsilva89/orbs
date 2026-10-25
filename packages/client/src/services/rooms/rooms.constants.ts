@@ -16,7 +16,6 @@ export const ROOMS = {
   searchSkeletonRows: 3,
   searchContextChars: 40,
   quickReactions: ['👍', '👎', '❤️', '😂', '🎉', '😮'],
-  // Shown after the quick reactions where there is room for two rows, as on mobile.
   moreReactions: ['🔥', '👀', '🙏', '😢', '💯'],
   emojiSlowMs: 6000,
   emojiSkeletonCells: 40,
@@ -43,7 +42,6 @@ export const ROOMS_SEND_MODES = {
   interrupt: m.rooms_send_interrupt,
 } satisfies Record<ConversationWhenBusy, () => string>;
 
-/** Approval choices in order; `tone` tints the option's letter badge on web and mobile. */
 export const ROOMS_APPROVAL_CHOICES = [
   { decision: 'approve', label: m.rooms_chat_approval_approve, tone: 'success' },
   { decision: 'always', label: m.rooms_chat_approval_always, tone: 'info' },

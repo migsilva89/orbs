@@ -3,7 +3,6 @@ import { useMutation } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
 import type { SettingsDoneParams } from '../types/settings.types';
 
-/** Revokes a paired device's access. */
 export function useSettingsDeviceRevoke({ onDone }: SettingsDoneParams) {
   const { rpc } = useRpc();
   const revoke = useMutation(rpc.devices.revoke.mutationOptions({ meta: { invalidates: [rpc.devices.list.key()] }, onSuccess: () => onDone() }));

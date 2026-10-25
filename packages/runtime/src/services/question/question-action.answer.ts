@@ -1,17 +1,18 @@
 import { match, P } from 'ts-pattern';
 import { questionDocument } from './question.constants';
 import { questionAnswerValidate, questionCopy } from './question.utils';
-import type { QuestionAnswerParams, QuestionServiceDeps } from '../../types/question.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { QuestionAnswerParams, QuestionContextParams, QuestionServiceDeps } from '../../types/question.types';
 import type { TaskId } from '@earendil-works/pi-durable';
 
 export async function questionActionAnswer(
   { harness }: QuestionServiceDeps,
-  params: QuestionAnswerParams,
-  context: Context,
+  { context, ...params }: QuestionAnswerParams & QuestionContextParams,
 ) {
+  // SAFETY: question IDs are the task IDs of bot_question tool calls; the task kind and conversation are matched below.
+  const taskId = params.id as TaskId;
+
   return harness.commit(async (tx) => {
-    const task = await tx.task(params.id as TaskId);
+    const task = await tx.task(taskId);
 
     return match(task)
       .with({
@@ -20,7 +21,7 @@ export async function questionActionAnswer(
         abortRequested: false,
         state: { status: P.union('pending', 'running', 'waiting', 'sleeping') },
       }, async () => {
-        const doc = await tx.doc(questionDocument, params.id as TaskId);
+        const doc = await tx.doc(questionDocument, taskId);
         const now = Date.now();
 
         return match(doc.question)

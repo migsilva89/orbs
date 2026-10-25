@@ -1,11 +1,11 @@
 import { defineDoc, defineDocFamily } from '@earendil-works/pi-durable';
-import type { RuntimeApproval, RuntimeBotBinding } from '../../types/runtime.types';
+import type { RuntimeBotBinding, RuntimeBotIdentity, RuntimeToolApprovalDocument } from '../../types/runtime.types';
 
 export const runtimeToolApproval = defineDoc({
   kind: 'bots.tool-approval',
   version: 1,
   scope: 'task',
-  initial: (): { approval: RuntimeApproval | null } => ({ approval: null }),
+  initial: (): RuntimeToolApprovalDocument => ({ approval: null }),
   checkpointWhen: () => false,
 });
 
@@ -15,7 +15,7 @@ export const runtimeBot = defineDoc({
   scope: 'conversation',
   history: 'latest',
   fork: 'current',
-  initial: (): { botId: string | null; skillsPrompt: string } => ({ botId: null, skillsPrompt: '' }),
+  initial: (): RuntimeBotIdentity => ({ botId: null, skillsPrompt: '' }),
   checkpointWhen: () => false,
 });
 
@@ -28,10 +28,8 @@ export const runtimeBotConversations = defineDocFamily<RuntimeBotBinding, null>(
   checkpointWhen: () => false,
 });
 
-/** Model streams running at once across all bots; later requests wait in order. */
 export const RUNTIME_MAX_MODEL_REQUESTS = 4;
 
-/** While live work runs, re-arm the host alarm so an evicted host wakes and resumes it. */
 export const RUNTIME_ALARM_HEARTBEAT_MS = 60_000;
 
 export const RUNTIME_ALARM_DEBOUNCE_MS = 1_000;

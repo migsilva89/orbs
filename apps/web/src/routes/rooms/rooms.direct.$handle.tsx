@@ -1,4 +1,4 @@
-import { chatInitialViewOptions } from '@repo/client/react';
+import { chatQueries } from '@repo/client/react';
 import { createFileRoute, Outlet, useMatch } from '@tanstack/react-router';
 import { LayoutNotFound } from '@/components/layout/layout-error';
 import { RoomsPage } from '@/components/rooms/rooms-page';
@@ -9,7 +9,7 @@ import { seoHead } from '@/services/seo/seo.utils';
 export const Route = createFileRoute('/_chat/rooms/direct/$handle')({
   loader: async ({ context, params }) => {
     const bot = await roomsDirectBot(context.queryClient, params);
-    await context.queryClient.ensureQueryData(chatInitialViewOptions(RPC_CONTEXT, { botId: bot.id }));
+    await context.queryClient.ensureQueryData(chatQueries.initialView(RPC_CONTEXT, { botId: bot.id }));
 
     return { botId: bot.id, title: bot.name };
   },

@@ -5,14 +5,13 @@ import { collaborationBotId } from './collaboration.utils';
 import type { Context } from '@earendil-works/chord/context';
 import type { Cursor, ToolExecutionApi } from '@earendil-works/pi-durable';
 
-/** The sending bot and how many hops the request it is answering already took; owner input counts as 0. */
 export async function collaborationQueryOrigin(api: ToolExecutionApi, context: Context) {
   const botId = await collaborationBotId(api, context);
 
   const hops = await api.commit(async (tx) => {
-    return readOrigin();
+    return collaborationReadOrigin();
 
-    async function readOrigin(cursor?: Cursor): Promise<number> {
+    async function collaborationReadOrigin(cursor?: Cursor): Promise<number> {
       const page = await tx.scanEntries({ conversationId: api.conversationId, order: 'descending' }, 50, cursor);
 
       const input = page.items.find((entry) => (
@@ -25,8 +24,7 @@ export async function collaborationQueryOrigin(api: ToolExecutionApi, context: C
         ))
         .with(P.nonNullable, () => 0)
         .otherwise(() => match(page.next)
-          .with(P.nonNullable, readOrigin)
-          // Nothing to trace the request to, so it may not start a chain.
+          .with(P.nonNullable, collaborationReadOrigin)
           .otherwise(() => Number.POSITIVE_INFINITY));
     }
   }, context);

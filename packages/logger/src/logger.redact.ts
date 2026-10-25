@@ -1,6 +1,5 @@
 import type { RedactConfig } from 'evlog';
 
-/** Whole-match secrets: provider keys, tokens, JWTs and private keys. */
 const SECRET_PATTERNS = [
   /\bsk-(?:proj-|ant-)?[A-Za-z0-9_-]{20,}/g,
   /\b(?:sk|rk|pk)_(?:live|test)_[A-Za-z0-9]{16,}/g,
@@ -14,7 +13,6 @@ const SECRET_PATTERNS = [
   /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/g,
 ];
 
-/** Secret values after a kept prefix: URL credentials, `password=` or JSON key pairs, and bearer tokens. */
 const SECRET_VALUE_PATTERNS = [
   /(?<keep>\b[a-z][a-z0-9+.-]*:\/\/)[^\s:@/]+:[^\s@/]+(?=@)/gi,
   /(?<keep>(?<![a-z0-9])(?:[a-z0-9]+[_-])*(?:password|passwd|pwd|secret|token|api[_-]?key|access[_-]?key)["']?\s*[:=]\s*["']?)[^\s"',}]{6,}/gi,

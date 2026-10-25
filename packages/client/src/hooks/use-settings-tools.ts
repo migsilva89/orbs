@@ -4,7 +4,6 @@ import { useRpc } from './use-rpc';
 import type { SettingsDoneParams } from '../types/settings.types';
 import type { ToolSettingsForm } from '@repo/contracts/universal';
 
-/** Tool approval rules, the approval timeout and the JEV key; an empty key keeps the saved one. */
 export function useSettingsTools({ onDone }: SettingsDoneParams) {
   const queryClient = useQueryClient();
   const { rpc } = useRpc();

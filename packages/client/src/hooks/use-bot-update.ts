@@ -2,7 +2,6 @@ import { m } from '@repo/i18n/client';
 import { useMutation } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
 
-/** Saves bot fields and refreshes the bot list and catalog; `success` shows a message after saving. */
 export function useBotUpdate(success?: string) {
   const { rpc } = useRpc();
 

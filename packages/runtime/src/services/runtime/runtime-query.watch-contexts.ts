@@ -2,18 +2,16 @@ import { replicatedState } from '@earendil-works/chord';
 import { match } from 'ts-pattern';
 import { runtimeContextWatchBusyIds, runtimeContextWatchIsRelevant } from './runtime-context-watch.utils';
 import { runtimeQueryConversation } from './runtime-query.conversation';
-import type { RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeContextInput, RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
 
 export async function runtimeQueryWatchContexts(
   deps: RuntimeServiceDeps,
-  params: RuntimeConversationParams,
-  context: Context,
+  params: RuntimeConversationParams & RuntimeContextInput,
 ) {
-  const conversation = await runtimeQueryConversation(deps, params, context);
+  const { context } = params;
+  const conversation = await runtimeQueryConversation(deps, params);
   const state = replicatedState({ revision: 0 });
 
-  // Subscribe before graph acquisition so membership commits during attach are not missed.
   const unsubscribe = deps.harness.subscribeCommits((publication, commitContext) => {
     match(runtimeContextWatchIsRelevant(publication.changes, conversation.id))
       .with(true, () => {

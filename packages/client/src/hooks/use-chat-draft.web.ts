@@ -2,7 +2,6 @@ import { useSyncExternalStore } from 'react';
 import { ROOMS } from '../services/rooms/rooms.constants';
 import type { RoomsPrefill } from '../types/rooms.types';
 
-/** The composer draft for one bot, kept in localStorage and shared across tabs. */
 export function useChatDraft(botId: string) {
   const key = `${ROOMS.draftKeyPrefix}${botId}`;
 

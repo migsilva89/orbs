@@ -7,10 +7,6 @@ import { RUNTIME_ALARM_HEARTBEAT_MS, runtimeBotConversations, runtimeToolApprova
 import type { RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 
-/**
- * Earliest time this bot's store needs the host awake, read from saved Pi state: routine runs, approval and
- * question deadlines, and a heartbeat while other work is live. `null` means nothing is pending.
- */
 export async function runtimeQueryNextDeadline({ harness, botId }: RuntimeServiceDeps, context: Context) {
   const now = Date.now();
   const binding = await harness.snapshot(runtimeBotConversations, botId, context);

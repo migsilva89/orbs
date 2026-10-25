@@ -1,73 +1,9 @@
-import fsSync from 'node:fs';
-import fs from 'node:fs/promises';
 import path from 'node:path';
-import { parseSync } from 'oxc-parser';
-
-interface Node {
-  type: string
-  id?: Node
-  name?: string
-  value?: string
-  kind?: string
-  source?: Node
-  declaration?: Node
-  declarations?: Node[]
-  init?: Node
-  params?: Node[]
-  typeAnnotation?: Node
-  returnType?: Node
-  callee?: Node
-  object?: Node
-  property?: Node
-  key?: Node
-  body?: Node[]
-  computed?: boolean
-}
-
-interface FileInfo {
-  absolutePath: string
-  relativePath: string
-  source: string
-  program: Node
-}
-
-interface Declaration {
-  file: FileInfo
-  node: Node
-  name: string
-  params?: Node[]
-  returnType?: Node
-}
-
-type FunctionDeclaration = Declaration & {
-  params: Node[]
-  returnType?: Node
-}
-
-interface MatchFileNameOptions {
-  file: string
-  function: string
-  type: string
-  value?: string | string[]
-}
-
-const fileCache = new Map<string, FileInfo>();
-
-function pascalCase(value: string): string {
-  return value
-    .split(/[-_\s]+/)
-    .filter(Boolean)
-    .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
-    .join('');
-}
-
-function camelCase(value: string): string {
-  const next = pascalCase(value);
-  return `${next.charAt(0).toLowerCase()}${next.slice(1)}`;
-}
+import { archAssertEmpty, archCamelCase, archDomainFromFile, archDynamicImports, archExportedDeclarations, archFilePrefix, archFormatDeclaration, archGlobToRegExp, archGroupByFile, archImports, archIsComponentLike, archListFiles, archMatchTemplate, archNameMatchesFilePrefix, archParseFile, archPascalCase, archPascalFromBasename, archResolveWorkspaceRoot, archTopLevelFunctions } from './arch.utils';
+import type { ArchDeclaration, ArchMatchFileNameOptions } from '../types/arch.types';
 
 export function arch() {
-  return new Arch(resolveWorkspaceRoot(process.cwd()));
+  return new Arch(archResolveWorkspaceRoot(process.cwd()));
 }
 
 class Arch {
@@ -90,11 +26,11 @@ class ArchExpectation {
   }
 
   exports() {
-    return new ArchSelection(this.cfg, async () => (await this.files()).flatMap((file) => exportedDeclarations(file)));
+    return new ArchSelection(this.cfg, async () => (await this.files()).flatMap((file) => archExportedDeclarations(file)));
   }
 
   topLevelFunctions() {
-    return new ArchSelection(this.cfg, async () => (await this.files()).flatMap((file) => topLevelFunctions(file)));
+    return new ArchSelection(this.cfg, async () => (await this.files()).flatMap((file) => archTopLevelFunctions(file)));
   }
 
   fileNames() {
@@ -102,29 +38,29 @@ class ArchExpectation {
   }
 
   imports() {
-    return new ArchSelection(this.cfg, async () => (await this.files()).flatMap((file) => imports(file)));
+    return new ArchSelection(this.cfg, async () => (await this.files()).flatMap((file) => archImports(file)));
   }
 
   dynamicImports() {
-    return new ArchSelection(this.cfg, async () => (await this.files()).flatMap((file) => dynamicImports(file)));
+    return new ArchSelection(this.cfg, async () => (await this.files()).flatMap((file) => archDynamicImports(file)));
   }
 
   async toContainNoFunctions() {
     const failures = (await this.topLevelFunctions().items()).map((item) => `${item.file.relativePath}: ${item.name}`);
-    assertEmpty('Expected files to contain no functions.', failures);
+    archAssertEmpty('Expected files to contain no functions.', failures);
   }
 
   async toOnlyHaveConstants() {
-    const failures = (await this.files()).flatMap((file) => exportedDeclarations(file)
+    const failures = (await this.files()).flatMap((file) => archExportedDeclarations(file)
       .filter((declaration) => declaration.node.type !== 'VariableDeclaration' || declaration.node.kind !== 'const')
       .map((declaration) => `${declaration.file.relativePath}: ${declaration.name}`));
 
-    assertEmpty('Expected files to only export constants.', failures);
+    archAssertEmpty('Expected files to only export constants.', failures);
   }
 
   async toBeEmpty() {
     const failures = (await this.files()).map((file) => file.relativePath);
-    assertEmpty('Expected glob to match no files.', failures);
+    archAssertEmpty('Expected glob to match no files.', failures);
   }
 
   get not() {
@@ -134,42 +70,42 @@ class ArchExpectation {
           .filter((method) => file.source.includes(`.${method}(`))
           .map((method) => `${file.relativePath}: ${method}`));
 
-        assertEmpty('Expected files not to use restricted methods.', failures);
+        archAssertEmpty('Expected files not to use restricted methods.', failures);
       },
       toImportFrom: async (patterns: string[]) => {
         const failures = (await this.imports().items()).flatMap((item) => patterns
-          .filter((pattern) => globToRegExp(pattern).test(item.name))
+          .filter((pattern) => archGlobToRegExp(pattern).test(item.name))
           .map((pattern) => `${item.file.relativePath}: ${item.name} matches ${pattern}`));
 
-        assertEmpty('Expected files not to import from restricted paths.', failures);
+        archAssertEmpty('Expected files not to import from restricted paths.', failures);
       },
       toDynamicallyImportFrom: async (patterns: string[]) => {
         const failures = (await this.dynamicImports().items()).flatMap((item) => patterns
-          .filter((pattern) => globToRegExp(pattern).test(item.name))
+          .filter((pattern) => archGlobToRegExp(pattern).test(item.name))
           .map((pattern) => `${item.file.relativePath}: ${item.name} matches ${pattern}`));
 
-        assertEmpty('Expected files not to dynamically import from restricted paths.', failures);
+        archAssertEmpty('Expected files not to dynamically import from restricted paths.', failures);
       },
       toContain: async (substrings: string[]) => {
         const failures = (await this.files()).flatMap((file) => substrings
           .filter((substring) => file.source.includes(substring))
           .map((substring) => `${file.relativePath}: contains ${JSON.stringify(substring)}`));
 
-        assertEmpty('Expected files not to contain restricted substrings.', failures);
+        archAssertEmpty('Expected files not to contain restricted substrings.', failures);
       },
     };
   }
 
   private async files() {
-    const paths = await listFiles(this.cfg.root);
-    const matcher = globToRegExp(this.cfg.pattern);
-    const ignoreMatchers = this.cfg.ignores.map((ignore) => globToRegExp(ignore));
+    const paths = await archListFiles(this.cfg.root);
+    const matcher = archGlobToRegExp(this.cfg.pattern);
+    const ignoreMatchers = this.cfg.ignores.map((ignore) => archGlobToRegExp(ignore));
     const matches = paths.filter((file) => matcher.test(file) && !ignoreMatchers.some((ignore) => ignore.test(file)));
-    return Promise.all(matches.map((relativePath) => parseFile(this.cfg.root, relativePath)));
+    return Promise.all(matches.map((relativePath) => archParseFile(this.cfg.root, relativePath)));
   }
 }
 
-class ArchSelection<T extends Declaration> {
+class ArchSelection<T extends ArchDeclaration> {
   constructor(private readonly cfg: { root: string, pattern: string, ignores: string[] }, private readonly load: () => Promise<T[]>) {}
 
   async items() {
@@ -178,61 +114,61 @@ class ArchSelection<T extends Declaration> {
 
   async toStartWithFilePrefix() {
     const failures = (await this.items())
-      .filter((item) => !nameMatchesFilePrefix(item.name, item.file.relativePath))
-      .map((item) => `${item.file.relativePath}: ${item.name} (expected prefix: ${filePrefix(item.file.relativePath)})`);
+      .filter((item) => !archNameMatchesFilePrefix(item.name, item.file.relativePath))
+      .map((item) => `${item.file.relativePath}: ${item.name} (expected prefix: ${archFilePrefix(item.file.relativePath)})`);
 
-    assertEmpty('Expected exports to start with their file prefix.', failures);
+    archAssertEmpty('Expected exports to start with their file prefix.', failures);
   }
 
   async toOnlyMatch(pattern: RegExp) {
-    assertEmpty(`Expected names to match ${pattern}.`, (await this.items())
+    archAssertEmpty(`Expected names to match ${pattern}.`, (await this.items())
       .filter((item) => !pattern.test(item.name))
-      .map(formatDeclaration));
+      .map(archFormatDeclaration));
   }
 
-  async toMatchFileName(options: MatchFileNameOptions) {
+  async toMatchFileName(options: ArchMatchFileNameOptions) {
     const failures = (await this.items()).filter((item) => {
-      const domain = domainFromFile(item.file.relativePath, options.file);
+      const domain = archDomainFromFile(item.file.relativePath, options.file);
 
       if (!domain) {
         return false;
       }
 
-      const expectedFunction = options.function.replace('{Domain}', pascalCase(domain));
-      const expectedType = options.type.replace('{Domain}', pascalCase(domain));
+      const expectedFunction = options.function.replace('{Domain}', archPascalCase(domain));
+      const expectedType = options.type.replace('{Domain}', archPascalCase(domain));
 
       const expectedValues = [options.value ?? []]
         .flat()
-        .map((value) => value.replace('{Domain}', pascalCase(domain)).replace('{domain}', camelCase(domain)));
+        .map((value) => value.replace('{Domain}', archPascalCase(domain)).replace('{domain}', archCamelCase(domain)));
 
       return item.name !== expectedFunction && item.name !== expectedType && !expectedValues.includes(item.name);
-    }).map(formatDeclaration);
+    }).map(archFormatDeclaration);
 
-    assertEmpty('Expected exports to match their file name.', failures);
+    archAssertEmpty('Expected exports to match their file name.', failures);
   }
 
   async toMatchActionFileName() {
-    assertEmpty('Expected action file names to match {domain}-action.{verb}.ts.', (await this.items())
+    archAssertEmpty('Expected action file names to match {domain}-action.{verb}.ts.', (await this.items())
       .filter((item) => !/^[a-z0-9]+(?:-[a-z0-9]+)*-action\.[a-z0-9]+(?:[-.][a-z0-9]+)*\.ts$/.test(item.name))
-      .map(formatDeclaration));
+      .map(archFormatDeclaration));
   }
 
   async toMatchQueryFileName() {
-    assertEmpty('Expected query file names to match {domain}-query.{name}.ts.', (await this.items())
+    archAssertEmpty('Expected query file names to match {domain}-query.{name}.ts.', (await this.items())
       .filter((item) => !/^[a-z0-9]+(?:-[a-z0-9]+)*-query\.[a-z0-9]+(?:[-.][a-z0-9]+)*\.ts$/.test(item.name))
-      .map(formatDeclaration));
+      .map(archFormatDeclaration));
   }
 
   async toOnlyExport(templates: string[]) {
-    const byFile = groupByFile(await this.items());
+    const byFile = archGroupByFile(await this.items());
     const failures: string[] = [];
 
     for (const { file, decls } of byFile.values()) {
       const domain = path.basename(file.relativePath).split('.')[0] ?? '';
 
       const allowed = templates.map((template) => template
-        .replace('{Domain}', pascalCase(domain))
-        .replace('{domain}', camelCase(domain)));
+        .replace('{Domain}', archPascalCase(domain))
+        .replace('{domain}', archCamelCase(domain)));
 
       for (const decl of decls) {
         if (!allowed.includes(decl.name)) {
@@ -241,7 +177,7 @@ class ArchSelection<T extends Declaration> {
       }
     }
 
-    assertEmpty('Expected files to only export listed names.', failures);
+    archAssertEmpty('Expected files to only export listed names.', failures);
   }
 
   async toMatchFolderPrefix() {
@@ -270,16 +206,16 @@ class ArchSelection<T extends Declaration> {
       }
     }
 
-    assertEmpty('Expected file names to start with their parent folder name (or its singular form).', failures);
+    archAssertEmpty('Expected file names to start with their parent folder name (or its singular form).', failures);
   }
 
   async toMatchComponentExport() {
-    const byFile = groupByFile(await this.items());
+    const byFile = archGroupByFile(await this.items());
     const failures: string[] = [];
 
     for (const { file, decls } of byFile.values()) {
-      const expected = pascalFromBasename(path.basename(file.relativePath));
-      const components = decls.filter((decl) => isComponentLike(decl));
+      const expected = archPascalFromBasename(path.basename(file.relativePath));
+      const components = decls.filter((decl) => archIsComponentLike(decl));
 
       if (components.length === 0) {
         continue;
@@ -294,329 +230,57 @@ class ArchSelection<T extends Declaration> {
       }
     }
 
-    assertEmpty('Expected component exports to match file name.', failures);
+    archAssertEmpty('Expected component exports to match file name.', failures);
   }
 
   async toMatchFactoryName(fileTemplate: string, fnTemplate: string) {
-    const byFile = groupByFile(await this.items());
+    const byFile = archGroupByFile(await this.items());
     const failures: string[] = [];
 
     for (const { file, decls } of byFile.values()) {
-      const groups = matchTemplate(path.basename(file.relativePath), fileTemplate);
+      const groups = archMatchTemplate(path.basename(file.relativePath), fileTemplate);
 
       if (!groups) {
         continue;
       }
 
       const expected = fnTemplate
-        .replace('{Domain}', pascalCase(groups.domain))
-        .replace('{domain}', camelCase(groups.domain))
-        .replace('{Name}', pascalCase(groups.name));
+        .replace('{Domain}', archPascalCase(groups.domain))
+        .replace('{domain}', archCamelCase(groups.domain))
+        .replace('{Name}', archPascalCase(groups.name));
 
       if (!decls.some((decl) => decl.name === expected)) {
         failures.push(`${file.relativePath}: expected ${expected}`);
       }
     }
 
-    assertEmpty('Expected factory exports to match file name template.', failures);
+    archAssertEmpty('Expected factory exports to match file name template.', failures);
   }
 
   async toOnlyMatchFactoryName(fileTemplate: string, fnTemplate: string) {
     const failures: string[] = [];
 
     for (const item of await this.items()) {
-      const groups = matchTemplate(path.basename(item.file.relativePath), fileTemplate);
+      const groups = archMatchTemplate(path.basename(item.file.relativePath), fileTemplate);
 
       if (!groups) {
         continue;
       }
 
       const expected = fnTemplate
-        .replace('{Domain}', pascalCase(groups.domain))
-        .replace('{domain}', camelCase(groups.domain))
-        .replace('{Name}', pascalCase(groups.name));
+        .replace('{Domain}', archPascalCase(groups.domain))
+        .replace('{domain}', archCamelCase(groups.domain))
+        .replace('{Name}', archPascalCase(groups.name));
 
       if (item.name !== expected) {
         failures.push(`${item.file.relativePath}: ${item.name} (expected ${expected})`);
       }
     }
 
-    assertEmpty('Expected declarations to match file factory name.', failures);
+    archAssertEmpty('Expected declarations to match file factory name.', failures);
   }
 
   get not() {
     return new ArchExpectation(this.cfg).not;
   }
-}
-
-function exportedDeclarations(file: FileInfo): (Declaration | FunctionDeclaration)[] {
-  return programBody(file).flatMap((node) => {
-    if (node.type !== 'ExportNamedDeclaration' && node.type !== 'ExportDefaultDeclaration') {
-      return [];
-    }
-
-    return declarationsFromNode(file, node.declaration);
-  });
-}
-
-function topLevelFunctions(file: FileInfo): FunctionDeclaration[] {
-  return programBody(file).flatMap((node) => functionFromNode(file, unwrapExport(node)));
-}
-
-function imports(file: FileInfo) {
-  return programBody(file)
-    .filter((node: Node) => node.type === 'ImportDeclaration')
-    .map((node: Node) => ({ file, node, name: node.source?.value ?? '' }));
-}
-
-function dynamicImports(file: FileInfo) {
-  return [...file.source.matchAll(/\bimport\s*\(\s*(['"])([^'"]+)\1\s*\)/g)]
-    .map((match) => ({ file, node: file.program, name: match[2] }));
-}
-
-function declarationsFromNode(file: FileInfo, node?: Node): (Declaration | FunctionDeclaration)[] {
-  if (!node) {
-    return [];
-  }
-
-  if (node.type === 'VariableDeclaration') {
-    return (node.declarations ?? []).map((declaration) => ({ file, node, name: declaration.id?.name ?? '<anonymous>' }));
-  }
-
-  if (node.type === 'FunctionDeclaration') {
-    return [{ file, node, name: node.id?.name ?? '<anonymous>', params: node.params ?? [], returnType: node.returnType }];
-  }
-
-  const name = node.id?.name;
-  return name ? [{ file, node, name }] : [];
-}
-
-function functionFromNode(file: FileInfo, node?: Node): FunctionDeclaration[] {
-  if (node?.type === 'FunctionDeclaration') {
-    return [{ file, node, name: node.id?.name ?? '<anonymous>', params: node.params ?? [], returnType: node.returnType }];
-  }
-
-  if (node?.type === 'VariableDeclaration') {
-    return (node.declarations ?? []).flatMap((declaration) => {
-      if (declaration.init?.type !== 'FunctionExpression' && declaration.init?.type !== 'ArrowFunctionExpression') {
-        return [];
-      }
-
-      return [{
-        file,
-        node: declaration.init,
-        name: declaration.id?.name ?? '<anonymous>',
-        params: declaration.init.params ?? [],
-        returnType: declaration.init.returnType,
-      }];
-    });
-  }
-
-  return [];
-}
-
-function unwrapExport(node: Node) {
-  return node.type === 'ExportNamedDeclaration' || node.type === 'ExportDefaultDeclaration' ? node.declaration : node;
-}
-
-function programBody(file: FileInfo) {
-  return file.program.body ?? [];
-}
-
-async function parseFile(root: string, relativePath: string) {
-  const absolutePath = path.join(root, relativePath);
-  const cached = fileCache.get(absolutePath);
-
-  if (cached) {
-    return cached;
-  }
-
-  const source = await fs.readFile(absolutePath, 'utf8');
-  const lang = absolutePath.endsWith('.tsx') ? 'tsx' : 'ts';
-  const parsed = parseSync(absolutePath, source, { sourceType: 'module', lang });
-  // SAFETY: oxc-parser's Program follows the same discriminated ESTree node contract traversed by these helpers.
-  const file = { absolutePath, relativePath, source, program: parsed.program as Node };
-  fileCache.set(absolutePath, file);
-
-  return file;
-}
-
-async function listFiles(root: string) {
-  const result: string[] = [];
-
-  async function walk(directory: string) {
-    const directories: string[] = [];
-
-    for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
-      if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === '.git') {
-        continue;
-      }
-
-      const absolutePath = path.join(directory, entry.name);
-
-      if (entry.isDirectory()) {
-        directories.push(absolutePath);
-        continue;
-      }
-
-      result.push(path.relative(root, absolutePath).replaceAll(path.sep, '/'));
-    }
-
-    await Promise.all(directories.map((child) => walk(child)));
-  }
-
-  await walk(root);
-
-  return result;
-}
-
-function globToRegExp(pattern: string) {
-  let source = '';
-
-  for (let i = 0; i < pattern.length; i++) {
-    const char = pattern[i];
-    const next = pattern[i + 1];
-    const afterNext = pattern[i + 2];
-
-    if (char === '*' && next === '*' && afterNext === '/') {
-      source += '(?:.*/)?';
-      i += 2;
-      continue;
-    }
-
-    if (char === '*' && next === '*') {
-      source += '.*';
-      i += 1;
-      continue;
-    }
-
-    if (char === '*') {
-      source += '[^/]*';
-      continue;
-    }
-
-    if (char === '{') {
-      const end = pattern.indexOf('}', i);
-
-      if (end !== -1) {
-        const alternatives = pattern
-          .slice(i + 1, end)
-          .split(',')
-          .map((alt) => alt.replaceAll(/[.+^${}()|[\]\\]/g, (match) => `\\${match}`));
-
-        source += `(?:${alternatives.join('|')})`;
-        i = end;
-        continue;
-      }
-    }
-
-    source += /[.+^${}()|[\]\\]/.test(char) ? `\\${char}` : char;
-  }
-
-  return new RegExp(`^${source}$`);
-}
-
-function resolveWorkspaceRoot(start: string) {
-  let current = start;
-
-  while (current !== path.dirname(current)) {
-    const packagePath = path.join(current, 'package.json');
-
-    if (fsSync.existsSync(packagePath)) {
-      const pkg = JSON.parse(fsSync.readFileSync(path.join(current, 'package.json'), 'utf8'));
-
-      if (Array.isArray(pkg.workspaces)) {
-        return current;
-      }
-    }
-
-    current = path.dirname(current);
-  }
-
-  return start;
-}
-
-function domainFromFile(filePath: string, pattern: string) {
-  const expectedSuffix = pattern.replace('{domain}', '');
-  const fileName = path.basename(filePath);
-  return fileName.endsWith(expectedSuffix) ? fileName.slice(0, -expectedSuffix.length) : null;
-}
-
-function filePrefix(filePath: string) {
-  return path.basename(filePath).split('.')[0] ?? '';
-}
-
-function nameMatchesFilePrefix(name: string, filePath: string) {
-  const prefix = filePrefix(filePath).replaceAll('-', '').toLowerCase();
-  const normalized = name.replaceAll('_', '').toLowerCase();
-  return normalized.startsWith(prefix);
-}
-
-function isComponentLike(decl: Declaration): boolean {
-  if (!/^[A-Z][a-z]/.test(decl.name)) {
-    return false;
-  }
-
-  return decl.node.type === 'FunctionDeclaration' || decl.node.type === 'VariableDeclaration';
-}
-
-function pascalFromBasename(basename: string) {
-  const stem = basename.replace(/\.(tsx?|jsx?)$/, '');
-  return stem
-    .split(/[-.]/)
-    .filter((part) => part.length > 0)
-    .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
-    .join('');
-}
-
-function formatDeclaration(item: Declaration) {
-  return `${item.file.relativePath}: ${item.name}`;
-}
-
-function assertEmpty(message: string, failures: string[]) {
-  if (failures.length === 0) {
-    return;
-  }
-
-  throw new Error(`${message}\n${failures.join('\n')}`);
-}
-
-function groupByFile<T extends Declaration>(items: T[]) {
-  const result = new Map<string, { file: FileInfo, decls: T[] }>();
-
-  for (const item of items) {
-    const entry = result.get(item.file.relativePath) ?? { file: item.file, decls: [] };
-    entry.decls.push(item);
-    result.set(item.file.relativePath, entry);
-  }
-
-  return result;
-}
-
-function matchTemplate(basename: string, template: string): Record<string, string> | null {
-  let pattern = '';
-  let i = 0;
-
-  while (i < template.length) {
-    const char = template[i];
-
-    if (char === '{') {
-      const end = template.indexOf('}', i);
-
-      if (end === -1) {
-        return null;
-      }
-
-      const key = template.slice(i + 1, end);
-      pattern += `(?<${key}>[a-z0-9-]+)`;
-      i = end + 1;
-      continue;
-    }
-
-    pattern += /[.+^${}()|[\]\\]/.test(char) ? `\\${char}` : char;
-    i += 1;
-  }
-
-  const match = new RegExp(`^${pattern}$`).exec(basename);
-  return match?.groups ?? null;
 }

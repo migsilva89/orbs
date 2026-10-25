@@ -31,6 +31,3 @@ export async function makeStorageLockService({ path }: StorageLockParams) {
     close: () => database.close(),
   };
 }
-
-// fallow-ignore-next-line unused-type
-export type StorageLockService = Awaited<ReturnType<typeof makeStorageLockService>>;

@@ -1,5 +1,5 @@
 import { botBubble, CHAT, chatPairMessages, roomsTimeLabel } from '@repo/client/client';
-import { chatViewOptions, useChatPendingSync, useChatRoom } from '@repo/client/react';
+import { chatQueries, useChatPendingSync, useChatRoom } from '@repo/client/react';
 import { getLocale, m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -41,7 +41,7 @@ interface ChatPairContentProps extends ChatPairProps {
 
 function ChatPairContent({ session, botId, peerId, conversationId }: ChatPairContentProps) {
   const bots = useQuery(session.rpc.bots.list.queryOptions());
-  const view = useQuery(chatViewOptions(session, { botId: peerId, conversationId }));
+  const view = useQuery(chatQueries.view(session, { botId: peerId, conversationId }));
 
   return (
     <Screen padding="none" scroll={false}>

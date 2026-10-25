@@ -104,7 +104,7 @@ packages/<package>/src/
     ├── <domain>.service.ts             exports only make<Domain>Service(deps) and its inferred type
     ├── <domain>-action.<name>.ts       one write, (deps, params)
     ├── <domain>-query.<name>.ts        one read without mutations, model calls or connections
-    ├── <domain>-<part>.service.ts      a sub-service with its own state, built by the domain service
+    ├── <domain>-<part>.service.ts      a sub-service with its own state, built by its domain or daemon
     ├── <domain>[-<part>].extension.ts  a Pi Durable extension; never renamed once shipped
     ├── <domain>[-<part>].task.ts       a Pi task definition
     ├── <domain>.driver.ts              a low-level adapter: SQLite, HTTP, subprocess
@@ -214,6 +214,7 @@ packages/
 ├── avatar-blobs/src/<concern>.ts       the blob avatar engine, player and skins
 ├── tanstack-helpers/src/<concern>.ts   head, metadata and favicon helpers
 ├── tooling/src/vitest/                 shared Vitest config
+├── <package>/src/types/<prefix>.types.ts  a shared package's types and zod schemas
 └── typescript-config/{base,react}.json    compiler options every package extends
 ```
 
@@ -269,7 +270,7 @@ Native code stays in its owning package behind `/native`. Using files, SQLite or
 Create only the files an operation needs. Folders are flat. Package entries expose APIs; they do not boot applications.
 
 - Each service has a concrete responsibility. Skill settings and discovery belong to skill; MCP settings and discovery belong to MCP. A combined composer catalog is a response shape, not a `resource` domain.
-- Factories receive whole owning services with explicit dependency types, never detached methods or callback bags. Export the factory and its inferred service type.
+- Factories receive whole owning services with explicit dependency types, never detached methods or callback bags. Export the factory and its inferred service type; an async factory's service type is an explicit interface in its types file.
 - Runtime adapters that wrap a domain service for the model use `runtime-<name>.extension.ts`. Pi stores an extension's name in conversation settings, so a shipped name never changes.
 - Library callbacks remain callbacks: Pi execution environments, oRPC connections and lazy request context do not need invented services.
 - Actions write; queries read without mutations, model calls or starting connections and processes.

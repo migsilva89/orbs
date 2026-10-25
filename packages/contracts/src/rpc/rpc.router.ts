@@ -24,18 +24,15 @@ import {
 import { avatarUpload } from '../types/avatar.types';
 import { bot, botAvatarImage, botCatalog, botCreate, botDeleteResult, botGet, botList, botSwapModels, botSwapModelsResult, botUpdate } from '../types/bot.types';
 import { commandCatalog, commandExecute, commandExecuteResult, commandList } from '../types/command.types';
-import { conversationContextUsage } from '../types/context-usage.types';
+import { conversationContextUsage } from '../types/conversation-context-usage.types';
+import { conversationUsage } from '../types/conversation-usage.types';
 import {
+  conversationAnswerQuestion,
+  conversationAnswerQuestionResult,
   conversationArrange,
   conversationArrangeResult,
-  conversationConfigure,
-  conversationSetHidden,
-  conversationSetMuted,
-  conversationSettings,
-  conversationSetWhenBusy,
-} from '../types/conversation-preference.types';
-import {
   conversationClearResult,
+  conversationConfigure,
   conversationContextPage,
   conversationContexts,
   conversationFrame,
@@ -44,7 +41,18 @@ import {
   conversationList,
   conversationMarkRead,
   conversationPreferences,
+  conversationQuestionList,
+  conversationReactions,
+  conversationReactionsResult,
+  conversationSearch,
+  conversationSearchResult,
+  conversationSetHidden,
+  conversationSetMuted,
   conversationSetPinned,
+  conversationSetReaction,
+  conversationSetReactionResult,
+  conversationSettings,
+  conversationSetWhenBusy,
   conversationStopResult,
   conversationSubmit,
   conversationSubmitResult,
@@ -54,7 +62,6 @@ import {
 } from '../types/conversation.types';
 import { credentialsList, credentialsSet, credentialsSetResult } from '../types/credentials.types';
 import { deviceList, deviceRevoke, deviceRevokeResult } from '../types/device.types';
-import { conversationSearch, conversationSearchResult } from '../types/history.types';
 import { instructionCatalog, instructionConfigure, instructionDiscover, instructionSettings } from '../types/instruction.types';
 import { limitConfigure, limitSettings } from '../types/limit.types';
 import {
@@ -72,8 +79,6 @@ import { modelList } from '../types/model.types';
 import { notificationConfigure, notificationPresence, notificationPush, notificationSettings, notificationVoid } from '../types/notification.types';
 import { pluginCatalog, pluginConfigure, pluginDiscover, pluginSettings } from '../types/plugin.types';
 import { providerCancelResult, providerComplete, providerList, providerLogin, providerLogout, providerLogoutResult, providerSession, providerSessionId } from '../types/provider.types';
-import { conversationAnswerQuestion, conversationAnswerQuestionResult, conversationQuestionList } from '../types/question.types';
-import { conversationReactions, conversationReactionsResult, conversationSetReaction, conversationSetReactionResult } from '../types/reaction.types';
 import { routine, routineCreate, routineList, routineRemoveResult, routineTarget, routineUpdate } from '../types/routine.types';
 import { secretConfigure, secretRemove, secretRules, secretSave, secretSettings, secretVoid } from '../types/secret.types';
 import { serverConfigure, serverInfo } from '../types/server.types';
@@ -97,7 +102,6 @@ import {
   toolPending,
   toolSettings,
 } from '../types/tool.types';
-import { conversationUsage } from '../types/usage.types';
 
 const oc = baseContract.errors({
   RATE_LIMITED: errorSchemas.RATE_LIMITED,
@@ -105,35 +109,19 @@ const oc = baseContract.errors({
   SERVER_MISMATCH: errorSchemas.SERVER_MISMATCH,
 });
 
+const ocAuth = oc.errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED });
+const ocFind = ocAuth.errors({ NOT_FOUND: errorSchemas.NOT_FOUND });
+const ocBusy = ocFind.errors({ CONFLICT: errorSchemas.CONFLICT });
+const ocValidate = ocFind.errors({ VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR });
+const ocWrite = ocValidate.errors({ CONFLICT: errorSchemas.CONFLICT });
+const ocAdmin = ocWrite.errors({ FORBIDDEN: errorSchemas.FORBIDDEN });
+
 export const contract = {
   providers: {
-    list: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(providerList),
-    login: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        FORBIDDEN: errorSchemas.FORBIDDEN,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        CONFLICT: errorSchemas.CONFLICT,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(providerLogin)
-      .output(providerSession),
-    complete: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        FORBIDDEN: errorSchemas.FORBIDDEN,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        CONFLICT: errorSchemas.CONFLICT,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(providerComplete)
-      .output(providerSession),
-    session: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(providerSessionId)
-      .output(providerSession),
+    list: ocAuth.output(providerList),
+    login: ocAdmin.input(providerLogin).output(providerSession),
+    complete: ocAdmin.input(providerComplete).output(providerSession),
+    session: ocFind.input(providerSessionId).output(providerSession),
     cancel: oc
       .errors({
         UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
@@ -143,41 +131,15 @@ export const contract = {
       })
       .input(providerSessionId)
       .output(providerCancelResult),
-    logout: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(providerLogout)
-      .output(providerLogoutResult),
+    logout: ocFind.input(providerLogout).output(providerLogoutResult),
   },
   limits: {
-    settings: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(limitSettings),
-    configure: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(limitConfigure)
-      .output(limitSettings),
+    settings: ocAuth.output(limitSettings),
+    configure: ocAuth.input(limitConfigure).output(limitSettings),
   },
   mcpAuth: {
-    start: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        FORBIDDEN: errorSchemas.FORBIDDEN,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        CONFLICT: errorSchemas.CONFLICT,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(mcpAuthStart)
-      .output(mcpAuthStartResult),
-    complete: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        FORBIDDEN: errorSchemas.FORBIDDEN,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        CONFLICT: errorSchemas.CONFLICT,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(mcpAuthComplete)
-      .output(mcpAuthCompleteResult),
+    start: ocAdmin.input(mcpAuthStart).output(mcpAuthStartResult),
+    complete: ocAdmin.input(mcpAuthComplete).output(mcpAuthCompleteResult),
     cancel: oc
       .errors({
         UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
@@ -186,371 +148,124 @@ export const contract = {
       })
       .input(mcpAuthTarget)
       .output(mcpAuthCancelResult),
-    logout: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(mcpAuthTarget)
-      .output(mcpAuthLogoutResult),
-    status: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(mcpAuthTarget)
-      .output(mcpAuthStatusResult),
+    logout: ocFind.input(mcpAuthTarget).output(mcpAuthLogoutResult),
+    status: ocFind.input(mcpAuthTarget).output(mcpAuthStatusResult),
   },
   credentials: {
-    list: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(credentialsList),
-    set: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(credentialsSet)
-      .output(credentialsSetResult),
+    list: ocAuth.output(credentialsList),
+    set: ocAuth.input(credentialsSet).output(credentialsSetResult),
   },
   secrets: {
-    list: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(secretRules),
-    save: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(secretSave)
-      .output(secretVoid),
-    remove: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(secretRemove)
-      .output(secretVoid),
-    settings: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(secretSettings),
-    configure: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(secretConfigure)
-      .output(secretSettings),
+    list: ocAuth.output(secretRules),
+    save: ocAuth.input(secretSave).output(secretVoid),
+    remove: ocAuth.input(secretRemove).output(secretVoid),
+    settings: ocAuth.output(secretSettings),
+    configure: ocAuth.input(secretConfigure).output(secretSettings),
   },
   artifacts: {
-    blocks: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(artifactBlocks),
-    list: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(artifactListInput)
-      .output(artifactList),
-    listBot: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(artifactBotListInput)
-      .output(artifactList),
-    get: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(artifactGet)
-      .output(artifact),
-    versions: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(artifactVersionsInput)
-      .output(artifactVersionList),
-    create: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        CONFLICT: errorSchemas.CONFLICT,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(artifactCreate)
-      .output(artifact),
-    update: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        CONFLICT: errorSchemas.CONFLICT,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(artifactUpdate)
-      .output(artifact),
-    saveState: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        CONFLICT: errorSchemas.CONFLICT,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(artifactSaveState)
-      .output(artifact),
-    restore: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        CONFLICT: errorSchemas.CONFLICT,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(artifactRestore)
-      .output(artifact),
+    blocks: ocAuth.output(artifactBlocks),
+    list: ocFind.input(artifactListInput).output(artifactList),
+    listBot: ocFind.input(artifactBotListInput).output(artifactList),
+    get: ocFind.input(artifactGet).output(artifact),
+    versions: ocFind.input(artifactVersionsInput).output(artifactVersionList),
+    create: ocWrite.input(artifactCreate).output(artifact),
+    update: ocWrite.input(artifactUpdate).output(artifact),
+    saveState: ocWrite.input(artifactSaveState).output(artifact),
+    restore: ocWrite.input(artifactRestore).output(artifact),
   },
   routines: {
-    list: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(botGet)
-      .output(routineList),
-    create: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(routineCreate)
-      .output(routine),
-    update: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(routineUpdate)
-      .output(routine),
-    run: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        CONFLICT: errorSchemas.CONFLICT,
-      })
-      .input(routineTarget)
-      .output(routine),
-    remove: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(routineTarget)
-      .output(routineRemoveResult),
+    list: ocFind.input(botGet).output(routineList),
+    create: ocValidate.input(routineCreate).output(routine),
+    update: ocValidate.input(routineUpdate).output(routine),
+    run: ocBusy.input(routineTarget).output(routine),
+    remove: ocFind.input(routineTarget).output(routineRemoveResult),
   },
   todos: {
-    list: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(botGet)
-      .output(todoList),
-    create: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(todoCreate)
-      .output(todo),
-    update: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(todoUpdate)
-      .output(todo),
-    reorder: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(todoReorder)
-      .output(todoList),
-    remove: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(todoTarget)
-      .output(todoRemoveResult),
+    list: ocFind.input(botGet).output(todoList),
+    create: ocValidate.input(todoCreate).output(todo),
+    update: ocValidate.input(todoUpdate).output(todo),
+    reorder: ocValidate.input(todoReorder).output(todoList),
+    remove: ocFind.input(todoTarget).output(todoRemoveResult),
   },
   avatars: {
-    upload: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(avatarUpload)
-      .output(botAvatarImage),
+    upload: ocAuth.input(avatarUpload).output(botAvatarImage),
   },
   attachments: {
-    upload: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(attachmentUpload)
-      .output(attachment),
+    upload: ocFind.input(attachmentUpload).output(attachment),
     download: oc
       .meta(openapi({ method: 'GET', path: '/{botId}/{attachmentId}' }))
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
       .input(attachmentGet)
       .output(attachmentDownload),
-    list: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(attachmentList)
-      .output(attachmentPage),
-    remove: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        CONFLICT: errorSchemas.CONFLICT,
-      })
-      .input(attachmentGet)
-      .output(attachmentRemoveResult),
+    list: ocFind.input(attachmentList).output(attachmentPage),
+    remove: ocBusy.input(attachmentGet).output(attachmentRemoveResult),
   },
   server: {
-    info: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(serverInfo),
+    info: ocAuth.output(serverInfo),
 
-    configure: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(serverConfigure)
-      .output(serverInfo),
+    configure: ocAuth.input(serverConfigure).output(serverInfo),
   },
 
   models: {
-    list: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(modelList),
+    list: ocAuth.output(modelList),
   },
 
   commands: {
-    list: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(commandList)
-      .output(commandCatalog),
+    list: ocFind.input(commandList).output(commandCatalog),
 
-    execute: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        CONFLICT: errorSchemas.CONFLICT,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(commandExecute)
-      .output(commandExecuteResult),
+    execute: ocWrite.input(commandExecute).output(commandExecuteResult),
   },
 
   plugins: {
-    discover: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(pluginDiscover)
-      .output(pluginCatalog),
+    discover: ocFind.input(pluginDiscover).output(pluginCatalog),
 
-    settings: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(pluginSettings),
+    settings: ocAuth.output(pluginSettings),
 
-    configure: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(pluginConfigure)
-      .output(pluginSettings),
+    configure: ocAuth.input(pluginConfigure).output(pluginSettings),
   },
 
   instructions: {
-    discover: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(instructionDiscover)
-      .output(instructionCatalog),
+    discover: ocFind.input(instructionDiscover).output(instructionCatalog),
 
-    settings: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(instructionSettings),
+    settings: ocAuth.output(instructionSettings),
 
-    configure: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(instructionConfigure)
-      .output(instructionSettings),
+    configure: ocAuth.input(instructionConfigure).output(instructionSettings),
   },
 
   skills: {
-    discover: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(skillDiscover)
-      .output(skillCatalog),
+    discover: ocFind.input(skillDiscover).output(skillCatalog),
 
-    settings: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(skillSettings),
+    settings: ocAuth.output(skillSettings),
 
-    configure: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(skillConfigure)
-      .output(skillSettings),
+    configure: ocAuth.input(skillConfigure).output(skillSettings),
   },
 
   mcp: {
-    discover: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(mcpDiscover)
-      .output(mcpCatalog),
+    discover: ocFind.input(mcpDiscover).output(mcpCatalog),
 
-    connect: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(mcpDiscover)
-      .output(mcpCatalog),
+    connect: ocFind.input(mcpDiscover).output(mcpCatalog),
 
-    settings: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(mcpSettings),
+    settings: ocAuth.output(mcpSettings),
 
-    configure: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(mcpConfigure)
-      .output(mcpSettings),
+    configure: ocAuth.input(mcpConfigure).output(mcpSettings),
   },
 
   tools: {
-    settings: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(toolSettings),
+    settings: ocAuth.output(toolSettings),
 
-    configure: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(toolConfigure)
-      .output(toolSettings),
+    configure: ocAuth.input(toolConfigure).output(toolSettings),
 
-    pending: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(toolPending)
-      .output(toolApprovalList),
+    pending: ocFind.input(toolPending).output(toolApprovalList),
 
-    answer: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(toolAnswer)
-      .output(toolAnswerResult),
+    answer: ocFind.input(toolAnswer).output(toolAnswerResult),
   },
 
   bots: {
-    swapModels: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        CONFLICT: errorSchemas.CONFLICT,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(botSwapModels)
-      .output(botSwapModelsResult),
+    swapModels: ocWrite.input(botSwapModels).output(botSwapModelsResult),
 
-    list: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(botList),
+    list: ocAuth.output(botList),
 
-    get: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(botGet)
-      .output(bot),
+    get: ocFind.input(botGet).output(bot),
 
     create: oc
       .errors({
@@ -561,37 +276,15 @@ export const contract = {
       .input(botCreate)
       .output(bot),
 
-    update: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        CONFLICT: errorSchemas.CONFLICT,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(botUpdate)
-      .output(bot),
+    update: ocWrite.input(botUpdate).output(bot),
 
-    delete: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(botGet)
-      .output(botDeleteResult),
+    delete: ocFind.input(botGet).output(botDeleteResult),
 
-    catalog: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(botGet)
-      .output(botCatalog),
+    catalog: ocFind.input(botGet).output(botCatalog),
   },
 
   pairing: {
-    create: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(authPairResult),
+    create: ocAuth.output(authPairResult),
 
     bootstrap: oc
       .errors({
@@ -600,234 +293,75 @@ export const contract = {
       })
       .output(authPairResult),
 
-    redeem: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(authRedeem)
-      .output(authRedeemResult),
+    redeem: ocAuth.input(authRedeem).output(authRedeemResult),
   },
 
   sidebarSections: {
-    list: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(sidebarSectionList),
-    create: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(sidebarSectionCreate)
-      .output(sidebarSection),
-    rename: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(sidebarSectionRename)
-      .output(sidebarSection),
-    remove: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(sidebarSectionTarget)
-      .output(sidebarSectionVoid),
-    arrange: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(sidebarSectionArrange)
-      .output(sidebarSectionVoid),
-    setCollapsed: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(sidebarSectionSetCollapsed)
-      .output(sidebarSection),
+    list: ocAuth.output(sidebarSectionList),
+    create: ocAuth.input(sidebarSectionCreate).output(sidebarSection),
+    rename: ocFind.input(sidebarSectionRename).output(sidebarSection),
+    remove: ocFind.input(sidebarSectionTarget).output(sidebarSectionVoid),
+    arrange: ocFind.input(sidebarSectionArrange).output(sidebarSectionVoid),
+    setCollapsed: ocFind.input(sidebarSectionSetCollapsed).output(sidebarSection),
   },
 
   conversation: {
-    watchNotifications: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(asyncIteratorObject(conversationFrame)),
+    watchNotifications: ocAuth.output(asyncIteratorObject(conversationFrame)),
 
-    search: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(conversationSearch)
-      .output(conversationSearchResult),
-    questions: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(conversationTarget)
-      .output(conversationQuestionList),
-    answerQuestion: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(conversationAnswerQuestion)
-      .output(conversationAnswerQuestionResult),
-    setReaction: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(conversationSetReaction)
-      .output(conversationSetReactionResult),
-    reactions: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(conversationReactions)
-      .output(conversationReactionsResult),
-    setHidden: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(conversationSetHidden)
-      .output(conversationPreferences),
-    setMuted: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(conversationSetMuted)
-      .output(conversationPreferences),
-    setWhenBusy: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(conversationSetWhenBusy)
-      .output(conversationPreferences),
-    settings: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(conversationSettings),
-    configure: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(conversationConfigure)
-      .output(conversationSettings),
-    arrange: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
-      .input(conversationArrange)
-      .output(conversationArrangeResult),
+    search: ocValidate.input(conversationSearch).output(conversationSearchResult),
+    questions: ocFind.input(conversationTarget).output(conversationQuestionList),
+    answerQuestion: ocFind.input(conversationAnswerQuestion).output(conversationAnswerQuestionResult),
+    setReaction: ocValidate.input(conversationSetReaction).output(conversationSetReactionResult),
+    reactions: ocFind.input(conversationReactions).output(conversationReactionsResult),
+    setHidden: ocFind.input(conversationSetHidden).output(conversationPreferences),
+    setMuted: ocFind.input(conversationSetMuted).output(conversationPreferences),
+    setWhenBusy: ocFind.input(conversationSetWhenBusy).output(conversationPreferences),
+    settings: ocAuth.output(conversationSettings),
+    configure: ocAuth.input(conversationConfigure).output(conversationSettings),
+    arrange: ocFind.input(conversationArrange).output(conversationArrangeResult),
 
-    contextUsage: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(conversationTarget)
-      .output(conversationContextUsage),
+    contextUsage: ocFind.input(conversationTarget).output(conversationContextUsage),
 
-    watchContexts: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(conversationTarget)
-      .output(asyncIteratorObject(conversationFrame)),
+    watchContexts: ocFind.input(conversationTarget).output(asyncIteratorObject(conversationFrame)),
 
-    usage: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(conversationTarget)
-      .output(conversationUsage),
+    usage: ocFind.input(conversationTarget).output(conversationUsage),
 
-    contexts: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(conversationContexts)
-      .output(conversationContextPage),
+    contexts: ocValidate.input(conversationContexts).output(conversationContextPage),
 
-    markRead: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(conversationMarkRead)
-      .output(conversationPreferences),
+    markRead: ocFind.input(conversationMarkRead).output(conversationPreferences),
 
-    setPinned: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(conversationSetPinned)
-      .output(conversationPreferences),
+    setPinned: ocFind.input(conversationSetPinned).output(conversationPreferences),
 
-    watchList: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(asyncIteratorObject(conversationFrame)),
+    watchList: ocAuth.output(asyncIteratorObject(conversationFrame)),
 
-    list: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(conversationList),
+    list: ocAuth.output(conversationList),
 
-    history: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(conversationHistory)
-      .output(conversationHistoryResult),
+    history: ocValidate.input(conversationHistory).output(conversationHistoryResult),
 
-    submit: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        CONFLICT: errorSchemas.CONFLICT,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(conversationSubmit)
-      .output(conversationSubmitResult),
+    submit: ocBusy.input(conversationSubmit).output(conversationSubmitResult),
 
-    updateSubmission: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        CONFLICT: errorSchemas.CONFLICT,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-        VALIDATION_ERROR: errorSchemas.VALIDATION_ERROR,
-      })
-      .input(conversationUpdateSubmission)
-      .output(conversationUpdateSubmissionResult),
+    updateSubmission: ocWrite.input(conversationUpdateSubmission).output(conversationUpdateSubmissionResult),
 
-    stop: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(conversationTarget)
-      .output(conversationStopResult),
+    stop: ocFind.input(conversationTarget).output(conversationStopResult),
 
-    clear: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(botGet)
-      .output(conversationClearResult),
+    clear: ocFind.input(botGet).output(conversationClearResult),
 
-    watch: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(conversationTarget)
-      .output(asyncIteratorObject(conversationFrame)),
+    watch: ocFind.input(conversationTarget).output(asyncIteratorObject(conversationFrame)),
   },
 
   devices: {
-    list: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(deviceList),
+    list: ocAuth.output(deviceList),
 
-    revoke: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(deviceRevoke)
-      .output(deviceRevokeResult),
+    revoke: ocAuth.input(deviceRevoke).output(deviceRevokeResult),
   },
 
   notifications: {
-    settings: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .output(notificationSettings),
+    settings: ocAuth.output(notificationSettings),
 
-    configure: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(notificationConfigure)
-      .output(notificationSettings),
+    configure: ocAuth.input(notificationConfigure).output(notificationSettings),
 
-    presence: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(notificationPresence)
-      .output(notificationVoid),
+    presence: ocAuth.input(notificationPresence).output(notificationVoid),
 
-    push: oc
-      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
-      .input(notificationPush)
-      .output(notificationVoid),
+    push: ocAuth.input(notificationPush).output(notificationVoid),
   },
 };

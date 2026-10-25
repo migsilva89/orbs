@@ -2,14 +2,9 @@ import { LiveDoc } from '@earendil-works/pi-durable';
 import { match, P } from 'ts-pattern';
 import { subagentAgents } from './subagent.constants';
 import { subagentDetails, subagentReply } from './subagent.utils';
-import type { Context } from '@earendil-works/chord/context';
-import type { ToolExecutionApi } from '@earendil-works/pi-durable';
+import type { SubagentStatusParams } from '../../types/subagent.types';
 
-export async function subagentQueryStatus(
-  api: ToolExecutionApi,
-  name: string | undefined,
-  context: Context,
-) {
+export async function subagentQueryStatus({ api, name, context }: SubagentStatusParams) {
   const agents = (await api.snapshot(subagentAgents, api.conversationId, context))?.agents ?? {};
 
   const names = match(name)

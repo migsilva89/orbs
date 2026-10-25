@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { messageQuote } from './reply.types';
+import { replyQuote } from './reply.types';
 
 export const ATTACHMENT = {
   entryKind: 'bots.attachment-message',
@@ -44,7 +44,7 @@ export const attachmentIds = z.array(z.uuid()).max(ATTACHMENT.maxPerMessage).ref
 export const attachmentMessage = z.object({
   content: z.string(),
   attachments: z.array(attachment),
-  replyTo: messageQuote.optional(),
+  replyTo: replyQuote.optional(),
 });
 
 export type Attachment = z.infer<typeof attachment>;

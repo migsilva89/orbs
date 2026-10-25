@@ -1,5 +1,5 @@
 import { CHAT, chatPairMessages } from '@repo/client/client';
-import { chatViewOptions, useChatRoom } from '@repo/client/react';
+import { chatQueries, useChatRoom } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
@@ -70,7 +70,7 @@ interface RoomsPairProps {
 
 export function RoomsPair({ sender, peer, conversationId }: RoomsPairProps) {
   const { data: bots } = useSuspenseQuery(rpc.bots.list.queryOptions());
-  const { data: view } = useQuery(chatViewOptions(RPC_CONTEXT, { botId: peer.id, conversationId }));
+  const { data: view } = useQuery(chatQueries.view(RPC_CONTEXT, { botId: peer.id, conversationId }));
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">

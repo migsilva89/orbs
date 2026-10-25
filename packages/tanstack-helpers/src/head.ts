@@ -1,31 +1,10 @@
 import { createJsonLd } from './json-ld';
 import { createMetadata } from './metadata';
 import { canonicalLocalizedLink, hreflangLinks } from './url';
-import type { TanstackJsonLdSchema } from './json-ld';
-import type { TanstackMetadata } from './metadata';
-import type { TanstackUrlCanonicalLink, TanstackUrlHreflangLink } from './url';
+import type { TanstackHeadBuilderParams, TanstackHeadParams } from './types/tanstack-head.types';
+import type { TanstackMetadata } from './types/tanstack-metadata.types';
+import type { TanstackUrlCanonicalLink, TanstackUrlHreflangLink } from './types/tanstack-url.types';
 
-export interface TanstackHeadParams {
-  path: string
-  locale?: string
-  title: string
-  description: string
-  robots?: string
-  hreflang?: boolean
-  metadata?: TanstackMetadata
-  schemas?: readonly TanstackJsonLdSchema[]
-}
-
-export interface TanstackHeadBuilderParams {
-  origin: string
-  baseLocale: string
-  locales: readonly string[]
-  defaults: TanstackMetadata
-  resolveLocale: (locale?: string) => string
-  formatOpenGraphLocale?: (locale: string) => string
-}
-
-/** Build a reusable route head function with localized canonical, hreflang, and meta. */
 export function createHead(builder: TanstackHeadBuilderParams) {
   return function head(params: TanstackHeadParams) {
     const locale = builder.resolveLocale(params.locale);

@@ -27,14 +27,12 @@ export interface McpAuthCredentials {
 
 export interface McpAuthServiceDeps {
   credentials: McpAuthCredentials;
-  /** Shown to the user on the OAuth consent screen. */
   appName: string;
 }
 
 export interface McpAuthPending {
   deviceId: string;
   botId: string;
-  /** App link the callback page opens after login, so a native login sheet can close. */
   returnUrl?: string;
   serverUrl: string;
   redirectUrl: string;
@@ -76,7 +74,6 @@ export interface McpAuthStartParams extends McpAuthDeviceParams {
 }
 
 export interface McpAuthCallbackParams {
-  /** Query string the authorization server appended to the redirect URL. */
   search: string;
 }
 

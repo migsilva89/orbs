@@ -8,7 +8,6 @@ import { roomsQuestionText } from '../services/rooms/rooms.utils';
 import { useRpc } from './use-rpc';
 import type { ConversationQuestion, QuestionAnswerInput } from '@repo/contracts/universal';
 
-/** The state of a bot question card: picked choices, a typed answer or secret, and sending, skipping or choosing. */
 export function useChatQuestion(question: ConversationQuestion) {
   const { rpc } = useRpc();
   const [picked, setPicked] = useState<string[]>([]);

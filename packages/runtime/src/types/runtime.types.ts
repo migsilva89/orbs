@@ -1,14 +1,15 @@
-import { artifactSpec, routineCreate, todo } from '@repo/contracts/universal';
+import { artifactSpec, commandArguments, commandIdArguments, routineCreate, todo } from '@repo/contracts/universal';
 import { z } from 'zod';
 import type { ArtifactService } from '../services/artifact/artifact.service';
-import type { ConversationIndexService } from '../services/conversation-index/conversation-index.service';
 import type { NotificationService } from '../services/notification/notification.service';
 import type { QuestionService } from '../services/question/question.service';
 import type { RoutineService } from '../services/routine/routine.service';
 import type { TodoService } from '../services/todo/todo.service';
 import type { AlarmService } from './alarm.types';
 import type { CollaborationDirectory, CollaborationPolicy } from './collaboration.types';
+import type { ConversationIndexService } from './conversation-index.types';
 import type { StorageService } from './storage.types';
+import type { Draft, JsonValue } from '@earendil-works/chord';
 import type { Context } from '@earendil-works/chord/context';
 import type { ToolCall } from '@earendil-works/pi-ai';
 import type { Models } from '@earendil-works/pi-ai/models';
@@ -17,7 +18,6 @@ import type { ImageProcessor } from '@earendil-works/pi-durable/tools';
 import type * as UniversalTypes from '@repo/contracts/universal';
 
 export interface RuntimeServiceParams {
-  /** Host application name the bot instructions use. */
   appName: string;
   storage: StorageService;
   alarm: AlarmService;
@@ -25,9 +25,7 @@ export interface RuntimeServiceParams {
   env: NonNullable<PiDurableTypes.HarnessOptions['env']>;
   permissions: RuntimeToolPolicy;
   collaboration: CollaborationPolicy;
-  /** Shrinks and converts the images `read` returns, so large photos reach the model. */
   images?: ImageProcessor;
-  /** Gives bash commands stored secrets as placeholders, and keeps real values out of tool results. */
   secrets?: RuntimeSecrets;
   toolExtensions?: PiDurableTypes.Extension[];
 }
@@ -42,7 +40,6 @@ export interface RuntimeSecrets {
   };
 }
 
-/** The part of Pi's bash execution a secret broker may change. */
 export interface RuntimeSecretExecution {
   command: string;
   env: Record<string, string>;
@@ -63,7 +60,6 @@ export interface RuntimeSecretsParams {
 
 export interface RuntimeToolPolicy {
   authorize(call: RuntimeToolCall, context: Context): Promise<RuntimeToolDecision>;
-  /** How long an approval waits for an answer before it counts as denied. */
   approvalTimeoutMs(): Promise<number>;
 }
 
@@ -86,7 +82,6 @@ export interface RuntimeModelsDeps {
   models: Models;
 }
 
-/** Built once per daemon and shared by every bot store, including the model-request limiter. */
 export interface RuntimeSharedDeps extends RuntimeModelsDeps {
   appName: string;
   storage: StorageService;
@@ -95,12 +90,10 @@ export interface RuntimeSharedDeps extends RuntimeModelsDeps {
   permissions: RuntimeToolPolicy;
   extensions: PiDurableTypes.Extension[];
   readOnlyTools: PiDurableTypes.ToolRegistration[];
-  /** The host's own bot tools (messaging, todos, routines, artifacts…); they run without asking the owner. */
   ownTools: PiDurableTypes.ToolRegistration[];
   directory: CollaborationDirectory;
 }
 
-/** One bot's Pi store. */
 export interface RuntimeServiceDeps extends RuntimeModelsDeps {
   appName: string;
   botId: string;
@@ -128,7 +121,6 @@ export interface RuntimeCarryOverParams {
 export interface RuntimeBot {
   deps: RuntimeServiceDeps;
   notifications: NotificationService;
-  /** Resume pending Pi work after a host alarm and re-arm the next one. */
   wake(): void;
   close(): Promise<void>;
 }
@@ -239,7 +231,66 @@ export interface RuntimeQuestionAnswer extends RuntimeConversationParams {
   answeredBy: string;
 }
 
-/** What a history clear keeps: routines, todos and the latest version of each artifact, with their IDs. */
+export interface RuntimeContextInput {
+  context: Context;
+}
+
+export type RuntimeBotOperation<P, R> = (deps: RuntimeServiceDeps, params: P & RuntimeContextInput) => Promise<R> | R;
+
+export type RuntimeBotFailure = Extract<PiDurableTypes.SessionEnd, { reason: 'failed' }>;
+
+export interface RuntimeDirectoryParams {
+  open: (botId: string) => Promise<RuntimeBot>;
+}
+
+export interface RuntimeWatchSource<T> {
+  state: { value: T; subscribe: (listener: (value: T) => void) => () => void };
+  closed: Promise<PiDurableTypes.WatchEnd>;
+  stop: () => Promise<PiDurableTypes.WatchEnd>;
+}
+
+export interface RuntimeWatchMergeParams<T, S extends object> {
+  directory: RuntimeDirectory;
+  initial: S;
+  attach: (bot: RuntimeBot, context: Context) => Promise<RuntimeWatchSource<T>>;
+  apply: (draft: Draft<S>, botId: string, value: T | null) => void;
+  context: Context;
+}
+
+export interface RuntimeToolApprovalDocument extends PiDurableTypes.JsonObject {
+  approval: RuntimeApproval | null;
+}
+
+export interface RuntimeBotIdentity extends PiDurableTypes.JsonObject {
+  botId: string | null;
+  skillsPrompt: string;
+}
+
+export interface RuntimeToolTarget {
+  botId: string;
+  conversationId: PiDurableTypes.ConversationId;
+}
+
+export interface RuntimeQuoteParams extends RuntimeContextInput {
+  conversationId: PiDurableTypes.ConversationId;
+  entryId: number | null | undefined;
+}
+
+export interface RuntimeRetryParams extends RuntimeContextInput {
+  conversationId: PiDurableTypes.ConversationId;
+  taskId: PiDurableTypes.TaskId<JsonValue>;
+}
+
+export interface RuntimeInterruptParams extends RuntimeInterruptDraft, RuntimeContextInput {
+  conversationId: PiDurableTypes.ConversationId;
+}
+
+export const runtimeTemporaryCursor = z.object({ offset: z.number().int().nonnegative() });
+
+export const runtimeCommandArgumentsSchema = z.record(z.string(), z.json()).parse(z.toJSONSchema(commandArguments));
+
+export const runtimeCommandIdArgumentsSchema = z.record(z.string(), z.json()).parse(z.toJSONSchema(commandIdArguments));
+
 export const runtimeCarry = z.object({
   routines: z.array(routineCreate.omit({ botId: true }).extend({ id: z.uuid() })),
   artifacts: z.array(z.object({

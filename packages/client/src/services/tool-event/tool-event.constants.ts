@@ -1,6 +1,5 @@
 import type * as ToolEventTypes from '../../types/tool-event.types';
 
-/** Every tool call shown as a chat event instead of a tool row, by tool name. */
 export const TOOL_EVENTS = new Map<string, ToolEventTypes.ToolEventSource>([
   ['bot_message', { kind: 'peers' }],
   ['bot_ask', { kind: 'peers' }],
@@ -16,7 +15,6 @@ export const TOOL_EVENTS = new Map<string, ToolEventTypes.ToolEventSource>([
   ['bot_swap_models', { kind: 'bot', action: 'models' }],
 ]);
 
-/** What each routine and todo event shows before its name: the glyph says what happened, not just what it touched. */
 export const TOOL_EVENT_ICONS = {
   routine: {
     create: 'alarm-clock-plus',

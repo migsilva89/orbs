@@ -2,7 +2,6 @@ import { secretProxyAllows, secretProxyMapHeaders, secretProxyPlaceholder } from
 import type { SecretProxyServiceDeps, SecretProxySwapParams } from '../../types/secret-proxy.types';
 import type { requestSteps } from 'mockttp';
 
-/** Puts real values in place of placeholders in headers and the query string, only over HTTPS to the hosts each secret allows. */
 export async function secretProxyActionSwap(
   { source, state }: SecretProxyServiceDeps,
   { request }: SecretProxySwapParams,
@@ -29,14 +28,13 @@ export async function secretProxyActionSwap(
   }
 
   const stored = swaps.flatMap(({ placeholder, value }) => (value === null ? [] : [{ placeholder, value }]));
-  const swap = (text: string) => stored.reduce((result, { placeholder, value }) => result.replaceAll(placeholder, value), text);
+  const secretProxySwapText = (text: string) => stored.reduce((result, { placeholder, value }) => result.replaceAll(placeholder, value), text);
 
   state.swapped.set(request.id, stored);
-  // Headers and the query string only: a value swapped into the path could be echoed back transformed.
-  url.search = swap(url.search);
+  url.search = secretProxySwapText(url.search);
 
   return {
     url: url.toString(),
-    headers: secretProxyMapHeaders(request.headers, swap),
+    headers: secretProxyMapHeaders(request.headers, secretProxySwapText),
   };
 }

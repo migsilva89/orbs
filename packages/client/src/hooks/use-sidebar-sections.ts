@@ -4,7 +4,6 @@ import { match } from 'ts-pattern';
 import { useRpc } from './use-rpc';
 import type * as UniversalTypes from '@repo/contracts/universal';
 
-/** Sidebar sections and their mutations; the live chat list watch pushes every change, including other devices'. */
 export function useSidebarSections() {
   const { rpc } = useRpc();
   const queryClient = useQueryClient();

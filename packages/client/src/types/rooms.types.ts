@@ -131,15 +131,11 @@ export interface RoomsAttachmentFile {
 
 export interface RoomsAttachmentsParams<Source> {
   botId: string;
-  /** Reads name, type and size without loading the file. */
   describe: (source: Source) => RoomsAttachmentFile;
-  /** Image preview url for an accepted file, or an empty string. */
   preview: (source: Source) => string;
   read: (source: Source) => Promise<File>;
-  /** Frees a preview url once its attachment leaves the composer. */
   release?: (attachment: RoomsAttachment) => void;
   onFailed?: (attachment: RoomsAttachment) => void;
-  /** Shows why a file was refused. */
   onProblem: (message: string) => void;
 }
 

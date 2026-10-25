@@ -1,7 +1,6 @@
 import { MutationCache } from '@tanstack/react-query';
 import type { QueryMutationCacheParams } from '../../types/query.types';
 
-/** Shows each mutation's `meta` message and refreshes its `meta.invalidates` keys, so hooks declare them instead of wiring callbacks. */
 export function queryMutationCache({ notify, onError }: QueryMutationCacheParams) {
   return new MutationCache({
     onError: (error, _variables, _result, mutation) => {

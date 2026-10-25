@@ -2,11 +2,10 @@ import { z } from 'zod';
 import type { Extension } from '@earendil-works/pi-durable';
 import type { PluginCatalog } from '@repo/contracts/universal';
 
-const pluginFunction = z.custom((value) => typeof value === 'function');
+const pluginFunction = z.instanceof(Function);
 const pluginObject = z.object({}).loose();
 const pluginName = z.string().refine((value) => value.trim().length > 0);
 
-// Pi's registry checks names and collisions, not module structure.
 const pluginDefinition = z.object({
   name: pluginName,
   tools: z.array(z.object({
@@ -52,7 +51,6 @@ const pluginDefinition = z.object({
   })).optional(),
 });
 
-// Keep Pi registrations and their function identities; do not return Zod's cloned objects.
 export const pluginExtension = z.custom<Extension>((value) => pluginDefinition.safeParse(value).success);
 
 export interface PluginLoaderServiceDeps {

@@ -10,23 +10,19 @@ import {
   todoToolTargetParameters,
   todoToolUpdate,
   todoToolUpdateParameters,
-} from '../../types/runtime-todo.types';
-import { runtimeQueryConversation } from './runtime-query.conversation';
-import { runtimeBot } from './runtime.constants';
-import type { RuntimeTodoToolsDeps } from '../../types/runtime-todo.types';
-import type { Context } from '@earendil-works/chord/context';
-import type { ToolExecutionApi } from '@earendil-works/pi-durable';
-import type { Todo } from '@repo/contracts/universal';
+} from '../../types/todo-tool.types';
+import { runtimeToolBotTarget, runtimeToolOutput } from './runtime-tool.utils';
+import type { TodoToolDeps } from '../../types/todo-tool.types';
 
-export function runtimeTodoToolsExtension(deps: RuntimeTodoToolsDeps) {
+export function runtimeTodoToolsExtension(deps: TodoToolDeps) {
   const list = defineTool({
     name: 'bot_todo_list',
     description: m.ui_tool_bot_todo_list_description(),
     parameters: Type.Object({}, { additionalProperties: false }),
     replay: 'safe',
     execute: async (_params, api, context) => {
-      const target = await runtimeTodoTarget(deps, api, context);
-      return runtimeTodoOutput(await deps.todos.queries.list(target, context));
+      const { conversationId } = await runtimeToolBotTarget(deps, api, context);
+      return runtimeToolOutput(await deps.todos.queries.list({ conversationId }, context));
     },
   });
 
@@ -37,8 +33,8 @@ export function runtimeTodoToolsExtension(deps: RuntimeTodoToolsDeps) {
     replay: 'unsafe',
     execute: async (params, api, context) => {
       const input = todoToolCreate.parse(params);
-      const target = await runtimeTodoTarget(deps, api, context);
-      return runtimeTodoOutput(await deps.todos.actions.create({ ...input, ...target }, context));
+      const { conversationId } = await runtimeToolBotTarget(deps, api, context);
+      return runtimeToolOutput(await deps.todos.actions.create({ ...input, conversationId }, context));
     },
   });
 
@@ -49,8 +45,8 @@ export function runtimeTodoToolsExtension(deps: RuntimeTodoToolsDeps) {
     replay: 'unsafe',
     execute: async (params, api, context) => {
       const input = todoToolUpdate.parse(params);
-      const target = await runtimeTodoTarget(deps, api, context);
-      return runtimeTodoOutput(await deps.todos.actions.update({ ...input, ...target }, context));
+      const { conversationId } = await runtimeToolBotTarget(deps, api, context);
+      return runtimeToolOutput(await deps.todos.actions.update({ ...input, conversationId }, context));
     },
   });
 
@@ -61,18 +57,17 @@ export function runtimeTodoToolsExtension(deps: RuntimeTodoToolsDeps) {
     replay: 'unsafe',
     execute: async (params, api, context) => {
       const input = todoToolTarget.parse(params);
-      const target = await runtimeTodoTarget(deps, api, context);
+      const { conversationId } = await runtimeToolBotTarget(deps, api, context);
 
-      // Read it first: the output names what was removed, so the chat can show it.
-      const removed = match((await deps.todos.queries.list(target, context)).find((todo) => todo.id === input.todoId))
+      const removed = match((await deps.todos.queries.list({ conversationId }, context)).find((todo) => todo.id === input.todoId))
         .with(P.nonNullable, (todo) => todo)
         .otherwise(() => {
           throw new Errors.NOT_FOUND({ resource: 'todo', resourceId: input.todoId });
         });
 
-      await deps.todos.actions.remove({ ...input, ...target }, context);
+      await deps.todos.actions.remove({ ...input, conversationId }, context);
 
-      return runtimeTodoOutput(removed);
+      return runtimeToolOutput(removed);
     },
   });
 
@@ -80,22 +75,4 @@ export function runtimeTodoToolsExtension(deps: RuntimeTodoToolsDeps) {
     extension: defineExtension({ name: 'bots.todo-tools', tools: [list, create, update, remove] }),
     readOnlyTools: [list],
   };
-}
-
-/** Todos belong to the bot's main chat, including when a private context or subagent edits them. */
-async function runtimeTodoTarget(deps: RuntimeTodoToolsDeps, api: ToolExecutionApi, context: Context) {
-  const identity = await api.snapshot(runtimeBot, api.conversationId, context);
-
-  const botId = match(identity?.botId)
-    .with(P.string, (id) => id)
-    .otherwise(() => {
-      throw new Errors.FORBIDDEN();
-    });
-
-  const conversation = await runtimeQueryConversation(deps, { botId }, context);
-  return { conversationId: conversation.id };
-}
-
-function runtimeTodoOutput(value: Todo | Todo[]) {
-  return { output: [{ type: 'text' as const, text: JSON.stringify(value) }] };
 }

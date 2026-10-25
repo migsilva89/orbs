@@ -1,7 +1,6 @@
 import { useEffect, useEffectEvent, useState } from 'react';
 import { useChatMarkRead } from './use-chat-mark-read';
 
-/** Marks new entries read while the tab is visible and focused; the unread divider stays where it was until the owner comes back. */
 export function useChatRead(botId: string, readThroughEntryId: number, latestEntryId: number) {
   const [divider, setDivider] = useState(readThroughEntryId);
   const [isSeen, setIsSeen] = useState(false);

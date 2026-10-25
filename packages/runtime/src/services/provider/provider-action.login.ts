@@ -32,7 +32,7 @@ export function providerActionLogin(deps: ProviderTypes.ProviderServiceDeps, par
     .exhaustive();
 
   match(method)
-    .when((value) => value !== undefined && 'login' in value, () => undefined)
+    .when((value) => value?.login !== undefined, () => undefined)
     .otherwise(() => {
       throw new Errors.VALIDATION_ERROR({
         fields: { authType: { message: 'validation_provider_login_unsupported' } },
@@ -76,7 +76,7 @@ export function providerActionLogin(deps: ProviderTypes.ProviderServiceDeps, par
 
   session.done = deps.models.login(params.providerId, params.authType, {
     signal: abort.signal,
-    prompt: (prompt) => providerWaitForPrompt(session, prompt),
+    prompt: (prompt) => providerWaitForPrompt(prompt),
     notify: (event) => providerPushEvent(session, event),
   }, {
     agentName: PROVIDER.agentName,
@@ -113,39 +113,39 @@ export function providerActionLogin(deps: ProviderTypes.ProviderServiceDeps, par
   deps.sessions.set(session.id, session);
 
   return providerSessionView(session);
-}
 
-function providerWaitForPrompt(session: ProviderTypes.ProviderLoginRecord, prompt: AuthPrompt) {
-  session.abort.signal.throwIfAborted();
-  prompt.signal?.throwIfAborted();
+  function providerWaitForPrompt(prompt: AuthPrompt) {
+    session.abort.signal.throwIfAborted();
+    prompt.signal?.throwIfAborted();
 
-  const promptId = crypto.randomUUID();
+    const promptId = crypto.randomUUID();
 
-  return new Promise<string>((resolve, reject) => {
-    const finish = (settle: () => void) => {
-      session.abort.signal.removeEventListener('abort', onAbort);
-      prompt.signal?.removeEventListener('abort', onPromptAbort);
-      match(session.pending?.promptId === promptId)
-        .with(true, () => {
-          session.pending = undefined;
-          session.prompt = undefined;
-        })
-        .with(false, () => undefined)
-        .exhaustive();
-      settle();
-    };
+    return new Promise<string>((resolve, reject) => {
+      const providerSettle = (settle: ProviderTypes.ProviderSettle) => {
+        session.abort.signal.removeEventListener('abort', providerOnAbort);
+        prompt.signal?.removeEventListener('abort', providerOnPromptAbort);
+        match(session.pending?.promptId === promptId)
+          .with(true, () => {
+            session.pending = undefined;
+            session.prompt = undefined;
+          })
+          .with(false, () => undefined)
+          .exhaustive();
+        settle();
+      };
 
-    const onAbort = () => finish(() => reject(new Error('Login cancelled')));
-    const onPromptAbort = () => finish(() => reject(new Error('Login cancelled')));
+      const providerOnAbort = () => providerSettle(() => reject(new Errors.CONFLICT({ internal: 'Login cancelled' })));
+      const providerOnPromptAbort = () => providerSettle(() => reject(new Errors.CONFLICT({ internal: 'Login cancelled' })));
 
-    session.prompt = providerPromptView(promptId, prompt);
-    session.pending = {
-      promptId,
-      resolve: (answer) => finish(() => resolve(answer)),
-      reject: (error) => finish(() => reject(error)),
-    };
+      session.prompt = providerPromptView(promptId, prompt);
+      session.pending = {
+        promptId,
+        resolve: (answer) => providerSettle(() => resolve(answer)),
+        reject: (error) => providerSettle(() => reject(error)),
+      };
 
-    session.abort.signal.addEventListener('abort', onAbort, { once: true });
-    prompt.signal?.addEventListener('abort', onPromptAbort, { once: true });
-  });
+      session.abort.signal.addEventListener('abort', providerOnAbort, { once: true });
+      prompt.signal?.addEventListener('abort', providerOnPromptAbort, { once: true });
+    });
+  }
 }

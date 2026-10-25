@@ -1,13 +1,11 @@
 import { runtimeQueryConversation } from './runtime-query.conversation';
-import type { RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { RuntimeContextInput, RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
 
 export async function runtimeQueryAttachmentTarget(
   deps: RuntimeServiceDeps,
-  params: RuntimeConversationParams,
-  context: Context,
+  params: RuntimeConversationParams & RuntimeContextInput,
 ) {
-  const conversation = await runtimeQueryConversation(deps, params, context);
+  const conversation = await runtimeQueryConversation(deps, params);
 
   return conversation.id;
 }

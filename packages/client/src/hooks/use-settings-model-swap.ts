@@ -3,7 +3,6 @@ import { useMutation } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
 import type { SettingsDoneParams } from '../types/settings.types';
 
-/** Moves bots from one model to another and reports how many primaries and fallbacks changed. */
 export function useSettingsModelSwap({ onDone }: SettingsDoneParams) {
   const { rpc } = useRpc();
 

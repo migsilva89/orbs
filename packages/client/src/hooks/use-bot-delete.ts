@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRpc } from './use-rpc';
 import type { BotDeleteParams } from '../types/bot.types';
 
-/** Deletes a bot, refreshes the bot list and drops the bot's cached data, then lets the app leave its screens. */
 export function useBotDelete({ botId, onDeleted }: BotDeleteParams) {
   const queryClient = useQueryClient();
   const { rpc } = useRpc();

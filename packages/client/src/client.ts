@@ -3,12 +3,13 @@ import { RPCLink as FetchRPCLink } from '@orpc/client/fetch';
 import { RetryLinkPlugin } from '@orpc/client/plugins';
 import { RPCLink } from '@orpc/client/websocket';
 import { SERVER_PROTOCOL } from '@repo/contracts/universal';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
-import type { Client, ClientOptions, HttpClientOptions } from './types/client.types';
+import type { Client, ClientHttpOptions, ClientOptions } from './types/client.types';
 
-export function makeHttpClient(options: HttpClientOptions | (() => HttpClientOptions | Promise<HttpClientOptions>)): Client {
+export function makeHttpClient(options: () => ClientHttpOptions | Promise<ClientHttpOptions>): Client {
   return createORPCClient(new DynamicLink(async () => {
-    const { url, token, serverId, fetch } = typeof options === 'function' ? await options() : options;
+    const { url, token, serverId, fetch } = await options();
 
     return clientHttpLink(url, () => clientHeaders({ token, serverId }), fetch);
   }));
@@ -42,7 +43,7 @@ export function makeClient({ connect, token, serverId, url }: ClientOptions): Cl
     .with(P.union(['attachments', P.union('upload', 'download')], ['avatars', 'upload']), () => match(http)
       .with(P.nonNullable, (link) => link)
       .otherwise(() => {
-        throw new Error('File transfer requires an HTTP RPC base (ClientOptions.url).');
+        throw new Errors.INTERNAL_ERROR({ internal: 'File transfer requires an HTTP RPC base (ClientOptions.url).' });
       }))
     .otherwise(() => websocket)));
 }
@@ -59,15 +60,14 @@ async function clientHeaders({ token, serverId }: Pick<ClientOptions, 'token' | 
   };
 }
 
-function clientHttpLink(url: string, headers: () => ReturnType<typeof clientHeaders>, fetch?: HttpClientOptions['fetch']) {
+function clientHttpLink(url: string, headers: () => ReturnType<typeof clientHeaders>, fetch?: ClientHttpOptions['fetch']) {
   const parsed = new URL(url, 'http://localhost');
-  const path = `${parsed.pathname}${parsed.search}` as `/${string}`;
 
   return new FetchRPCLink({
     origin: match(url)
       .when((value) => /^https?:\/\//.test(value), () => parsed.origin)
       .otherwise(() => undefined),
-    url: path,
+    url: `/${parsed.pathname.slice(1)}${parsed.search}`,
     headers,
     fetch,
   });

@@ -4,7 +4,7 @@ import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeReactions } from './runtime-reaction.constants';
 import { runtimeBot } from './runtime.constants';
-import type { RuntimeReaction, RuntimeReactToolInput } from '../../types/reaction.types';
+import type { RuntimeReaction, RuntimeReactionToolInput } from '../../types/runtime-reaction.types';
 import type { Context } from '@earendil-works/chord/context';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
 import type { ConversationReaction } from '@repo/contracts/universal';
@@ -58,7 +58,7 @@ export function runtimeReactionToggle(emojis: string[], emoji: string, isPresent
     .exhaustive();
 }
 
-function runtimeReactionApplyBot(document: RuntimeReaction, botId: string, params: RuntimeReactToolInput) {
+function runtimeReactionApplyBot(document: RuntimeReaction, botId: string, params: RuntimeReactionToolInput) {
   const existing = document.botReactions.find((item) => item.botId === botId);
 
   match(existing)
@@ -81,7 +81,7 @@ function runtimeReactionApplyBot(document: RuntimeReaction, botId: string, param
 
 export async function runtimeReactionSetBot(
   api: PiDurableTypes.ToolExecutionApi,
-  params: RuntimeReactToolInput,
+  params: RuntimeReactionToolInput,
   context: Context,
 ): Promise<ConversationReaction> {
   const identity = await api.snapshot(runtimeBot, api.conversationId, context);
@@ -96,6 +96,7 @@ export async function runtimeReactionSetBot(
     const entryId = params.entryId ?? (await tx.scanEntries({ conversationId: api.conversationId, order: 'descending' }, 50)).items
       .find((entry) => runtimeReactionOwnerKinds.has(entry.kind))?.id;
 
+    // SAFETY: an entry ID is only a lookup key; runtimeReactionTarget rejects entries outside this conversation.
     return match(runtimeReactionTarget(entryId === undefined ? undefined : await tx.entry(entryId as PiDurableTypes.EntryId), api.conversationId))
       .with(P.nullish, () => {
         throw new Errors.NOT_FOUND({ resource: 'entry', resourceId: entryId ?? 0 });

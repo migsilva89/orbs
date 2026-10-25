@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { CHAT } from '../services/chat/chat.constants';
 import { useRpc } from './use-rpc';
 
-/** A browser url for a message file: downloads `attachment:` links into an object url, passes other urls through. */
 export function useChatAttachmentUrl(botId: string, url: string) {
   const { rpc } = useRpc();
   const attachmentId = url.startsWith(CHAT.attachmentScheme) ? url.slice(CHAT.attachmentScheme.length) : undefined;

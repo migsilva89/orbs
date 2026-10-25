@@ -26,7 +26,6 @@ export async function mcpAuthActionStart(
   const redirect = mcpAuthRedirectUrl(params.redirectUrl);
   mcpAuthPrune(deps);
 
-  // The same device starting again replaces its own unfinished login, such as one left behind by a reloaded page.
   match(deps.pending.get(url))
     .with(undefined, () => undefined)
     .with({ deviceId: params.deviceId, isCompleting: P.optional(P.not(true)) }, () => {

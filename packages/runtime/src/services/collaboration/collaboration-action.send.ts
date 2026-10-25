@@ -1,19 +1,13 @@
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
+import { collaborationDeliveryTarget } from '../../types/collaboration.types';
 import { collaborationActionTarget } from './collaboration-action.target';
 import { collaborationQueryOrigin } from './collaboration-query.origin';
 import { COLLABORATION, collaborationCall, collaborationStore, collaborationTemporaryLinks } from './collaboration.constants';
 import { collaborationFailureNote } from './collaboration.utils';
-import type { CollaborationSendParams, CollaborationToolDeps } from '../../types/collaboration.types';
-import type { Context } from '@earendil-works/chord/context';
-import type { ToolExecutionApi } from '@earendil-works/pi-durable';
+import type { CollaborationSendCall, CollaborationToolDeps } from '../../types/collaboration.types';
 
-export async function collaborationActionSend(
-  deps: CollaborationToolDeps,
-  params: CollaborationSendParams,
-  api: ToolExecutionApi,
-  context: Context,
-) {
+export async function collaborationActionSend(deps: CollaborationToolDeps, { input: params, api, context }: CollaborationSendCall) {
   const saved = await api.snapshot(collaborationCall, api.taskId, context);
 
   const deliveryId = await match(saved?.deliveryId)
@@ -29,14 +23,15 @@ export async function collaborationActionSend(
         return store.storeId;
       }, context);
 
-      const recipientConversationId = await collaborationActionTarget(await deps.directory.harness(recipient.id), {
+      const recipientConversationId = await collaborationActionTarget({ harness: await deps.directory.harness(recipient.id) }, {
         senderId: sender.id,
         senderStoreId,
         sourceConversationId: api.conversationId,
         recipientId: recipient.id,
-        context: params.context,
+        target: params.context,
         temporaryTtlMs,
-      }, context);
+        context,
+      });
 
       return api.commit(async (tx) => {
         const pages = await Promise.all((['pending', 'running', 'waiting', 'sleeping', 'completing'] as const).map((status) => tx.scanTasks({
@@ -100,8 +95,8 @@ export async function collaborationActionSend(
 
   const delivery = await api.getTask(deliveryId, context);
 
-  const { recipientConversationId, recipientName } = match<unknown>(delivery?.input)
-    .with({ recipientConversationId: P.number, recipientName: P.string }, (input) => input)
+  const { recipientConversationId, recipientName } = match(collaborationDeliveryTarget.safeParse(delivery?.input))
+    .with({ success: true }, ({ data }) => data)
     .otherwise(() => {
       throw new Errors.INTERNAL_ERROR({ internal: 'Bot delivery target is unavailable.' });
     });

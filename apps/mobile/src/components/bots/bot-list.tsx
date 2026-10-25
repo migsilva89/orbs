@@ -1,4 +1,4 @@
-import { chatListOptions, useChatSearch, useSidebarSections } from '@repo/client/react';
+import { chatQueries, useChatSearch, useSidebarSections } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -52,7 +52,7 @@ function BotListContent({ session }: BotListContentProps) {
   const router = useRouter();
   const isReachable = useServerReachable(session);
 
-  const query = useQuery(chatListOptions(session));
+  const query = useQuery(chatQueries.list(session));
 
   const isFetching = query.fetchStatus === 'fetching';
 

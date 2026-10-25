@@ -1,9 +1,14 @@
+import type { Context } from '@earendil-works/chord/context';
 import type { Harness } from '@earendil-works/pi-durable';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
 import type { QuestionAnswer, SecretRule } from '@repo/contracts/universal';
 
 export interface QuestionServiceDeps {
   harness: Harness;
+}
+
+export interface QuestionContextParams {
+  context: Context;
 }
 
 export interface QuestionPendingParams {
@@ -56,3 +61,12 @@ export type QuestionDetails = PiDurableTypes.JsonObject & {
   secret: SecretRule | null;
   expiresAt: number;
 };
+
+export interface QuestionDocument extends PiDurableTypes.JsonObject {
+  question: QuestionRecord | null;
+}
+
+export interface QuestionAskCall extends QuestionContextParams {
+  input: QuestionAskParams;
+  api: PiDurableTypes.ToolExecutionApi<QuestionDetails>;
+}

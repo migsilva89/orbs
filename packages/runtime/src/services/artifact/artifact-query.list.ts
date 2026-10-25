@@ -1,14 +1,12 @@
 import { ARTIFACT } from '@repo/contracts/universal';
 import { artifactDocument } from './artifact.constants';
 import { artifactSummary } from './artifact.utils';
-import type { ArtifactListParams, ArtifactServiceDeps } from '../../types/artifact.types';
-import type { Context } from '@earendil-works/chord/context';
+import type { ArtifactContextParams, ArtifactListParams, ArtifactServiceDeps } from '../../types/artifact.types';
 import type { ArtifactSummary } from '@repo/contracts/universal';
 
 export async function artifactQueryList(
   { harness }: ArtifactServiceDeps,
-  params: ArtifactListParams,
-  context: Context,
+  { context, ...params }: ArtifactListParams & ArtifactContextParams,
 ): Promise<ArtifactSummary[]> {
   const doc = await harness.snapshot(artifactDocument, params.conversationId, context);
   return Object.values(doc?.artifacts ?? {})

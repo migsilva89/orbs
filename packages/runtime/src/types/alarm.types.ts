@@ -8,10 +8,11 @@ export interface AlarmSetParams extends AlarmBotParams {
 
 export type AlarmHandler = (params: AlarmBotParams) => void;
 
-/**
- * Host wake-up port, one alarm per bot. Like a Durable Object alarm, `set` replaces the previous time.
- * Pi owns the work and its saved deadlines; the alarm only makes sure the host is awake to `resume()` it.
- */
+export interface AlarmServiceDeps {
+  timers: Map<string, ReturnType<typeof setTimeout>>;
+  handlers: Set<AlarmHandler>;
+}
+
 export interface AlarmService {
   set(params: AlarmSetParams): void;
   clear(params: AlarmBotParams): void;

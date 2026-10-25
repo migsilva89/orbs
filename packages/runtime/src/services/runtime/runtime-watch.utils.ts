@@ -7,6 +7,7 @@ import type { CommitChange, ConversationId } from '@earendil-works/pi-durable';
 import type { ConversationState } from '@repo/contracts/universal';
 
 export function runtimeWatchChanges(state: Draft<ConversationState>, changes: readonly CommitChange[]) {
+  // SAFETY: a conversation watch state is created with the Pi conversation ID it watches.
   const conversationId = state.conversationId as ConversationId;
 
   for (const change of changes) {

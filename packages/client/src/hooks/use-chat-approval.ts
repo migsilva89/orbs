@@ -6,7 +6,6 @@ import { useRpc } from './use-rpc';
 import type { ChatApprovalDecision } from '../types/chat.types';
 import type { ToolApproval } from '@repo/contracts/universal';
 
-/** Answers a pending tool approval; `always` also stops the bot asking for this tool. `problem` explains a failed or no longer pending answer. */
 export function useChatApproval(approval: ToolApproval) {
   const { rpc } = useRpc();
   const answer = useMutation(rpc.tools.answer.mutationOptions({ meta: { invalidates: [rpc.tools.pending.key()] } }));

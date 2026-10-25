@@ -4,7 +4,6 @@ import { ROOMS_SEND_MODES } from '../services/rooms/rooms.constants';
 import { useRpc } from './use-rpc';
 import type { ConversationWhenBusy } from '@repo/contracts/universal';
 
-/** Per-chat pin, hide, mute and send-mode changes, each refreshing the chat list. */
 export function useChatSettings(botId: string) {
   const { rpc } = useRpc();
   const meta = { error: m.rooms_hide_failed(), invalidates: [rpc.conversation.list.key()] };

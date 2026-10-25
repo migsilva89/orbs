@@ -1,7 +1,6 @@
 import { Errors } from '@repo/errors/universal';
 import type { ChatPicked } from '../../types/chat.types';
 
-/** Reads a picked photo or file from its local uri as an uploadable File. */
 export function chatReadPicked({ uri, name }: Pick<ChatPicked, 'uri' | 'name'>): Promise<File> {
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest();

@@ -76,7 +76,6 @@ export function botDefaultSettings({ models, thinkingLevel }: BotTypes.BotDefaul
     .otherwise(() => ({ modelProvider: '', modelId: '', thinkingLevel }));
 }
 
-// The palette colour an avatar shows: a blob's colour, or the swatch matching an emoji's background.
 export function botAvatarColor({ avatar }: BotTypes.BotAvatarColorParams): ColorId | null {
   return match(avatar)
     .with({ kind: 'blob' }, ({ color }) => color)
@@ -85,7 +84,6 @@ export function botAvatarColor({ avatar }: BotTypes.BotAvatarColorParams): Color
     .otherwise(() => null);
 }
 
-// A swatch recolours an emoji's background; any other avatar becomes a blob in that colour.
 export function botAvatarRecolor({ avatar, color }: BotTypes.BotAvatarRecolorParams): BotTypes.BotAvatar {
   return match(avatar)
     .with({ kind: 'emoji' }, (emoji) => ({ ...emoji, color: COLOR_BY_ID.get(color)?.hex ?? emoji.color }))

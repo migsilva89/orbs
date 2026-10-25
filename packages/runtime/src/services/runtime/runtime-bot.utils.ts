@@ -14,10 +14,10 @@ import { runtimeRoutineToolsExtension } from './runtime-routine-tools.extension'
 import { runtimeTodoToolsExtension } from './runtime-todo-tools.extension';
 import { runtimeToolsExtension } from './runtime-tools.extension';
 import { RUNTIME_ALARM_DEBOUNCE_MS } from './runtime.constants';
-import type { RuntimeBot, RuntimeServiceDeps, RuntimeSharedDeps } from '../../types/runtime.types';
+import type * as RuntimeTypes from '../../types/runtime.types';
+import type { Context } from '@earendil-works/chord/context';
 
-/** Open one bot's Pi store with its own registry and Harness; shared extensions and the model limiter are reused. */
-export async function runtimeBotOpen(shared: RuntimeSharedDeps, botId: string): Promise<RuntimeBot> {
+export async function runtimeBotOpen(shared: RuntimeTypes.RuntimeSharedDeps, botId: string): Promise<RuntimeTypes.RuntimeBot> {
   const storage = await shared.storage.open({ botId });
   const registry = createRegistry();
 
@@ -50,7 +50,6 @@ export async function runtimeBotOpen(shared: RuntimeSharedDeps, botId: string): 
       ...(todoTools.extension.tools ?? []),
     ];
 
-    // The permission hook stays last, including for custom and MCP tools.
     const permissionExtension = runtimeToolsExtension({
       harness,
       readOnlyTools,
@@ -62,7 +61,7 @@ export async function runtimeBotOpen(shared: RuntimeSharedDeps, botId: string): 
       registry.install(extension);
     }
 
-    const deps: RuntimeServiceDeps = {
+    const deps: RuntimeTypes.RuntimeServiceDeps = {
       appName: shared.appName,
       botId,
       directory: shared.directory,
@@ -102,12 +101,11 @@ export async function runtimeBotOpen(shared: RuntimeSharedDeps, botId: string): 
   }
 }
 
-/** Debounced alarm arming: after commits, set the host alarm to the store's next saved deadline. */
-function runtimeBotAlarm(shared: RuntimeSharedDeps, deps: RuntimeServiceDeps) {
+function runtimeBotAlarm(shared: RuntimeTypes.RuntimeSharedDeps, deps: RuntimeTypes.RuntimeServiceDeps) {
   let timer: ReturnType<typeof setTimeout> | undefined;
   let isCancelled = false;
 
-  const arm = async () => {
+  const runtimeBotArm = async () => {
     const at = await runtimeQueryNextDeadline(deps, BACKGROUND_CONTEXT).catch((error: unknown) => {
       match(isCancelled)
         .with(true, () => undefined)
@@ -130,7 +128,7 @@ function runtimeBotAlarm(shared: RuntimeSharedDeps, deps: RuntimeServiceDeps) {
   return {
     schedule: () => {
       clearTimeout(timer);
-      timer = setTimeout(() => void arm(), RUNTIME_ALARM_DEBOUNCE_MS);
+      timer = setTimeout(() => void runtimeBotArm(), RUNTIME_ALARM_DEBOUNCE_MS);
       timer.unref();
     },
     cancel: () => {
@@ -139,4 +137,11 @@ function runtimeBotAlarm(shared: RuntimeSharedDeps, deps: RuntimeServiceDeps) {
       shared.alarm.clear({ botId: deps.botId });
     },
   };
+}
+
+export function runtimeBotCall<P extends Pick<RuntimeTypes.RuntimeConversationParams, 'botId'>, R>(
+  directory: RuntimeTypes.RuntimeDirectory,
+  run: RuntimeTypes.RuntimeBotOperation<P, R>,
+) {
+  return async (params: P, context: Context = BACKGROUND_CONTEXT) => run((await directory.bot(params.botId)).deps, { ...params, context });
 }

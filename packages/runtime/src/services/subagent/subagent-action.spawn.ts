@@ -3,15 +3,9 @@ import { subagentAnchor } from './subagent-anchor.task';
 import { subagentReporter } from './subagent-reporter.task';
 import { SUBAGENT, subagentAgents, subagentCall } from './subagent.constants';
 import { subagentCreateChild, subagentDetails, subagentPendingReporters, subagentReply } from './subagent.utils';
-import type { SubagentMessageParams, SubagentReporterInput } from '../../types/subagent.types';
-import type { Context } from '@earendil-works/chord/context';
-import type { ToolExecutionApi } from '@earendil-works/pi-durable';
+import type { SubagentMessageParams, SubagentReporterInput, SubagentToolParams } from '../../types/subagent.types';
 
-export async function subagentActionSpawn(
-  api: ToolExecutionApi,
-  params: SubagentMessageParams,
-  context: Context,
-) {
+export async function subagentActionSpawn({ api, context, ...params }: SubagentMessageParams & SubagentToolParams) {
   const { maxBackgroundAgents } = SUBAGENT;
 
   const result = await api.commit(async (tx) => {

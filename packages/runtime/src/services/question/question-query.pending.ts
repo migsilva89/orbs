@@ -1,14 +1,12 @@
 import { match, P } from 'ts-pattern';
 import { questionDocument } from './question.constants';
 import { questionPendingView } from './question.utils';
-import type { QuestionPending, QuestionPendingParams, QuestionServiceDeps } from '../../types/question.types';
-import type { Context } from '@earendil-works/chord/context';
+import type * as QuestionTypes from '../../types/question.types';
 
 export async function questionQueryPending(
-  { harness }: QuestionServiceDeps,
-  params: QuestionPendingParams,
-  context: Context,
-): Promise<QuestionPending[]> {
+  { harness }: QuestionTypes.QuestionServiceDeps,
+  { context, ...params }: QuestionTypes.QuestionPendingParams & QuestionTypes.QuestionContextParams,
+): Promise<QuestionTypes.QuestionPending[]> {
   const graph = await harness.taskGraph(context);
 
   try {

@@ -44,7 +44,7 @@ export async function makeServices({
 
   const collaboration = makeCollaborationService({ database });
 
-  const runtime = await makeRuntimeService({
+  const runtime = makeRuntimeService({
     ...runtimeOptions,
     permissions: tools,
     collaboration,

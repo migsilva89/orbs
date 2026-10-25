@@ -1,6 +1,7 @@
 import { createAssistantMessageEventStream } from '@earendil-works/pi-ai/utils/event-stream';
 import { isContextOverflow } from '@earendil-works/pi-ai/utils/overflow';
 import { isRetryableAssistantError } from '@earendil-works/pi-ai/utils/retry';
+import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import type { RuntimeModelRequest } from '../../types/runtime-model.types';
 import type * as PiAiTypes from '@earendil-works/pi-ai';
@@ -13,11 +14,11 @@ export function runtimeModelStream(models: Models, { route, context, options }: 
   const fallback = models.getModel(route.fallback.modelProvider, route.fallback.modelId);
   const first = primary ?? fallback;
 
-  async function request() {
+  async function runtimeModelStreamRequest() {
     return match(first)
       .with(P.nonNullable, async (model) => {
         const selection = primary === undefined ? route.fallback : route.primary;
-        const events = models.streamSimple(model, context, runtimeModelOptions(selection, model, options));
+        const events = models.streamSimple(model, context, runtimeModelStreamOptions(selection, model, options));
         let hasOutput = false;
 
         for await (const event of events) {
@@ -25,13 +26,13 @@ export function runtimeModelStream(models: Models, { route, context, options }: 
             && !hasOutput && !options?.signal?.aborted
             && primary !== undefined && fallback !== undefined
             && (primary.provider !== fallback.provider || primary.id !== fallback.id)
-            && !runtimeModelHasOutput(event.error)
+            && !runtimeModelStreamHasOutput(event.error)
             && event.error.usage.totalTokens === 0 && event.error.usage.cost.total === 0
-            && runtimeModelCanFallback(event.error);
+            && runtimeModelStreamCanFallback(event.error);
 
           await match({ shouldFallback, fallback })
             .with({ shouldFallback: true, fallback: P.nonNullable }, async ({ fallback: backup }) => {
-              const response = models.streamSimple(backup, context, runtimeModelOptions(route.fallback, backup, options));
+              const response = models.streamSimple(backup, context, runtimeModelStreamOptions(route.fallback, backup, options));
 
               for await (const next of response) {
                 stream.push(next);
@@ -39,16 +40,16 @@ export function runtimeModelStream(models: Models, { route, context, options }: 
             })
             .otherwise(() => stream.push(event));
 
-          hasOutput ||= event.type !== 'error' && event.type !== 'done' && runtimeModelHasOutput(event.partial);
+          hasOutput ||= event.type !== 'error' && event.type !== 'done' && runtimeModelStreamHasOutput(event.partial);
         }
       })
       .otherwise(() => {
-        throw new Error('Configured models are unavailable.');
+        throw new Errors.INTERNAL_ERROR({ internal: 'Configured models are unavailable.' });
       });
   }
 
-  void request().catch(() => {
-    stream.push(runtimeModelFailure({
+  void runtimeModelStreamRequest().catch(() => {
+    stream.push(runtimeModelStreamFailure({
       api: first?.api ?? 'openai-completions',
       provider: first?.provider ?? route.primary.modelProvider,
       model: first?.id ?? route.primary.modelId,
@@ -58,7 +59,7 @@ export function runtimeModelStream(models: Models, { route, context, options }: 
   return stream;
 }
 
-export function runtimeModelFailure(
+export function runtimeModelStreamFailure(
   model: Pick<PiAiTypes.AssistantMessage, 'api' | 'provider' | 'model'>,
   options?: ModelsSimpleStreamOptions,
 ): PiAiTypes.AssistantMessageEvent {
@@ -86,7 +87,7 @@ export function runtimeModelFailure(
   };
 }
 
-function runtimeModelOptions(selection: ModelSelection, model: PiAiTypes.Model<PiAiTypes.Api>, options?: ModelsSimpleStreamOptions) {
+function runtimeModelStreamOptions(selection: ModelSelection, model: PiAiTypes.Model<PiAiTypes.Api>, options?: ModelsSimpleStreamOptions) {
   return {
     ...options,
     reasoning: match(selection.thinkingLevel).with('off', () => undefined).otherwise((level) => level),
@@ -94,13 +95,13 @@ function runtimeModelOptions(selection: ModelSelection, model: PiAiTypes.Model<P
   };
 }
 
-function runtimeModelCanFallback(message: PiAiTypes.AssistantMessage) {
+function runtimeModelStreamCanFallback(message: PiAiTypes.AssistantMessage) {
   return message.stopReason === 'error' && !isContextOverflow(message)
     && (isRetryableAssistantError(message)
       || /\b(401|403)\b|not configured|no (?:api key|credentials)|unauthorized|authentication|\bauth\b|oauth|token.*(?:expired|invalid)|insufficient_quota|quota exceeded|billing|usage limit/i.test(message.errorMessage ?? ''));
 }
 
-function runtimeModelHasOutput(message: PiAiTypes.AssistantMessage) {
+function runtimeModelStreamHasOutput(message: PiAiTypes.AssistantMessage) {
   return message.content.some((block) => match(block)
     .with({ type: 'text' }, ({ text }) => text.length > 0)
     .with({ type: 'thinking' }, ({ thinking }) => thinking.length > 0)

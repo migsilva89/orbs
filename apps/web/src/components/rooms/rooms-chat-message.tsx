@@ -7,6 +7,7 @@ import { Fragment, useState } from 'react';
 import { match } from 'ts-pattern';
 import { RoomsChatActions } from '@/components/rooms/rooms-chat-actions';
 import { RoomsChatArtifact } from '@/components/rooms/rooms-chat-artifact';
+import { RoomsChatEvents } from '@/components/rooms/rooms-chat-events';
 import { RoomsChatFailure } from '@/components/rooms/rooms-chat-failure';
 import { RoomsChatFiles } from '@/components/rooms/rooms-chat-files';
 import { RoomsChatMention } from '@/components/rooms/rooms-chat-mention';
@@ -60,7 +61,7 @@ export function RoomsChatMessage({
   const { hideVerbose } = useChatHideVerbose();
   const blocks = toolBlocks({ parts: message.parts, hideVerbose });
   const files = message.parts.filter(isFileUIPart);
-  const standalone = (block: typeof blocks[number] | undefined) => block?.kind === 'tools';
+  const standalone = (block: typeof blocks[number] | undefined) => block?.kind === 'tools' || block?.kind === 'events';
   const bubbleBlocks = blocks.filter((block) => !standalone(block));
   const firstText = blocks.find((block) => block.kind === 'text');
   const actionsBlock = blocks.filter((block) => block.kind === 'text').at(-1) ?? bubbleBlocks.filter((block) => block.kind !== 'reasoning').at(-1);
@@ -115,6 +116,15 @@ export function RoomsChatMessage({
           key={`${message.id}-${first.index}`}
           live={live}
           parts={first.parts}
+        />
+      );
+    }
+
+    if (first?.kind === 'events') {
+      return (
+        <RoomsChatEvents
+          events={first.events}
+          key={`${message.id}-${first.index}`}
           senderId={botId}
         />
       );
@@ -128,7 +138,7 @@ export function RoomsChatMessage({
             const key = `${message.id}-${block.index}`;
 
             const content = match(block)
-              .with({ kind: 'tools' }, () => null)
+              .with({ kind: 'tools' }, { kind: 'events' }, () => null)
               .with({ kind: 'reasoning' }, (reasoning) => (
                 <Reasoning isStreaming={live ? reasoning.parts.some((part) => part.state === 'streaming') : false}>
                   <ReasoningTrigger botName={name} />

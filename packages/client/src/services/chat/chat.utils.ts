@@ -1,4 +1,4 @@
-import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entrySubagentReport, REACTION, reactionMessage, REPLY, replyMessage, replySilent, toolCallJson } from '@repo/contracts/universal';
+import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entrySubagentReport, REACTION, REPLY, replyMessage, replySilent, toolCallJson } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { match, P } from 'ts-pattern';
 import { mentionSubmission } from '../mention/mention.client';
@@ -33,14 +33,8 @@ export function chatMessages({ entries, bot, bots }: ChatTypes.ChatMessagesParam
           createdAt,
         })))
         .otherwise(() => undefined))
-      .with(REACTION.entryKind, () => match(reactionMessage.safeParse(entry.data))
-        .with({ success: true }, ({ data }) => messages.push(chatOwnerMessage(entry, {
-          text: data.emoji,
-          files: [],
-          replyTo: { entryId: data.replyTo.entryId, authorName: chatQuoteName(data.replyTo), text: data.replyTo.content },
-          createdAt,
-        })))
-        .otherwise(() => undefined))
+      // A reaction is only the bot's cue; the chat shows it as a badge on the message it reacts to.
+      .with(REACTION.entryKind, () => undefined)
       .with(ATTACHMENT.entryKind, () => match(attachmentMessage.safeParse(entry.data))
         .with({ success: true }, ({ data }) => messages.push(chatOwnerMessage(entry, {
           text: data.content,

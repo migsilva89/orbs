@@ -61,4 +61,5 @@ export type ChatMessagePart =
 export type ChatMessageSegment =
   | { key: string; kind: 'bubbles'; parts: ChatMessagePart[] }
   | { key: string; kind: 'tools'; parts: ClientTypes.ToolPart[] }
+  | { key: string; kind: 'events'; events: ClientTypes.ToolEvent[] }
   | { key: string; kind: 'subagent'; part: ClientTypes.ToolPart; subagent: ClientTypes.ToolSubagent };

@@ -1,5 +1,8 @@
 import { z } from 'zod';
 import { artifactSummary } from './artifact.types';
+import { bot } from './bot.types';
+import { routine } from './routine.types';
+import { todo } from './todo.types';
 
 /** Shapes of Pi tool call inputs and outputs as clients render them. */
 export const toolCallJson = z.record(z.string(), z.json());
@@ -26,14 +29,24 @@ const toolCallArtifactSummary = artifactSummary.pick({
   version: true,
 });
 
-export const toolCallArtifact = z.string().transform((text, context) => {
-  try {
-    return JSON.parse(text) as z.input<typeof toolCallArtifactSummary>;
-  } catch {
-    context.addIssue({ code: 'custom', message: 'tool_output_invalid' });
-    return z.NEVER;
-  }
-}).pipe(toolCallArtifactSummary);
+/** A tool output that is the JSON text of one value, read with `schema`; text that is not JSON fails `schema`. */
+function toolCallJsonOutput<T extends z.ZodType>(schema: T) {
+  return z.preprocess((text) => {
+    try {
+      return typeof text === 'string' ? JSON.parse(text) : text;
+    } catch {
+      return text;
+    }
+  }, schema);
+}
+
+export const toolCallArtifact = toolCallJsonOutput(toolCallArtifactSummary);
+
+export const toolCallRoutine = toolCallJsonOutput(routine.pick({ id: true, name: true }));
+
+export const toolCallTodo = toolCallJsonOutput(todo.pick({ id: true, title: true }));
+
+export const toolCallBot = toolCallJsonOutput(bot.pick({ id: true, name: true }));
 
 export const toolCallSubagent = z.object({
   operation: z.enum(['run', 'spawn', 'send']),
@@ -48,4 +61,7 @@ export const toolCallPeerDetails = z.object({ recipientId: z.uuid(), recipientCo
 export type ToolCallJson = z.infer<typeof toolCallJson>;
 export type ToolCallJsonValue = ToolCallJson[string];
 export type ToolCallArtifact = z.infer<typeof toolCallArtifact>;
+export type ToolCallRoutine = z.infer<typeof toolCallRoutine>;
+export type ToolCallTodo = z.infer<typeof toolCallTodo>;
+export type ToolCallBot = z.infer<typeof toolCallBot>;
 export type ToolCallSubagent = z.infer<typeof toolCallSubagent>;

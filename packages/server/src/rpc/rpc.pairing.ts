@@ -20,8 +20,8 @@ export const pairing = {
     });
   }),
   redeem: baseRouter.pairing.redeem.handler(async ({ context, input }) => {
-    const { id, addresses } = await context.server.queries.info();
     const redeemed = await context.auth.actions.redeem(input);
+    const { id, addresses } = await context.server.queries.info();
 
     return { ...redeemed, serverId: id, addresses };
   }),

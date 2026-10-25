@@ -16,7 +16,7 @@ export function limitActionAcquire({ state }: LimitRuntimeDeps, { kind }: LimitA
   match(used < cap)
     .with(true, () => undefined)
     .with(false, () => {
-      throw new Errors.RATE_LIMITED({ retryAfter: 1 });
+      throw new Errors.RATE_LIMITED({ retryAfter: 1, internal: `${kind} in-flight cap reached (${used}/${cap})` });
     })
     .exhaustive();
 

@@ -2,6 +2,7 @@ import { connectionAddressesMerge, connectionAddressPick, connectionRpcUrl, make
 import { connectionStored, SERVER_PROTOCOL } from '@repo/contracts/universal';
 import { Errors } from '@repo/errors/universal';
 import * as SecureStore from 'expo-secure-store';
+import { match, P } from 'ts-pattern';
 import { CONNECTION_STORAGE_KEY } from './connection.constants';
 import type * as ConnectionTypes from '@/types/connection.types';
 import type { RpcSession } from '@/types/rpc.types';
@@ -26,18 +27,20 @@ export async function connectionForget(connection: ConnectionSaved): Promise<boo
   return true;
 }
 
-export async function connectionPair({ payload, name }: ConnectionTypes.ConnectionPairParams): Promise<ConnectionSaved> {
-  const { address } = await connectionAddressPick(payload);
+export async function connectionPair({ entry, address, name }: ConnectionTypes.ConnectionPairParams): Promise<ConnectionSaved> {
+  const picked = await match(entry.target)
+    .with(P.nonNullable, async (target) => (await connectionAddressPick(target)).address)
+    .otherwise(async () => address);
 
-  if (!address) {
+  if (!picked) {
     throw new Errors.CONFLICT({ internal: 'No server address answered' });
   }
 
-  const redeemed = await makeHttpClient({ url: connectionRpcUrl(address) }).pairing.redeem({ token: payload.token, name });
+  const redeemed = await makeHttpClient({ url: connectionRpcUrl(picked) }).pairing.redeem({ pin: entry.pin, name });
 
   const connection: ConnectionSaved = {
-    serverId: payload.serverId,
-    addresses: payload.addresses,
+    serverId: redeemed.serverId,
+    addresses: connectionAddressesMerge([picked], redeemed.addresses),
     deviceId: redeemed.device.id,
     token: redeemed.token,
   };

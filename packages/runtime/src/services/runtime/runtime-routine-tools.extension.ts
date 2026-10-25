@@ -74,9 +74,17 @@ export function runtimeRoutineToolsExtension(deps: RuntimeRoutineToolsDeps) {
     execute: async (params, api, context) => {
       const input = routineToolTarget.parse(params);
       const target = await runtimeRoutineTarget(deps, api, context);
+
+      // Read it first: the output names what was removed, so the chat can show it.
+      const removed = match((await deps.routines.queries.list(target, context)).find((routine) => routine.id === input.routineId))
+        .with(P.nonNullable, (routine) => routine)
+        .otherwise(() => {
+          throw new Errors.NOT_FOUND({ resource: 'routine', resourceId: input.routineId });
+        });
+
       await deps.routines.actions.remove({ ...input, ...target }, context);
 
-      return { output: [{ type: 'text', text: m.ui_tool_bot_routine_removed() }] };
+      return runtimeRoutineOutput(removed);
     },
   });
 

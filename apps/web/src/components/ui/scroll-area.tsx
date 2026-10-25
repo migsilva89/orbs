@@ -45,8 +45,10 @@ const OVERFLOW_CLASSES = {
   both: 'overflow-auto',
 } as const;
 
+// Colours go through the plugin's variables: Tailwind's own scrollbar-thumb/track utilities set
+// scrollbar-color, which makes Chromium drop the 4px pseudo-element bar for a 15px native one.
 const SCROLLBAR_CLASSES =
-  'scrollbar scrollbar-w-1 scrollbar-h-1 scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent scrollbar-thumb-rounded-full [scrollbar-gutter:stable]';
+  'scrollbar scrollbar-w-1 scrollbar-h-1 [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-thumb-rounded-full [scrollbar-gutter:stable]';
 
 function ScrollArea({
   children,

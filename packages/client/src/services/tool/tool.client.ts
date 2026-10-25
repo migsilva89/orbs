@@ -1,5 +1,6 @@
 import { toolCallArtifact, toolCallPeerDetails, toolCallSubagent, toolCallSubagentDetails } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
+import { toolEvent, toolEventsAppend } from '../tool-event/tool-event.utils';
 import { TOOL_ARTIFACT_NAMES, TOOL_MCP_NAME, TOOL_PATH_KEYS, TOOL_PEER_NAMES, TOOL_PRESENTATIONS, TOOL_PREVIEW_KEYS, TOOL_QUESTION, TOOL_SUBAGENT } from './tool.constants';
 import { toolInputText, toolInputTexts, toolReadableName } from './tool.utils';
 import type * as ToolTypes from '../../types/tool.types';
@@ -49,6 +50,12 @@ export function toolBlocks({ parts, hideVerbose = false }: ToolTypes.ToolBlocksP
       return [...blocks, { kind: 'subagent', index, part, subagent }];
     }
 
+    const event = toolEvent(part);
+
+    if (event) {
+      return last?.kind === 'events' ? [...blocks.slice(0, -1), { ...last, events: toolEventsAppend(last.events, event) }] : [...blocks, { kind: 'events', index, events: [event] }];
+    }
+
     if (part.toolName === TOOL_QUESTION && !part.state.startsWith('output-')) {
       return blocks;
     }
@@ -60,14 +67,7 @@ export function toolBlocks({ parts, hideVerbose = false }: ToolTypes.ToolBlocksP
     return all;
   }
 
-  return all.flatMap((block): ToolTypes.ToolBlock[] => match(block)
-    .with({ kind: 'reasoning' }, () => [])
-    .with({ kind: 'tools' }, (tools) => {
-      const peers = tools.parts.filter((part) => TOOL_PEER_NAMES.has(part.toolName));
-
-      return peers.length > 0 ? [{ ...tools, parts: peers }] : [];
-    })
-    .otherwise((other) => [other]));
+  return all.filter((block) => block.kind !== 'reasoning' && block.kind !== 'tools');
 }
 
 /** The distinct bots that `bot_message` and `bot_ask` calls reached, each with its conversation once the daemon accepted the message. */

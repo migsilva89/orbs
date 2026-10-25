@@ -13,7 +13,8 @@ const mentionVariants = cva({
       // The one kind with a colour of its own, on its icon only, so the text reads on any bubble.
       skill: '[&>svg]:text-skill',
       muted: 'text-muted-foreground',
-      plain: 'text-xs font-normal',
+      // Chat event lines: the named thing reads a step brighter than the muted sentence around it.
+      plain: 'font-normal text-foreground/80',
     },
   },
   defaultVariants: { variant: 'default' },

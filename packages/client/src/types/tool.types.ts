@@ -1,4 +1,5 @@
 import type { ChatMessage } from './chat.types';
+import type { ToolEvent } from './tool-event.types';
 import type { Bot, ToolCallArtifact, ToolCallSubagent } from '@repo/contracts/universal';
 import type { DynamicToolUIPart } from 'ai';
 
@@ -25,6 +26,7 @@ export type ToolBlock =
   | { kind: 'text'; index: number; parts: ToolTextPart[] }
   | { kind: 'reasoning'; index: number; parts: ToolReasoningPart[] }
   | { kind: 'tools'; index: number; parts: DynamicToolUIPart[] }
+  | { kind: 'events'; index: number; events: ToolEvent[] }
   | { kind: 'failure'; index: number; text: string }
   | { kind: 'artifact'; index: number; artifact: ToolCallArtifact }
   | { kind: 'subagent'; index: number; part: DynamicToolUIPart; subagent: ToolSubagent };
@@ -61,7 +63,7 @@ export interface ToolIdentity {
 
 export interface ToolBlocksParams {
   parts: ChatMessage['parts'];
-  /** Drops thinking and tool calls, as the owner's hide-verbose setting asks; messages to other bots stay. */
+  /** Drops thinking and tool calls, as the owner's hide-verbose setting asks; events stay. */
   hideVerbose?: boolean;
 }
 

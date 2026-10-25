@@ -57,6 +57,7 @@ export function databaseDriverLoadMigrations() {
     '0010_bot_preference_when_busy': readFileSync(new URL('./migrations/0010_bot_preference_when_busy.sql', import.meta.url), 'utf8'),
     '0011_device_push_token': readFileSync(new URL('./migrations/0011_device_push_token.sql', import.meta.url), 'utf8'),
     '0012_device_push_url': readFileSync(new URL('./migrations/0012_device_push_url.sql', import.meta.url), 'utf8'),
-    '0013_sidebar_sections': readFileSync(new URL('./migrations/0013_sidebar_sections.sql', import.meta.url), 'utf8'),
+    '0013_pairing_pin': readFileSync(new URL('./migrations/0013_pairing_pin.sql', import.meta.url), 'utf8'),
+    '0014_sidebar_sections': readFileSync(new URL('./migrations/0014_sidebar_sections.sql', import.meta.url), 'utf8'),
   };
 }

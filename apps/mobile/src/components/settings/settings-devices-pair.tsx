@@ -10,6 +10,7 @@ import { Empty } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { ItemTitle } from '@/components/ui/item';
 import { LabelDescription } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
 import { useToast } from '@/hooks/use-toast';
 
 interface SettingsDevicesPairProps {
@@ -30,6 +31,13 @@ export function SettingsDevicesPair({ isTitleHidden = false }: SettingsDevicesPa
       )}
       {settings.pairing ? (
         <View className="items-center gap-3 py-2">
+          <Text
+            selectable
+            accessibilityLabel={m.settings_devices_pair_pin()}
+            variant="pin"
+          >
+            {settings.pairing.pin}
+          </Text>
           <View accessibilityLabel={m.settings_devices_pair_qr()} className="rounded-xl bg-white p-3">
             <SvgXml
               height={208}

@@ -57,6 +57,8 @@ export const textVariants = cva({
       'trace-preview': 'text-caption',
       'search-match': 'text-body font-semibold',
       'trace-code': 'font-mono text-caption',
+      pin: 'font-mono text-display font-semibold tracking-widest',
+      'pin-slot': 'text-body',
       'message-time': 'text-center text-caption',
       'chat-title': 'text-body leading-tight font-semibold',
       'reaction-emoji': 'text-[10px] leading-3.5',

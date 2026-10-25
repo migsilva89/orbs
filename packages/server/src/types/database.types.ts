@@ -55,10 +55,10 @@ export interface DatabaseSchema {
     pushUrl: string | null;
   };
   pairingGrant: {
-    tokenHash: string;
+    pinHash: string;
     issuedBy: string | null;
     expiresAt: number;
-    claimedAt: number | null;
+    failedAttempts: Generated<number>;
   };
 }
 

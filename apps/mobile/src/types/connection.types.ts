@@ -1,5 +1,5 @@
 import type { RpcSession } from './rpc.types';
-import type { AuthPairPayload, ConnectionSaved, ServerAddress } from '@repo/contracts/universal';
+import type { AuthPairEntry, ConnectionSaved, ServerAddress } from '@repo/contracts/universal';
 
 export interface ConnectionAvatarParams {
   session: Pick<RpcSession, 'address'> | null | undefined;
@@ -17,6 +17,7 @@ export interface ConnectionFileParams {
 }
 
 export interface ConnectionPairParams {
-  payload: AuthPairPayload;
+  entry: AuthPairEntry;
+  address: ServerAddress | null;
   name: string;
 }

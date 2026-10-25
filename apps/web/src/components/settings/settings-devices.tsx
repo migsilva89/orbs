@@ -64,6 +64,8 @@ export function SettingsDevices({ connection }: SettingsDevicesProps) {
           </PanelContent>
           {settings.pairing ? (
             <div className="flex flex-col items-start gap-2">
+              <p aria-label={m.settings_devices_pair_pin()} className="font-mono text-3xl tracking-widest">{settings.pairing.pin}</p>
+              <p className="text-sm text-muted-foreground">{m.settings_devices_pair_ready()}</p>
               <img
                 alt={m.settings_devices_pair_qr()}
                 className="size-48 rounded-lg bg-white p-2"

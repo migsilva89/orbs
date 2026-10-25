@@ -4,28 +4,28 @@ import { serverAddress } from './server.types';
 
 export const authToken = z.string().regex(/^[a-f0-9]{64}$/);
 
+/** The six-digit code a paired device or the CLI shows for adding another device. */
+export const authPin = z.string().trim().regex(/^\d{6}$/u);
+
 export const authRedeem = z.object({
-  token: authToken,
+  pin: authPin,
   name: z.string().trim().min(1).max(100),
 });
 
-export const authGrantStatus = authRedeem.pick({ token: true });
-
 export const authPairResult = z.object({
-  token: authToken,
+  pin: authPin,
   expiresAt: z.number().int(),
   qr: z.object({ payload: z.string(), svg: z.string() }),
 });
 
 export const authPairPayload = z.object({
-  version: z.literal(2),
+  version: z.literal(3),
   serverId: z.uuid(),
   addresses: z.array(serverAddress).min(1),
-  token: authToken,
-  expiresAt: z.number().int(),
+  pin: authPin,
 });
 
-/** The URL-safe Base64 pairing payload a new device scans or pastes. */
+/** The URL-safe Base64 pairing payload a new device scans or opens as a link: the PIN plus where the daemon is. */
 export const authPairCode = z.string().trim().transform((code, context) => {
   try {
     return JSON.parse(atob(code.replaceAll('-', '+').replaceAll('_', '/'))) as z.input<typeof authPairPayload>;
@@ -35,13 +35,19 @@ export const authPairCode = z.string().trim().transform((code, context) => {
   }
 }).pipe(authPairPayload);
 
-export const authRedeemResult = z.object({ device, token: authToken });
+/** What a person enters to pair: a typed PIN, or a pairing code that also names the daemon. */
+export const authPairEntry = z.union([
+  authPin.transform((pin) => ({ pin, target: null })),
+  authPairCode.transform(({ pin, serverId, addresses }) => ({ pin, target: { serverId, addresses } })),
+]);
 
-export const authGrant = z.object({
-  issuedBy: z.uuid().nullable(),
-  expiresAt: z.number().int(),
-  claimedAt: z.number().int().nullable(),
+export const authRedeemResult = z.object({
+  device,
+  token: authToken,
+  serverId: z.uuid(),
+  addresses: z.array(serverAddress).min(1),
 });
 
 export type AuthRedeemInput = z.infer<typeof authRedeem>;
 export type AuthPairPayload = z.infer<typeof authPairPayload>;
+export type AuthPairEntry = z.infer<typeof authPairEntry>;

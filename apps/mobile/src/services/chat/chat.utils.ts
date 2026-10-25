@@ -22,6 +22,15 @@ export function chatMessageSegments(message: ChatMessage, hideVerbose: boolean):
       .with({ kind: 'tools' }, ({ parts }) => parts)
       .otherwise(() => undefined);
 
+    if (block.kind === 'events') {
+      segments.push({
+        key: `events-${block.index}`,
+        kind: 'events',
+        events: block.events,
+      });
+      continue;
+    }
+
     if (block.kind === 'subagent') {
       segments.push({
         key: `subagent-${block.index}`,

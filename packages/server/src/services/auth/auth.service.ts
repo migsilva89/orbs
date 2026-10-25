@@ -6,7 +6,6 @@ import { authActionRevoke } from './auth-action.revoke';
 import { authQueryAuthenticate } from './auth-query.authenticate';
 import { authQueryDevice } from './auth-query.device';
 import { authQueryDevices } from './auth-query.devices';
-import { authQueryGrant } from './auth-query.grant';
 import type * as AuthTypes from '../../types/auth.types';
 import type { AuthRedeemInput } from '@repo/contracts/universal';
 
@@ -30,7 +29,6 @@ export function makeAuthService({ database }: AuthTypes.AuthServiceParams) {
     },
     queries: {
       authenticate: (params: AuthTypes.AuthAuthenticateParams) => authQueryAuthenticate(deps, params),
-      grant: (params: AuthTypes.AuthTokenParams) => authQueryGrant(deps, params),
       device: (params: AuthTypes.AuthTokenParams) => authQueryDevice(deps, params),
       devices: () => authQueryDevices(deps),
     },

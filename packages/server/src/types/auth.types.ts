@@ -14,6 +14,10 @@ export type AuthRevocationListener = (deviceId: string) => void;
 export interface AuthGrantParams {
   issuedBy: string | null;
 }
+export interface AuthGrant {
+  pin: string;
+  expiresAt: number;
+}
 export interface AuthPairTarget {
   serverId: string;
   addresses: ServerAddress[];

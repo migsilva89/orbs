@@ -9,6 +9,7 @@ import { Message, MessageBubble, MessageQuote } from '@/components/ui/message';
 import { Text } from '@/components/ui/text';
 import { chatMessageSegments } from '@/services/chat/chat.utils';
 import { ChatArtifact } from './chat-artifact';
+import { ChatEvents } from './chat-events';
 import { ChatFailure } from './chat-failure';
 import { ChatFiles } from './chat-files';
 import { ChatHtml } from './chat-html';
@@ -155,12 +156,14 @@ export function ChatMessage({
     <>
       {timeLabel}
       {segments.map((segment) => match(segment)
-        .with({ kind: 'tools' }, (tools) => (
-          <ChatTools
+        .with({ kind: 'tools' }, (tools) => <ChatTools key={tools.key} parts={tools.parts} />)
+        .with({ kind: 'events' }, (events) => (
+          <ChatEvents
             bots={bots}
-            key={tools.key}
-            parts={tools.parts}
+            events={events.events}
+            key={events.key}
             senderId={bot.id}
+            session={session}
           />
         ))
         .with({ kind: 'subagent' }, (block) => (

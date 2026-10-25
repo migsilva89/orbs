@@ -1,4 +1,4 @@
-import { authPairCode } from '@repo/contracts/universal';
+import { authPairEntry } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
@@ -30,9 +30,9 @@ export function SettingsDevicesScanScreen() {
     }
 
     scanned.current = data;
-    const payload = authPairCode.safeParse(connectionCodeFromUrl(data) ?? data);
+    const entry = authPairEntry.safeParse(connectionCodeFromUrl(data) ?? data);
 
-    if (!payload.success) {
+    if (!entry.success || !entry.data.target) {
       setProblem(m.connect_code_invalid());
       return;
     }
@@ -40,7 +40,11 @@ export function SettingsDevicesScanScreen() {
     setProblem(null);
     setIsPairing(true);
     try {
-      connect(await connectionPair({ payload: payload.data, name: connectionDeviceName() }));
+      connect(await connectionPair({
+        entry: entry.data,
+        address: null,
+        name: connectionDeviceName(),
+      }));
       router.dismissTo('/');
     } catch {
       setProblem(m.connect_failed());

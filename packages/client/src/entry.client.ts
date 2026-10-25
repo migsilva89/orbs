@@ -33,4 +33,5 @@ export type * from './types/html.types';
 export type * from './types/mention.types';
 export type * from './types/rooms.types';
 export type * from './types/routines.types';
+export type * from './types/tool-event.types';
 export type * from './types/tool.types';

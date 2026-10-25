@@ -53,6 +53,7 @@ export default (): ExpoConfig => ({
   ios: {
     bundleIdentifier,
     appleTeamId: appEnv.MOBILE_APPLE_TEAM_ID,
+    icon: './assets/orbs.icon',
     supportsTablet: true,
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,

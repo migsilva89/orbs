@@ -1,12 +1,11 @@
 import { OpenAPIHandler } from '@orpc/openapi/fetch';
-import { onError, ORPCError } from '@orpc/server';
+import { onError } from '@orpc/server';
 import { RPCHandler as FetchRPCHandler } from '@orpc/server/fetch';
 import { CORSPlugin, RequestHeadersPlugin } from '@orpc/server/plugins';
 import { RPCHandler as WebsocketRPCHandler } from '@orpc/server/websocket';
 import { env } from '@repo/env/server';
-import { errorStatusMap } from '@repo/errors/universal';
+import { errorStatusMap, isAppError } from '@repo/errors/universal';
 import { log } from '@repo/logger/server';
-import { match, P } from 'ts-pattern';
 import { router } from '@repo/server/server';
 import type { CoreRpcNativeParams } from '../types/core.types';
 import type { RPCHandlerOptions } from '@orpc/server/fetch';
@@ -18,12 +17,20 @@ export function coreRpcNative(
 ) {
   const plugins = [new RequestHeadersPlugin()];
 
-  const interceptors: RPCHandlerOptions<object>['interceptors'] = [onError((error) => {
-    log.error({
-      tag: 'rpc',
-      message: 'Request failed',
-      code: match(error).with(P.instanceOf(ORPCError), (failure) => failure.code).otherwise(() => 'INTERNAL_ERROR'),
-    });
+  const interceptors: RPCHandlerOptions<object>['interceptors'] = [onError((error, { path }) => {
+    const fields = { tag: 'rpc', message: 'Request failed', path: path.join('.') };
+
+    if (isAppError(error) && !error.reportable) {
+      log.warn({
+        ...fields,
+        code: error.code,
+        reason: error.internal,
+        data: error.data,
+      });
+      return;
+    }
+
+    log.error({ ...fields, error });
   })];
 
   return {

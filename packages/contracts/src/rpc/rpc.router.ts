@@ -17,8 +17,6 @@ import {
 } from '../types/artifact.types';
 import { attachment, attachmentDownload, attachmentGet, attachmentList, attachmentPage, attachmentRemoveResult, attachmentUpload } from '../types/attachment.types';
 import {
-  authGrant,
-  authGrantStatus,
   authPairResult,
   authRedeem,
   authRedeemResult,
@@ -606,14 +604,6 @@ export const contract = {
       .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
       .input(authRedeem)
       .output(authRedeemResult),
-
-    status: oc
-      .errors({
-        UNAUTHORIZED: errorSchemas.UNAUTHORIZED,
-        NOT_FOUND: errorSchemas.NOT_FOUND,
-      })
-      .input(authGrantStatus)
-      .output(authGrant),
   },
 
   sidebarSections: {

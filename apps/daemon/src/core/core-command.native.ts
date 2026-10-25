@@ -87,9 +87,9 @@ async function coreCommandPairNative(url = env.WEB_PUBLIC_URL): Promise<void> {
     fetch: (request, init) => fetch(request, { ...init, unix }),
   }));
 
-  const { qr } = await client.pairing.bootstrap();
+  const { pin, qr } = await client.pairing.bootstrap();
   const link = new URL(`/connect#code=${encodeURIComponent(qr.payload)}`, serverUrl).href;
-  process.stdout.write(`${qr.payload}\n\n${link}\n\n${renderUnicodeCompact(link)}\n`);
+  process.stdout.write(`PIN ${pin}\n\n${link}\n\n${renderUnicodeCompact(link)}\n`);
 }
 
 async function coreCommandDetachNative(): Promise<void> {

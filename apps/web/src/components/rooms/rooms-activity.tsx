@@ -56,9 +56,9 @@ export function RoomsActivity({ botId }: RoomsActivityProps) {
         </div>
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 p-6">
+        <div className="flex w-full flex-col gap-3 p-6">
           {runs.isPending ? [0, 1, 2, 3].map((key) => (
-            <div className="flex flex-col gap-2 py-4 pl-7" key={key}>
+            <div className="flex flex-col gap-1.5 py-2 pl-8.5" key={key}>
               <Skeleton className="h-4 w-2/3" />
               <Skeleton className="h-3 w-1/3" />
             </div>
@@ -80,7 +80,7 @@ export function RoomsActivity({ botId }: RoomsActivityProps) {
               title={m.rooms_activity_empty_title()}
             />
           ) : null}
-          <ul className="m-0 flex list-none flex-col divide-y p-0">
+          <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
             {items.map((run) => (
               <RoomsActivityRun
                 bot={bot}

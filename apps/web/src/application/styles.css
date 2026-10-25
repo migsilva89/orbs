@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import '../components/arc/foundation.css';
 
 @source '../../node_modules/streamdown/dist/*.js';
 
@@ -97,6 +96,10 @@ button {
   --warning-foreground: oklch(0.96 0.03 95);
   --blue: oklch(0.623 0.214 259.815);
   --border: oklch(0.92 0.004 286.32);
+  --series-1: #1f7dcf;
+  --series-2: #7128a5;
+  --series-3: #e58f00;
+  --series-4: #009e84;
   --input: oklch(0.871 0.006 286.286);
   --ring: oklch(0.871 0.006 286.286);
   --sidebar: oklch(0.985 0 0);
@@ -177,6 +180,10 @@ button {
   --warning-foreground: oklch(0.96 0.03 95);
   --blue: oklch(0.623 0.214 259.815);
   --border: oklch(1 0 0 / 10%);
+  --series-1: #55adff;
+  --series-2: #9c37be;
+  --series-3: #e66e00;
+  --series-4: #00a861;
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
   --sidebar: oklch(0.205 0 0);
@@ -267,6 +274,59 @@ button {
   --animate-typing-dot: typing-dot 1.4s ease-in-out infinite;
   --animate-typing-dot-2: typing-dot 1.4s ease-in-out 160ms infinite;
   --animate-typing-dot-3: typing-dot 1.4s ease-in-out 320ms infinite;
+  --animate-timeline-shine: timeline-shine 1.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  --animate-timeline-draw-down: timeline-draw-down 360ms var(--ease-out-quint) backwards;
+  --animate-timeline-draw-up: timeline-draw-up 360ms var(--ease-out-quint) backwards;
+  --animate-timeline-port-in: timeline-port-in 160ms var(--ease-out-quint) var(--delay, 0ms) backwards;
+  --animate-timeline-appear: timeline-appear 160ms var(--ease-out-quint);
+
+  @keyframes timeline-shine {
+    from {
+      background-position: -28px 0;
+    }
+    70%,
+    to {
+      background-position: calc(100% + 28px) 0;
+    }
+  }
+
+  @keyframes timeline-draw-down {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0);
+    }
+  }
+
+  @keyframes timeline-draw-up {
+    from {
+      clip-path: inset(100% 0 0 0);
+    }
+    to {
+      clip-path: inset(0);
+    }
+  }
+
+  @keyframes timeline-port-in {
+    from {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes timeline-appear {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 
   @keyframes collapsible-down {
     from {

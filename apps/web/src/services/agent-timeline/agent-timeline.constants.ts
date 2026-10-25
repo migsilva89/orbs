@@ -1,0 +1,21 @@
+export const AGENT_TIMELINE = {
+  row: 44,
+  bar: 16,
+  pad: 6,
+  axis: 30,
+  line: 1.5,
+  cardWidth: 280,
+  cardEstimate: 120,
+  lead: 'var(--muted-foreground)',
+  series: ['var(--series-1)', 'var(--series-2)', 'var(--series-3)', 'var(--series-4)'],
+  ticks: [1, 2, 5, 10, 15, 30, 60, 120, 300, 600],
+  tickGap: 56,
+  iconMinPx: 15,
+  speeds: [1, 2],
+  card: {
+    glide: { type: 'spring', visualDuration: 0.26, bounce: 0 },
+    smooth: { type: 'spring', visualDuration: 0.4, bounce: 0 },
+    enter: { duration: 0.16, ease: [0.16, 1, 0.3, 1] },
+    exit: { duration: 0.12, ease: [0.22, 1, 0.36, 1] },
+  },
+} as const;

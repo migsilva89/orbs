@@ -3,13 +3,13 @@ import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { match, P } from 'ts-pattern';
-import { AgentTimeline } from '@/components/arc/agent-timeline/agent-timeline';
 import { BotBrandLogo } from '@/components/bots/bot-brand-logo';
 import { ToolIcon } from '@/components/tools/tool-icon';
+import { AgentTimeline } from '@/components/ui/agent-timeline';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { AgentTimelineRun } from '@/components/arc/agent-timeline/agent-timeline';
+import type { AgentTimelineRun } from '@/types/agent-timeline.types';
 import type * as UniversalTypes from '@repo/contracts/universal';
 
 interface RoomsActivityTimelineProps {
@@ -119,11 +119,9 @@ export function RoomsActivityTimeline({ bot, run, title }: RoomsActivityTimeline
   }
 
   return (
-    <div className="arc">
-      <AgentTimeline
-        live={detail.data.isLive}
-        run={timeline(detail.data)}
-      />
-    </div>
+    <AgentTimeline
+      live={detail.data.isLive}
+      run={timeline(detail.data)}
+    />
   );
 }

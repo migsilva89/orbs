@@ -1,9 +1,10 @@
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
 import { Link, useHydrated } from '@tanstack/react-router';
-import { match, P } from 'ts-pattern';
+import { match } from 'ts-pattern';
 import { RoomsActivityTimeline } from '@/components/rooms/rooms-activity-timeline';
 import { cn } from '@/lib/cn';
+import { agentTimelineCost, agentTimelineSeconds } from '@/services/agent-timeline/agent-timeline.utils';
 import IconActivity from '~icons/lucide/activity';
 import IconAlarmClock from '~icons/lucide/alarm-clock';
 import IconBot from '~icons/lucide/bot';
@@ -24,12 +25,6 @@ export function RoomsActivityRun({ bot, run, isOpen }: RoomsActivityRunProps) {
   const hydrated = useHydrated();
   const date = new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium', timeStyle: 'short' });
 
-  const cost = new Intl.NumberFormat(getLocale(), {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  });
-
   const triggerIcon = match(run.trigger)
     .with('message', () => <IconMessageSquare />)
     .with('routine', () => <IconAlarmClock />)
@@ -48,22 +43,18 @@ export function RoomsActivityRun({ bot, run, isOpen }: RoomsActivityRunProps) {
     .with('other', () => m.rooms_activity_trigger_other())
     .exhaustive();
 
-  const duration = match(run.durationMs / 1000)
-    .with(P.number.lt(60), (value) => `${value.toFixed(1)}s`)
-    .otherwise((value) => `${Math.floor(value / 60)}m ${String(Math.floor(value % 60)).padStart(2, '0')}s`);
-
   const meta = [
-    duration,
+    agentTimelineSeconds(run.durationMs / 1000),
     run.agentCount === 1 ? m.rooms_activity_agent() : m.rooms_activity_agents({ count: run.agentCount }),
     run.toolCallCount === 1 ? m.rooms_activity_tool() : m.rooms_activity_tools({ count: run.toolCallCount }),
-    cost.format(run.cost),
+    agentTimelineCost(run.cost),
   ];
 
   return (
-    <li className="py-2">
+    <li>
       <Link
         aria-expanded={isOpen}
-        className="group flex w-full min-w-0 items-start gap-3 rounded-md py-2 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="group flex w-full min-w-0 items-start gap-2.5 rounded-lg px-2 py-1.5 text-left outline-none hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
         params={{ handle: bot.handle, runId: run.id }}
         resetScroll={false}
         title={m.rooms_activity_expand()}
@@ -75,9 +66,9 @@ export function RoomsActivityRun({ bot, run, isOpen }: RoomsActivityRunProps) {
             className={cn('size-4 text-muted-foreground transition-transform group-hover:text-foreground', isOpen && 'rotate-90 text-foreground')}
           />
         </span>
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <div className="flex h-5 min-w-0 items-center gap-3">
-            <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground/90 group-hover:text-foreground">{run.title ?? trigger}</span>
+            <span className="min-w-0 flex-1 truncate text-sm text-foreground/90 group-hover:text-foreground">{run.title ?? trigger}</span>
             {run.isLive ? (
               <span className="flex flex-none items-center gap-1.5 text-xs text-muted-foreground">
                 <span className="size-1.5 animate-pulse rounded-full bg-success motion-reduce:animate-none" />
@@ -108,7 +99,7 @@ export function RoomsActivityRun({ bot, run, isOpen }: RoomsActivityRunProps) {
         </div>
       </Link>
       {isOpen ? (
-        <div className="py-2 pl-7">
+        <div className="pt-3 pb-4 pl-8.5">
           <RoomsActivityTimeline
             bot={bot}
             run={run}

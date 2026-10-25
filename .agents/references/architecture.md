@@ -165,7 +165,6 @@ apps/web/
     ├── routes/handlers/handler.<name>.ts    a non-page HTTP handler
     ├── components/<area>/<area>-<name>.tsx    feature components of one area
     ├── components/ui/<name>.tsx        shared primitives
-    ├── components/arc/                 vendored Arc Pro components, motion tokens and foundation.css, kept as shipped
     ├── services/<domain>/<domain>.{client,utils,constants}.ts    web-only queries, helpers and constants
     ├── hooks/use-<name>.ts             a web-only hook
     ├── context/<name>.ts  lib/<name>.ts    React contexts and tiny generic helpers

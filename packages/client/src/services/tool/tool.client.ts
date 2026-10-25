@@ -1,7 +1,7 @@
 import { toolCallArtifact, toolCallPeerDetails, toolCallSubagent, toolCallSubagentDetails } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { toolEvent, toolEventsAppend } from '../tool-event/tool-event.utils';
-import { TOOL_ARTIFACT_NAMES, TOOL_MCP_NAME, TOOL_PATH_KEYS, TOOL_PEER_NAMES, TOOL_PRESENTATIONS, TOOL_PREVIEW_KEYS, TOOL_QUESTION, TOOL_SUBAGENT } from './tool.constants';
+import { TOOL_ARTIFACT_NAMES, TOOL_MCP_NAME, TOOL_PATH_KEYS, TOOL_PEER_NAMES, TOOL_PRESENTATIONS, TOOL_PREVIEW_KEYS, TOOL_QUESTIONS, TOOL_SUBAGENT } from './tool.constants';
 import { toolInputText, toolInputTexts, toolReadableName } from './tool.utils';
 import type * as ToolTypes from '../../types/tool.types';
 import type { Bot, ToolCallArtifact } from '@repo/contracts/universal';
@@ -56,7 +56,7 @@ export function toolBlocks({ parts, hideVerbose = false }: ToolTypes.ToolBlocksP
       return last?.kind === 'events' ? [...blocks.slice(0, -1), { ...last, events: toolEventsAppend(last.events, event) }] : [...blocks, { kind: 'events', index, events: [event] }];
     }
 
-    if (part.toolName === TOOL_QUESTION && !part.state.startsWith('output-')) {
+    if (TOOL_QUESTIONS.has(part.toolName) && !part.state.startsWith('output-')) {
       return blocks;
     }
 

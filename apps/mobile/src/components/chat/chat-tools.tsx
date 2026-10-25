@@ -1,6 +1,6 @@
 import { toolGroupState, toolIdentity, toolInputTexts, toolOutputText, toolPresentation, toolPreview, toolRunning } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
-import { AlarmClock, Bot, Cpu, FileText, LayoutDashboard, ListTodo, MessageCircleQuestion, Plug, Search, SquarePen, Terminal, Wrench } from 'lucide-react-native';
+import { AlarmClock, Bot, Cpu, FileText, KeyRound, LayoutDashboard, ListTodo, MessageCircleQuestion, Plug, Search, SquarePen, Terminal, Wrench } from 'lucide-react-native';
 import { useState } from 'react';
 import { Trace, TraceCode, TraceContent, TraceRow } from '@/components/ui/trace';
 import type { TraceStatus } from '@/components/ui/trace';
@@ -15,6 +15,7 @@ const CHAT_TOOL_ICONS = {
   bot: Bot,
   model: Cpu,
   question: MessageCircleQuestion,
+  secret: KeyRound,
   routine: AlarmClock,
   todo: ListTodo,
   artifact: LayoutDashboard,

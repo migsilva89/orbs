@@ -1,7 +1,7 @@
 import { toolCallBot, toolCallJson, toolCallRoutine, toolCallTodo } from '@repo/contracts/universal';
 import { match } from 'ts-pattern';
 import { toolInputText } from '../tool/tool.utils';
-import { TOOL_EVENTS } from './tool-event.constants';
+import { TOOL_EVENT_ICONS, TOOL_EVENTS } from './tool-event.constants';
 import type { ToolEvent } from '../../types/tool-event.types';
 import type { DynamicToolUIPart } from 'ai';
 
@@ -18,12 +18,12 @@ export function toolEvent(part: DynamicToolUIPart): ToolEvent | undefined {
     .with({ kind: 'peers' }, () => ({ kind: 'peers', key, parts: [part] }))
     .with({ kind: 'routine' }, ({ action }) => {
       const routine = toolCallRoutine.safeParse(output).data;
-      return routine && { kind: 'routine', key, action, routine };
+      return routine && { kind: 'routine', key, action, icon: TOOL_EVENT_ICONS.routine[action], routine };
     })
     .with({ kind: 'todo' }, ({ action }) => {
       const todo = toolCallTodo.safeParse(output).data;
-      const isCompleted = action === 'update' && toolCallJson.safeParse(part.input).data?.isDone === true;
-      return todo && { kind: 'todo', key, action: isCompleted ? 'complete' : action, todo };
+      const todoAction = action === 'update' && toolCallJson.safeParse(part.input).data?.isDone === true ? 'complete' : action;
+      return todo && { kind: 'todo', key, action: todoAction, icon: TOOL_EVENT_ICONS.todo[todoAction], todo };
     })
     .with({ kind: 'bot', action: 'models' }, ({ action }) => {
       const botId = toolInputText({ input: part.input, key: 'botId' });

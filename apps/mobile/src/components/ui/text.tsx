@@ -11,6 +11,8 @@ export const textBaseVariants = cva({
     tone: {
       default: 'text-foreground',
       muted: 'text-muted-foreground',
+      // A step brighter than muted: what a muted sentence names, like the chat's event lines.
+      subtle: 'text-foreground/70',
       'glass-muted': 'text-glass-muted',
       primary: 'text-primary',
       'on-primary': 'text-primary-foreground',

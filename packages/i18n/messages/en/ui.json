@@ -99,6 +99,7 @@
   "tool_label_search_tools": "Find tools",
   "tool_label_agent": "Run agent",
   "tool_label_ask": "Ask a question",
+  "tool_label_secret": "Ask for a secret",
   "tool_label_routines": "Routines",
   "tool_label_bot_list": "List bots",
   "tool_label_bot_get": "Read bot",

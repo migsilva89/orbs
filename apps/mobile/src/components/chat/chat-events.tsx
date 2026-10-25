@@ -2,7 +2,7 @@ import { toolPeers, toolRunning } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { AlarmClock, ListTodo } from 'lucide-react-native';
+import { AlarmClock, AlarmClockCheck, AlarmClockOff, AlarmClockPlus, CircleCheck, ListPlus, ListTodo, ListX } from 'lucide-react-native';
 import { Fragment } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { match } from 'ts-pattern';
@@ -13,7 +13,19 @@ import { Text } from '@/components/ui/text';
 import type { RpcSession } from '@/types/rpc.types';
 import type * as ClientTypes from '@repo/client/client';
 import type { Bot } from '@repo/contracts/universal';
+import type { LucideIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
+
+const CHAT_EVENTS_ICONS = {
+  'alarm-clock-plus': AlarmClockPlus,
+  'alarm-clock': AlarmClock,
+  'alarm-clock-check': AlarmClockCheck,
+  'alarm-clock-off': AlarmClockOff,
+  'list-plus': ListPlus,
+  'list-todo': ListTodo,
+  'circle-check': CircleCheck,
+  'list-x': ListX,
+} satisfies Record<ClientTypes.ToolEventIcon, LucideIcon>;
 
 interface ChatEventsLineProps {
   label: string;
@@ -46,7 +58,7 @@ function ChatEventsChip({ icon, name, onPress }: ChatEventsChipProps) {
       onPress={onPress}
     >
       {icon}
-      <Text variant="featured-name">{name}</Text>
+      <Text tone="subtle" variant="featured-name">{name}</Text>
     </Pressable>
   );
 }
@@ -88,7 +100,7 @@ function ChatEventsPeers({ parts, bots, senderId }: ChatEventsPeersProps) {
                 </View>
               ))}
             </View>
-            <Text variant="featured-name">{m.rooms_pair_bots({ count: peers.length })}</Text>
+            <Text tone="subtle" variant="featured-name">{m.rooms_pair_bots({ count: peers.length })}</Text>
           </View>
         </Menu>
       ) : peers.map((target, index) => (
@@ -134,7 +146,7 @@ function ChatEventsRoutine({ event, senderId, session }: ChatEventsRoutineProps)
   return (
     <ChatEventsLine isDeleted={isDeleted} label={label}>
       <ChatEventsChip
-        icon={<Icon icon={AlarmClock} />}
+        icon={<Icon icon={CHAT_EVENTS_ICONS[event.icon]} tone="subtle" />}
         name={event.routine.name}
         onPress={isRemoved || isDeleted ? undefined : () => router.push({ pathname: '/bots/[botId]/routines', params: { botId: senderId } })}
       />
@@ -164,7 +176,7 @@ function ChatEventsTodo({ event, senderId, session }: ChatEventsTodoProps) {
   return (
     <ChatEventsLine isDeleted={isDeleted} label={label}>
       <ChatEventsChip
-        icon={<Icon icon={ListTodo} />}
+        icon={<Icon icon={CHAT_EVENTS_ICONS[event.icon]} tone="subtle" />}
         name={event.todo.title}
         onPress={isRemoved || isDeleted ? undefined : () => router.push({ pathname: '/bots/[botId]/todos', params: { botId: senderId } })}
       />

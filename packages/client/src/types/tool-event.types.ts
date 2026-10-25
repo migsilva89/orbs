@@ -7,6 +7,17 @@ export type ToolEventTodoAction = 'create' | 'update' | 'complete' | 'remove';
 
 export type ToolEventBotAction = 'create' | 'update' | 'models';
 
+/** The Lucide glyph an event shows before its name; each platform maps it to its own icon component. */
+export type ToolEventIcon =
+  | 'alarm-clock-plus'
+  | 'alarm-clock'
+  | 'alarm-clock-check'
+  | 'alarm-clock-off'
+  | 'list-plus'
+  | 'list-todo'
+  | 'circle-check'
+  | 'list-x';
+
 /** Which event a tool call becomes, before its output is read. */
 export type ToolEventSource =
   | { kind: 'peers' }
@@ -25,6 +36,7 @@ export interface ToolEventRoutine {
   kind: 'routine';
   key: string;
   action: ToolEventRoutineAction;
+  icon: ToolEventIcon;
   routine: ToolCallRoutine;
 }
 
@@ -32,6 +44,7 @@ export interface ToolEventTodo {
   kind: 'todo';
   key: string;
   action: ToolEventTodoAction;
+  icon: ToolEventIcon;
   todo: ToolCallTodo;
 }
 

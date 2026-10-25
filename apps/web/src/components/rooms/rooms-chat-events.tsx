@@ -7,14 +7,32 @@ import { match } from 'ts-pattern';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Mention } from '@/components/ui/mention';
+import { useSidebar } from '@/components/ui/sidebar';
 import { roomsPairLink } from '@/services/rooms/rooms.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconAlarmClock from '~icons/lucide/alarm-clock';
+import IconAlarmClockCheck from '~icons/lucide/alarm-clock-check';
+import IconAlarmClockOff from '~icons/lucide/alarm-clock-off';
+import IconAlarmClockPlus from '~icons/lucide/alarm-clock-plus';
+import IconCircleCheck from '~icons/lucide/circle-check';
+import IconListPlus from '~icons/lucide/list-plus';
 import IconListTodo from '~icons/lucide/list-todo';
+import IconListX from '~icons/lucide/list-x';
 import type * as ClientTypes from '@repo/client/client';
 import type { Bot } from '@repo/contracts/universal';
 import type { DynamicToolUIPart } from 'ai';
-import type { ReactNode } from 'react';
+import type { ComponentType, ReactNode, SVGProps } from 'react';
+
+const ROOMS_CHAT_EVENTS_ICONS = {
+  'alarm-clock-plus': IconAlarmClockPlus,
+  'alarm-clock': IconAlarmClock,
+  'alarm-clock-check': IconAlarmClockCheck,
+  'alarm-clock-off': IconAlarmClockOff,
+  'list-plus': IconListPlus,
+  'list-todo': IconListTodo,
+  'circle-check': IconCircleCheck,
+  'list-x': IconListX,
+} satisfies Record<ClientTypes.ToolEventIcon, ComponentType<SVGProps<SVGSVGElement>>>;
 
 interface RoomsChatEventsLineProps {
   label: string
@@ -29,6 +47,26 @@ function RoomsChatEventsLine({ label, isDeleted = false, children }: RoomsChatEv
       {children}
       {isDeleted ? <span className="ml-1">{m.rooms_event_deleted()}</span> : null}
     </p>
+  );
+}
+
+interface RoomsChatEventsPanelLinkProps {
+  handle: string
+  panel: 'routines' | 'todos'
+  children: ReactNode
+}
+
+function RoomsChatEventsPanelLink({ handle, panel, children }: RoomsChatEventsPanelLinkProps) {
+  const { isMobile, setOpen, setOpenMobile } = useSidebar();
+
+  return (
+    <Link
+      params={{ handle }}
+      to={panel === 'routines' ? '/rooms/direct/$handle/routines' : '/rooms/direct/$handle/todos'}
+      onClick={() => (isMobile ? setOpenMobile(true) : setOpen(true))}
+    >
+      {children}
+    </Link>
   );
 }
 
@@ -141,16 +179,18 @@ function RoomsChatEventsRoutine({ event, senderId, sender }: RoomsChatEventsRout
     .with('remove', () => m.rooms_event_routine_remove())
     .exhaustive();
 
+  const EventIcon = ROOMS_CHAT_EVENTS_ICONS[event.icon];
+
   const chip = (
     <Mention variant="plain">
-      <IconAlarmClock className="size-4 p-0.5" />
+      <EventIcon className="size-4" />
       {event.routine.name}
     </Mention>
   );
 
   return (
     <RoomsChatEventsLine isDeleted={isDeleted} label={label}>
-      {sender && !isRemoved && !isDeleted ? <Link params={{ handle: sender.handle }} to="/rooms/direct/$handle/routines">{chip}</Link> : chip}
+      {sender && !isRemoved && !isDeleted ? <RoomsChatEventsPanelLink handle={sender.handle} panel="routines">{chip}</RoomsChatEventsPanelLink> : chip}
     </RoomsChatEventsLine>
   );
 }
@@ -173,16 +213,18 @@ function RoomsChatEventsTodo({ event, senderId, sender }: RoomsChatEventsTodoPro
     .with('remove', () => m.rooms_event_todo_remove())
     .exhaustive();
 
+  const EventIcon = ROOMS_CHAT_EVENTS_ICONS[event.icon];
+
   const chip = (
     <Mention variant="plain">
-      <IconListTodo className="size-4 p-0.5" />
+      <EventIcon className="size-4" />
       {event.todo.title}
     </Mention>
   );
 
   return (
     <RoomsChatEventsLine isDeleted={isDeleted} label={label}>
-      {sender && !isRemoved && !isDeleted ? <Link params={{ handle: sender.handle }} to="/rooms/direct/$handle/todos">{chip}</Link> : chip}
+      {sender && !isRemoved && !isDeleted ? <RoomsChatEventsPanelLink handle={sender.handle} panel="todos">{chip}</RoomsChatEventsPanelLink> : chip}
     </RoomsChatEventsLine>
   );
 }

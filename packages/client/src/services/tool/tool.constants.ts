@@ -11,6 +11,11 @@ export const TOOL_MCP_NAME = /^mcp_(.+)_[0-9a-f]{24}$/u;
 
 export const TOOL_QUESTION = 'bot_question';
 
+export const TOOL_SECRET = 'bot_secret';
+
+/** Tools whose question card stands in for the tool row until the owner answers. */
+export const TOOL_QUESTIONS = new Set([TOOL_QUESTION, TOOL_SECRET]);
+
 export const TOOL_SUBAGENT = 'bot_subagent';
 
 export const TOOL_PEER_NAMES = new Set(['bot_message', 'bot_ask']);
@@ -24,6 +29,7 @@ export const TOOL_PRESENTATIONS = new Map<string, ToolTypes.ToolPresentationDefi
   ['edit', { label: m.tool_label_edit_file, icon: 'edit' }],
   ['tool_search', { label: m.tool_label_search_tools, icon: 'search' }],
   [TOOL_QUESTION, { label: m.tool_label_ask, icon: 'question' }],
+  [TOOL_SECRET, { label: m.tool_label_secret, icon: 'secret' }],
   [TOOL_SUBAGENT, { label: m.tool_label_agent, icon: 'bot' }],
   ['bot_subagent_stop', { label: m.tool_label_agent_stop, icon: 'bot' }],
   ['bot_list', { label: m.tool_label_bot_list, icon: 'bot' }],

@@ -1,3 +1,4 @@
+import { registerBunOAuthFlows } from '@earendil-works/pi-ai/bun-oauth';
 import { ModelRuntime } from '@earendil-works/pi-coding-agent';
 import { providerActionCancel } from './provider-action.cancel';
 import { providerActionCancelDevice } from './provider-action.cancel-device';
@@ -10,6 +11,7 @@ import { providerClose } from './provider.utils';
 import type * as ProviderTypes from '../../types/provider.types';
 
 export async function makeProviderService() {
+  registerBunOAuthFlows();
   const models = await ModelRuntime.create();
   const deps: ProviderTypes.ProviderServiceDeps = { models, sessions: new Map() };
 

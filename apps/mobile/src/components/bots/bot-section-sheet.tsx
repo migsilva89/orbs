@@ -48,20 +48,24 @@ function BotSectionSheetForm({ section }: BotSectionSheetFormProps) {
   const parsed = sidebarSectionCreate.safeParse({ name });
 
   const save = () => {
-    if (!parsed.success) {
+    if (!parsed.success || sidebarSections.isCreating) {
       return;
     }
 
     match(section)
-      .with(P.nonNullable, ({ id }) => sidebarSections.rename({ sectionId: id, name: parsed.data.name }))
-      .otherwise(() => sidebarSections.create(parsed.data));
-    router.back();
+      .with(P.nonNullable, ({ id }) => {
+        sidebarSections.rename({ sectionId: id, name: parsed.data.name });
+        router.back();
+      })
+      .otherwise(() => sidebarSections.create(parsed.data, { onSuccess: () => router.back() }));
   };
 
   return (
     <ActionSheet>
       <Text variant="heading">{section ? m.rooms_section_rename() : m.rooms_section_create()}</Text>
       <FormInput
+        // oxlint-disable-next-line jsx-a11y/no-autofocus -- the sheet exists only to type this name
+        autoFocus
         hint={m.rooms_section_name_hint()}
         label={m.rooms_section_name()}
         maxLength={sidebarSectionCreate.shape.name.maxLength ?? undefined}
@@ -72,6 +76,7 @@ function BotSectionSheetForm({ section }: BotSectionSheetFormProps) {
       />
       <Button
         disabled={!parsed.success}
+        loading={sidebarSections.isCreating}
         variant="primary"
         onPress={save}
       >

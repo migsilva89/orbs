@@ -39,10 +39,12 @@ export function useBotActions(chat: ConversationListItem): MenuItem[] {
     items: [
       ...sections.map((section) => ({
         label: section.name,
+        systemImage: chat.sectionId === section.id ? 'checkmark' : undefined,
         onSelect: () => moveToSection(section.id),
-      })),
+      } satisfies MenuItem)),
       {
         label: m.rooms_section_ungrouped(),
+        systemImage: sections.some((section) => section.id === chat.sectionId) ? undefined : 'checkmark',
         onSelect: () => moveToSection(null),
       },
     ],

@@ -27,6 +27,7 @@ import { useConnection } from '@/hooks/use-connection';
 import { useServerReachable } from '@/hooks/use-server-reachable';
 import { BOT_HOME } from '@/services/bot/bot-home.constants';
 import { botHomeSections } from '@/services/bot/bot-home.utils';
+import { BotActionsMenu } from './bot-actions-menu';
 import { BotHomeRow } from './bot-home-row';
 import { BotListOffline } from './bot-list-offline';
 import { BotSectionHeading } from './bot-section-heading';
@@ -120,26 +121,30 @@ function BotListContent({ session }: BotListContentProps) {
 
   const header = match(featured)
     .with(P.nonNullable, (chat) => (
-      <View className="items-center gap-2 py-8">
-        <View>
-          <Avatar
-            avatar={chat.avatar}
-            name={chat.name}
-            size="featured"
-          />
-          <Badge
-            accessibilityLabel={m.rooms_pinned()}
-            className="absolute -right-1 bottom-0"
-            variant="pinned"
-          >
-            <Icon
-              fill="currentColor"
-              icon={Star}
-              size="sm"
-            />
-          </Badge>
-        </View>
-        <Text tone="muted" variant="featured-name">{chat.name}</Text>
+      <View className="items-center py-8">
+        <BotActionsMenu botId={chat.botId} mode="longPress">
+          <View className="items-center gap-2">
+            <View>
+              <Avatar
+                avatar={chat.avatar}
+                name={chat.name}
+                size="featured"
+              />
+              <Badge
+                accessibilityLabel={m.rooms_pinned()}
+                className="absolute -right-1 bottom-0"
+                variant="pinned"
+              >
+                <Icon
+                  fill="currentColor"
+                  icon={Star}
+                  size="sm"
+                />
+              </Badge>
+            </View>
+            <Text tone="muted" variant="featured-name">{chat.name}</Text>
+          </View>
+        </BotActionsMenu>
       </View>
     ))
     .with(undefined, () => undefined)

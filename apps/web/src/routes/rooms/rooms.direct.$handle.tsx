@@ -1,5 +1,6 @@
 import { chatInitialViewOptions } from '@repo/client/react';
 import { createFileRoute, Outlet, useMatch } from '@tanstack/react-router';
+import { LayoutNotFound } from '@/components/layout/layout-error';
 import { RoomsPage } from '@/components/rooms/rooms-page';
 import { roomsDirectBot } from '@/services/rooms/rooms.client';
 import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
@@ -14,6 +15,7 @@ export const Route = createFileRoute('/_chat/rooms/direct/$handle')({
   },
   head: ({ loaderData }) => seoHead({ title: loaderData?.title }),
   component: DirectRoomRoute,
+  notFoundComponent: LayoutNotFound,
 });
 
 function DirectRoomRoute() {

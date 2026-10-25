@@ -3,7 +3,7 @@ import { connectionRpcUrl, connectionSocketUrl, makeClient, makeHttpClient } fro
 import { Errors } from '@repo/errors/universal';
 import { createIsomorphicFn } from '@tanstack/react-start';
 import { getRequest, getRequestHeader } from '@tanstack/react-start/server';
-import { connectionRead } from '@/services/connection/connection.client';
+import { connectionRead, connectionVerify } from '@/services/connection/connection.client';
 import { CONNECTION } from '@/services/connection/connection.constants';
 import { connectionParse, connectionTarget } from '@/services/connection/connection.utils';
 
@@ -18,7 +18,7 @@ export const rpcClient = createIsomorphicFn()
     }
 
     if (!target.url) {
-      throw new Errors.CONFLICT({ internal: 'No server address answered' });
+      throw new Errors.SERVER_UNREACHABLE();
     }
 
     return {
@@ -38,7 +38,11 @@ export const rpcClient = createIsomorphicFn()
       serverId: connection?.serverId,
       url: CONNECTION.rpcPath,
       token: () => connection?.token,
-      connect: () => new WebSocket(connectionSocketUrl({ url: location.origin })),
+      connect: async () => {
+        await connectionVerify({ serverId: connection?.serverId });
+
+        return new WebSocket(connectionSocketUrl({ url: location.origin }));
+      },
     });
   })();
 

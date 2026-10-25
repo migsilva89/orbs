@@ -1,9 +1,9 @@
-import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
 import { ClientOnly, HeadContent, Scripts } from '@tanstack/react-router';
 import { ContextProviders } from '@/components/context/context-providers';
 import { ContextShellScript } from '@/components/context/context-shell';
 import { ContextThemeScript } from '@/components/context/context-theme';
+import { LayoutError, LayoutNotFound } from '@/components/layout/layout-error';
 import { LayoutInstallPrompt } from '@/components/layout/layout-install-prompt';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
@@ -14,16 +14,16 @@ interface LayoutRootErrorProps {
 
 export function LayoutRootError({ error }: LayoutRootErrorProps) {
   return (
-    <main className="mx-auto max-w-6xl px-4 py-24">
-      <h1 className="text-3xl font-medium tracking-tight">{error instanceof Error ? error.message : String(error)}</h1>
+    <main className="flex h-svh">
+      <LayoutError error={error} />
     </main>
   );
 }
 
 export function LayoutRootNotFound() {
   return (
-    <main className="mx-auto max-w-6xl px-4 py-24">
-      <h1 className="text-3xl font-medium tracking-tight">{m.layout_not_found()}</h1>
+    <main className="flex h-svh">
+      <LayoutNotFound />
     </main>
   );
 }

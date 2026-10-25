@@ -1,6 +1,6 @@
-import { ORPCError } from '@orpc/client';
+import { connectionLostReason } from '@repo/client/client';
 import { createFaviconLinks, createMetadata } from '@repo/tanstack-helpers/universal';
-import { createRootRouteWithContext } from '@tanstack/react-router';
+import { createRootRouteWithContext, redirect } from '@tanstack/react-router';
 import { match, P } from 'ts-pattern';
 import { LayoutRootDocument, LayoutRootError, LayoutRootNotFound } from '@/components/layout/layout-root';
 import { connectionForget, connectionLearn, connectionRead } from '@/services/connection/connection.client';
@@ -29,12 +29,12 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         },
       };
     } catch (error) {
-      return match(error)
-        .with(P.intersection(P.instanceOf(ORPCError), { code: P.union('UNAUTHORIZED', 'SERVER_MISMATCH') }), async () => {
+      return match(connectionLostReason(error))
+        .with(P.nonNullable, async (reason) => {
           await connectionForget();
           context.queryClient.clear();
 
-          return { connection: null };
+          throw redirect({ to: '/connect', search: { reason } });
         })
         .otherwise(() => {
           throw error;

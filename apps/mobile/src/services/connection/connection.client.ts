@@ -33,7 +33,7 @@ export async function connectionPair({ entry, address, name }: ConnectionTypes.C
     .otherwise(async () => address);
 
   if (!picked) {
-    throw new Errors.CONFLICT({ internal: 'No server address answered' });
+    throw new Errors.SERVER_UNREACHABLE();
   }
 
   const redeemed = await makeHttpClient({ url: connectionRpcUrl(picked) }).pairing.redeem({ pin: entry.pin, name });

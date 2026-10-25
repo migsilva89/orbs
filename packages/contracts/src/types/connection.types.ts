@@ -33,5 +33,11 @@ export const connectionPairForm = z.object({
   name: z.string().trim().min(1).max(100),
 });
 
+/** Why a client dropped its saved connection: this device was revoked, or the server was reset or replaced. */
+export const connectionLostReason = z.enum(['revoked', 'replaced']);
+
+export const connectSearch = z.object({ reason: connectionLostReason.optional().catch(undefined) });
+
 export type ConnectionSaved = z.infer<typeof connectionSaved>;
+export type ConnectionLostReason = z.infer<typeof connectionLostReason>;
 export type ConnectionPairForm = z.infer<typeof connectionPairForm>;

@@ -80,10 +80,13 @@ try {
 
       if (pathname === '/rpc' || pathname === '/health' || pathname === '/mcp/callback' || pathname.startsWith('/rpc/') || pathname.startsWith('/files/') || pathname.startsWith('/avatars/')) {
         const cookies = request.headers.get('cookie') ?? '';
-        const daemon = connectionHasAddresses(cookies) ? (await connectionTarget(cookies)).url : LOCAL_DAEMON;
+        const picked = connectionHasAddresses(cookies) ? await connectionTarget(cookies) : { url: LOCAL_DAEMON, isMismatch: false };
+        const daemon = picked.url;
 
         if (!daemon) {
-          return new Response('No server address answered', { status: 502 });
+          return picked.isMismatch
+            ? new Response('This address belongs to a different server', { status: 409 })
+            : new Response('No server address answered', { status: 502 });
         }
 
         const target = new URL(pathname + search, daemon);

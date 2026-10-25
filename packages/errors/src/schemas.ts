@@ -13,6 +13,7 @@ const errorSchemas = {
     reportable: false,
   },
   SERVER_MISMATCH: { message: 'This address belongs to a different server', status: 409, reportable: false },
+  SERVER_UNREACHABLE: { message: "Can't reach your server", status: 503, reportable: false },
 
   NOT_FOUND: { message: 'Resource not found', status: 404, data: z.object({ resource: z.string().optional(), resourceId: z.union([z.string(), z.number()]).optional() }), reportable: false },
   VALIDATION_ERROR: {

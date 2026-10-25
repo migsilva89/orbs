@@ -1,14 +1,23 @@
+import { connectionLostReason } from '@repo/client/client';
 import { queryMutationCache } from '@repo/client/react';
 import { log } from '@repo/logger/client';
 import { isCancelledError, QueryCache, QueryClient } from '@tanstack/react-query';
+import { match, P } from 'ts-pattern';
 import { toasty } from '@/components/ui/sonner';
+import { connectionLost } from '@/services/connection/connection.client';
 
 export function tanstackQueryContext() {
+  const tanstackConnectionError = (error: Error) => match(connectionLostReason(error))
+    .with(P.nonNullable, (reason) => void connectionLost(reason))
+    .otherwise(() => undefined);
+
   const queryClient = new QueryClient({
-    queryCache: new QueryCache({}),
+    queryCache: new QueryCache({ onError: tanstackConnectionError }),
     mutationCache: queryMutationCache({
       notify: ({ message, variant }) => toasty(message, variant === 'error' ? '⚠️' : '✅'),
       onError: (error) => {
+        tanstackConnectionError(error);
+
         if (!isCancelledError(error)) {
           log.error({ action: 'mutation_error', error });
         }

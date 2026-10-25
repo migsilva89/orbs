@@ -11,3 +11,7 @@ export interface ConnectionTargetResult {
   url: string | null;
   isMismatch: boolean;
 }
+
+export interface ConnectionVerifyParams {
+  serverId: string | undefined;
+}

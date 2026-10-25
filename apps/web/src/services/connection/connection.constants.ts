@@ -2,6 +2,7 @@ export const CONNECTION = {
   storageKey: 'bots.connection',
   pairingKey: 'bots.pairing',
   rpcPath: '/rpc',
+  healthPath: '/health',
   cookieMaxAgeSeconds: 365 * 24 * 60 * 60,
   pairingMaxAgeSeconds: 10 * 60,
   targetCacheMs: 15_000,

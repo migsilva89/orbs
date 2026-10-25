@@ -1,6 +1,7 @@
 import { bootZodErrors } from '@repo/i18n/validation';
 import { createRouter as createTanStackRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
+import { LayoutError, LayoutNotFound } from '@/components/layout/layout-error';
 import { tanstackQueryContext } from '@/services/tanstack/tanstack.client';
 import { routeTree } from './routes.tree';
 
@@ -20,6 +21,9 @@ export function getRouter() {
     scrollRestoration: ({ location }) => !location.pathname.startsWith('/rooms'),
     defaultPreloadStaleTime: 0,
     defaultStructuralSharing: true,
+    defaultErrorComponent: LayoutError,
+    defaultNotFoundComponent: LayoutNotFound,
+    notFoundMode: 'root',
   });
 
   setupRouterSsrQueryIntegration({

@@ -1,15 +1,14 @@
-import { ORPCError } from '@orpc/client';
 import { createRouterUtils } from '@orpc/tanstack-query';
-import { connectionAddressPick, connectionRpcUrl, connectionSocketUrl, makeClient } from '@repo/client/client';
+import { connectionAddressPick, connectionLostReason, connectionRpcUrl, connectionSocketUrl, makeClient } from '@repo/client/client';
 import { queryMutationCache } from '@repo/client/react';
 import { Errors } from '@repo/errors/universal';
 import { QueryCache, QueryClient } from '@tanstack/react-query';
 import { AppState } from 'react-native';
-import { match } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 import { connectionAddressesLearn } from '@/services/connection/connection.client';
 import type { RpcClientParams, RpcSession } from '@/types/rpc.types';
 
-export function rpcClientCreate({ connection, notify, onUnauthorized }: RpcClientParams): RpcSession {
+export function rpcClientCreate({ connection, notify, onDisconnected }: RpcClientParams): RpcSession {
   let socket: WebSocket | undefined;
   let isActive = AppState.currentState === 'active';
   let isReachable = true;
@@ -32,11 +31,15 @@ export function rpcClientCreate({ connection, notify, onUnauthorized }: RpcClien
     connect: () => {
       return match(isActive)
         .with(true, async () => {
-          const { address: picked } = await connectionAddressPick(connection);
+          const { address: picked, isMismatch } = await connectionAddressPick(connection);
 
           if (!picked) {
             rpcReachableSet(false);
-            throw new Errors.CONFLICT({ internal: 'No server address answered' });
+            match(isMismatch)
+              .with(true, () => onDisconnected('replaced'))
+              .with(false, () => undefined)
+              .exhaustive();
+            throw new Errors.SERVER_UNREACHABLE();
           }
 
           address = picked;
@@ -57,8 +60,8 @@ export function rpcClientCreate({ connection, notify, onUnauthorized }: RpcClien
   });
 
   const rpcOnError = (error: Error) => {
-    match(error)
-      .when((value) => value instanceof ORPCError && value.code === 'UNAUTHORIZED', onUnauthorized)
+    match(connectionLostReason(error))
+      .with(P.nonNullable, onDisconnected)
       .otherwise(() => undefined);
   };
 

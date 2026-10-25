@@ -1,6 +1,9 @@
+import { connectionLostMessage } from '@repo/client/client';
 import { env } from '@repo/env/client';
 import { m } from '@repo/i18n/client';
+import { useSearch } from '@tanstack/react-router';
 import { LayoutBrand } from '@/components/layout/layout-brand';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import * as Card from '@/components/ui/card';
 import BrandsLogo from '~icons/brands/logo';
 import IconLock from '~icons/lucide/lock';
@@ -8,6 +11,8 @@ import { ConnectForm } from './connect-form';
 import { ConnectFriends } from './connect-friends';
 
 export function ConnectCard() {
+  const { reason } = useSearch({ from: '/connect' });
+
   return (
     <div className="flex-center min-h-svh flex-col bg-muted p-6 md:p-10">
       <div className="w-full max-w-sm md:max-w-4xl">
@@ -22,6 +27,11 @@ export function ConnectCard() {
                 <h1 className="text-xl font-semibold">{m.connect_title()}</h1>
                 <p className="text-xs text-balance text-muted-foreground">{m.connect_description({ name: env.VITE_APP_NAME })}</p>
               </div>
+              {reason ? (
+                <Alert className="mx-auto mb-5 max-w-68">
+                  <AlertDescription>{connectionLostMessage(reason)}</AlertDescription>
+                </Alert>
+              ) : null}
               <ConnectForm />
             </div>
             <ConnectFriends />

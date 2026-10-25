@@ -1,7 +1,10 @@
+import { ORPCError } from '@orpc/client';
 import { serverHealth } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
+import { match } from 'ts-pattern';
 import { CONNECTION } from './connection.constants';
 import type { ConnectionPick, ConnectionTarget } from '../../types/connection.types';
-import type { ServerAddress } from '@repo/contracts/universal';
+import type { ConnectionLostReason, ServerAddress } from '@repo/contracts/universal';
 
 /**
  * Probes every address at once and returns the first one, in list order, where the paired daemon answers.
@@ -41,4 +44,19 @@ export function connectionSocketUrl(address: Pick<ServerAddress, 'url'>): string
   url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
 
   return url.toString();
+}
+
+/** Why the daemon refused this device's saved connection, or null when the error is something else. */
+export function connectionLostReason(error: unknown): ConnectionLostReason | null {
+  return match(error)
+    .when((value) => value instanceof ORPCError && value.code === 'UNAUTHORIZED', () => 'revoked' as const)
+    .when((value) => value instanceof ORPCError && value.code === 'SERVER_MISMATCH', () => 'replaced' as const)
+    .otherwise(() => null);
+}
+
+export function connectionLostMessage(reason: ConnectionLostReason): string {
+  return match(reason)
+    .with('revoked', () => m.connect_revoked())
+    .with('replaced', () => m.connect_replaced())
+    .exhaustive();
 }

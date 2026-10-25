@@ -1,3 +1,4 @@
+import { connectionLostMessage } from '@repo/client/client';
 import { rpcContext } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { focusManager, QueryClientProvider } from '@tanstack/react-query';
@@ -27,10 +28,10 @@ export function ContextConnection({ children }: ContextConnectionProps) {
     setSession(rpcClientCreate({
       connection,
       notify: ({ message, variant }) => toast.show({ message, variant: variant === 'error' ? 'error' : 'default' }),
-      onUnauthorized: () => {
+      onDisconnected: (reason) => {
         setSession((current) => (current?.connection === connection ? null : current));
         void connectionForget(connection).then(
-          (isForgotten) => isForgotten && setError(m.mobile_connection_revoked()),
+          (isForgotten) => isForgotten && setError(connectionLostMessage(reason)),
           () => setError(m.mobile_storage_failed()),
         );
       },

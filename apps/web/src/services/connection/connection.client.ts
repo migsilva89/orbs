@@ -1,9 +1,12 @@
 import { connectionAddressesMerge, makeHttpClient } from '@repo/client/client';
+import { serverHealth } from '@repo/contracts/universal';
+import { Errors } from '@repo/errors/universal';
 import { createIsomorphicFn } from '@tanstack/react-start';
+import { match } from 'ts-pattern';
 import { CONNECTION } from './connection.constants';
 import { connectionCookie, connectionPairingCookie, connectionParse } from './connection.utils';
 import type * as ConnectionTypes from '@/types/connection.types';
-import type { ConnectionSaved, ServerAddress } from '@repo/contracts/universal';
+import type { ConnectionLostReason, ConnectionSaved, ServerAddress } from '@repo/contracts/universal';
 
 export const connectionRead = createIsomorphicFn()
   .server(async () => {
@@ -63,4 +66,29 @@ export async function connectionPair({ entry, name }: ConnectionTypes.Connection
   } finally {
     document.cookie = connectionPairingCookie(null, secure);
   }
+}
+
+export const connectionLost = createIsomorphicFn()
+  .server(async (_reason: ConnectionLostReason) => undefined)
+  .client(async (reason: ConnectionLostReason) => {
+    await connectionForget();
+    location.assign(`/connect?reason=${reason}`);
+  });
+
+export async function connectionVerify({ serverId }: ConnectionTypes.ConnectionVerifyParams): Promise<void> {
+  const response = await fetch(CONNECTION.healthPath, { cache: 'no-store' }).catch(() => null);
+  const id = response?.ok ? serverHealth.safeParse(await response.json().catch(() => null)).data?.id : undefined;
+  const isReplaced = response?.status === 409 || (id !== undefined && serverId !== undefined && id !== serverId);
+
+  await match(isReplaced)
+    .with(true, () => connectionLost('replaced'))
+    .with(false, () => undefined)
+    .exhaustive();
+
+  match(isReplaced || id === undefined)
+    .with(true, () => {
+      throw new Errors.SERVER_UNREACHABLE();
+    })
+    .with(false, () => undefined)
+    .exhaustive();
 }

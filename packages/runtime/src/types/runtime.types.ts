@@ -1,5 +1,6 @@
 import { artifactSpec, commandArguments, commandIdArguments, routineCreate, todo } from '@repo/contracts/universal';
 import { z } from 'zod';
+import type { ActivityService } from '../services/activity/activity.service';
 import type { ArtifactService } from '../services/artifact/artifact.service';
 import type { NotificationService } from '../services/notification/notification.service';
 import type { QuestionService } from '../services/question/question.service';
@@ -103,6 +104,7 @@ export interface RuntimeServiceDeps extends RuntimeModelsDeps {
   routines: RoutineService;
   todos: TodoService;
   artifacts: ArtifactService;
+  activity: ActivityService;
   index: ConversationIndexService;
   registry: PiDurableTypes.Registry;
   readOnlyTools: PiDurableTypes.ToolRegistration[];

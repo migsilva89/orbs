@@ -2,6 +2,7 @@ import { BACKGROUND_CONTEXT } from '@earendil-works/chord/context';
 import { createRegistry, Harness } from '@earendil-works/pi-durable';
 import { log } from '@repo/logger/server';
 import { match, P } from 'ts-pattern';
+import { makeActivityService } from '../activity/activity.service';
 import { makeArtifactService } from '../artifact/artifact.service';
 import { makeConversationIndexService } from '../conversation-index/conversation-index.service';
 import { makeNotificationService } from '../notification/notification.service';
@@ -19,6 +20,12 @@ import type { Context } from '@earendil-works/chord/context';
 
 export async function runtimeBotOpen(shared: RuntimeTypes.RuntimeSharedDeps, botId: string): Promise<RuntimeTypes.RuntimeBot> {
   const storage = await shared.storage.open({ botId });
+
+  const telemetry = await shared.storage.openTelemetry({ botId }).catch(async (error: unknown) => {
+    await storage.close(BACKGROUND_CONTEXT);
+    throw error;
+  });
+
   const registry = createRegistry();
 
   for (const extension of shared.extensions) {
@@ -29,7 +36,9 @@ export async function runtimeBotOpen(shared: RuntimeTypes.RuntimeSharedDeps, bot
     models: shared.models,
     registry,
     env: shared.env,
+    telemetry: telemetry.telemetry,
   }, BACKGROUND_CONTEXT).catch(async (error: unknown) => {
+    await telemetry.close();
     await storage.close(BACKGROUND_CONTEXT);
     throw error;
   });
@@ -70,6 +79,7 @@ export async function runtimeBotOpen(shared: RuntimeTypes.RuntimeSharedDeps, bot
       routines,
       todos,
       artifacts,
+      activity: makeActivityService({ harness, telemetry: telemetry.telemetry }),
       index: await makeConversationIndexService({ harness }),
       registry,
       models: shared.models,
@@ -92,11 +102,11 @@ export async function runtimeBotOpen(shared: RuntimeTypes.RuntimeSharedDeps, bot
       close: async () => {
         unsubscribe();
         arm.cancel();
-        await harness.close(BACKGROUND_CONTEXT);
+        await harness.close(BACKGROUND_CONTEXT).finally(() => telemetry.close());
       },
     };
   } catch (error) {
-    await harness.close(BACKGROUND_CONTEXT);
+    await harness.close(BACKGROUND_CONTEXT).finally(() => telemetry.close());
     throw error;
   }
 }

@@ -26,6 +26,7 @@ import { Route as botsBotsDotbotIdDotdeleteRouteImport } from "./../routes/bots/
 import { Route as roomsRoomsDotdirectDothandleRouteImport } from "./../routes/rooms/rooms.direct.$handle";
 import { Route as settingsSettingsDotthemesDotcreateRouteImport } from "./../routes/settings/settings.themes.create";
 import { Route as artifactsArtifactsDotbotIdDotconversationIdDotartifactIdRouteImport } from "./../routes/artifacts/artifacts.$botId.$conversationId.$artifactId";
+import { Route as roomsRoomsDotdirectDothandleDotactivityRouteImport } from "./../routes/rooms/rooms.direct.$handle.activity";
 import { Route as roomsRoomsDotdirectDothandleDotmediaRouteImport } from "./../routes/rooms/rooms.direct.$handle.media";
 import { Route as roomsRoomsDotdirectDothandleDotresetRouteImport } from "./../routes/rooms/rooms.direct.$handle.reset";
 import { Route as roomsRoomsDotdirectDothandleDotroutinesRouteImport } from "./../routes/rooms/rooms.direct.$handle.routines";
@@ -35,6 +36,7 @@ import { Route as settingsSettingsDotprovidersDotproviderIdDotlogoutRouteImport 
 import { Route as botsBotsDotbotIdDotroutinesDotroutineIdDotdeleteRouteImport } from "./../routes/bots/bots.$botId.routines.$routineId.delete";
 import { Route as botsBotsDotbotIdDotroutinesDotroutineIdDoteditRouteImport } from "./../routes/bots/bots.$botId.routines.$routineId.edit";
 import { Route as botsBotsDotbotIdDottodosDottodoIdDotdeleteRouteImport } from "./../routes/bots/bots.$botId.todos.$todoId.delete";
+import { Route as roomsRoomsDotdirectDothandleDotactivityDotrunIdRouteImport } from "./../routes/rooms/rooms.direct.$handle.activity.$runId";
 import { Route as roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRouteImport } from "./../routes/rooms/rooms.direct.$handle.todos.$todoId.delete";
 import { Route as roomsRoomsDotdirectDothandleDotwithDotpeerRouteImport } from "./../routes/rooms/rooms.direct.$handle.with.$peer";
 
@@ -130,6 +132,12 @@ const artifactsArtifactsDotbotIdDotconversationIdDotartifactIdRoute =
     path: "/$botId/$conversationId/$artifactId",
     getParentRoute: () => artifactsArtifactsDotlayoutRoute,
   } as any);
+const roomsRoomsDotdirectDothandleDotactivityRoute =
+  roomsRoomsDotdirectDothandleDotactivityRouteImport.update({
+    id: "/activity",
+    path: "/activity",
+    getParentRoute: () => roomsRoomsDotdirectDothandleRoute,
+  } as any);
 const roomsRoomsDotdirectDothandleDotmediaRoute =
   roomsRoomsDotdirectDothandleDotmediaRouteImport.update({
     id: "/media",
@@ -184,6 +192,12 @@ const botsBotsDotbotIdDottodosDottodoIdDotdeleteRoute =
     path: "/todos/$todoId/delete",
     getParentRoute: () => botsBotsDotbotIdRoute,
   } as any);
+const roomsRoomsDotdirectDothandleDotactivityDotrunIdRoute =
+  roomsRoomsDotdirectDothandleDotactivityDotrunIdRouteImport.update({
+    id: "/$runId",
+    path: "/$runId",
+    getParentRoute: () => roomsRoomsDotdirectDothandleDotactivityRoute,
+  } as any);
 const roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute =
   roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRouteImport.update({
     id: "/$todoId/delete",
@@ -214,6 +228,7 @@ export interface FileRoutesByFullPath {
   "/rooms/direct/$handle": typeof roomsRoomsDotdirectDothandleRouteWithChildren;
   "/settings/themes/create": typeof settingsSettingsDotthemesDotcreateRoute;
   "/artifacts/$botId/$conversationId/$artifactId": typeof artifactsArtifactsDotbotIdDotconversationIdDotartifactIdRoute;
+  "/rooms/direct/$handle/activity": typeof roomsRoomsDotdirectDothandleDotactivityRouteWithChildren;
   "/rooms/direct/$handle/media": typeof roomsRoomsDotdirectDothandleDotmediaRoute;
   "/rooms/direct/$handle/reset": typeof roomsRoomsDotdirectDothandleDotresetRoute;
   "/rooms/direct/$handle/routines": typeof roomsRoomsDotdirectDothandleDotroutinesRoute;
@@ -223,6 +238,7 @@ export interface FileRoutesByFullPath {
   "/bots/$botId/routines/$routineId/delete": typeof botsBotsDotbotIdDotroutinesDotroutineIdDotdeleteRoute;
   "/bots/$botId/routines/$routineId/edit": typeof botsBotsDotbotIdDotroutinesDotroutineIdDoteditRoute;
   "/bots/$botId/todos/$todoId/delete": typeof botsBotsDotbotIdDottodosDottodoIdDotdeleteRoute;
+  "/rooms/direct/$handle/activity/$runId": typeof roomsRoomsDotdirectDothandleDotactivityDotrunIdRoute;
   "/rooms/direct/$handle/todos/$todoId/delete": typeof roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute;
   "/rooms/direct/$handle/with/$peer/$conversationId": typeof roomsRoomsDotdirectDothandleDotwithDotpeerRoute;
 }
@@ -241,6 +257,7 @@ export interface FileRoutesByTo {
   "/rooms/direct/$handle": typeof roomsRoomsDotdirectDothandleRouteWithChildren;
   "/settings/themes/create": typeof settingsSettingsDotthemesDotcreateRoute;
   "/artifacts/$botId/$conversationId/$artifactId": typeof artifactsArtifactsDotbotIdDotconversationIdDotartifactIdRoute;
+  "/rooms/direct/$handle/activity": typeof roomsRoomsDotdirectDothandleDotactivityRouteWithChildren;
   "/rooms/direct/$handle/media": typeof roomsRoomsDotdirectDothandleDotmediaRoute;
   "/rooms/direct/$handle/reset": typeof roomsRoomsDotdirectDothandleDotresetRoute;
   "/rooms/direct/$handle/routines": typeof roomsRoomsDotdirectDothandleDotroutinesRoute;
@@ -250,6 +267,7 @@ export interface FileRoutesByTo {
   "/bots/$botId/routines/$routineId/delete": typeof botsBotsDotbotIdDotroutinesDotroutineIdDotdeleteRoute;
   "/bots/$botId/routines/$routineId/edit": typeof botsBotsDotbotIdDotroutinesDotroutineIdDoteditRoute;
   "/bots/$botId/todos/$todoId/delete": typeof botsBotsDotbotIdDottodosDottodoIdDotdeleteRoute;
+  "/rooms/direct/$handle/activity/$runId": typeof roomsRoomsDotdirectDothandleDotactivityDotrunIdRoute;
   "/rooms/direct/$handle/todos/$todoId/delete": typeof roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute;
   "/rooms/direct/$handle/with/$peer/$conversationId": typeof roomsRoomsDotdirectDothandleDotwithDotpeerRoute;
 }
@@ -272,6 +290,7 @@ export interface FileRoutesById {
   "/_chat/rooms/direct/$handle": typeof roomsRoomsDotdirectDothandleRouteWithChildren;
   "/_chat/settings/themes/create": typeof settingsSettingsDotthemesDotcreateRoute;
   "/_chat/artifacts/$botId/$conversationId/$artifactId": typeof artifactsArtifactsDotbotIdDotconversationIdDotartifactIdRoute;
+  "/_chat/rooms/direct/$handle/activity": typeof roomsRoomsDotdirectDothandleDotactivityRouteWithChildren;
   "/_chat/rooms/direct/$handle/media": typeof roomsRoomsDotdirectDothandleDotmediaRoute;
   "/_chat/rooms/direct/$handle/reset": typeof roomsRoomsDotdirectDothandleDotresetRoute;
   "/_chat/rooms/direct/$handle/routines": typeof roomsRoomsDotdirectDothandleDotroutinesRoute;
@@ -281,6 +300,7 @@ export interface FileRoutesById {
   "/_chat/bots/$botId/routines/$routineId/delete": typeof botsBotsDotbotIdDotroutinesDotroutineIdDotdeleteRoute;
   "/_chat/bots/$botId/routines/$routineId/edit": typeof botsBotsDotbotIdDotroutinesDotroutineIdDoteditRoute;
   "/_chat/bots/$botId/todos/$todoId/delete": typeof botsBotsDotbotIdDottodosDottodoIdDotdeleteRoute;
+  "/_chat/rooms/direct/$handle/activity/$runId": typeof roomsRoomsDotdirectDothandleDotactivityDotrunIdRoute;
   "/_chat/rooms/direct/$handle/todos/$todoId/delete": typeof roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute;
   "/_chat/rooms/direct/$handle/with/$peer/$conversationId": typeof roomsRoomsDotdirectDothandleDotwithDotpeerRoute;
 }
@@ -303,6 +323,7 @@ export interface FileRouteTypes {
     | "/rooms/direct/$handle"
     | "/settings/themes/create"
     | "/artifacts/$botId/$conversationId/$artifactId"
+    | "/rooms/direct/$handle/activity"
     | "/rooms/direct/$handle/media"
     | "/rooms/direct/$handle/reset"
     | "/rooms/direct/$handle/routines"
@@ -312,6 +333,7 @@ export interface FileRouteTypes {
     | "/bots/$botId/routines/$routineId/delete"
     | "/bots/$botId/routines/$routineId/edit"
     | "/bots/$botId/todos/$todoId/delete"
+    | "/rooms/direct/$handle/activity/$runId"
     | "/rooms/direct/$handle/todos/$todoId/delete"
     | "/rooms/direct/$handle/with/$peer/$conversationId";
   fileRoutesByTo: FileRoutesByTo;
@@ -330,6 +352,7 @@ export interface FileRouteTypes {
     | "/rooms/direct/$handle"
     | "/settings/themes/create"
     | "/artifacts/$botId/$conversationId/$artifactId"
+    | "/rooms/direct/$handle/activity"
     | "/rooms/direct/$handle/media"
     | "/rooms/direct/$handle/reset"
     | "/rooms/direct/$handle/routines"
@@ -339,6 +362,7 @@ export interface FileRouteTypes {
     | "/bots/$botId/routines/$routineId/delete"
     | "/bots/$botId/routines/$routineId/edit"
     | "/bots/$botId/todos/$todoId/delete"
+    | "/rooms/direct/$handle/activity/$runId"
     | "/rooms/direct/$handle/todos/$todoId/delete"
     | "/rooms/direct/$handle/with/$peer/$conversationId";
   id:
@@ -360,6 +384,7 @@ export interface FileRouteTypes {
     | "/_chat/rooms/direct/$handle"
     | "/_chat/settings/themes/create"
     | "/_chat/artifacts/$botId/$conversationId/$artifactId"
+    | "/_chat/rooms/direct/$handle/activity"
     | "/_chat/rooms/direct/$handle/media"
     | "/_chat/rooms/direct/$handle/reset"
     | "/_chat/rooms/direct/$handle/routines"
@@ -369,6 +394,7 @@ export interface FileRouteTypes {
     | "/_chat/bots/$botId/routines/$routineId/delete"
     | "/_chat/bots/$botId/routines/$routineId/edit"
     | "/_chat/bots/$botId/todos/$todoId/delete"
+    | "/_chat/rooms/direct/$handle/activity/$runId"
     | "/_chat/rooms/direct/$handle/todos/$todoId/delete"
     | "/_chat/rooms/direct/$handle/with/$peer/$conversationId";
   fileRoutesById: FileRoutesById;
@@ -502,6 +528,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof artifactsArtifactsDotbotIdDotconversationIdDotartifactIdRouteImport;
       parentRoute: typeof artifactsArtifactsDotlayoutRoute;
     };
+    "/_chat/rooms/direct/$handle/activity": {
+      id: "/_chat/rooms/direct/$handle/activity";
+      path: "/activity";
+      fullPath: "/rooms/direct/$handle/activity";
+      preLoaderRoute: typeof roomsRoomsDotdirectDothandleDotactivityRouteImport;
+      parentRoute: typeof roomsRoomsDotdirectDothandleRoute;
+    };
     "/_chat/rooms/direct/$handle/media": {
       id: "/_chat/rooms/direct/$handle/media";
       path: "/media";
@@ -564,6 +597,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/bots/$botId/todos/$todoId/delete";
       preLoaderRoute: typeof botsBotsDotbotIdDottodosDottodoIdDotdeleteRouteImport;
       parentRoute: typeof botsBotsDotbotIdRoute;
+    };
+    "/_chat/rooms/direct/$handle/activity/$runId": {
+      id: "/_chat/rooms/direct/$handle/activity/$runId";
+      path: "/$runId";
+      fullPath: "/rooms/direct/$handle/activity/$runId";
+      preLoaderRoute: typeof roomsRoomsDotdirectDothandleDotactivityDotrunIdRouteImport;
+      parentRoute: typeof roomsRoomsDotdirectDothandleDotactivityRoute;
     };
     "/_chat/rooms/direct/$handle/todos/$todoId/delete": {
       id: "/_chat/rooms/direct/$handle/todos/$todoId/delete";
@@ -655,6 +695,21 @@ const settingsSettingsDotlayoutRouteWithChildren =
     settingsSettingsDotlayoutRouteChildren,
   );
 
+interface roomsRoomsDotdirectDothandleDotactivityRouteChildren {
+  roomsRoomsDotdirectDothandleDotactivityDotrunIdRoute: typeof roomsRoomsDotdirectDothandleDotactivityDotrunIdRoute;
+}
+
+const roomsRoomsDotdirectDothandleDotactivityRouteChildren: roomsRoomsDotdirectDothandleDotactivityRouteChildren =
+  {
+    roomsRoomsDotdirectDothandleDotactivityDotrunIdRoute:
+      roomsRoomsDotdirectDothandleDotactivityDotrunIdRoute,
+  };
+
+const roomsRoomsDotdirectDothandleDotactivityRouteWithChildren =
+  roomsRoomsDotdirectDothandleDotactivityRoute._addFileChildren(
+    roomsRoomsDotdirectDothandleDotactivityRouteChildren,
+  );
+
 interface roomsRoomsDotdirectDothandleDottodosRouteChildren {
   roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute: typeof roomsRoomsDotdirectDothandleDottodosDottodoIdDotdeleteRoute;
 }
@@ -671,6 +726,7 @@ const roomsRoomsDotdirectDothandleDottodosRouteWithChildren =
   );
 
 interface roomsRoomsDotdirectDothandleRouteChildren {
+  roomsRoomsDotdirectDothandleDotactivityRoute: typeof roomsRoomsDotdirectDothandleDotactivityRouteWithChildren;
   roomsRoomsDotdirectDothandleDotmediaRoute: typeof roomsRoomsDotdirectDothandleDotmediaRoute;
   roomsRoomsDotdirectDothandleDotresetRoute: typeof roomsRoomsDotdirectDothandleDotresetRoute;
   roomsRoomsDotdirectDothandleDotroutinesRoute: typeof roomsRoomsDotdirectDothandleDotroutinesRoute;
@@ -680,6 +736,8 @@ interface roomsRoomsDotdirectDothandleRouteChildren {
 
 const roomsRoomsDotdirectDothandleRouteChildren: roomsRoomsDotdirectDothandleRouteChildren =
   {
+    roomsRoomsDotdirectDothandleDotactivityRoute:
+      roomsRoomsDotdirectDothandleDotactivityRouteWithChildren,
     roomsRoomsDotdirectDothandleDotmediaRoute:
       roomsRoomsDotdirectDothandleDotmediaRoute,
     roomsRoomsDotdirectDothandleDotresetRoute:

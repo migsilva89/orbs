@@ -1,6 +1,7 @@
 import { asyncIteratorObject, oc as baseContract } from '@orpc/contract';
 import { openapi } from '@orpc/openapi';
 import { errorSchemas } from '@repo/errors/universal';
+import { activityListInput, activityPage, activityRun, activityRunGet } from '../types/activity.types';
 import {
   artifact,
   artifactBlocks,
@@ -186,6 +187,10 @@ export const contract = {
     update: ocValidate.input(todoUpdate).output(todo),
     reorder: ocValidate.input(todoReorder).output(todoList),
     remove: ocFind.input(todoTarget).output(todoRemoveResult),
+  },
+  activity: {
+    list: ocFind.input(activityListInput).output(activityPage),
+    run: ocFind.input(activityRunGet).output(activityRun),
   },
   avatars: {
     upload: ocAuth.input(avatarUpload).output(botAvatarImage),

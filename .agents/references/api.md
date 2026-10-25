@@ -12,6 +12,7 @@ DATA_DIR/                     default ~/.config/orbs/
   data/daemon.lock            one lock for every store
   data/ipc/rpc.sock           owner-only socket, used by `orbs pair`
   data/bots/<botId>/runtime.sql   that bot's Pi store; the file is the unit of erasure
+  data/bots/<botId>/telemetry.sql model and tool spans, kept 14 days; reset with the store, not backed up
 ```
 
 - Startup opens and migrates SQL, restores every bot, then resumes Pi. A failing store closes only its bot.

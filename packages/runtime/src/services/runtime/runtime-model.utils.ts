@@ -3,6 +3,7 @@ import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeModelRoute } from '../../types/runtime-model.types';
 import { runtimeModelStream, runtimeModelStreamFailure } from './runtime-model-stream.utils';
+import { runtimeModelTrace } from './runtime-model-trace.utils';
 import { RUNTIME_MAX_MODEL_REQUESTS } from './runtime.constants';
 import type { RuntimeBotParams } from '../../types/runtime.types';
 import type { Models } from '@earendil-works/pi-ai/models';
@@ -22,7 +23,19 @@ export function runtimeModelRef(bot: RuntimeBotParams): ModelRef {
     .otherwise(() => ({ provider: bot.modelProvider, modelId: bot.modelId }));
 }
 
-export function runtimeModels(models: Models): Models {
+export function runtimeModels(source: Models): Models {
+  const tracedStream = runtimeModelTrace(source.streamSimple.bind(source));
+
+  const models = new Proxy(source, {
+    get: (target, property) => match(property)
+      .with('streamSimple', () => tracedStream)
+      .otherwise(() => {
+        // SAFETY: this Proxy only wraps a Models object, so every property it is asked for is read from that Models target.
+        const value = target[property as keyof Models];
+        return match(value).with(P.instanceOf(Function), (method) => method.bind(target)).otherwise(() => value);
+      }),
+  });
+
   const runtimeModelGet: Models['getModel'] = (provider, id) => match(provider)
     .with(ROUTE_PROVIDER, () => {
       return match(runtimeModelParse(id)).with(P.nonNullable, (route) => {

@@ -1,3 +1,4 @@
+import { activity } from './rpc.activity';
 import { artifacts } from './rpc.artifacts';
 import { attachments } from './rpc.attachments';
 import { avatars } from './rpc.avatars';
@@ -31,6 +32,7 @@ export const router = rpcRouter.router({
   mcpAuth,
   routines,
   todos,
+  activity,
   attachments,
   avatars,
   artifacts,

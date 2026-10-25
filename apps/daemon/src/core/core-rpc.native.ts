@@ -41,6 +41,7 @@ export function coreRpcNative(
       mcpAuth: services.mcpAuth,
       routines: services.routines,
       todos: services.todos,
+      activity: services.activity,
       auth: services.auth,
       credentials: services.credentials,
       secrets: services.secrets,

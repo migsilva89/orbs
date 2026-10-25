@@ -39,6 +39,8 @@ import { runtimeChatToolsExtension } from './runtime-chat-tools.extension';
 import { runtimeCodingTools } from './runtime-coding-tools.extension';
 import { runtimeDirectory } from './runtime-directory.utils';
 import { runtimeModels } from './runtime-model.utils';
+import { runtimeQueryActivity } from './runtime-query.activity';
+import { runtimeQueryActivityRun } from './runtime-query.activity-run';
 import { runtimeQueryApprovals } from './runtime-query.approvals';
 import { runtimeQueryArtifact } from './runtime-query.artifact';
 import { runtimeQueryArtifactVersions } from './runtime-query.artifact-versions';
@@ -199,6 +201,8 @@ export function makeRuntimeService({
       search: runtimeBotCall(directory, runtimeQuerySearch),
       routines: runtimeBotCall(directory, runtimeQueryListRoutines),
       todos: runtimeBotCall(directory, runtimeQueryListTodos),
+      activity: runtimeBotCall(directory, runtimeQueryActivity),
+      activityRun: runtimeBotCall(directory, runtimeQueryActivityRun),
       questions: runtimeBotCall(directory, runtimeQueryQuestions),
       reactions: runtimeBotCall(directory, runtimeQueryReactions),
       attachment: runtimeBotCall(directory, runtimeQueryAttachment),

@@ -21,10 +21,11 @@ export const Route = createFileRoute('/_chat/rooms/direct/$handle')({
 function DirectRoomRoute() {
   const { botId } = Route.useLoaderData();
   const pair = useMatch({ from: '/_chat/rooms/direct/$handle/with/$peer/$conversationId', shouldThrow: false });
+  const activity = useMatch({ from: '/_chat/rooms/direct/$handle/activity', shouldThrow: false });
 
   return (
     <>
-      {pair ? null : <RoomsPage botId={botId} />}
+      {pair || activity ? null : <RoomsPage botId={botId} />}
       <Outlet />
     </>
   );

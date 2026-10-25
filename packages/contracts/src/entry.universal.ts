@@ -1,4 +1,5 @@
 export { contract } from './rpc/rpc.router';
+export * from './types/activity.types';
 export * from './types/artifact.types';
 export * from './types/attachment.types';
 export * from './types/auth.types';

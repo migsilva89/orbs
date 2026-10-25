@@ -1,4 +1,5 @@
 import { makeRuntimeService } from '@repo/runtime/server';
+import { makeActivityService } from '../services/activity/activity.service';
 import { makeArtifactService } from '../services/artifact/artifact.service';
 import { makeAttachmentService } from '../services/attachment/attachment.service';
 import { makeAuthService } from '../services/auth/auth.service';
@@ -97,6 +98,7 @@ export async function makeServices({
     return {
       routines: makeRoutineService({ bots, runtime }),
       todos: makeTodoService({ bots, runtime }),
+      activity: makeActivityService({ bots, runtime }),
       artifacts: makeArtifactService({ bots, runtime }),
       notifications,
       server,

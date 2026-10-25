@@ -1,3 +1,4 @@
+import type { ActivityService } from '../services/activity/activity.service';
 import type { ArtifactService } from '../services/artifact/artifact.service';
 import type { AttachmentService } from '../services/attachment/attachment.service';
 import type { AuthService } from '../services/auth/auth.service';
@@ -28,6 +29,7 @@ export interface RpcContext extends RequestHeadersPluginContext {
   mcpAuth: McpAuthService;
   routines: RoutineService;
   todos: TodoService;
+  activity: ActivityService;
   artifacts: ArtifactService;
   notifications: NotificationService;
   attachments: AttachmentService;

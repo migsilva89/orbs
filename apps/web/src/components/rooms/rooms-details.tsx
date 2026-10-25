@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Item, ItemActions, ItemContent, ItemGroup, ItemLink, ItemMedia, ItemTitle, ItemValue } from '@/components/ui/item';
 import * as Sidebar from '@/components/ui/sidebar';
 import { rpc } from '@/services/rpc/rpc.client';
+import IconActivity from '~icons/lucide/activity';
 import IconCalendarClock from '~icons/lucide/calendar-clock';
 import IconChevronLeft from '~icons/lucide/chevron-left';
 import IconChevronRight from '~icons/lucide/chevron-right';
@@ -136,6 +137,7 @@ function RoomsDetailsContent({ bot, chat, page }: RoomsDetailsContentProps) {
     { to: '/rooms/direct/$handle/todos', title: m.rooms_todos(), icon: <IconListTodo /> },
     { to: '/rooms/direct/$handle/routines', title: m.rooms_routines(), icon: <IconCalendarClock /> },
     { to: '/rooms/direct/$handle/media', title: m.rooms_tab_media(), icon: <IconImages /> },
+    { to: '/rooms/direct/$handle/activity', title: m.rooms_activity(), icon: <IconActivity /> },
   ] as const;
 
   return match(page)

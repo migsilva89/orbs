@@ -15,6 +15,9 @@ export const routes = rootRoute('root.tsx', [
         ]),
         route('/routines', 'rooms/rooms.direct.$handle.routines.tsx'),
         route('/media', 'rooms/rooms.direct.$handle.media.tsx'),
+        route('/activity', 'rooms/rooms.direct.$handle.activity.tsx', [
+          route('/$runId', 'rooms/rooms.direct.$handle.activity.$runId.tsx'),
+        ]),
       ]),
     ]),
     route('/bots', 'bots/bots.layout.tsx', [

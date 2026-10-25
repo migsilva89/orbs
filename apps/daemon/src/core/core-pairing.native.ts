@@ -16,7 +16,7 @@ export function corePairingNative(services: Awaited<ReturnType<typeof makeServic
 
     const { id, addresses } = await services.server.queries.info();
 
-    const { qr, expiresAt } = await services.auth.actions.bootstrap({
+    const { pin, qr, expiresAt } = await services.auth.actions.bootstrap({
       serverId: id,
       addresses,
       isLocal: true,
@@ -24,7 +24,7 @@ export function corePairingNative(services: Awaited<ReturnType<typeof makeServic
 
     const link = new URL(`/connect#code=${encodeURIComponent(qr.payload)}`, serverUrl).href;
 
-    process.stdout.write(`\nNo device is paired. Open this link or scan the code to pair the first device:\n\n${link}\n\n${renderUnicodeCompact(link)}\n`);
+    process.stdout.write(`\nNo device is paired. Enter PIN ${pin}, open this link or scan the code to pair the first device:\n\n${link}\n\n${renderUnicodeCompact(link)}\n`);
     timer = setTimeout(() => void issue(), expiresAt - Date.now());
   }
 

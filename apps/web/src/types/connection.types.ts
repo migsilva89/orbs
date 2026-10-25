@@ -1,9 +1,9 @@
-import type { AuthPairPayload, ConnectionSaved } from '@repo/contracts/universal';
+import type { AuthPairEntry, ConnectionSaved } from '@repo/contracts/universal';
 
 export type ConnectionInfo = Pick<ConnectionSaved, 'serverId' | 'deviceId' | 'addresses'>;
 
 export interface ConnectionPairParams {
-  payload: AuthPairPayload;
+  entry: AuthPairEntry;
   name: string;
 }
 

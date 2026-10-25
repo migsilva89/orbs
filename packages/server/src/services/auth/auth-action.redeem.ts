@@ -1,11 +1,12 @@
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
+import { AUTH } from './auth.constants';
 import { authTokenCreate, authTokenHash } from './auth.utils';
 import type { AuthServiceDeps } from '../../types/auth.types';
 import type { AuthRedeemInput } from '@repo/contracts/universal';
 
 export async function authActionRedeem({ database }: AuthServiceDeps, params: AuthRedeemInput) {
-  const grantHash = await authTokenHash(params.token);
+  const pinHash = await authTokenHash(params.pin);
   const token = authTokenCreate();
   const tokenHash = await authTokenHash(token);
 
@@ -13,27 +14,37 @@ export async function authActionRedeem({ database }: AuthServiceDeps, params: Au
     const claimedAt = Date.now();
     const existing = await tx.selectFrom('device').select('id').limit(1).executeTakeFirst();
 
-    match(await tx.updateTable('pairingGrant')
-      .set({ claimedAt })
-      .where('tokenHash', '=', grantHash)
+    const grant = await tx.deleteFrom('pairingGrant')
+      .where('pinHash', '=', pinHash)
       .where('expiresAt', '>', claimedAt)
-      .where('claimedAt', 'is', null)
-      .returning('tokenHash')
-      .executeTakeFirst())
-      .with(P.nonNullable, (value) => value)
-      .otherwise(() => {
-        throw new Errors.UNAUTHORIZED();
-      });
+      .returning('pinHash')
+      .executeTakeFirst();
+
+    if (!grant) {
+      return null;
+    }
 
     const paired = { id: crypto.randomUUID(), name: params.name, createdAt: claimedAt };
     await tx.insertInto('device').values({ ...paired, tokenHash }).execute();
 
     await match(existing)
-      .with(undefined, () => tx.deleteFrom('pairingGrant').where('issuedBy', 'is', null).where('claimedAt', 'is', null).execute())
+      .with(undefined, () => tx.deleteFrom('pairingGrant').where('issuedBy', 'is', null).execute())
       .otherwise(() => undefined);
 
     return paired;
   });
 
-  return { device, token };
+  return match(device)
+    .with(P.nonNullable, (paired) => ({ device: paired, token }))
+    .otherwise(async () => {
+      await database.db.transaction().execute(async (tx) => {
+        await tx.updateTable('pairingGrant')
+          .set((eb) => ({ failedAttempts: eb('failedAttempts', '+', 1) }))
+          .where('expiresAt', '>', Date.now())
+          .execute();
+        await tx.deleteFrom('pairingGrant').where('failedAttempts', '>=', AUTH.pinFailedAttempts).execute();
+      });
+
+      throw new Errors.UNAUTHORIZED();
+    });
 }

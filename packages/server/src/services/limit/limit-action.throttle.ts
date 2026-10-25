@@ -13,7 +13,7 @@ export async function limitActionThrottle({ state }: LimitRuntimeDeps, params: L
   match(result)
     .with({ success: true }, () => undefined)
     .with({ success: false }, ({ reset }) => {
-      throw new Errors.RATE_LIMITED({ retryAfter: limitRetryAfterSeconds(reset ?? Date.now()) });
+      throw new Errors.RATE_LIMITED({ retryAfter: limitRetryAfterSeconds(reset ?? Date.now()), internal: `${params.kind} request window exhausted` });
     })
     .exhaustive();
 }

@@ -19,6 +19,10 @@ export const pairing = {
       isLocal: context.isLocal,
     });
   }),
-  redeem: baseRouter.pairing.redeem.handler(async ({ context, input }) => context.auth.actions.redeem(input)),
-  status: authedRouter.pairing.status.handler(async ({ context, input }) => context.auth.queries.grant(input)),
+  redeem: baseRouter.pairing.redeem.handler(async ({ context, input }) => {
+    const { id, addresses } = await context.server.queries.info();
+    const redeemed = await context.auth.actions.redeem(input);
+
+    return { ...redeemed, serverId: id, addresses };
+  }),
 };

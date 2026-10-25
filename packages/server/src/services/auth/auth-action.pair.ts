@@ -7,11 +7,10 @@ export async function authActionPair(deps: AuthServiceDeps, params: AuthPairPara
   const grant = await authActionGrant(deps, { issuedBy: params.issuedBy });
 
   const payload = btoa(JSON.stringify({
-    version: 2,
+    version: 3,
     serverId: params.serverId,
     addresses: params.addresses,
-    token: grant.token,
-    expiresAt: grant.expiresAt,
+    pin: grant.pin,
   } satisfies AuthPairPayload)).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/u, '');
 
   const svg = renderSVG(payload, { ecc: 'M', border: 4 });

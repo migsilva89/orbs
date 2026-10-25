@@ -47,16 +47,16 @@ export const connectionLearn = createIsomorphicFn()
     }
   });
 
-export async function connectionPair({ payload, name }: ConnectionTypes.ConnectionPairParams) {
+export async function connectionPair({ entry, name }: ConnectionTypes.ConnectionPairParams) {
   const secure = location.protocol === 'https:';
-  document.cookie = connectionPairingCookie(payload, secure);
+  document.cookie = connectionPairingCookie(entry.target, secure);
 
   try {
-    const redeemed = await makeHttpClient({ url: CONNECTION.rpcPath }).pairing.redeem({ token: payload.token, name });
+    const redeemed = await makeHttpClient({ url: CONNECTION.rpcPath }).pairing.redeem({ pin: entry.pin, name });
 
     document.cookie = connectionCookie({
-      serverId: payload.serverId,
-      addresses: payload.addresses,
+      serverId: redeemed.serverId,
+      addresses: redeemed.addresses,
       deviceId: redeemed.device.id,
       token: redeemed.token,
     }, secure);

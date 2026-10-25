@@ -14,6 +14,7 @@ import type { PluginService } from '../services/plugin/plugin.service';
 import type { RoutineService } from '../services/routine/routine.service';
 import type { SecretService } from '../services/secret/secret.service';
 import type { ServerService } from '../services/server/server.service';
+import type { SidebarSectionService } from '../services/sidebar-section/sidebar-section.service';
 import type { SkillService } from '../services/skill/skill.service';
 import type { TodoService } from '../services/todo/todo.service';
 import type { ToolService } from '../services/tool/tool.service';
@@ -43,5 +44,6 @@ export interface RpcContext extends RequestHeadersPluginContext {
   instructions: InstructionService;
   mcp: McpService;
   bots: BotService;
+  sidebarSections: SidebarSectionService;
   conversation: ConversationService;
 }

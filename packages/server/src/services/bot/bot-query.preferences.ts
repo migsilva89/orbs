@@ -9,6 +9,7 @@ export async function botQueryPreferences({ database }: BotDatabaseDeps): Promis
       'botPreference.isPinned',
       'botPreference.isHidden',
       'botPreference.rank',
+      'botPreference.sectionId',
       'botPreference.isMuted',
       'botPreference.mutedUntil',
       'botPreference.readThroughEntryId',

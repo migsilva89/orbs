@@ -30,6 +30,7 @@ export * from './types/reply.types';
 export * from './types/routine.types';
 export * from './types/secret.types';
 export * from './types/server.types';
+export * from './types/sidebar-section.types';
 export * from './types/skill.types';
 export * from './types/theme.types';
 export * from './types/todo.types';

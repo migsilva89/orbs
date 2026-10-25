@@ -1,4 +1,5 @@
 import { roomsSidebarOrder } from '@repo/client/client';
+import { useSidebarSections } from '@repo/client/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useMatch, useNavigate } from '@tanstack/react-router';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -10,8 +11,9 @@ export function useLayoutShortcuts() {
   const navigate = useNavigate();
   const { data: chats } = useSuspenseQuery(rpc.conversation.list.queryOptions());
   const currentDirect = useMatch({ from: '/_chat/rooms/direct/$handle', shouldThrow: false });
-  const { pinned, others } = roomsSidebarOrder({ chats });
-  const ordered = [...pinned, ...others];
+  const { sections: sidebarSections } = useSidebarSections();
+  const { pinned, sections, others } = roomsSidebarOrder({ chats, sections: sidebarSections });
+  const ordered = [...pinned, ...sections.flatMap((section) => section.chats), ...others];
   const current = ordered.findIndex((chat) => chat.handle === currentDirect?.params.handle);
 
   const rotate = (step: number) => {

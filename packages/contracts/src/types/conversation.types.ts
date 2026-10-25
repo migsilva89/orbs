@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { attachmentIds } from './attachment.types';
 import { botAvatar } from './bot.types';
 import { conversationWhenBusy } from './conversation-preference.types';
+import type { SidebarSection } from './sidebar-section.types';
 import type { JsonValue } from '@earendil-works/chord';
 import type { Op } from '@earendil-works/chord/delta';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
@@ -138,6 +139,7 @@ export const conversationPreferences = z.object({
   isMuted: z.boolean(),
   mutedUntil: z.number().int().positive().nullable(),
   rank: z.number().int().nonnegative().nullable(),
+  sectionId: z.uuid().nullable(),
   readThroughEntryId: z.number().int().nonnegative(),
   hasUnread: z.boolean(),
   whenBusy: conversationWhenBusy.nullable(),
@@ -173,6 +175,12 @@ export const conversationList = z.array(conversationSummary.extend({
 
 export type ConversationSummary = z.infer<typeof conversationSummary>;
 export type ConversationListItem = z.infer<typeof conversationList>[number];
+
+/** The live chat list watch: the chats and the owner's sidebar sections they are grouped in. */
+export interface ConversationListState {
+  conversations: ConversationListItem[];
+  sections: SidebarSection[];
+}
 
 export type ConversationPreferences = z.infer<typeof conversationPreferences>;
 export type ConversationMarkReadInput = z.infer<typeof conversationMarkRead>;

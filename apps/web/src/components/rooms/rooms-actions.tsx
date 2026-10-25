@@ -1,11 +1,9 @@
-import { useChatArrange, useChatSettings } from '@repo/client/react';
+import { useChatSettings } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { RoomsMuteMenu } from '@/components/rooms/rooms-mute-menu';
 import { RoomsSendModeMenu } from '@/components/rooms/rooms-send-mode-menu';
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { rpc } from '@/services/rpc/rpc.client';
 import IconEye from '~icons/lucide/eye';
 import IconEyeOff from '~icons/lucide/eye-off';
 import IconPencilLine from '~icons/lucide/pencil-line';
@@ -20,16 +18,9 @@ interface RoomsActionsProps {
 }
 
 export function RoomsActions({ chat }: RoomsActionsProps) {
-  const { data: chats } = useSuspenseQuery(rpc.conversation.list.queryOptions());
-  const arrange = useChatArrange();
   const settings = useChatSettings(chat.botId);
-  const shown = chats.filter((item) => !item.isHidden);
-  const pinnedIds = shown.filter((item) => item.isPinned).map((item) => item.botId);
 
-  const togglePin = () => arrange({
-    botIds: shown.map((item) => item.botId),
-    pinnedIds: chat.isPinned ? pinnedIds.filter((botId) => botId !== chat.botId) : [...pinnedIds, chat.botId],
-  });
+  const togglePin = () => settings.pin(!chat.isPinned);
 
   return (
     <>

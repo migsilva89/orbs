@@ -13,6 +13,7 @@ import { makeNotificationService } from '../services/notification/notification.s
 import { makePluginService } from '../services/plugin/plugin.service';
 import { makeRoutineService } from '../services/routine/routine.service';
 import { makeServerService } from '../services/server/server.service';
+import { makeSidebarSectionService } from '../services/sidebar-section/sidebar-section.service';
 import { makeSkillService } from '../services/skill/skill.service';
 import { makeTodoService } from '../services/todo/todo.service';
 import { makeToolService } from '../services/tool/tool.service';
@@ -62,6 +63,8 @@ export async function makeServices({
     const skill = makeSkillService({ settings, loader: skillLoader });
     const instruction = makeInstructionService({ settings, loader: instructionLoader });
     const plugin = makePluginService({ settings, loader: pluginLoader });
+
+    const sidebarSections = makeSidebarSectionService({ database });
 
     const bots = makeBotService({
       database,
@@ -118,12 +121,14 @@ export async function makeServices({
       instructions: instruction,
       plugins: plugin,
       mcp,
+      sidebarSections,
       conversation: makeConversationService({
         notifications,
         runtime,
         auth,
         bots,
         secrets,
+        sidebarSections,
         settings,
         skill,
         attachments,

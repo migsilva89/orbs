@@ -5,9 +5,10 @@ import { match } from 'ts-pattern';
 import { conversationWatchStream } from './conversation-watch.utils';
 import { conversationListItems, conversationSummaries } from './conversation.utils';
 import type { ConversationListWatchParams, ConversationServiceDeps } from '../../types/conversation.types';
+import type { ConversationListState } from '@repo/contracts/universal';
 
 export async function conversationQueryWatchList(
-  { auth, runtime, bots }: ConversationServiceDeps,
+  { auth, runtime, bots, sidebarSections }: ConversationServiceDeps,
   { deviceId, authorization, signal }: ConversationListWatchParams,
 ) {
   const revoked = new AbortController();
@@ -29,15 +30,19 @@ export async function conversationQueryWatchList(
       });
     });
 
-    const unsubscribeBots = bots.onChange(() => {
+    const conversationNotify = () => {
       state.change(context, (draft) => {
         draft.revision += 1;
       });
-    });
+    };
+
+    const unsubscribeBots = bots.onChange(conversationNotify);
+    const unsubscribeSections = sidebarSections.onChange(conversationNotify);
 
     const closed = watch.closed.then((end) => {
       unwatch();
       unsubscribeBots();
+      unsubscribeSections();
       unsubscribe();
 
       return end;
@@ -48,12 +53,16 @@ export async function conversationQueryWatchList(
       closed,
       stop: watch.stop,
     }, lifetime, async (value) => {
-      const [botList, preferences] = await Promise.all([
+      const [botList, preferences, sections] = await Promise.all([
         bots.queries.list(),
         bots.queries.preferences(),
+        sidebarSections.queries.list(),
       ]);
 
-      return conversationListItems(botList, conversationSummaries(value.conversations, preferences));
+      return {
+        conversations: conversationListItems(botList, conversationSummaries(value.conversations, preferences)),
+        sections,
+      } satisfies ConversationListState;
     });
   } catch (error) {
     revoked.abort(error);

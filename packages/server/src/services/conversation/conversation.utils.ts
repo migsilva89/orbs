@@ -22,6 +22,7 @@ export function conversationPreferencesView(preference: BotPreferences, lastAssi
     isMuted: preference.isMuted,
     mutedUntil: preference.mutedUntil,
     rank: preference.rank,
+    sectionId: preference.sectionId,
     readThroughEntryId: preference.readThroughEntryId,
     hasUnread: lastAssistantEntryId > preference.readThroughEntryId,
     whenBusy: preference.whenBusy,

@@ -37,6 +37,7 @@ export interface BotPreferences {
   isPinned: boolean;
   isHidden: boolean;
   rank: number | null;
+  sectionId: string | null;
   isMuted: boolean;
   mutedUntil: number | null;
   readThroughEntryId: number;
@@ -47,6 +48,8 @@ export type BotPreferencesUpdate = Partial<BotPreferences> & UniversalTypes.BotG
 
 export interface BotArrangeParams {
   botIds: string[];
+  isPinned: boolean;
+  sectionId?: string | null;
 }
 
 export interface BotMarkReadParams extends UniversalTypes.BotGetInput {
@@ -57,6 +60,7 @@ export interface BotPreferenceRow {
   isPinned: number | null;
   isHidden: number | null;
   rank: number | null;
+  sectionId: string | null;
   isMuted: number | null;
   mutedUntil: number | null;
   readThroughEntryId: number | null;

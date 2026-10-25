@@ -9,6 +9,7 @@ export function botPreferenceRecord(row: BotPreferenceRow | undefined, now = Dat
     isPinned: row?.isPinned === 1,
     isHidden: row?.isHidden === 1,
     rank: row?.rank ?? null,
+    sectionId: row?.sectionId ?? null,
     isMuted: row?.isMuted === 1 && (mutedUntil === null || mutedUntil > now),
     mutedUntil,
     readThroughEntryId: row?.readThroughEntryId ?? 0,

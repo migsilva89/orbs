@@ -48,6 +48,7 @@ export function coreRpcNative(
       peerAddress: null,
       runtime: services.runtime,
       bots: services.bots,
+      sidebarSections: services.sidebarSections,
       conversation: services.conversation,
       tools: services.tools,
       skills: services.skills,

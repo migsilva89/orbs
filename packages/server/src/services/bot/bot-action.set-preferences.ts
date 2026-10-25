@@ -9,6 +9,7 @@ export async function botActionSetPreferences(deps: BotServiceDeps, { botId, ...
     isPinned: botPreferenceFlag(patch.isPinned),
     isHidden: botPreferenceFlag(patch.isHidden),
     rank: patch.rank,
+    sectionId: patch.sectionId,
     isMuted: botPreferenceFlag(patch.isMuted),
     mutedUntil: patch.mutedUntil,
     readThroughEntryId: patch.readThroughEntryId,

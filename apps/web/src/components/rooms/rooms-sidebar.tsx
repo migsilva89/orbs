@@ -1,24 +1,30 @@
-import { DndContext, DragOverlay, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, DragOverlay, KeyboardSensor, MouseSensor, TouchSensor, useDroppable, useSensor, useSensors } from '@dnd-kit/core';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { ROOMS_DRAG_PRESS, roomsSidebarOrder } from '@repo/client/client';
-import { useChatArrange } from '@repo/client/react';
+import { useChatArrange, useSidebarSections } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { match } from 'ts-pattern';
 import { RoomItem } from '@/components/rooms/room-item';
 import { RoomsDragCard } from '@/components/rooms/rooms-drag-card';
 import { RoomsPinZone } from '@/components/rooms/rooms-pin-zone';
+import { RoomsSidebarSectionGroup } from '@/components/rooms/rooms-sidebar-section';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader } from '@/components/ui/empty';
 import * as Sidebar from '@/components/ui/sidebar';
 import { rpc } from '@/services/rpc/rpc.client';
+import IconFolderPlus from '~icons/lucide/folder-plus';
+import IconMessageSquarePlus from '~icons/lucide/message-square-plus';
 import IconPlus from '~icons/lucide/plus';
 import IconSearch from '~icons/lucide/search';
 import type { DragEndEvent } from '@dnd-kit/core';
+import type { ReactNode } from 'react';
 
 export function RoomsSidebarActions() {
   const { setOpenMobile } = Sidebar.useSidebar();
@@ -40,21 +46,40 @@ export function RoomsSidebarActions() {
           <IconSearch className="size-4" />
         </Link>
       </Button>
-      <Button
-        asChild
-        size="icon-sm"
-        variant="outline"
-      >
-        <Link
-          aria-label={m.rooms_new()}
-          search={{ start: true }}
-          title={m.rooms_new()}
-          to="/rooms"
-          onClick={() => setOpenMobile(false)}
-        >
-          <IconPlus className="size-4" />
-        </Link>
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            aria-label={m.rooms_new()}
+            size="icon-sm"
+            title={m.rooms_new()}
+            variant="outline"
+          >
+            <IconPlus className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem asChild>
+            <Link
+              search={{ start: true }}
+              to="/rooms"
+              onClick={() => setOpenMobile(false)}
+            >
+              <IconMessageSquarePlus className="size-4" />
+              {m.rooms_new_chat()}
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link
+              search={(previous) => ({ ...previous, section: 'create' })}
+              to="."
+              onClick={() => setOpenMobile(false)}
+            >
+              <IconFolderPlus className="size-4" />
+              {m.rooms_section_new()}
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
@@ -87,10 +112,7 @@ function RoomsSidebarEmpty({ hasBots }: RoomsSidebarEmptyProps) {
               {m.rooms_new()}
             </Link>
           ) : (
-            <Link
-              to="/bots/create"
-              onClick={() => setOpenMobile(false)}
-            >
+            <Link to="/bots/create" onClick={() => setOpenMobile(false)}>
               <IconPlus className="size-4" />
               {m.rooms_bot_title()}
             </Link>
@@ -101,9 +123,21 @@ function RoomsSidebarEmpty({ hasBots }: RoomsSidebarEmptyProps) {
   );
 }
 
+interface RoomsSidebarUngroupedProps {
+  id: string
+  children: ReactNode
+}
+
+function RoomsSidebarUngrouped({ id, children }: RoomsSidebarUngroupedProps) {
+  const { setNodeRef } = useDroppable({ id });
+
+  return <div ref={setNodeRef}>{children}</div>;
+}
+
 export function RoomsSidebar() {
   const { data: chats } = useSuspenseQuery(rpc.conversation.list.queryOptions());
   const { data: bots } = useSuspenseQuery(rpc.bots.list.queryOptions());
+  const sidebarSections = useSidebarSections();
   const arrange = useChatArrange();
   const [draggedId, setDraggedId] = useState<string | null>(null);
 
@@ -113,10 +147,11 @@ export function RoomsSidebar() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  const { pinned, others, hidden } = roomsSidebarOrder({ chats });
-  const shown = [...pinned, ...others];
+  const { pinned, sections, others, hidden } = roomsSidebarOrder({ chats, sections: sidebarSections.sections });
+  const shown = [...pinned, ...sections.flatMap((section) => section.chats), ...others];
   const dragged = shown.find((chat) => chat.botId === draggedId);
   const pinZone = 'pin';
+  const ungroupedZone = 'section:ungrouped';
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     setDraggedId(null);
@@ -128,12 +163,55 @@ export function RoomsSidebar() {
       return;
     }
 
-    const toPinned = over.id === pinZone || pinned.some((chat) => chat.botId === over.id);
-    const ids = shown.map((chat) => chat.botId);
-    const next = arrayMove(ids, ids.indexOf(String(active.id)), over.id === pinZone ? 0 : ids.indexOf(String(over.id)));
-    const pinnedIds = pinned.map((chat) => chat.botId).filter((botId) => botId !== active.id);
+    const activeId = String(active.id);
+    const overId = String(over.id);
 
-    arrange({ botIds: next, pinnedIds: toPinned ? [...pinnedIds, String(active.id)] : pinnedIds });
+    if (activeId.startsWith('section:')) {
+      const sectionIds = sections.map((section) => section.id);
+      const activeSectionId = activeId.slice('section:'.length);
+      const overSectionId = overId.slice('section:'.length);
+
+      if (sectionIds.includes(activeSectionId) && sectionIds.includes(overSectionId)) {
+        sidebarSections.arrange({ sectionIds: arrayMove(sectionIds, sectionIds.indexOf(activeSectionId), sectionIds.indexOf(overSectionId)) });
+      }
+
+      return;
+    }
+
+    const activeChat = shown.find((chat) => chat.botId === activeId);
+    const overChat = shown.find((chat) => chat.botId === overId);
+
+    if (!activeChat) {
+      return;
+    }
+
+    const toPinned = overId === pinZone || overChat?.isPinned === true;
+
+    const sectionId = match(overId)
+      .with(ungroupedZone, () => null)
+      .when((id) => id.startsWith('section:'), (id) => id.slice('section:'.length))
+      .otherwise(() => (overChat ? overChat.sectionId : activeChat.sectionId));
+
+    const group = match({ toPinned, sectionId })
+      .with({ toPinned: true }, () => pinned)
+      .with({ sectionId: null }, () => others)
+      .otherwise(() => sections.find((section) => section.id === sectionId)?.chats ?? []);
+
+    const ids = group.map((chat) => chat.botId);
+    const from = ids.indexOf(activeId);
+    const to = overChat ? ids.indexOf(overChat.botId) : -1;
+    const rest = ids.filter((botId) => botId !== activeId);
+    const insertAt = match(to).when((index) => index >= 0, (index) => index).otherwise(() => (overId === pinZone ? 0 : rest.length));
+
+    const botIds = match({ isSameGroup: from >= 0 && to >= 0 })
+      .with({ isSameGroup: true }, () => arrayMove(ids, from, to))
+      .otherwise(() => [...rest.slice(0, insertAt), activeId, ...rest.slice(insertAt)]);
+
+    arrange({
+      botIds,
+      isPinned: toPinned,
+      sectionId: toPinned ? undefined : sectionId,
+    });
   };
 
   const dragOverlayOnDocumentBody = dragged ? createPortal(
@@ -150,15 +228,37 @@ export function RoomsSidebar() {
       onDragEnd={onDragEnd}
       onDragStart={({ active }) => setDraggedId(String(active.id))}
     >
-      <SortableContext items={shown.map((chat) => chat.botId)} strategy={verticalListSortingStrategy}>
-        {pinned.length === 0 && dragged ? <RoomsPinZone id={pinZone} /> : null}
-        <Sidebar.SidebarGroup className="-mt-2">
-          {chats.length === 0 ? <RoomsSidebarEmpty hasBots={bots.length > 0} /> : null}
+      {pinned.length === 0 && dragged ? <RoomsPinZone id={pinZone} /> : null}
+      <Sidebar.SidebarGroup className="-mt-2">
+        {chats.length === 0 ? <RoomsSidebarEmpty hasBots={bots.length > 0} /> : null}
+        <SortableContext items={pinned.map((chat) => chat.botId)} strategy={verticalListSortingStrategy}>
           <Sidebar.SidebarMenu>
-            {shown.map((chat) => <RoomItem chat={chat} key={chat.botId} />)}
+            {pinned.map((chat) => <RoomItem chat={chat} key={chat.botId} />)}
           </Sidebar.SidebarMenu>
-        </Sidebar.SidebarGroup>
+        </SortableContext>
+      </Sidebar.SidebarGroup>
+      <SortableContext items={sections.map((section) => `section:${section.id}`)} strategy={verticalListSortingStrategy}>
+        {sections.map((section) => (
+          <RoomsSidebarSectionGroup
+            key={section.id}
+            section={section}
+            onCollapsedChange={(isCollapsed) => sidebarSections.setCollapsed({ sectionId: section.id, isCollapsed })}
+          >
+            <SortableContext items={section.chats.map((chat) => chat.botId)} strategy={verticalListSortingStrategy}>
+              {section.chats.map((chat) => <RoomItem chat={chat} key={chat.botId} />)}
+            </SortableContext>
+          </RoomsSidebarSectionGroup>
+        ))}
       </SortableContext>
+      <RoomsSidebarUngrouped id={ungroupedZone}>
+        <Sidebar.SidebarGroup>
+          <SortableContext items={others.map((chat) => chat.botId)} strategy={verticalListSortingStrategy}>
+            <Sidebar.SidebarMenu>
+              {others.map((chat) => <RoomItem chat={chat} key={chat.botId} />)}
+            </Sidebar.SidebarMenu>
+          </SortableContext>
+        </Sidebar.SidebarGroup>
+      </RoomsSidebarUngrouped>
       {hidden.length > 0 ? (
         <Collapsible className="group-data-[collapsible=icon]:hidden">
           <Sidebar.SidebarGroup>

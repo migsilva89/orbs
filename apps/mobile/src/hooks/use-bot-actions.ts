@@ -1,6 +1,7 @@
 import { ROOMS_MUTE_DURATIONS } from '@repo/client/client';
-import { useChatSettings } from '@repo/client/react';
+import { useChatArrange, useChatSettings, useRpc } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { botMenuSendModes } from '@/services/bot/bot-menu.utils';
 import type { MenuItem } from '@/types/menu.types';
@@ -9,6 +10,10 @@ import type { ConversationListItem } from '@repo/contracts/universal';
 export function useBotActions(chat: ConversationListItem): MenuItem[] {
   const router = useRouter();
   const settings = useChatSettings(chat.botId);
+  const arrange = useChatArrange();
+  const { rpc } = useRpc();
+  const chats = useQuery(rpc.conversation.list.queryOptions()).data ?? [];
+  const sections = useQuery(rpc.sidebarSections.list.queryOptions()).data ?? [];
   const { botId } = chat;
 
   const pinItems: MenuItem[] = chat.isHidden ? [] : [{
@@ -28,6 +33,35 @@ export function useBotActions(chat: ConversationListItem): MenuItem[] {
       })),
     };
 
+  const moveItem: MenuItem = {
+    label: m.rooms_section_move(),
+    systemImage: 'folder',
+    items: [
+      ...sections.map((section) => ({
+        label: section.name,
+        systemImage: chat.sectionId === section.id ? 'checkmark' : undefined,
+        onSelect: () => moveToSection(section.id),
+      } satisfies MenuItem)),
+      {
+        label: m.rooms_section_ungrouped(),
+        systemImage: sections.some((section) => section.id === chat.sectionId) ? undefined : 'checkmark',
+        onSelect: () => moveToSection(null),
+      },
+    ],
+  };
+
+  function moveToSection(sectionId: string | null) {
+    const botIds = chats
+      .filter((item) => !item.isPinned && !item.isHidden && item.sectionId === sectionId && item.botId !== botId)
+      .map((item) => item.botId);
+
+    arrange({
+      botIds: [...botIds, botId],
+      isPinned: false,
+      sectionId,
+    });
+  }
+
   const sendModeItem: MenuItem = {
     label: m.rooms_action_send_mode(),
     systemImage: 'list.number',
@@ -41,6 +75,7 @@ export function useBotActions(chat: ConversationListItem): MenuItem[] {
   return [
     { label: m.rooms_action_edit_bot(), systemImage: 'pencil.line', onSelect: () => router.push({ pathname: '/bots/[botId]/edit', params: { botId } }) },
     ...pinItems,
+    moveItem,
     {
       label: chat.isHidden ? m.rooms_action_unhide() : m.rooms_action_hide(),
       systemImage: chat.isHidden ? 'eye' : 'eye.slash',

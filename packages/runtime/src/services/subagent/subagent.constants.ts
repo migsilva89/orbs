@@ -23,6 +23,7 @@ export const subagentAgents = defineDoc<SubagentAgents>({
   history: 'latest',
   fork: 'initial',
   initial: () => ({ agents: {} }),
+  checkpointWhen: () => false,
 });
 
 export const subagentCall = defineDoc<SubagentCall>({
@@ -30,4 +31,5 @@ export const subagentCall = defineDoc<SubagentCall>({
   version: 1,
   scope: 'task',
   initial: () => ({ text: null, name: null, conversationId: null }),
+  checkpointWhen: () => false,
 });

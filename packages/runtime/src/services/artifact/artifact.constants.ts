@@ -9,6 +9,7 @@ export const artifactDocument = defineDoc<ArtifactDocument>({
   history: 'latest',
   fork: 'initial',
   initial: () => ({ artifacts: {} }),
+  checkpointWhen: () => false,
 });
 
 export const artifactContent = defineDocFamily<ArtifactContent, null>({
@@ -19,6 +20,7 @@ export const artifactContent = defineDocFamily<ArtifactContent, null>({
   history: 'latest',
   fork: 'initial',
   initial: () => ({ spec: null }),
+  checkpointWhen: () => false,
 });
 
 export const artifactVersionEntry = defineEntry<ArtifactVersionData>(ARTIFACT.entryKind);

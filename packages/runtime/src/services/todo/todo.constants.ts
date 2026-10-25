@@ -8,6 +8,7 @@ export const todoDocument = defineDoc<TodoDocument>({
   history: 'latest',
   fork: 'initial',
   initial: () => ({ nextId: 1, todos: [] }),
+  checkpointWhen: () => false,
 });
 
 /** Open todos shown in the system prompt; the rest stay reachable through `bot_todo_list`. */

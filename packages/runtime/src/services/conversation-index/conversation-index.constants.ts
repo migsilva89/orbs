@@ -7,4 +7,5 @@ export const conversationIndex = defineDoc<ConversationIndexDocument>({
   version: 1,
   scope: 'session',
   initial: () => ({ conversations: {} }),
+  checkpointWhen: () => false,
 });

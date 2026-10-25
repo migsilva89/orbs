@@ -39,7 +39,7 @@ export async function subagentAnswer(tx: PiDurableTypes.Tx, answerId: PiDurableT
 }
 
 export async function subagentPendingReporters(tx: PiDurableTypes.Tx, conversationId: PiDurableTypes.ConversationId, limit: number) {
-  const pages = await Promise.all((['pending', 'running', 'waiting', 'completing'] as const).map((status) => (
+  const pages = await Promise.all((['pending', 'running', 'waiting', 'sleeping', 'completing'] as const).map((status) => (
     tx.scanTasks({
       conversationId,
       kind: SUBAGENT.reporter,

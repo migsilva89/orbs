@@ -6,6 +6,7 @@ export const runtimeToolApproval = defineDoc({
   version: 1,
   scope: 'task',
   initial: (): { approval: RuntimeApproval | null } => ({ approval: null }),
+  checkpointWhen: () => false,
 });
 
 export const runtimeBot = defineDoc({
@@ -15,6 +16,7 @@ export const runtimeBot = defineDoc({
   history: 'latest',
   fork: 'current',
   initial: (): { botId: string | null; skillsPrompt: string } => ({ botId: null, skillsPrompt: '' }),
+  checkpointWhen: () => false,
 });
 
 export const runtimeBotConversations = defineDocFamily<RuntimeBotBinding, null>({
@@ -23,6 +25,7 @@ export const runtimeBotConversations = defineDocFamily<RuntimeBotBinding, null>(
   scope: 'session',
   family: true,
   initial: () => ({ conversationId: null }),
+  checkpointWhen: () => false,
 });
 
 /** Model streams running at once across all bots; later requests wait in order. */

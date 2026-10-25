@@ -18,7 +18,7 @@ export async function questionActionAnswer(
         kind: 'pi.tool',
         conversationId: params.conversationId,
         abortRequested: false,
-        state: { status: P.union('pending', 'running', 'waiting') },
+        state: { status: P.union('pending', 'running', 'waiting', 'sleeping') },
       }, async () => {
         const doc = await tx.doc(questionDocument, params.id as TaskId);
         const now = Date.now();

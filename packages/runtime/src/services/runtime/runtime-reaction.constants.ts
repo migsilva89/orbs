@@ -19,4 +19,5 @@ export const runtimeReactions = defineDocFamily<RuntimeReaction, null>({
       botReactions: [],
     }))
     .otherwise(() => value as RuntimeReaction),
+  checkpointWhen: () => false,
 });

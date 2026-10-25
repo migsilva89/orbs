@@ -11,18 +11,15 @@ export const runtimeReactionTask = defineTask<RuntimeReactionTaskInput, RuntimeR
   version: 1,
   initial: () => ({ phase: 'wait' }),
   phases: {
-    wait: async (task, api, context) => {
-      await api.sleep(task.input.deliverAt, context);
+    wait: (task, api, context) => api.sleepUntil(task.input.deliverAt, { phase: 'check' }, context),
+    check: (task, api, context) => api.commit(async (tx) => {
+      const document = await tx.doc(runtimeReactions, api.conversationId, String(task.input.entryId), null);
 
-      return api.commit(async (tx) => {
-        const document = await tx.doc(runtimeReactions, api.conversationId, String(task.input.entryId), null);
-
-        return match(document.emojis.includes(task.input.emoji))
-          .with(true, () => ({ status: 'running' as const, checkpoint: { phase: 'deliver' as const } }))
-          .with(false, () => ({ status: 'terminal' as const, outcome: { status: 'completed' as const, result: null } }))
-          .exhaustive();
-      }, context);
-    },
+      return match(document.emojis.includes(task.input.emoji))
+        .with(true, () => ({ status: 'running' as const, checkpoint: { phase: 'deliver' as const } }))
+        .with(false, () => ({ status: 'terminal' as const, outcome: { status: 'completed' as const, result: null } }))
+        .exhaustive();
+    }, context),
     deliver: async (task, api, context) => {
       const { emoji, quote } = task.input;
 

@@ -11,4 +11,5 @@ export const runtimeAttachments = defineDoc({
   history: 'latest',
   fork: 'initial',
   initial: (): RuntimeAttachments => ({ files: {} }),
+  checkpointWhen: () => false,
 });

@@ -29,4 +29,4 @@ export interface RuntimeReactionTaskInput {
   deliverAt: number;
 }
 
-export type RuntimeReactionTaskState = { phase: 'wait' } | { phase: 'deliver' };
+export type RuntimeReactionTaskState = { phase: 'wait' } | { phase: 'check' } | { phase: 'deliver' };

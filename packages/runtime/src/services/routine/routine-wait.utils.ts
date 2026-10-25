@@ -22,7 +22,9 @@ export async function routineWait(api: RoutineTaskRuntime, routineId: string, ch
     });
 
     const waiting = match(checkpoint.until)
-      .with(P.number, (until) => Promise.race([changed, api.sleep(until, child.context)]))
+      .with(P.number, (until) => Promise.race([changed, new Promise<void>((resolve) => {
+        api.setTimer(resolve, until - api.now());
+      })]))
       .with(null, () => changed)
       .exhaustive();
 

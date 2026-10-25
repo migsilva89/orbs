@@ -14,4 +14,5 @@ export const questionDocument = defineDoc({
   version: 1,
   scope: 'task',
   initial: (): { question: QuestionRecord | null } => ({ question: null }),
+  checkpointWhen: () => false,
 });

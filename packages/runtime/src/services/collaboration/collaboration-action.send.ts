@@ -39,7 +39,7 @@ export async function collaborationActionSend(
       }, context);
 
       return api.commit(async (tx) => {
-        const pages = await Promise.all((['pending', 'running', 'waiting', 'completing'] as const).map((status) => tx.scanTasks({
+        const pages = await Promise.all((['pending', 'running', 'waiting', 'sleeping', 'completing'] as const).map((status) => tx.scanTasks({
           conversationId: api.conversationId,
           kind: COLLABORATION.delivery,
           status,

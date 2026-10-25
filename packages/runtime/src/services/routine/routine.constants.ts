@@ -8,4 +8,5 @@ export const routineDocument = defineDoc<RoutineDocument>({
   history: 'latest',
   fork: 'initial',
   initial: () => ({ routines: {} }),
+  checkpointWhen: () => false,
 });

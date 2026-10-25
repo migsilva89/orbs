@@ -1,5 +1,5 @@
 export const BACKUP = {
-  version: 2,
+  version: 3,
   manifest: 'manifest.json',
   lock: 'data/daemon',
   files: {

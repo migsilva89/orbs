@@ -5,6 +5,8 @@ import { createFileRoute, Outlet, redirect, useMatch } from '@tanstack/react-rou
 import { LayoutShellDashboard } from '@/components/layout/layout-shell-dashboard';
 import { RoomsDetails } from '@/components/rooms/rooms-details';
 import { RoomsSearch } from '@/components/rooms/rooms-search';
+import { RoomsSectionDeleteDialog } from '@/components/rooms/rooms-section-delete-dialog';
+import { RoomsSectionDialog } from '@/components/rooms/rooms-section-dialog';
 import { useLayoutShortcuts } from '@/hooks/use-layout-shortcuts';
 import { useRoomsNotify } from '@/hooks/use-rooms-notify';
 import { useRoomsPresence } from '@/hooks/use-rooms-presence';
@@ -52,6 +54,8 @@ function RoomsLayout() {
     >
       <Outlet />
       <RoomsSearch />
+      <RoomsSectionDialog />
+      <RoomsSectionDeleteDialog />
     </LayoutShellDashboard>
   );
 }

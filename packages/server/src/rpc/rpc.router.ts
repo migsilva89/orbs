@@ -19,6 +19,7 @@ import { providers } from './rpc.providers';
 import { routines } from './rpc.routines';
 import { secrets } from './rpc.secrets';
 import { rpcServer } from './rpc.server';
+import { sidebarSections } from './rpc.sidebar-sections';
 import { skills } from './rpc.skills';
 import { todos } from './rpc.todos';
 import { tools } from './rpc.tools';
@@ -38,6 +39,7 @@ export const router = rpcRouter.router({
   devices,
   notifications,
   conversation,
+  sidebarSections,
   credentials,
   secrets,
   pairing,

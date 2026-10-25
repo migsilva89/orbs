@@ -89,6 +89,9 @@ function RootLayoutStack() {
           <Stack.Screen name="bots/[botId]/todos/[todoId]/delete" options={DIALOG} />
           <Stack.Screen name="bots/[botId]/routines/[routineId]/edit" options={{ headerShown: true, title: m.rooms_routines_edit(), headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="bots/[botId]/routines/[routineId]/delete" options={DIALOG} />
+          <Stack.Screen name="sections/create" options={SHEET_FIT} />
+          <Stack.Screen name="sections/[sectionId]/rename" options={SHEET_FIT} />
+          <Stack.Screen name="sections/[sectionId]/delete" options={DIALOG} />
           <Stack.Screen name="artifacts/index" options={{ headerShown: true, title: m.artifacts_title(), headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="bots/[botId]/artifacts/[artifactId]/index" options={{ headerShown: true, title: m.artifacts_title(), headerBackButtonDisplayMode: 'minimal' }} />
         </Stack.Protected>

@@ -1,7 +1,6 @@
-import { watchConversations } from '@repo/client/client';
-import { useChatSearch } from '@repo/client/react';
+import { chatListOptions, useChatSearch, useSidebarSections } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
-import { experimental_streamedQuery as streamedQuery, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { Bot, LayoutDashboard, Plus, Star, UserRound } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
@@ -18,6 +17,7 @@ import { GlassButton } from '@/components/ui/glass-button';
 import { Icon } from '@/components/ui/icon';
 import { Item, ItemContent } from '@/components/ui/item';
 import { KeyboardSticky } from '@/components/ui/keyboard-sticky';
+import { Menu } from '@/components/ui/menu';
 import { Screen } from '@/components/ui/screen';
 import { SearchField } from '@/components/ui/search-field';
 import { SectionHeading } from '@/components/ui/section-heading';
@@ -29,9 +29,9 @@ import { BOT_HOME } from '@/services/bot/bot-home.constants';
 import { botHomeSections } from '@/services/bot/bot-home.utils';
 import { BotHomeRow } from './bot-home-row';
 import { BotListOffline } from './bot-list-offline';
+import { BotSectionHeading } from './bot-section-heading';
 import type { BotHomeGroup } from '@/types/bot-home.types';
 import type { ConnectionContextValue } from '@/types/connection-context.types';
-import type { ConversationListItem } from '@repo/contracts/universal';
 
 export function BotList() {
   const { session } = useConnection();
@@ -47,18 +47,11 @@ interface BotListContentProps {
 function BotListContent({ session }: BotListContentProps) {
   const [search, setSearch] = useState('');
   const [collapsed, setCollapsed] = useState<BotHomeGroup[]>(['hidden']);
+  const sidebarSections = useSidebarSections();
   const router = useRouter();
   const isReachable = useServerReachable(session);
 
-  const query = useQuery({
-    ...session.rpc.conversation.list.queryOptions(),
-    queryFn: streamedQuery({
-      streamFn: ({ signal }) => watchConversations(session.client, signal),
-      refetchMode: 'append',
-      reducer: (_previous: ConversationListItem[], chats: ConversationListItem[]) => chats,
-      initialValue: [],
-    }),
-  });
+  const query = useQuery(chatListOptions(session));
 
   const isFetching = query.fetchStatus === 'fetching';
 
@@ -72,11 +65,16 @@ function BotListContent({ session }: BotListContentProps) {
     return () => clearTimeout(timer);
   }, [isReachable, isFetching, session]);
 
-  const { featured, sections } = botHomeSections({ chats: query.data ?? [], search });
+  const { featured, sections } = botHomeSections({
+    chats: query.data ?? [],
+    sections: sidebarSections.sections,
+    search,
+  });
+
   const isSearching = search.trim().length > 0;
   const messages = useChatSearch(search, isSearching);
   const hasHits = isSearching && (messages.isPending || messages.results.groups.length > 0);
-  const hasMultipleGroups = sections.length > 1;
+  const hasSectionHeaders = sections.length > 1 || sections.some((section) => section.section);
 
   const emptyCopy = match(isSearching)
     .with(true, () => ({ title: m.mobile_home_search_empty(), hint: m.mobile_home_search_hint(), action: m.mobile_home_search_clear() }))
@@ -85,7 +83,10 @@ function BotListContent({ session }: BotListContentProps) {
 
   const visibleSections = sections.map((section) => ({
     ...section,
-    data: match(hasMultipleGroups && collapsed.includes(section.key) && !isSearching).with(true, () => []).with(false, () => section.data).exhaustive(),
+    data: match(hasSectionHeaders && (section.section?.isCollapsed ?? collapsed.includes(section.key)) && !isSearching)
+      .with(true, () => [])
+      .with(false, () => section.data)
+      .exhaustive(),
   }));
 
   function handleEmptyAction() {
@@ -196,17 +197,20 @@ function BotListContent({ session }: BotListContentProps) {
               ) : undefined}
               ListHeaderComponent={header}
               renderItem={({ item }) => <BotHomeRow chat={item} />}
-              renderSectionHeader={({ section }) => match(hasMultipleGroups).with(true, () => (
-                <SectionHeading
-                  disabled={isSearching}
-                  expanded={!collapsed.includes(section.key) || isSearching}
-                  label={section.title}
-                  onPress={() => setCollapsed((previous) => match(previous.includes(section.key))
-                    .with(true, () => previous.filter((key) => key !== section.key))
-                    .with(false, () => [...previous, section.key])
-                    .exhaustive())}
-                />
-              )).with(false, () => null).exhaustive()}
+              renderSectionHeader={({ section }) => match({ hasSectionHeaders, sidebarSection: section.section })
+                .with({ hasSectionHeaders: false }, () => null)
+                .with({ sidebarSection: P.nonNullable }, ({ sidebarSection }) => <BotSectionHeading isSearching={isSearching} section={sidebarSection} />)
+                .otherwise(() => (
+                  <SectionHeading
+                    disabled={isSearching}
+                    expanded={!collapsed.includes(section.key) || isSearching}
+                    label={section.title}
+                    onPress={() => setCollapsed((previous) => match(previous.includes(section.key))
+                      .with(true, () => previous.filter((key) => key !== section.key))
+                      .with(false, () => [...previous, section.key])
+                      .exhaustive())}
+                  />
+                ))}
               sections={visibleSections}
               stickySectionHeadersEnabled={false}
             />
@@ -220,9 +224,16 @@ function BotListContent({ session }: BotListContentProps) {
             <GlassButton accessibilityLabel={m.artifacts_title()} onPress={() => router.push('/artifacts')}>
               <Icon icon={LayoutDashboard} size="action" />
             </GlassButton>
-            <GlassButton accessibilityLabel={m.rooms_bot_title()} onPress={() => router.push('/bots/create')}>
-              <Icon icon={Plus} size="action" />
-            </GlassButton>
+            <Menu
+              items={[
+                { label: m.rooms_bot_title(), systemImage: 'person.badge.plus', onSelect: () => router.push('/bots/create') },
+                { label: m.rooms_section_create(), systemImage: 'folder.badge.plus', onSelect: () => router.push('/sections/create') },
+              ]}
+            >
+              <GlassButton accessibilityLabel={m.mobile_home_create()}>
+                <Icon icon={Plus} size="action" />
+              </GlassButton>
+            </Menu>
           </View>
         </FloatingBar>
         <KeyboardSticky>

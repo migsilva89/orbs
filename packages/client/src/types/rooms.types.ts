@@ -51,6 +51,11 @@ export interface RoomsQuestionText {
 
 export interface RoomsSidebarOrderParams {
   chats: RoomsChat[];
+  sections?: UniversalTypes.SidebarSection[];
+}
+
+export interface RoomsSidebarSection extends UniversalTypes.SidebarSection {
+  chats: RoomsChat[];
 }
 
 export interface RoomsSearchHit extends UniversalTypes.ConversationHistoryMessage {
@@ -114,7 +119,8 @@ export interface RoomsUnread {
 
 export interface RoomsArrangeParams {
   botIds: string[];
-  pinnedIds: string[];
+  isPinned: boolean;
+  sectionId?: string | null;
 }
 
 export interface RoomsAttachmentFile {

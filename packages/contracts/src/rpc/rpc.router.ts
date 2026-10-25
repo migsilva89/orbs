@@ -79,6 +79,16 @@ import { conversationReactions, conversationReactionsResult, conversationSetReac
 import { routine, routineCreate, routineList, routineRemoveResult, routineTarget, routineUpdate } from '../types/routine.types';
 import { secretConfigure, secretRemove, secretRules, secretSave, secretSettings, secretVoid } from '../types/secret.types';
 import { serverConfigure, serverInfo } from '../types/server.types';
+import {
+  sidebarSection,
+  sidebarSectionArrange,
+  sidebarSectionCreate,
+  sidebarSectionList,
+  sidebarSectionRename,
+  sidebarSectionSetCollapsed,
+  sidebarSectionTarget,
+  sidebarSectionVoid,
+} from '../types/sidebar-section.types';
 import { skillCatalog, skillConfigure, skillDiscover, skillSettings } from '../types/skill.types';
 import { todo, todoCreate, todoList, todoRemoveResult, todoReorder, todoTarget, todoUpdate } from '../types/todo.types';
 import {
@@ -604,6 +614,32 @@ export const contract = {
       })
       .input(authGrantStatus)
       .output(authGrant),
+  },
+
+  sidebarSections: {
+    list: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .output(sidebarSectionList),
+    create: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED })
+      .input(sidebarSectionCreate)
+      .output(sidebarSection),
+    rename: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(sidebarSectionRename)
+      .output(sidebarSection),
+    remove: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(sidebarSectionTarget)
+      .output(sidebarSectionVoid),
+    arrange: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(sidebarSectionArrange)
+      .output(sidebarSectionVoid),
+    setCollapsed: oc
+      .errors({ UNAUTHORIZED: errorSchemas.UNAUTHORIZED, NOT_FOUND: errorSchemas.NOT_FOUND })
+      .input(sidebarSectionSetCollapsed)
+      .output(sidebarSection),
   },
 
   conversation: {

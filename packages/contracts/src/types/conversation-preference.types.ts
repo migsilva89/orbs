@@ -15,6 +15,8 @@ export const conversationSetMuted = z.object({
 
 export const conversationArrange = z.object({
   botIds: z.array(z.uuid()).max(1000).refine((ids) => new Set(ids).size === ids.length),
+  isPinned: z.boolean(),
+  sectionId: z.uuid().nullable().optional(),
 });
 
 export const conversationArrangeResult = z.void();

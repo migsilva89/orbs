@@ -4,6 +4,7 @@ import type { BotService } from '../services/bot/bot.service';
 import type { NotificationService } from '../services/notification/notification.service';
 import type { SecretService } from '../services/secret/secret.service';
 import type { SettingsService } from '../services/settings/settings.service';
+import type { SidebarSectionService } from '../services/sidebar-section/sidebar-section.service';
 import type { SkillService } from '../services/skill/skill.service';
 import type { ToolService } from '../services/tool/tool.service';
 import type { AuthAuthenticateParams } from './auth.types';
@@ -19,6 +20,7 @@ export interface ConversationServiceDeps {
   bots: BotService;
   runtime: RuntimeService;
   secrets: SecretService;
+  sidebarSections: SidebarSectionService;
   settings: SettingsService;
   skill: SkillService;
   tools: ToolService;

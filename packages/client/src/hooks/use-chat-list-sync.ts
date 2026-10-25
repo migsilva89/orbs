@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { watchConversations } from '../conversations';
 import { useRpc } from './use-rpc';
 
-/** Keeps the cached chat list live from the daemon's conversation watch while mounted. */
+/** Keeps the cached chat list and sidebar sections live from the daemon's conversation watch while mounted. */
 export function useChatListSync() {
   const queryClient = useQueryClient();
   const { client, rpc } = useRpc();
@@ -12,8 +12,9 @@ export function useChatListSync() {
     const controller = new AbortController();
 
     void (async () => {
-      for await (const chats of watchConversations(client, controller.signal)) {
-        queryClient.setQueryData(rpc.conversation.list.queryKey(), chats);
+      for await (const { conversations, sections } of watchConversations(client, controller.signal)) {
+        queryClient.setQueryData(rpc.conversation.list.queryKey(), conversations);
+        queryClient.setQueryData(rpc.sidebarSections.list.queryKey(), sections);
       }
     })().catch(() => undefined);
 

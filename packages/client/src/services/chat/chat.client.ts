@@ -1,6 +1,7 @@
 import { queryOptions, experimental_streamedQuery as streamedQuery } from '@tanstack/react-query';
 import { watchConversationContexts } from '../../contexts';
 import { readConversation, watchConversation } from '../../conversation';
+import { watchConversations } from '../../conversations';
 import { watchNotifications } from '../../notifications';
 import { CHAT } from './chat.constants';
 import type { ChatHistoryParams } from '../../types/chat.types';
@@ -17,6 +18,24 @@ export function chatViewOptions({ client, rpc }: RpcContextValue, target: Univer
       initialValue: null,
     }),
     staleTime: 0,
+  });
+}
+
+/** The live chat list; each frame also refreshes the cached sidebar sections the chats are grouped in. */
+export function chatListOptions({ client, rpc }: RpcContextValue) {
+  return queryOptions({
+    queryKey: rpc.conversation.list.queryKey(),
+    queryFn: streamedQuery({
+      async *streamFn({ client: queryClient, signal }) {
+        for await (const { conversations, sections } of watchConversations(client, signal)) {
+          queryClient.setQueryData(rpc.sidebarSections.list.queryKey(), sections);
+          yield conversations;
+        }
+      },
+      refetchMode: 'append',
+      reducer: (_chats: UniversalTypes.ConversationListItem[], next: UniversalTypes.ConversationListItem[]) => next,
+      initialValue: [],
+    }),
   });
 }
 

@@ -9,12 +9,17 @@ export function roomsFold(text: string) {
   return text.normalize('NFD').replaceAll(/\p{M}/gu, '').toLowerCase();
 }
 
-export function roomsSidebarOrder({ chats }: RoomsTypes.RoomsSidebarOrderParams) {
+export function roomsSidebarOrder({ chats, sections = [] }: RoomsTypes.RoomsSidebarOrderParams) {
   const shown = chats.filter((chat) => !chat.isHidden);
+  const unpinned = shown.filter((chat) => !chat.isPinned);
 
   return {
     pinned: shown.filter((chat) => chat.isPinned),
-    others: shown.filter((chat) => !chat.isPinned),
+    sections: sections.map((section) => ({
+      ...section,
+      chats: unpinned.filter((chat) => chat.sectionId === section.id),
+    })),
+    others: unpinned.filter((chat) => !sections.some((section) => section.id === chat.sectionId)),
     hidden: chats.filter((chat) => chat.isHidden),
   };
 }

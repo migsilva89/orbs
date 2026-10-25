@@ -14,10 +14,19 @@ export interface DatabaseBotPreference {
   isPinned: Generated<number>;
   isHidden: Generated<number>;
   rank: number | null;
+  sectionId: string | null;
   isMuted: Generated<number>;
   mutedUntil: number | null;
   readThroughEntryId: Generated<number>;
   whenBusy: ConversationWhenBusy | null;
+  updatedAt: number;
+}
+
+export interface DatabaseSidebarSection {
+  id: string;
+  name: string;
+  rank: number;
+  isCollapsed: Generated<number>;
   updatedAt: number;
 }
 
@@ -36,6 +45,7 @@ export interface DatabaseSchema {
   };
   bot: DatabaseBot;
   botPreference: DatabaseBotPreference;
+  sidebarSection: DatabaseSidebarSection;
   device: {
     id: string;
     name: string;

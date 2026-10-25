@@ -1,6 +1,7 @@
 import { CredentialSynchronizationError } from '@earendil-works/pi-coding-agent';
 import { Errors } from '@repo/errors/universal';
 import * as m from '@repo/i18n/messages';
+import { log } from '@repo/logger/server';
 import { match, P } from 'ts-pattern';
 import { PROVIDER } from './provider.constants';
 import {
@@ -93,6 +94,13 @@ export function providerActionLogin(deps: ProviderTypes.ProviderServiceDeps, par
             match(abort.signal.aborted)
               .with(true, () => providerFinish(session, 'cancelled'))
               .with(false, () => {
+                log.error({
+                  tag: 'provider',
+                  message: 'Cannot sign in to the provider.',
+                  providerId: params.providerId,
+                  authType: params.authType,
+                  error,
+                });
                 session.error = m.ui_provider_login_failed();
                 providerFinish(session, 'failed');
               })

@@ -21,7 +21,7 @@
     },
     "apps/daemon": {
       "name": "@repo/daemon",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "bin": {
         "orbs": "./src/entry.native.ts",
       },
@@ -48,7 +48,7 @@
     },
     "apps/desktop": {
       "name": "@repo/desktop",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "@repo/env": "workspace:*",
         "@repo/i18n": "workspace:*",
@@ -62,7 +62,7 @@
     },
     "apps/mobile": {
       "name": "@repo/mobile",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "@expo-google-fonts/inter": "catalog:mobile",
         "@expo/ui": "catalog:mobile",
@@ -125,7 +125,7 @@
     },
     "apps/web": {
       "name": "@repo/web",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "@dnd-kit/core": "catalog:",
         "@dnd-kit/modifiers": "catalog:",
@@ -209,7 +209,7 @@
     },
     "packages/avatar-blobs": {
       "name": "@repo/avatar-blobs",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "devDependencies": {
         "@repo/typescript-config": "workspace:*",
         "@types/node": "catalog:",
@@ -218,7 +218,7 @@
     },
     "packages/client": {
       "name": "@repo/client",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "@earendil-works/chord": "catalog:",
         "@json-render/core": "catalog:",
@@ -259,7 +259,7 @@
     },
     "packages/contracts": {
       "name": "@repo/contracts",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "@earendil-works/chord": "catalog:",
         "@earendil-works/pi-durable": "catalog:",
@@ -277,7 +277,7 @@
     },
     "packages/env": {
       "name": "@repo/env",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "@t3-oss/env-core": "catalog:",
         "zod": "catalog:",
@@ -291,7 +291,7 @@
     },
     "packages/errors": {
       "name": "@repo/errors",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "@orpc/client": "catalog:",
         "zod": "catalog:",
@@ -304,7 +304,7 @@
     },
     "packages/i18n": {
       "name": "@repo/i18n",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "@inlang/paraglide-js": "catalog:",
         "ts-pattern": "catalog:",
@@ -318,7 +318,7 @@
     },
     "packages/logger": {
       "name": "@repo/logger",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "evlog": "catalog:",
       },
@@ -330,7 +330,7 @@
     },
     "packages/runtime": {
       "name": "@repo/runtime",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "@earendil-works/chord": "catalog:",
         "@earendil-works/pi-ai": "catalog:",
@@ -354,7 +354,7 @@
     },
     "packages/secret-proxy": {
       "name": "@repo/secret-proxy",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "mockttp": "catalog:",
         "ts-pattern": "catalog:",
@@ -367,7 +367,7 @@
     },
     "packages/server": {
       "name": "@repo/server",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "@earendil-works/chord": "catalog:",
         "@earendil-works/pi-coding-agent": "catalog:",
@@ -395,7 +395,7 @@
     },
     "packages/tanstack-helpers": {
       "name": "@repo/tanstack-helpers",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "@tanstack/router-core": "catalog:",
         "schema-dts": "catalog:",
@@ -413,7 +413,7 @@
     },
     "packages/tooling": {
       "name": "@repo/tooling",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "dependencies": {
         "oxc-parser": "catalog:",
       },
@@ -426,7 +426,7 @@
     },
     "packages/typescript-config": {
       "name": "@repo/typescript-config",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "devDependencies": {
         "@types/node": "catalog:",
       },

@@ -20,6 +20,7 @@ A bot backend for one owner. A native daemon runs each bot as a persistent Pi Du
 - User-facing copy uses English keys in `packages/i18n/messages/en/`.
 - Architecture, lint, TypeScript and Fallow rules change only on the user's explicit request; fix the code to pass a check.
 - Keep development data and credentials separate from production. The user owns the dev servers: ask before stopping or starting one. If a dev terminal has crashed, restart it in the same Paseo terminal and say so.
+- To pair a device with the running dev daemon, run `bun run dev:pair`. It prints a PIN and a connect link for `http://localhost:47190`; pass `--url <origin>` (for example the machine's Tailscale address on port 47190) to link another web origin.
 - A new native dependency on mobile needs a rebuild of the iOS dev app before its JavaScript can load; say so when you add one.
 - Add tests only when the user asks.
 - After a substantial set of code changes, run the `review` skill in full (simplify, code, blast), fix its findings within the task, and rerun the affected checks before reporting completion.

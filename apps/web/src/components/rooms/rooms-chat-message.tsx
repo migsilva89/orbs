@@ -10,10 +10,11 @@ import { RoomsChatEvents } from '@/components/rooms/rooms-chat-events';
 import { RoomsChatFailure } from '@/components/rooms/rooms-chat-failure';
 import { RoomsChatFiles } from '@/components/rooms/rooms-chat-files';
 import { RoomsChatMention } from '@/components/rooms/rooms-chat-mention';
+import { RoomsChatReasoning } from '@/components/rooms/rooms-chat-reasoning';
 import { RoomsChatSubagent } from '@/components/rooms/rooms-chat-subagent';
 import { RoomsChatTools } from '@/components/rooms/rooms-chat-tools';
+import { EventList } from '@/components/ui/ai/event';
 import { Message, MessageClamp, MessageContent, MessageStack } from '@/components/ui/ai/message';
-import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
 import { Response } from '@/components/ui/ai/response';
 import { useLongPress } from '@/hooks/use-long-press';
 import { MENTION_ALLOWED_TAGS } from '@/services/mention/mention.constants';
@@ -58,10 +59,10 @@ export function RoomsChatMessage({
   const { hideVerbose } = useChatHideVerbose();
   const blocks = toolBlocks({ parts: message.parts, hideVerbose });
   const files = message.parts.filter(isFileUIPart);
-  const standalone = (block: typeof blocks[number] | undefined) => block?.kind === 'tools' || block?.kind === 'events';
+  const standalone = (block: typeof blocks[number] | undefined) => block?.kind === 'tools' || block?.kind === 'events' || block?.kind === 'reasoning' || block?.kind === 'failure';
   const bubbleBlocks = blocks.filter((block) => !standalone(block));
   const firstText = blocks.find((block) => block.kind === 'text');
-  const actionsBlock = blocks.filter((block) => block.kind === 'text').at(-1) ?? bubbleBlocks.filter((block) => block.kind !== 'reasoning').at(-1);
+  const actionsBlock = blocks.filter((block) => block.kind === 'text').at(-1) ?? bubbleBlocks.at(-1);
 
   const segments: typeof blocks[] = files.length > 0 && bubbleBlocks.length === 0 ? [[]] : [];
 
@@ -107,14 +108,20 @@ export function RoomsChatMessage({
   return segments.map((segment) => {
     const first = segment.at(0);
 
-    if (first?.kind === 'tools') {
-      return (
-        <RoomsChatTools
-          key={`${message.id}-${first.index}`}
-          live={live}
-          parts={first.parts}
+    const event = match(first)
+      .with({ kind: 'tools' }, (tools) => <RoomsChatTools parts={tools.parts} />)
+      .with({ kind: 'reasoning' }, (reasoning) => (
+        <RoomsChatReasoning
+          bot={bot ?? { name }}
+          isStreaming={live ? reasoning.parts.some((part) => part.state === 'streaming') : false}
+          text={reasoning.parts.map((part) => part.text).join('\n\n')}
         />
-      );
+      ))
+      .with({ kind: 'failure' }, (failure) => <RoomsChatFailure bot={bot ?? { name }} detail={failure.text} />)
+      .otherwise(() => null);
+
+    if (event) {
+      return <EventList key={`${message.id}-${first?.index}`}>{event}</EventList>;
     }
 
     if (first?.kind === 'events') {
@@ -135,18 +142,7 @@ export function RoomsChatMessage({
             const key = `${message.id}-${block.index}`;
 
             const content = match(block)
-              .with({ kind: 'tools' }, { kind: 'events' }, () => null)
-              .with({ kind: 'reasoning' }, (reasoning) => (
-                <Reasoning isStreaming={live ? reasoning.parts.some((part) => part.state === 'streaming') : false}>
-                  <ReasoningTrigger botName={name} />
-                  <ReasoningContent>{reasoning.parts.map((part) => part.text).join('\n\n')}</ReasoningContent>
-                </Reasoning>
-              ))
-              .with({ kind: 'failure' }, (failure) => (
-                <div className="flex items-center gap-1 px-4">
-                  <RoomsChatFailure botName={name} detail={failure.text} />
-                </div>
-              ))
+              .with({ kind: 'tools' }, { kind: 'events' }, { kind: 'reasoning' }, { kind: 'failure' }, () => null)
               .with({ kind: 'artifact' }, (artifact) => <RoomsChatArtifact artifact={artifact.artifact} />)
               .with({ kind: 'subagent' }, (subagent) => (
                 <RoomsChatSubagent

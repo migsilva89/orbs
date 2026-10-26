@@ -4,21 +4,26 @@ import { Button } from './button';
 import type { VariantProps } from 'cva';
 import type { ComponentProps } from 'react';
 
-function InputGroup({ className, ...props }: ComponentProps<'div'>) {
-  return (
-    <div
-      className={cn(
-        'group/input-group relative flex w-full items-center rounded-md border border-input shadow-xs transition-[color,box-shadow] outline-none dark:bg-input/30',
-        'h-9 min-w-0 has-[>textarea]:h-auto',
-        'has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col',
-        'has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col',
-        'has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:ring-destructive/20 dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40',
-        className,
-      )}
-      data-slot="input-group"
-      {...props}
-    />
-  );
+const inputGroupVariants = cva({
+  base: [
+    'group/input-group relative flex w-full items-center border border-input transition-[color,box-shadow] outline-none',
+    'min-w-0 has-[>textarea]:h-auto',
+    'has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col',
+    'has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col',
+    'has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:ring-destructive/20 dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40',
+  ],
+  variants: {
+    variant: {
+      default: 'h-9 rounded-md shadow-xs dark:bg-input/30',
+      // The chat composer's shell, shared by every field that sends a message to a bot.
+      prompt: 'h-auto rounded-3xl bg-background shadow-sm dark:bg-card',
+    },
+  },
+  defaultVariants: { variant: 'default' },
+});
+
+function InputGroup({ className, variant, ...props }: ComponentProps<'div'> & VariantProps<typeof inputGroupVariants>) {
+  return <div className={cn(inputGroupVariants({ variant }), className)} data-slot="input-group" {...props} />;
 }
 
 const inputGroupAddonVariants = cva({
@@ -53,6 +58,7 @@ const inputGroupButtonVariants = cva({
       sm: 'h-8 gap-1.5 rounded-md px-2.5 has-[>svg]:px-2.5',
       'icon-xs': 'size-6 rounded-[calc(var(--radius)-5px)] p-0 has-[>svg]:p-0',
       'icon-sm': 'size-8 p-0 has-[>svg]:p-0',
+      'icon-md': "size-7 p-0 has-[>svg]:p-0 [&>svg:not([class*='size-'])]:size-3.5",
     },
   },
   defaultVariants: { size: 'xs' },

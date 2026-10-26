@@ -1,5 +1,6 @@
 import { cva } from 'cva';
 import { buttonGlossyEffects } from '@/components/ui/button';
+import { InputGroup, InputGroupAddon } from '@/components/ui/input-group';
 import { cn } from '@/lib/cn';
 import IconLucideCheck from '~icons/lucide/check';
 import IconLucidePencil from '~icons/lucide/pencil';
@@ -128,14 +129,12 @@ export function QuestionAnswer({ index, className, children, ...props }: Compone
   );
 }
 
+/** A one-line answer in the composer's shell, rounded like the options above it, with `action` as its send button. */
 export function QuestionField({ action, className, ...props }: ComponentProps<'input'> & { action?: ReactNode }) {
   return (
-    <div
-      className="flex h-10 items-center gap-2 rounded-lg border bg-background pr-1 pl-3 transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 has-[input:disabled]:opacity-50"
-      data-slot="question-field"
-    >
-      <input className={cn('h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground md:text-sm', className)} {...props} />
-      {action}
-    </div>
+    <InputGroup className="min-h-11.5 rounded-lg has-[input:disabled]:opacity-50" data-slot="question-field" variant="prompt">
+      <input className={cn('min-w-0 flex-1 self-stretch bg-transparent pl-4 text-base outline-none placeholder:text-muted-foreground md:text-sm', className)} {...props} />
+      {action ? <InputGroupAddon align="inline-end">{action}</InputGroupAddon> : null}
+    </InputGroup>
   );
 }

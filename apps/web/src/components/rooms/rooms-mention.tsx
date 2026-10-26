@@ -1,6 +1,6 @@
 import { botSkillName, mentionTarget } from '@repo/client/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { BotAvatar } from '@/components/bots/bot-avatar';
+import { BotMention } from '@/components/bots/bot-mention';
 import { Mention } from '@/components/ui/mention';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconBox from '~icons/lucide/box';
@@ -49,14 +49,5 @@ export function RoomsMention({ href, label }: RoomsMentionProps) {
     return <Mention variant="muted">{label}</Mention>;
   }
 
-  return (
-    <Mention title={`@${bot.handle}`}>
-      <BotAvatar
-        animate={false}
-        bot={bot}
-        size={16}
-      />
-      {bot.name}
-    </Mention>
-  );
+  return <BotMention bot={bot} />;
 }

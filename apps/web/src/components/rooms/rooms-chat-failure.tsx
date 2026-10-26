@@ -1,39 +1,23 @@
 import { m } from '@repo/i18n/client';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import IconInfo from '~icons/lucide/info';
+import { BotMention } from '@/components/bots/bot-mention';
+import { Event, EventBody, EventContent, EventLabel, EventTrigger } from '@/components/ui/ai/event';
+import type { ToolBot } from '@repo/client/client';
 
 interface RoomsChatFailureProps {
-  botName: string
+  bot: ToolBot
   detail: string
 }
 
-export function RoomsChatFailure({ botName, detail }: RoomsChatFailureProps) {
+export function RoomsChatFailure({ bot, detail }: RoomsChatFailureProps) {
   return (
-    <>
-      <span className="text-xs text-muted-foreground">{m.rooms_chat_failed({ bot: botName })}</span>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            aria-label={m.rooms_chat_info()}
-            size="icon-xs"
-            title={m.rooms_chat_info()}
-            variant="quiet"
-          >
-            <IconInfo className="size-3.5" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          align="start"
-          arrow={false}
-          className="w-64 p-3"
-        >
-          <div className="flex flex-col gap-1.5 text-xs">
-            <p className="font-medium">{m.rooms_chat_failed_detail()}</p>
-            <p className="scrollbar max-h-64 overflow-y-auto font-mono text-xxs wrap-break-word whitespace-pre-wrap text-muted-foreground outline-hidden [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1">{detail}</p>
-          </div>
-        </PopoverContent>
-      </Popover>
-    </>
+    <Event>
+      <EventTrigger status="error">
+        <EventLabel>{m.rooms_event_failed()}</EventLabel>
+        <BotMention activity="failed" bot={bot} />
+      </EventTrigger>
+      <EventContent>
+        <EventBody>{detail}</EventBody>
+      </EventContent>
+    </Event>
   );
 }

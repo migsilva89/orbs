@@ -36,7 +36,7 @@ export function RoomsChatTranscriptItem({
     <MessageScrollerItem className={isSending ? 'opacity-60' : undefined} variant={isFocused ? 'highlight' : 'default'}>
       {time ? <p className="my-3 zoom-[0.8] text-center text-xs text-muted-foreground">{time}</p> : null}
       {match(message.role)
-        .with('system', () => <RoomsChatNotice bot={bot} message={message} />)
+        .with('system', () => <RoomsChatNotice message={message} />)
         .with('assistant', () => (
           <RoomsChatReply
             bot={bot}

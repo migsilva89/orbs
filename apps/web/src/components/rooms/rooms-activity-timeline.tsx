@@ -59,6 +59,12 @@ export function RoomsActivityTimeline({ bot, run, title }: RoomsActivityTimeline
     .with({ tool: P.string }, ({ tool }) => toolPresentation({ toolName: tool }).label)
     .otherwise(() => m.rooms_activity_span_tool_running());
 
+  const tool = (toolName: string) => {
+    const presentation = toolPresentation({ toolName });
+
+    return { name: presentation.label, mark: <ToolIcon icon={presentation.icon} /> };
+  };
+
   const timeline = (data: UniversalTypes.ActivityRun): AgentTimelineRun => {
     const children = data.agents.filter((agent) => !agent.isMain);
 
@@ -80,7 +86,7 @@ export function RoomsActivityTimeline({ bot, run, title }: RoomsActivityTimeline
         end: span.end ?? undefined,
         label: label(span),
         detail: span.detail ?? undefined,
-        tool: span.tool ? { name: toolPresentation({ toolName: span.tool }).label, mark: <ToolIcon toolName={span.tool} /> } : undefined,
+        tool: span.tool ? tool(span.tool) : undefined,
         tokens: span.tokens ?? undefined,
         cost: span.cost ?? undefined,
         status: span.isFailed ? 'failed' : 'ok',

@@ -1,4 +1,3 @@
-import { toolPresentation } from '@repo/client/client';
 import IconLucideAlarmClock from '~icons/lucide/alarm-clock';
 import IconLucideBot from '~icons/lucide/bot';
 import IconLucideCpu from '~icons/lucide/cpu';
@@ -32,11 +31,11 @@ const toolLabelIcons = {
 } satisfies Record<ToolIconKind, ComponentType<SVGProps<SVGSVGElement>>>;
 
 interface ToolIconProps {
-  toolName: string
+  icon: ToolIconKind
 }
 
-export function ToolIcon({ toolName }: ToolIconProps) {
-  const Icon = toolLabelIcons[toolPresentation({ toolName }).icon];
+export function ToolIcon({ icon }: ToolIconProps) {
+  const Icon = toolLabelIcons[icon];
 
   return <Icon />;
 }

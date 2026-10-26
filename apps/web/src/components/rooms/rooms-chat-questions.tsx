@@ -1,10 +1,11 @@
 import { roomsChoice } from '@repo/client/client';
 import { useChatQuestion } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
+import { PromptInputSubmit } from '@/components/ui/ai/prompt-input';
 import { Question, QuestionDescription, QuestionField, QuestionHeader, QuestionHeading, QuestionOption, QuestionOptions, QuestionTitle } from '@/components/ui/ai/question';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import IconArrowUp from '~icons/lucide/arrow-up';
+import IconArrowRight from '~icons/lucide/arrow-right';
 import IconX from '~icons/lucide/x';
 import type { ConversationQuestion } from '@repo/contracts/universal';
 
@@ -47,6 +48,7 @@ export function RoomsChatQuestions({ question, className }: RoomsChatQuestionsPr
                 index={index}
                 key={choice}
                 role={question.isMultiSelect ? 'checkbox' : undefined}
+                tone={recommended ? 'success' : 'muted'}
                 onClick={() => card.choose(choice)}
               >
                 <span className="min-w-0">{label}</span>
@@ -64,16 +66,14 @@ export function RoomsChatQuestions({ question, className }: RoomsChatQuestionsPr
       >
         <QuestionField
           action={(
-            <Button
+            <PromptInputSubmit
               aria-label={m.rooms_chat_question_send()}
               disabled={card.isAnswered || !card.canSend}
-              size="icon-sm"
+              size="icon-md"
               title={m.rooms_chat_question_send()}
-              type="submit"
-              variant="default"
             >
-              <IconArrowUp />
-            </Button>
+              <IconArrowRight />
+            </PromptInputSubmit>
           )}
           aria-label={card.isSecret ? m.rooms_chat_question_secret_placeholder() : m.rooms_chat_question_other()}
           autoComplete={card.isSecret ? 'off' : undefined}

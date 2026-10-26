@@ -5,8 +5,9 @@ import { Link } from '@tanstack/react-router';
 import { Fragment } from 'react';
 import { match } from 'ts-pattern';
 import { BotAvatar } from '@/components/bots/bot-avatar';
+import { BotMention } from '@/components/bots/bot-mention';
+import { EventLabel, EventLine, EventList, EventName } from '@/components/ui/ai/event';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Mention } from '@/components/ui/mention';
 import { useSidebar } from '@/components/ui/sidebar';
 import { roomsPairLink } from '@/services/rooms/rooms.client';
 import { rpc } from '@/services/rpc/rpc.client';
@@ -42,11 +43,11 @@ interface RoomsChatEventsLineProps {
 
 function RoomsChatEventsLine({ label, isDeleted = false, children }: RoomsChatEventsLineProps) {
   return (
-    <p className="flex flex-wrap items-center justify-center gap-1 py-1.5 text-sm text-muted-foreground">
-      {label}
+    <EventLine>
+      <EventLabel>{label}</EventLabel>
       {children}
-      {isDeleted ? <span className="ml-1">{m.rooms_event_deleted()}</span> : null}
-    </p>
+      {isDeleted ? <EventLabel>{m.rooms_event_deleted()}</EventLabel> : null}
+    </EventLine>
   );
 }
 
@@ -79,26 +80,22 @@ function RoomsChatEventsPeers({ parts, sender }: RoomsChatEventsPeersProps) {
   const { data: bots } = useSuspenseQuery(rpc.bots.list.queryOptions());
   const peers = toolPeers(parts, bots);
 
+  const stack = peers.slice(0, 3).map(({ peer }) => (
+    <BotAvatar
+      animate={false}
+      bot={peer}
+      key={peer.id}
+      size={16}
+    />
+  ));
+
   return (
     <RoomsChatEventsLine label={parts.length > 1 ? m.rooms_pair_messages({ count: parts.length }) : m.rooms_pair_messaged()}>
       {peers.length > 2 ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="outline-none" type="button">
-              <Mention variant="plain">
-                <span className="flex -space-x-1.5">
-                  {peers.slice(0, 3).map(({ peer }) => (
-                    <span className="rounded-full ring-2 ring-background" key={peer.id}>
-                      <BotAvatar
-                        animate={false}
-                        bot={peer}
-                        size={16}
-                      />
-                    </span>
-                  ))}
-                </span>
-                {m.rooms_pair_bots({ count: peers.length })}
-              </Mention>
+            <button className="min-w-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring" type="button">
+              <EventName icon={stack}>{m.rooms_pair_bots({ count: peers.length })}</EventName>
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="center">
@@ -123,40 +120,29 @@ function RoomsChatEventsPeers({ parts, sender }: RoomsChatEventsPeersProps) {
             )))}
           </DropdownMenuContent>
         </DropdownMenu>
-      ) : peers.map(({ peer, conversationId }, index) => (
-        <Fragment key={peer.id}>
-          {index > 0 ? <span>{index === peers.length - 1 ? m.rooms_pair_and() : ','}</span> : null}
-          {sender && conversationId !== undefined ? (
-            <Link
-              {...roomsPairLink({
-                sender,
-                peer,
-                conversationId,
-              })}
-            >
-              <Mention variant="plain">
-                <BotAvatar
-                  animate={false}
-                  bot={peer}
-                  size={16}
-                />
-                {peer.name}
-              </Mention>
-            </Link>
-          ) : (
-            <span>
-              <Mention variant="plain">
-                <BotAvatar
-                  animate={parts.some(toolRunning)}
-                  bot={peer}
-                  size={16}
-                />
-                {peer.name}
-              </Mention>
-            </span>
-          )}
-        </Fragment>
-      ))}
+      ) : peers.map(({ peer, conversationId }, index) => {
+        const isLinked = sender !== undefined && conversationId !== undefined;
+
+        const name = <BotMention animate={!isLinked && parts.some(toolRunning)} bot={peer} />;
+
+        return (
+          <Fragment key={peer.id}>
+            {index > 0 && index === peers.length - 1 ? <EventLabel>{m.rooms_pair_and()}</EventLabel> : null}
+            {index > 0 && index < peers.length - 1 ? <EventLabel className="-ml-1.5">,</EventLabel> : null}
+            {isLinked ? (
+              <Link
+                {...roomsPairLink({
+                  sender,
+                  peer,
+                  conversationId,
+                })}
+              >
+                {name}
+              </Link>
+            ) : <span>{name}</span>}
+          </Fragment>
+        );
+      })}
     </RoomsChatEventsLine>
   );
 }
@@ -179,14 +165,9 @@ function RoomsChatEventsRoutine({ event, senderId, sender }: RoomsChatEventsRout
     .with('remove', () => m.rooms_event_routine_remove())
     .exhaustive();
 
-  const EventIcon = ROOMS_CHAT_EVENTS_ICONS[event.icon];
+  const Icon = ROOMS_CHAT_EVENTS_ICONS[event.icon];
 
-  const chip = (
-    <Mention variant="plain">
-      <EventIcon className="size-4" />
-      {event.routine.name}
-    </Mention>
-  );
+  const chip = <EventName icon={<Icon />}>{event.routine.name}</EventName>;
 
   return (
     <RoomsChatEventsLine isDeleted={isDeleted} label={label}>
@@ -213,14 +194,9 @@ function RoomsChatEventsTodo({ event, senderId, sender }: RoomsChatEventsTodoPro
     .with('remove', () => m.rooms_event_todo_remove())
     .exhaustive();
 
-  const EventIcon = ROOMS_CHAT_EVENTS_ICONS[event.icon];
+  const Icon = ROOMS_CHAT_EVENTS_ICONS[event.icon];
 
-  const chip = (
-    <Mention variant="plain">
-      <EventIcon className="size-4" />
-      {event.todo.title}
-    </Mention>
-  );
+  const chip = <EventName icon={<Icon />}>{event.todo.title}</EventName>;
 
   return (
     <RoomsChatEventsLine isDeleted={isDeleted} label={label}>
@@ -250,16 +226,7 @@ function RoomsChatEventsBot({ event }: RoomsChatEventsBotProps) {
     return null;
   }
 
-  const chip = (
-    <Mention variant="plain">
-      <BotAvatar
-        animate={false}
-        bot={bot ?? { name }}
-        size={16}
-      />
-      {name}
-    </Mention>
-  );
+  const chip = <BotMention bot={bot ?? { name }} />;
 
   return (
     <RoomsChatEventsLine isDeleted={isDeleted} label={label}>
@@ -278,7 +245,7 @@ export function RoomsChatEvents({ events, senderId }: RoomsChatEventsProps) {
   const sender = bots.find((item) => item.id === senderId);
 
   return (
-    <div className="flex flex-col py-0.5">
+    <EventList>
       {events.map((event) => match(event)
         .with({ kind: 'peers' }, (peers) => (
           <RoomsChatEventsPeers
@@ -305,6 +272,6 @@ export function RoomsChatEvents({ events, senderId }: RoomsChatEventsProps) {
         ))
         .with({ kind: 'bot' }, (bot) => <RoomsChatEventsBot event={bot} key={bot.key} />)
         .exhaustive())}
-    </div>
+    </EventList>
   );
 }

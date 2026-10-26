@@ -3,11 +3,11 @@ import { createContext, use, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { match } from 'ts-pattern';
 import { cn } from '@/lib/cn';
+import IconLucideArrowUp from '~icons/lucide/arrow-up';
 import IconLucideFileText from '~icons/lucide/file-text';
 import IconLucideLoader2 from '~icons/lucide/loader-2';
 import IconLucidePlus from '~icons/lucide/plus';
 import IconLucideReply from '~icons/lucide/reply';
-import IconLucideSend from '~icons/lucide/send';
 import IconLucideSquare from '~icons/lucide/square';
 import IconLucideX from '~icons/lucide/x';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../dropdown-menu';
@@ -51,7 +51,7 @@ export function PromptInput({ className, onSubmit, children, ...props }: PromptI
       <div className="absolute inset-x-5 bottom-[calc(100%-1rem)]" ref={setDrawer} />
       <PromptInputDrawerSlot value={drawer}>
         {/* Actions sit on the last line, so they stay put while the field grows; the solid dark fill hides the drawer behind it. */}
-        <InputGroup className="relative h-auto flex-wrap items-end overflow-hidden rounded-3xl bg-background shadow-sm transition-[color,box-shadow] duration-240 ease-panel has-[>[data-align=block-start]]:flex-row motion-reduce:transition-none dark:bg-card has-[[data-multiline=true]]:[&>[data-align=inline-end]]:ml-auto has-[[data-multiline=true]]:[&>[data-align=inline-start]]:order-last">{children}</InputGroup>
+        <InputGroup className="relative flex-wrap items-end overflow-hidden duration-240 ease-panel has-[>[data-align=block-start]]:flex-row motion-reduce:transition-none has-[[data-multiline=true]]:[&>[data-align=inline-end]]:ml-auto has-[[data-multiline=true]]:[&>[data-align=inline-start]]:order-last" variant="prompt">{children}</InputGroup>
       </PromptInputDrawerSlot>
     </form>
   );
@@ -167,7 +167,7 @@ export function PromptInputSubmit({ variant = 'default', status, children, ...pr
     .with('submitted', () => <IconLucideLoader2 className="size-4 animate-spin motion-reduce:animate-none" />)
     .with('streaming', () => <IconLucideSquare className="size-3.5" />)
     .with('error', () => <IconLucideX className="size-4" />)
-    .otherwise(() => <IconLucideSend className="size-4" />);
+    .otherwise(() => <IconLucideArrowUp className="size-4" />);
 
   return (
     <PromptInputButton type="submit" variant={variant} {...props}>

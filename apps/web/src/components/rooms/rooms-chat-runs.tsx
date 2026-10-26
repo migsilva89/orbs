@@ -1,10 +1,11 @@
-import { chatPrivateSource } from '@repo/client/client';
+import { m } from '@repo/i18n/client';
 import { Fragment } from 'react';
-import { BotAvatar } from '@/components/bots/bot-avatar';
+import { BotMention } from '@/components/bots/bot-mention';
 import { RoomsChatActivity } from '@/components/rooms/rooms-chat-activity';
 import { RoomsChatApproval } from '@/components/rooms/rooms-chat-approval';
 import { RoomsChatFailure } from '@/components/rooms/rooms-chat-failure';
 import { RoomsChatQuestions } from '@/components/rooms/rooms-chat-questions';
+import { EventLabel, EventLine, EventList } from '@/components/ui/ai/event';
 import { MessageScrollerItem } from '@/components/ui/message-scroller';
 import type { ChatActivity, ChatMessage } from '@repo/client/client';
 import type { Bot, ConversationQuestion, ToolApproval } from '@repo/contracts/universal';
@@ -21,9 +22,16 @@ interface RoomsChatRunsProps {
 
 export function RoomsChatRuns({ bot, bots = [], activity, failure, draft, approvals, questions }: RoomsChatRunsProps) {
   const source = (privateWith: string | null) => {
-    const label = chatPrivateSource({ privateWith, bots });
+    const peer = bots.find((item) => item.id === privateWith);
 
-    return label ? <p className="mt-2 text-xs text-muted-foreground">{label}</p> : null;
+    return peer ? (
+      <EventList>
+        <EventLine>
+          <EventLabel>{m.rooms_event_private_source()}</EventLabel>
+          <BotMention bot={peer} />
+        </EventLine>
+      </EventList>
+    ) : null;
   };
 
   return (
@@ -45,14 +53,9 @@ export function RoomsChatRuns({ bot, bots = [], activity, failure, draft, approv
         </Fragment>
       ))}
       {failure ? (
-        <div className="flex items-center gap-2 py-2">
-          <BotAvatar
-            activity="failed"
-            bot={bot}
-            size={24}
-          />
-          <RoomsChatFailure botName={bot.name} detail={failure} />
-        </div>
+        <EventList>
+          <RoomsChatFailure bot={bot} detail={failure} />
+        </EventList>
       ) : null}
       <div className="flex h-8 items-center">
         {activity === 'idle' || activity === 'failed' ? null : (

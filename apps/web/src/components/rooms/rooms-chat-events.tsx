@@ -94,7 +94,7 @@ function RoomsChatEventsPeers({ parts, sender }: RoomsChatEventsPeersProps) {
       {peers.length > 2 ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="min-w-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring" type="button">
+            <button className="min-w-0" type="button">
               <EventName icon={stack}>{m.rooms_pair_bots({ count: peers.length })}</EventName>
             </button>
           </DropdownMenuTrigger>

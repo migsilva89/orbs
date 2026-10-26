@@ -8,6 +8,7 @@ import IconLucideCircleAlert from '~icons/lucide/circle-alert';
 import IconLucideLoaderCircle from '~icons/lucide/loader-circle';
 import IconLucideShieldQuestion from '~icons/lucide/shield-question';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../collapsible';
+import { messageSurface } from './message';
 import type { VariantProps } from 'cva';
 import type { ComponentProps, ReactNode } from 'react';
 
@@ -15,7 +16,7 @@ type EventStatus = 'running' | 'done' | 'error' | 'approval' | 'denied'
 
 // Every chat event reads the same: a centred muted line of label, then icon and name a step brighter, then a status
 // icon. An event with details opens into a card whose header is that same line. Icons and avatars all sit in 16px.
-const eventLine = 'flex h-8 max-w-full min-w-0 items-center gap-1.5 text-sm text-muted-foreground data-[status=running]:*:data-[slot=event-label]:shimmer';
+const eventLine = 'flex h-8 max-w-full min-w-0 items-center gap-1.5 text-sm text-muted-foreground data-[status=running]:*:data-[slot=event-label]:shimmer [&_:is(a,button)]:rounded-md [&_:is(a,button)]:outline-none [&_:is(a,button):focus-visible]:ring-2 [&_:is(a,button):focus-visible]:ring-ring';
 
 const eventFocus = 'outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset';
 
@@ -43,7 +44,7 @@ function EventName({ icon, className, children, ...props }: ComponentProps<'span
   const stack = Array.isArray(icon) ? (
     <span aria-hidden="true" className="-my-0.5 flex shrink-0 -space-x-1.5">
       {icon.map((item, index) => (
-        <span className="flex size-5 items-center justify-center overflow-hidden rounded-full border bg-background [&>svg]:size-3" key={index}>{item}</span>
+        <span className="flex size-5 items-center justify-center overflow-hidden rounded-full border border-input bg-background [&>svg]:size-3" key={index}>{item}</span>
       ))}
     </span>
   ) : null;
@@ -123,13 +124,13 @@ function EventTrigger({ status, className, children, ...props }: Omit<ComponentP
 function EventContent({ className, children, ...props }: ComponentProps<typeof CollapsibleContent>) {
   return (
     <CollapsibleContent className="w-full max-w-lg" data-slot="event-content" {...props}>
-      <div className={cn('mt-1 mb-2 overflow-hidden rounded-2xl border bg-card', className)}>{children}</div>
+      <div className={cn(messageSurface, 'mt-1 mb-2 overflow-hidden', className)}>{children}</div>
     </CollapsibleContent>
   );
 }
 
 const eventBodyVariants = cva({
-  base: 'scrollbar max-h-72 overflow-y-auto overscroll-contain px-3 py-2.5 wrap-break-word text-muted-foreground [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1',
+  base: 'scrollbar max-h-72 overflow-y-auto overscroll-contain px-4 py-3 wrap-break-word text-muted-foreground [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1',
   variants: {
     variant: {
       text: 'text-sm whitespace-pre-wrap',
@@ -146,7 +147,7 @@ function EventBody({ variant, className, ...props }: ComponentProps<'div'> & Var
 
 /** Structured details, such as a tool call's input and output, in an open card or under an item. */
 function EventDetails({ className, ...props }: ComponentProps<'div'>) {
-  return <div className={cn('flex min-w-0 flex-col gap-2 px-3 py-2.5 text-xs text-muted-foreground in-data-[slot=event-item]:pt-0 in-data-[slot=event-item]:pb-3 in-data-[slot=event-item]:pl-10', className)} data-slot="event-details" {...props} />;
+  return <div className={cn('flex min-w-0 flex-col gap-2 px-4 py-3 text-xs text-muted-foreground in-data-[slot=event-item]:pt-0 in-data-[slot=event-item]:pl-11 *:data-[slot=question-details]:px-0', className)} data-slot="event-details" {...props} />;
 }
 
 function EventItems({ className, ...props }: ComponentProps<'ul'>) {
@@ -164,7 +165,7 @@ function EventItem({ icon, label, preview, description, status, className, child
   return (
     <li className="min-w-0" data-slot="event-item">
       <Collapsible className={cn('group/event-item flex min-w-0 flex-col', className)} {...props}>
-        <CollapsibleTrigger className={cn(eventFocus, 'flex w-full min-w-0 cursor-pointer items-start gap-3 px-3 py-2 text-left text-sm')}>
+        <CollapsibleTrigger className={cn(eventFocus, 'flex w-full min-w-0 cursor-pointer items-start gap-3 px-4 py-2 text-left text-sm')}>
           <EventIcon className="mt-0.5 text-muted-foreground">{icon}</EventIcon>
           <span className="flex min-w-0 flex-1 flex-col gap-0.5">
             <span className="truncate text-foreground data-[status=running]:shimmer motion-reduce:shimmer-none" data-status={status}>

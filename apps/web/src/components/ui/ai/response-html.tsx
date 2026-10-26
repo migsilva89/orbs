@@ -25,6 +25,7 @@ export function ResponseHtml(props: BlockProps) {
   return (
     <>
       <PreviewCard
+        content="page"
         icon={<IconCode />}
         kind={m.ui_html_page()}
         label={m.artifacts_expand()}

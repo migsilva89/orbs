@@ -17,6 +17,7 @@ import { EventList } from '@/components/ui/ai/event';
 import { Message, MessageClamp, MessageContent, MessageStack } from '@/components/ui/ai/message';
 import { Response } from '@/components/ui/ai/response';
 import { useLongPress } from '@/hooks/use-long-press';
+import { htmlReplyPage } from '@/services/html/html.utils';
 import { MENTION_ALLOWED_TAGS } from '@/services/mention/mention.constants';
 import { mentionRemark } from '@/services/mention/mention.utils';
 import type { ChatMessage, ToolBot } from '@repo/client/client';
@@ -170,6 +171,12 @@ export function RoomsChatMessage({
                     ))}
                   </>
                 );
+
+                const isPage = message.role === 'assistant' && text.parts.every((part) => part.state !== 'streaming' && htmlReplyPage(part.text));
+
+                if (isPage) {
+                  return <div className="w-full" data-quote-id={message.id}>{textContent}</div>;
+                }
 
                 return (
                   <MessageContent data-quote-id={message.id}>

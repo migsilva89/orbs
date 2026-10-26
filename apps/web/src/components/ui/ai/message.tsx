@@ -5,6 +5,14 @@ import { cn } from '@/lib/cn';
 import type { UIMessage } from 'ai';
 import type { HTMLAttributes, ReactNode } from 'react';
 
+/** The bubble's outline. Every card in the transcript wears it with `messageSurface`, so they read as one family. */
+const messageOutline = 'rounded-3xl border border-input';
+
+export const messageSurface = [messageOutline, 'bg-secondary text-foreground'];
+
+/** The icon tile that leads a card's header or footer. */
+export const messageTile = 'flex size-8 shrink-0 items-center justify-center rounded-lg border border-input bg-background text-muted-foreground [&_svg]:size-4';
+
 export type MessageProps = HTMLAttributes<HTMLDivElement> & {
   from: UIMessage['role']
 }
@@ -32,12 +40,14 @@ export function MessageContent({ children, className, ...props }: HTMLAttributes
     <div className="w-fit max-w-full min-w-0 has-[[data-message-wide]]:w-full">
       <div
         className={cn(
-          'flex flex-col gap-2 overflow-hidden rounded-3xl border border-input px-3 py-2 text-sm leading-snug',
+          messageOutline,
+          'flex flex-col gap-2 overflow-hidden px-3 py-2 text-sm leading-snug',
           'group-data-[role=user]:bg-bubble group-data-[role=user]:text-bubble-foreground',
           'group-data-[role=user]:selection:bg-bubble-foreground group-data-[role=user]:selection:text-bubble',
           'group-data-[role=assistant]:bg-secondary group-data-[role=assistant]:text-foreground',
           className,
         )}
+        data-slot="message-content"
         {...props}
       >
         {children}

@@ -19,3 +19,12 @@ const toolCodeVariants = cva({
 export function ToolCode({ variant, className, ...props }: ComponentProps<'pre'> & VariantProps<typeof toolCodeVariants>) {
   return <pre className={cn(toolCodeVariants({ variant }), className)} {...props} />;
 }
+
+/** Code a tool ran or returned, framed like the other inner blocks of a card. */
+export function ToolCodeBlock({ variant, children }: Pick<ComponentProps<typeof ToolCode>, 'variant' | 'children'>) {
+  return (
+    <div className="rounded-xl border border-input bg-background px-3 py-2">
+      <ToolCode variant={variant}>{children}</ToolCode>
+    </div>
+  );
+}

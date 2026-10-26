@@ -1,6 +1,8 @@
 import { BOT_ACTIVITY_LABELS, toolRunning } from '@repo/client/client';
 import { useChatHideVerbose } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
+import { messageSurface } from '@/components/ui/ai/message';
+import { cn } from '@/lib/cn';
 import type { ChatActivity, ChatMessage } from '@repo/client/client';
 
 interface RoomsChatActivityProps {
@@ -25,7 +27,7 @@ export function RoomsChatActivity({ botName, activity, draft, waiting }: RoomsCh
 
   return (
     <output aria-label={label} className="flex items-center gap-3">
-      <span aria-hidden className="flex h-7 items-center gap-1 rounded-full bg-secondary px-3">
+      <span aria-hidden className={cn(messageSurface, 'flex h-7 items-center gap-1 rounded-full px-3')}>
         <span className="size-1.5 animate-typing-dot rounded-full bg-muted-foreground motion-reduce:animate-none" />
         <span className="size-1.5 animate-typing-dot-2 rounded-full bg-muted-foreground motion-reduce:animate-none" />
         <span className="size-1.5 animate-typing-dot-3 rounded-full bg-muted-foreground motion-reduce:animate-none" />

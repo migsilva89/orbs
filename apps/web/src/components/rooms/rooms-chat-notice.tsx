@@ -4,6 +4,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { match, P } from 'ts-pattern';
 import { BotMention } from '@/components/bots/bot-mention';
 import { Event, EventBody, EventContent, EventLabel, EventLine, EventList, EventName, EventTrigger } from '@/components/ui/ai/event';
+import { Response } from '@/components/ui/ai/response';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconLucideAlarmClock from '~icons/lucide/alarm-clock';
 import IconLucideWorkflow from '~icons/lucide/workflow';
@@ -59,7 +60,9 @@ export function RoomsChatNotice({ message }: RoomsChatNoticeProps) {
         <Event>
           <EventTrigger status={line.status}>{content}</EventTrigger>
           <EventContent>
-            <EventBody>{text}</EventBody>
+            <EventBody variant="markdown">
+              <Response>{text}</Response>
+            </EventBody>
           </EventContent>
         </Event>
       ) : <EventLine status={line.status}>{content}</EventLine>}

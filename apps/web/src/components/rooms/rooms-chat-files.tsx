@@ -1,5 +1,6 @@
 import { useChatAttachmentUrl } from '@repo/client/web';
-import { Button } from '@/components/ui/button';
+import { messageSurface } from '@/components/ui/ai/message';
+import { cn } from '@/lib/cn';
 import IconLucideFileText from '~icons/lucide/file-text';
 import type { RoomsFilePart } from '@repo/client/client';
 
@@ -20,7 +21,7 @@ function RoomsChatFilesItem({ botId, file }: RoomsChatFilesItemProps) {
       >
         <img
           alt={file.filename ?? ''}
-          className="max-h-64 rounded-2xl object-cover"
+          className="max-h-64 rounded-3xl border border-input object-cover"
           loading="lazy"
           src={url}
         />
@@ -29,16 +30,14 @@ function RoomsChatFilesItem({ botId, file }: RoomsChatFilesItemProps) {
   }
 
   return (
-    <Button
-      asChild
-      size="sm"
-      variant="outline"
+    <a
+      className={cn(messageSurface, 'flex h-8 max-w-full items-center gap-1.5 rounded-full px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring')}
+      download={file.filename}
+      href={url}
     >
-      <a download={file.filename} href={url}>
-        <IconLucideFileText className="size-4 text-muted-foreground" />
-        <span className="max-w-56 truncate">{file.filename}</span>
-      </a>
-    </Button>
+      <IconLucideFileText className="size-4 shrink-0 text-muted-foreground" />
+      <span className="max-w-56 truncate">{file.filename}</span>
+    </a>
   );
 }
 

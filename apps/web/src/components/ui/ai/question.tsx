@@ -1,4 +1,5 @@
 import { cva } from 'cva';
+import { messageSurface, messageTile } from '@/components/ui/ai/message';
 import { buttonGlossyEffects } from '@/components/ui/button';
 import { InputGroup, InputGroupAddon } from '@/components/ui/input-group';
 import { cn } from '@/lib/cn';
@@ -8,7 +9,7 @@ import type { VariantProps } from 'cva';
 import type { ComponentProps, ReactNode } from 'react';
 
 export function Question({ className, ...props }: ComponentProps<'section'>) {
-  return <section className={cn('flex max-w-md min-w-0 flex-col gap-3 rounded-2xl bg-secondary p-3 text-foreground', className)} data-slot="question" {...props} />;
+  return <section className={cn(messageSurface, 'flex max-w-md min-w-0 flex-col gap-3 p-3', className)} data-slot="question" {...props} />;
 }
 
 export function QuestionHeader({ className, ...props }: ComponentProps<'div'>) {
@@ -16,7 +17,7 @@ export function QuestionHeader({ className, ...props }: ComponentProps<'div'>) {
 }
 
 export function QuestionIcon({ className, ...props }: ComponentProps<'span'>) {
-  return <span aria-hidden="true" className={cn('flex size-8 shrink-0 items-center justify-center rounded-md border bg-muted text-muted-foreground [&_svg]:size-4', className)} data-slot="question-icon" {...props} />;
+  return <span aria-hidden="true" className={cn(messageTile, className)} data-slot="question-icon" {...props} />;
 }
 
 export function QuestionHeading({ className, ...props }: ComponentProps<'div'>) {
@@ -31,7 +32,7 @@ export function QuestionDescription({ className, ...props }: ComponentProps<'p'>
   return <p className={cn('text-xs text-pretty wrap-break-word whitespace-pre-line text-muted-foreground', className)} data-slot="question-description" {...props} />;
 }
 
-const questionList = 'flex min-w-0 flex-col divide-y overflow-hidden rounded-lg border bg-background';
+const questionList = 'flex min-w-0 flex-col divide-y overflow-hidden rounded-xl border border-input bg-background';
 
 const questionRow = 'flex w-full min-w-0 items-center gap-3 px-3 py-2.5 text-left text-sm';
 
@@ -132,7 +133,7 @@ export function QuestionAnswer({ index, className, children, ...props }: Compone
 /** A one-line answer in the composer's shell, rounded like the options above it, with `action` as its send button. */
 export function QuestionField({ action, className, ...props }: ComponentProps<'input'> & { action?: ReactNode }) {
   return (
-    <InputGroup className="min-h-11.5 rounded-lg has-[input:disabled]:opacity-50" data-slot="question-field" variant="prompt">
+    <InputGroup className="min-h-11.5 rounded-xl has-[input:disabled]:opacity-50" data-slot="question-field" variant="prompt">
       <input className={cn('min-w-0 flex-1 self-stretch bg-transparent pl-4 text-base outline-none placeholder:text-muted-foreground md:text-sm', className)} {...props} />
       {action ? <InputGroupAddon align="inline-end">{action}</InputGroupAddon> : null}
     </InputGroup>

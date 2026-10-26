@@ -3,7 +3,7 @@ import { useChatApproval } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { ToolInput } from '@/components/tools/tool-input';
 import { Question, QuestionDescription, QuestionHeader, QuestionHeading, QuestionOption, QuestionOptions, QuestionTitle } from '@/components/ui/ai/question';
-import { ToolCode } from '@/components/ui/ai/tool';
+import { ToolCodeBlock } from '@/components/ui/ai/tool';
 import type { ToolApproval } from '@repo/contracts/universal';
 
 interface RoomsChatApprovalProps {
@@ -25,11 +25,7 @@ export function RoomsChatApproval({ approval, botName, className }: RoomsChatApp
           {text.description ? <QuestionDescription>{text.description}</QuestionDescription> : null}
         </QuestionHeading>
       </QuestionHeader>
-      {text.code ? (
-        <div className="px-1">
-          <ToolCode>{text.code}</ToolCode>
-        </div>
-      ) : <ToolInput input={approval.arguments} />}
+      {text.code ? <ToolCodeBlock>{text.code}</ToolCodeBlock> : <ToolInput input={approval.arguments} />}
       <QuestionOptions>
         {ROOMS_APPROVAL_CHOICES.map((choice, index) => (
           <QuestionOption

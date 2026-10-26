@@ -3,7 +3,7 @@ import { m } from '@repo/i18n/client';
 import { ToolIcon } from '@/components/tools/tool-icon';
 import { ToolInput } from '@/components/tools/tool-input';
 import { Event, EventContent, EventDetails, EventItem, EventItems, EventLabel, EventName, EventTrigger } from '@/components/ui/ai/event';
-import { ToolCode } from '@/components/ui/ai/tool';
+import { ToolCodeBlock } from '@/components/ui/ai/tool';
 import type { EventStatus } from '@/components/ui/ai/event';
 import type { DynamicToolUIPart } from 'ai';
 
@@ -29,11 +29,7 @@ function RoomsChatToolsDetails({ part }: RoomsChatToolsDetailsProps) {
   return (
     <>
       <ToolInput input={part.input} />
-      {output ? (
-        <div className="rounded-lg bg-muted px-2.5 py-2">
-          <ToolCode variant={part.state === 'output-error' ? 'destructive' : 'default'}>{output}</ToolCode>
-        </div>
-      ) : null}
+      {output ? <ToolCodeBlock variant={part.state === 'output-error' ? 'destructive' : 'default'}>{output}</ToolCodeBlock> : null}
     </>
   );
 }

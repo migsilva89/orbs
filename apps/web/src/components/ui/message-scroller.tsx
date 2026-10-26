@@ -321,7 +321,7 @@ const messageScrollerItemVariants = cva({
   variants: {
     variant: {
       default: '',
-      highlight: 'animate-highlight rounded-2xl motion-reduce:animate-none',
+      highlight: 'animate-highlight rounded-3xl motion-reduce:animate-none',
     },
   },
   defaultVariants: { variant: 'default' },

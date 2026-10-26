@@ -5,6 +5,7 @@ export const routes = rootRoute('root.tsx', [
   route('/connect', 'connect/connect.tsx'),
 
   layout('chat', 'chat.layout.tsx', [
+    route('/onboarding/$step', 'onboarding/onboarding.$step.tsx'),
     route('/rooms', [
       index('rooms/rooms.index.tsx'),
       route('/direct/$handle', 'rooms/rooms.direct.$handle.tsx', [

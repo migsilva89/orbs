@@ -39,7 +39,7 @@ export function Combobox({ value, groups, onValueChange, placeholder, search, di
           aria-expanded={open}
           aria-label={props['aria-label']}
           className={cn(
-            'flex h-10 w-full min-w-0 items-center justify-between gap-2 rounded-md border border-input bg-transparent px-3 text-left text-sm whitespace-nowrap shadow-xs outline-none',
+            'flex h-9 w-full min-w-0 items-center justify-between gap-2 rounded-md border border-input bg-transparent px-3 text-left text-sm whitespace-nowrap shadow-xs outline-none',
             'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30',
             '[&_svg]:pointer-events-none [&_svg]:shrink-0',
             className,

@@ -36,6 +36,7 @@ export function coreRpcNative(
   return {
     context: {
       server: services.server,
+      onboarding: services.onboarding,
       limits: services.limits,
       providers: services.providers,
       mcpAuth: services.mcpAuth,

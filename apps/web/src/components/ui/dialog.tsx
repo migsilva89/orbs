@@ -57,7 +57,7 @@ function DialogContent({
         <DialogPrimitive.Content
           className={cn(
             'bg-background data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
-            'relative z-50 my-4 grid w-full max-w-lg gap-4 rounded-lg border p-6 shadow-lg duration-200 dark:border-border/30',
+            'relative z-50 my-4 grid w-full max-w-lg gap-3 rounded-lg border p-5 shadow-lg duration-200 dark:border-border/30',
             className,
           )}
           data-slot="dialog-content"
@@ -87,7 +87,7 @@ function DialogContent({
 function DialogHeader({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
-      className={cn('-mx-6 -mt-6 mb-2 flex flex-col gap-1 border-b border-border/50 px-6 pt-4 pr-12 pb-3 text-left', className)}
+      className={cn('-mx-5 -mt-5 mb-1 flex flex-col gap-1 border-b border-border/50 px-5 pt-4 pr-12 pb-3 text-left', className)}
       data-slot="dialog-header"
       {...props}
     />
@@ -97,7 +97,7 @@ function DialogHeader({ className, ...props }: ComponentProps<'div'>) {
 function DialogFooter({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
-      className={cn('-mx-6 mt-2 -mb-6 flex flex-col-reverse gap-2 border-t border-border/50 px-6 py-3 sm:flex-row sm:justify-end', className)}
+      className={cn('-mx-5 mt-1 -mb-5 flex flex-col-reverse gap-2 border-t border-border/50 px-5 py-3 sm:flex-row sm:justify-end', className)}
       data-slot="dialog-footer"
       {...props}
     />

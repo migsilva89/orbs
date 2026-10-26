@@ -78,6 +78,7 @@ import {
 import { mcpCatalog, mcpConfigure, mcpDiscover, mcpSettings } from '../types/mcp.types';
 import { modelList } from '../types/model.types';
 import { notificationConfigure, notificationPresence, notificationPush, notificationSettings, notificationVoid } from '../types/notification.types';
+import { onboardingState } from '../types/onboarding.types';
 import { pluginCatalog, pluginConfigure, pluginDiscover, pluginSettings } from '../types/plugin.types';
 import { providerCancelResult, providerComplete, providerList, providerLogin, providerLogout, providerLogoutResult, providerSession, providerSessionId } from '../types/provider.types';
 import { routine, routineCreate, routineList, routineRemoveResult, routineTarget, routineUpdate } from '../types/routine.types';
@@ -209,6 +210,11 @@ export const contract = {
     info: ocAuth.output(serverInfo),
 
     configure: ocAuth.input(serverConfigure).output(serverInfo),
+  },
+
+  onboarding: {
+    state: ocAuth.output(onboardingState),
+    complete: ocAuth.output(onboardingState),
   },
 
   models: {

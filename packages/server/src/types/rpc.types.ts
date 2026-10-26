@@ -11,6 +11,7 @@ import type { LimitService } from '../services/limit/limit.service';
 import type { McpAuthService } from '../services/mcp/mcp-auth.service';
 import type { McpService } from '../services/mcp/mcp.service';
 import type { NotificationService } from '../services/notification/notification.service';
+import type { OnboardingService } from '../services/onboarding/onboarding.service';
 import type { PluginService } from '../services/plugin/plugin.service';
 import type { RoutineService } from '../services/routine/routine.service';
 import type { SecretService } from '../services/secret/secret.service';
@@ -24,6 +25,7 @@ import type { ProviderService, RuntimeService } from '@repo/runtime/server';
 
 export interface RpcContext extends RequestHeadersPluginContext {
   server: ServerService;
+  onboarding: OnboardingService;
   limits: LimitService;
   providers: ProviderService;
   mcpAuth: McpAuthService;

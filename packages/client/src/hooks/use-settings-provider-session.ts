@@ -21,9 +21,12 @@ export function useSettingsProviderSession(started: ProviderSession) {
   const isPending = session.status === 'pending';
 
   useEffect(() => {
-    if (!isPending) {
-      void queryClient.invalidateQueries({ queryKey: rpc.providers.list.key() });
+    if (isPending) {
+      return;
     }
+
+    void queryClient.invalidateQueries({ queryKey: rpc.providers.list.key() });
+    void queryClient.invalidateQueries({ queryKey: rpc.models.list.key() });
   }, [isPending, queryClient, rpc]);
 
   return {

@@ -2,6 +2,7 @@ import { useChatListSync } from '@repo/client/react';
 import { chatSearch } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { createFileRoute, Outlet, redirect, useMatch } from '@tanstack/react-router';
+import { match } from 'ts-pattern';
 import { LayoutShellDashboard } from '@/components/layout/layout-shell-dashboard';
 import { RoomsDetails } from '@/components/rooms/rooms-details';
 import { RoomsSearch } from '@/components/rooms/rooms-search';
@@ -17,10 +18,22 @@ import { seoHead } from '@/services/seo/seo.utils';
 export const Route = createFileRoute('/_chat')({
   head: () => seoHead({ title: m.rooms_meta_title() }),
   validateSearch: chatSearch,
-  beforeLoad: ({ context }) => {
+  beforeLoad: async ({ context, location }) => {
     if (!context.connection) {
       throw redirect({ to: '/connect' });
     }
+
+    const onboarding = await context.queryClient.ensureQueryData(rpc.onboarding.state.queryOptions());
+    const isOnboarding = location.pathname.startsWith('/onboarding/');
+
+    match({ isDone: onboarding.completedAt !== null, isOnboarding })
+      .with({ isDone: false, isOnboarding: false }, () => {
+        throw redirect({ to: '/onboarding/$step', params: { step: 'welcome' } });
+      })
+      .with({ isDone: true, isOnboarding: true }, () => {
+        throw redirect({ to: '/rooms' });
+      })
+      .otherwise(() => undefined);
 
     return { connection: context.connection };
   },

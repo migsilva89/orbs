@@ -13,6 +13,7 @@ import { mcp } from './rpc.mcp';
 import { mcpAuth } from './rpc.mcp-auth';
 import { models } from './rpc.models';
 import { notifications } from './rpc.notifications';
+import { onboarding } from './rpc.onboarding';
 import { pairing } from './rpc.pairing';
 import { plugins } from './rpc.plugins';
 import { rpcRouter } from './rpc.procedures';
@@ -27,6 +28,7 @@ import { tools } from './rpc.tools';
 
 export const router = rpcRouter.router({
   server: rpcServer,
+  onboarding,
   limits,
   providers,
   mcpAuth,

@@ -15,7 +15,7 @@ function PanelIcon({ className, ...props }: ComponentProps<'div'>) {
 }
 
 function PanelRow({ className, ...props }: ComponentProps<'div'>) {
-  return <div className={cn('flex items-center gap-4 p-4 [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-muted-foreground', className)} data-slot="panel-row" {...props} />;
+  return <div className={cn('flex items-center gap-4 px-4 py-3 [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-muted-foreground', className)} data-slot="panel-row" {...props} />;
 }
 
 function PanelContent({ className, ...props }: ComponentProps<'div'>) {

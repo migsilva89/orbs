@@ -24,6 +24,7 @@ DATA_DIR/                     default ~/.config/orbs/
 - Every call sends `x-bots-protocol`; `serverId` pins a client to one daemon. Mismatches return `PROTOCOL_MISMATCH` or `SERVER_MISMATCH` and are never retried.
 - Pairing uses a six-digit PIN that lives five minutes; the QR code and link are Base64 of `{ serverId, addresses, pin }` (`authPairEntry` in `contracts/src/types/auth.types.ts`). Redeem returns the server ID and addresses, so a bare PIN works against a known address. Every wrong PIN counts against all live grants, which die after five misses. Public transport can never bootstrap; only the owner socket can.
 - The web proxy only forwards to an address that reports the paired server ID, so a forged cookie cannot redirect it.
+- Web sends every chat route to `/onboarding/$step` until `onboarding.complete()` stores `onboarding.completedAt` in settings. It is stored per daemon, so devices paired later skip it.
 
 ## Retries and dedupe
 

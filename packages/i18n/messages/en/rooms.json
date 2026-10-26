@@ -75,7 +75,7 @@
   "bots_open": "Open",
   "rooms_details_more": "All bot settings",
   "rooms_bot_save_error": "Could not save the bot. Please try again.",
-  "rooms_chat_placeholder": "Message the bot…",
+  "rooms_chat_placeholder": "Message {bot}. Use $ for skills, / for commands",
   "rooms_chat_send": "Send",
   "rooms_chat_attach": "Add photos or files",
   "rooms_mention_bots_empty": "No other bots match",

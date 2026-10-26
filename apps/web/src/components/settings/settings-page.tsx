@@ -46,6 +46,13 @@ export function SettingsPage({ connection }: SettingsPageProps) {
             >
               <Link to="/lab/avatars">{m.layout_avatar_lab()}</Link>
             </Button>
+            <Button
+              asChild
+              size="xs"
+              variant="link-muted"
+            >
+              <Link to="/lab/chat">{m.layout_lab_chat()}</Link>
+            </Button>
           </nav>
         </div>
       </div>

@@ -49,7 +49,6 @@ export function RoomsChatTranscript({
       key: message.id,
       node: (
         <>
-          {index === 0 ? <RoomsChatHistory direction="older" {...older} /> : null}
           {unread && message.id === firstUnreadId ? <RoomsChatUnread seen={unread.isSeen} onSeen={unread.onSeen} /> : null}
           <RoomsChatTranscriptItem
             bot={bot}
@@ -85,6 +84,7 @@ export function RoomsChatTranscript({
         endInset={composerHeight}
         fade="both"
         focusKey={focusedId}
+        header={messages.length > 0 ? <RoomsChatHistory direction="older" {...older} /> : null}
         positionKey={bot.id}
         rowClassName="max-w-3xl"
         rows={rows}

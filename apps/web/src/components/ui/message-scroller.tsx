@@ -125,6 +125,7 @@ const messageScrollerViewportVariants = cva({
  */
 function MessageScrollerViewport({
   rows,
+  header,
   focusKey,
   positionKey,
   fade = 'end',
@@ -135,6 +136,8 @@ function MessageScrollerViewport({
   ...props
 }: Omit<ReactTypes.ComponentProps<'section'>, 'children'> & VariantProps<typeof messageScrollerViewportVariants> & {
   rows: MessageScrollerRow[]
+  /** Drawn in the start padding above the first row, such as a history loader: no row resizes when it changes, and the scroll anchor stays on a row. */
+  header?: ReactTypes.ReactNode
   focusKey?: string
   positionKey?: string
   rowClassName?: string
@@ -296,6 +299,7 @@ function MessageScrollerViewport({
       {...props}
     >
       <div className="relative w-full" style={{ height: virtualizer.getTotalSize() }}>
+        {header ? <div className={cn('absolute inset-x-0 top-0 mx-auto w-full px-4', rowClassName)}>{header}</div> : null}
         {virtualizer.getVirtualItems().map((item) => (
           <div
             className={cn('absolute inset-x-0 top-0 mx-auto w-full px-4', rowClassName)}

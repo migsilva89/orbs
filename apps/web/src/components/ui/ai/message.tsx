@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { match } from 'ts-pattern';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 import type { UIMessage } from 'ai';
@@ -49,9 +50,12 @@ const MESSAGE_CLAMP_HEIGHT = 320;
 
 const MESSAGE_CLAMP_FADE = 'linear-gradient(to bottom, black calc(100% - 1.75rem), transparent)';
 
+// Opened bubbles stay open for the session, so a transcript that unmounts a row while scrolling brings it back the same.
+const messageClampOpen = new Set<string>();
+
 /** Caps a long bubble at a fixed height, fading its last lines, with a toggle that shows the rest. */
-export function MessageClamp({ expandLabel, collapseLabel, children }: { expandLabel: string, collapseLabel: string, children: ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
+export function MessageClamp({ id, expandLabel, collapseLabel, children }: { id: string, expandLabel: string, collapseLabel: string, children: ReactNode }) {
+  const [isOpen, setIsOpen] = useState(() => messageClampOpen.has(id));
   const [isLong, setIsLong] = useState(false);
   const isFaded = isLong && !isOpen;
 
@@ -66,26 +70,41 @@ export function MessageClamp({ expandLabel, collapseLabel, children }: { expandL
     return () => observer.disconnect();
   };
 
+  const toggle = () => {
+    match(isOpen)
+      .with(true, () => messageClampOpen.delete(id))
+      .with(false, () => messageClampOpen.add(id))
+      .exhaustive();
+
+    setIsOpen(!isOpen);
+  };
+
+  const button = (
+    <Button
+      aria-expanded={isOpen}
+      className={cn('self-center hover:bg-foreground/10', !isOpen && 'absolute bottom-0 left-1/2 -translate-x-1/2')}
+      size="xs"
+      type="button"
+      variant="ghost"
+      onClick={toggle}
+    >
+      {isOpen ? collapseLabel : expandLabel}
+    </Button>
+  );
+
+  // While closed the toggle sits over the faded lines, so finding a bubble long only after it is drawn never changes its height.
   return (
     <>
-      <div
-        className={cn(!isOpen && 'overflow-hidden')}
-        style={isOpen ? undefined : { maxHeight: MESSAGE_CLAMP_HEIGHT, maskImage: isFaded ? MESSAGE_CLAMP_FADE : undefined }}
-      >
-        <div className="flex flex-col gap-2" ref={measure}>{children}</div>
-      </div>
-      {isLong ? (
-        <Button
-          aria-expanded={isOpen}
-          className={cn('self-center hover:bg-foreground/10', !isOpen && '-mt-3')}
-          size="xs"
-          type="button"
-          variant="ghost"
-          onClick={() => setIsOpen(!isOpen)}
+      <div className="relative flex flex-col">
+        <div
+          className={cn(!isOpen && 'overflow-hidden')}
+          style={isOpen ? undefined : { maxHeight: MESSAGE_CLAMP_HEIGHT, maskImage: isFaded ? MESSAGE_CLAMP_FADE : undefined }}
         >
-          {isOpen ? collapseLabel : expandLabel}
-        </Button>
-      ) : null}
+          <div className="flex flex-col gap-2" ref={measure}>{children}</div>
+        </div>
+        {isFaded ? button : null}
+      </div>
+      {isLong && isOpen ? button : null}
     </>
   );
 }

@@ -435,7 +435,7 @@ export function PromptInputEditor({
     <PromptInputEditorContext value={{ renderMention, renderItem }}>
       <EditorContent
         className={cn(
-          'min-w-0 flex-1 data-[multiline=true]:basis-full data-[multiline=true]:px-2 data-[multiline=true]:pt-1 [&_p.is-editor-empty:first-child]:before:pointer-events-none [&_p.is-editor-empty:first-child]:before:float-left [&_p.is-editor-empty:first-child]:before:h-0',
+          'min-w-0 flex-1 data-[multiline=true]:basis-full data-[multiline=true]:px-2 data-[multiline=true]:pt-1 [&_p.is-editor-empty:first-child]:before:pointer-events-none [&_p.is-editor-empty:first-child]:before:float-left [&_p.is-editor-empty:first-child]:before:h-0 [&_p.is-editor-empty:first-child]:before:w-full [&_p.is-editor-empty:first-child]:before:overflow-x-clip [&_p.is-editor-empty:first-child]:before:text-ellipsis [&_p.is-editor-empty:first-child]:before:whitespace-nowrap',
           '[&_p.is-editor-empty:first-child]:before:text-muted-foreground/60 [&_p.is-editor-empty:first-child]:before:content-[attr(data-placeholder)]',
           className,
         )}

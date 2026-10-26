@@ -16,6 +16,7 @@ import { Route as artifactsArtifactsDotlayoutRouteImport } from "./../routes/art
 import { Route as botsBotsDotlayoutRouteImport } from "./../routes/bots/bots.layout";
 import { Route as settingsSettingsDotlayoutRouteImport } from "./../routes/settings/settings.layout";
 import { Route as labLabDotavatarsRouteImport } from "./../routes/lab/lab.avatars";
+import { Route as labLabDotchatRouteImport } from "./../routes/lab/lab.chat";
 import { Route as artifactsArtifactsDotindexRouteImport } from "./../routes/artifacts/artifacts.index";
 import { Route as botsBotsDotindexRouteImport } from "./../routes/bots/bots.index";
 import { Route as botsBotsDotbotIdRouteImport } from "./../routes/bots/bots.$botId";
@@ -75,6 +76,11 @@ const settingsSettingsDotlayoutRoute =
 const labLabDotavatarsRoute = labLabDotavatarsRouteImport.update({
   id: "/lab/avatars",
   path: "/lab/avatars",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const labLabDotchatRoute = labLabDotchatRouteImport.update({
+  id: "/lab/chat",
+  path: "/lab/chat",
   getParentRoute: () => rootRouteImport,
 } as any);
 const artifactsArtifactsDotindexRoute =
@@ -225,6 +231,7 @@ export interface FileRoutesByFullPath {
   "/bots": typeof botsBotsDotlayoutRouteWithChildren;
   "/settings": typeof settingsSettingsDotlayoutRouteWithChildren;
   "/lab/avatars": typeof labLabDotavatarsRoute;
+  "/lab/chat": typeof labLabDotchatRoute;
   "/bots/$botId": typeof botsBotsDotbotIdRouteWithChildren;
   "/bots/create": typeof botsBotsDotcreateRoute;
   "/onboarding/$step": typeof onboardingOnboardingDotstepRoute;
@@ -255,6 +262,7 @@ export interface FileRoutesByTo {
   "/connect": typeof connectConnectRoute;
   "/settings": typeof settingsSettingsDotlayoutRouteWithChildren;
   "/lab/avatars": typeof labLabDotavatarsRoute;
+  "/lab/chat": typeof labLabDotchatRoute;
   "/bots/$botId": typeof botsBotsDotbotIdRouteWithChildren;
   "/bots/create": typeof botsBotsDotcreateRoute;
   "/onboarding/$step": typeof onboardingOnboardingDotstepRoute;
@@ -289,6 +297,7 @@ export interface FileRoutesById {
   "/_chat/bots": typeof botsBotsDotlayoutRouteWithChildren;
   "/_chat/settings": typeof settingsSettingsDotlayoutRouteWithChildren;
   "/lab/avatars": typeof labLabDotavatarsRoute;
+  "/lab/chat": typeof labLabDotchatRoute;
   "/_chat/bots/$botId": typeof botsBotsDotbotIdRouteWithChildren;
   "/_chat/bots/create": typeof botsBotsDotcreateRoute;
   "/_chat/onboarding/$step": typeof onboardingOnboardingDotstepRoute;
@@ -323,6 +332,7 @@ export interface FileRouteTypes {
     | "/bots"
     | "/settings"
     | "/lab/avatars"
+    | "/lab/chat"
     | "/bots/$botId"
     | "/bots/create"
     | "/onboarding/$step"
@@ -353,6 +363,7 @@ export interface FileRouteTypes {
     | "/connect"
     | "/settings"
     | "/lab/avatars"
+    | "/lab/chat"
     | "/bots/$botId"
     | "/bots/create"
     | "/onboarding/$step"
@@ -386,6 +397,7 @@ export interface FileRouteTypes {
     | "/_chat/bots"
     | "/_chat/settings"
     | "/lab/avatars"
+    | "/lab/chat"
     | "/_chat/bots/$botId"
     | "/_chat/bots/create"
     | "/_chat/onboarding/$step"
@@ -417,6 +429,7 @@ export interface RootRouteChildren {
   chatDotlayoutRoute: typeof chatDotlayoutRouteWithChildren;
   connectConnectRoute: typeof connectConnectRoute;
   labLabDotavatarsRoute: typeof labLabDotavatarsRoute;
+  labLabDotchatRoute: typeof labLabDotchatRoute;
   handlersHandlerDotwebmanifestRoute: typeof handlersHandlerDotwebmanifestRoute;
 }
 
@@ -469,6 +482,13 @@ declare module "@tanstack/react-router" {
       path: "/lab/avatars";
       fullPath: "/lab/avatars";
       preLoaderRoute: typeof labLabDotavatarsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/lab/chat": {
+      id: "/lab/chat";
+      path: "/lab/chat";
+      fullPath: "/lab/chat";
+      preLoaderRoute: typeof labLabDotchatRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/_chat/artifacts/": {
@@ -804,6 +824,7 @@ const rootRouteChildren: RootRouteChildren = {
   chatDotlayoutRoute: chatDotlayoutRouteWithChildren,
   connectConnectRoute: connectConnectRoute,
   labLabDotavatarsRoute: labLabDotavatarsRoute,
+  labLabDotchatRoute: labLabDotchatRoute,
   handlersHandlerDotwebmanifestRoute: handlersHandlerDotwebmanifestRoute,
 };
 export const routeTree = rootRouteImport

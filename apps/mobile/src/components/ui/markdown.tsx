@@ -40,6 +40,9 @@ const MARKDOWN_SYNTAX = {
 /** Tall code blocks scroll inside this height, like the web cap. */
 const MARKDOWN_CODE_MAX_HEIGHT = 320;
 
+/** The web code block's shape: a rounded panel with a 1pt edge. */
+const MARKDOWN_CODE_BLOCK = { marginTop: 4, marginBottom: 12, borderRadius: 16, borderWidth: 1 };
+
 interface MarkdownBlock {
   kind: 'text' | 'code';
   text: string;
@@ -110,9 +113,9 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
   // T3 Code's block shape: a modest radius and a hairline edge.
   const block = { marginTop: 4, marginBottom: 12, borderRadius: 8, borderWidth: StyleSheet.hairlineWidth, borderColor: border };
 
-  // Inside a coloured bubble the fence darkens the bubble colour instead of using the muted surface.
+  // Like web, a fence is a page-coloured panel; inside a coloured bubble it darkens the bubble colour instead.
   const fence = match({ color, theme })
-    .with({ color: undefined }, () => codeBackground)
+    .with({ color: undefined }, () => background)
     .with({ theme: 'dark' }, () => 'rgba(0, 0, 0, 0.28)')
     .otherwise(() => 'rgba(0, 0, 0, 0.16)');
 
@@ -136,10 +139,11 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
     thematicBreak: { color: border, height: 1, marginTop: 8, marginBottom: 8 },
     codeBlock: {
       ...text,
-      ...block,
+      ...MARKDOWN_CODE_BLOCK,
+      borderColor: border,
       fontFamily: 'Menlo',
-      fontSize: 14,
-      lineHeight: 20,
+      fontSize: 12,
+      lineHeight: 17,
       backgroundColor: fence,
       padding: 12,
       syntaxColors: theme === 'dark' ? MARKDOWN_SYNTAX.dark : MARKDOWN_SYNTAX.light,
@@ -160,13 +164,17 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
 
   const segments = markdownBlocks(children);
 
-  const render = (markdown: string, isLast: boolean) => (
+  // A capped code block's scroll box draws the block's edge, so the bottom stays rounded while it scrolls.
+  const capped: MarkdownStyle = { ...markdownStyle, codeBlock: { ...markdownStyle.codeBlock, marginTop: 0, marginBottom: 0, borderWidth: 0, borderRadius: 0 } };
+  const cap = { ...MARKDOWN_CODE_BLOCK, borderColor: border, maxHeight: MARKDOWN_CODE_MAX_HEIGHT };
+
+  const render = (markdown: string, isLast: boolean, style = markdownStyle) => (
     <EnrichedMarkdownText
       contextMenuItems={menuItems}
       flavor="github"
       selectable={selectable}
       markdown={markdown}
-      markdownStyle={markdownStyle}
+      markdownStyle={style}
       streamingAnimation={isStreaming && isLast}
       onLinkPress={({ url }) => onLinkPress(url)}
     />
@@ -178,8 +186,8 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
 
   return segments.map((segment, index) => match(segment.kind)
     .with('code', () => (
-      <ScrollView key={index} nestedScrollEnabled style={{ maxHeight: MARKDOWN_CODE_MAX_HEIGHT }}>
-        {render(segment.text, index === segments.length - 1)}
+      <ScrollView key={index} nestedScrollEnabled style={cap}>
+        {render(segment.text, index === segments.length - 1, capped)}
       </ScrollView>
     ))
     .with('text', () => <Fragment key={index}>{render(segment.text, index === segments.length - 1)}</Fragment>)

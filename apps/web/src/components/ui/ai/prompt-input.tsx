@@ -142,10 +142,10 @@ export function PromptInputActionMenu(props: ReactTypes.ComponentProps<typeof Dr
   return <DropdownMenu {...props} />;
 }
 
-export function PromptInputActionMenuTrigger({ children, ...props }: ReactTypes.ComponentProps<typeof PromptInputButton>) {
+export function PromptInputActionMenuTrigger({ children, className, ...props }: ReactTypes.ComponentProps<typeof PromptInputButton>) {
   return (
     <DropdownMenuTrigger asChild>
-      <PromptInputButton {...props}>{children ?? <IconLucidePlus className="size-4" />}</PromptInputButton>
+      <PromptInputButton className={cn('border border-black/8 dark:border-white/12', className)} {...props}>{children ?? <IconLucidePlus className="size-4" />}</PromptInputButton>
     </DropdownMenuTrigger>
   );
 }

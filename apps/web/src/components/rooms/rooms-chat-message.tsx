@@ -178,7 +178,11 @@ export function RoomsChatMessage({
                 return (
                   <MessageContent data-quote-id={message.id}>
                     {isCollapsible ? (
-                      <MessageClamp collapseLabel={m.rooms_chat_read_less()} expandLabel={m.rooms_chat_read_more()}>
+                      <MessageClamp
+                        collapseLabel={m.rooms_chat_read_less()}
+                        expandLabel={m.rooms_chat_read_more()}
+                        id={`${botId}:${key}`}
+                      >
                         {textContent}
                       </MessageClamp>
                     ) : textContent}

@@ -42,5 +42,6 @@ export const routes = rootRoute('root.tsx', [
     ]),
   ]),
   route('/lab/avatars', 'lab/lab.avatars.tsx'),
+  route('/lab/chat', 'lab/lab.chat.tsx'),
   route('/img/favicon/site.webmanifest', 'handlers/handler.webmanifest.ts'),
 ]);

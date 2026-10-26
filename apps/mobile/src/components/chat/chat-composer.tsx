@@ -233,7 +233,7 @@ export function ChatComposer({
     <PromptDock drawer={drawer} onLayout={onLayout}>
       <View className="flex-1">
         <PromptField
-          accessibilityLabel={m.rooms_chat_placeholder()}
+          accessibilityLabel={m.rooms_chat_placeholder({ bot: bot.name })}
           actions={(
             <Button
               accessibilityLabel={action.label}
@@ -246,6 +246,7 @@ export function ChatComposer({
             </Button>
           )}
           header={attachments}
+          isEmpty={text === ''}
           leading={(
             <Menu
               isDisabled={files.isFull}
@@ -257,7 +258,7 @@ export function ChatComposer({
             >
               <Button
                 accessibilityLabel={m.rooms_chat_attach()}
-                className="border border-black/10 dark:border-white/15"
+                className="border border-black/8 dark:border-white/12"
                 disabled={files.isFull}
                 size="icon-sm"
                 variant="secondary"
@@ -266,7 +267,7 @@ export function ChatComposer({
               </Button>
             </Menu>
           )}
-          placeholder={m.rooms_chat_placeholder()}
+          placeholder={m.rooms_chat_placeholder({ bot: bot.name })}
           onChangeText={setText}
           onSelectionChange={(event) => setCursor(event.nativeEvent.selection.end)}
         >

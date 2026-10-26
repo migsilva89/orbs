@@ -236,12 +236,12 @@ export function RoomsChatComposer({
         </InputGroupAddon>
         <Suspense fallback={<div aria-hidden className="h-11 min-w-0 flex-1" />}>
           <PromptInputEditor
-            aria-label={m.rooms_chat_placeholder()}
+            aria-label={m.rooms_chat_placeholder({ bot: bot.name })}
             disabled={isCompacting}
             enterSends={preferences.enterKey[isTouch ? 'mobile' : 'desktop'] === 'send'}
             focusOnMount={!isMobile}
             initialContent={draft.draft ? mentionSegments({ text: draft.draft }) : undefined}
-            placeholder={isCompacting ? m.rooms_chat_compacting_wait() : m.rooms_chat_placeholder()}
+            placeholder={isCompacting ? m.rooms_chat_compacting_wait() : m.rooms_chat_placeholder({ bot: bot.name })}
             recall={recall}
             ref={editor}
             renderItem={(item) => (

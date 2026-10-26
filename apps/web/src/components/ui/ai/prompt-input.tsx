@@ -51,7 +51,7 @@ export function PromptInput({ className, onSubmit, children, ...props }: PromptI
       <div className="absolute inset-x-5 bottom-[calc(100%-1rem)]" ref={setDrawer} />
       <PromptInputDrawerSlot value={drawer}>
         {/* Actions sit on the last line, so they stay put while the field grows; the solid dark fill hides the drawer behind it. */}
-        <InputGroup className="relative h-auto flex-wrap items-end overflow-hidden rounded-3xl bg-background shadow-sm transition-[color,box-shadow,border-radius] duration-240 ease-panel has-[[data-multiline=true]]:rounded-[1.25rem] has-[>[data-align=block-start]]:flex-row motion-reduce:transition-none dark:bg-card has-[[data-multiline=true]]:[&>[data-align=inline-end]]:ml-auto has-[[data-multiline=true]]:[&>[data-align=inline-start]]:order-last">{children}</InputGroup>
+        <InputGroup className="relative h-auto flex-wrap items-end overflow-hidden rounded-3xl bg-background shadow-sm transition-[color,box-shadow] duration-240 ease-panel has-[>[data-align=block-start]]:flex-row motion-reduce:transition-none dark:bg-card has-[[data-multiline=true]]:[&>[data-align=inline-end]]:ml-auto has-[[data-multiline=true]]:[&>[data-align=inline-start]]:order-last">{children}</InputGroup>
       </PromptInputDrawerSlot>
     </form>
   );

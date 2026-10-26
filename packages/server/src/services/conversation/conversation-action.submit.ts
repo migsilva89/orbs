@@ -17,13 +17,9 @@ export async function conversationActionSubmit(
     .otherwise(async () => {
       const bot = await bots.actions.configure({ botId: params.botId });
 
-      const expanded = await match(skills ?? [])
-        .with([], () => ({ content }))
-        .otherwise((names) => skill.queries.expand({
-          bot,
-          names,
-          content,
-        }));
+      const selected = await match(skills ?? [])
+        .with([], () => undefined)
+        .otherwise(async (names) => ({ names, prompt: (await skill.queries.expand({ bot, names })).prompt }));
 
       const files = await attachments.actions.prepare({ ...params, attachmentIds });
       const preferences = await bots.queries.preferences();
@@ -31,7 +27,8 @@ export async function conversationActionSubmit(
       const submission = await runtime.actions.submit({
         ...params,
         whenBusy: params.whenBusy ?? preferences.get(params.botId)?.whenBusy ?? (await conversationQuerySettings(deps)).whenBusy,
-        content: expanded.content,
+        content,
+        skills: selected,
         attachments: files,
       });
 

@@ -5,8 +5,8 @@ import type { ComponentProps } from 'react';
 
 const mentionVariants = cva({
   // Icon and text in the surrounding colour, with a faint tint only on hover or when picked in the editor. The
-  // negative margin keeps the pill inside its line, so it never makes the line taller.
-  base: '-my-1 inline-flex max-w-full items-center gap-1 rounded-md px-1 py-px align-middle text-sm leading-4 font-medium whitespace-nowrap transition-colors hover:bg-current/10 data-[selected=true]:bg-current/10',
+  // negative margin keeps the pill inside its line, so it never makes the line taller; -0.125em centres it on the text, where middle sat it low.
+  base: '-my-1 inline-flex max-w-full items-center gap-1 rounded-md px-1 py-px align-[-0.125em] text-sm leading-4 font-medium whitespace-nowrap transition-colors hover:bg-current/10 data-[selected=true]:bg-current/10',
   variants: {
     variant: {
       default: '',

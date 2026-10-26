@@ -37,9 +37,8 @@ export interface SkillLoadResult {
 
 export interface SkillExpandParams extends SkillLoadParams {
   names: string[];
-  content: string;
 }
 
 export interface SkillExpandResult {
-  content: string;
+  prompt: string;
 }

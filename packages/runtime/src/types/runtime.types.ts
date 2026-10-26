@@ -178,11 +178,23 @@ export interface RuntimeUpdateSubmissionParams extends RuntimeConversationParams
   content?: string;
   whenBusy?: 'followUp' | 'steer' | 'interrupt';
   attachments?: UniversalTypes.Attachment[];
+  skills?: RuntimeMessageSkills;
+}
+
+export interface RuntimeMessageSkills {
+  names: string[];
+  prompt: string;
+}
+
+export interface RuntimeMessageExtras {
+  attachments?: UniversalTypes.Attachment[];
+  replyTo?: UniversalTypes.ReplyQuote;
+  skills?: RuntimeMessageSkills;
 }
 
 type RuntimeSubmitBase = Omit<PiDurableTypes.InputSubmissionDraft, 'type' | 'requestId' | 'whenBusy' | 'entry'>
   & RuntimeConversationParams
-  & { requestId: string; attachments?: UniversalTypes.Attachment[]; replyToEntryId?: number };
+  & { requestId: string; attachments?: UniversalTypes.Attachment[]; replyToEntryId?: number; skills?: RuntimeMessageSkills };
 
 export type RuntimeSubmitParams =
   | (RuntimeSubmitBase & { whenBusy: 'interrupt'; entry?: never })

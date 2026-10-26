@@ -1,7 +1,6 @@
 import { toolBlocks } from '@repo/client/client';
 import { useChatHideVerbose } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { isFileUIPart } from 'ai';
 import { Fragment, useState } from 'react';
 import { match } from 'ts-pattern';
@@ -19,11 +18,11 @@ import { Response } from '@/components/ui/ai/response';
 import { useLongPress } from '@/hooks/use-long-press';
 import { MENTION_ALLOWED_TAGS } from '@/services/mention/mention.constants';
 import { mentionRemark } from '@/services/mention/mention.utils';
-import { rpc } from '@/services/rpc/rpc.client';
 import type { ChatMessage, ToolBot } from '@repo/client/client';
 import type * as ReactTypes from 'react';
 
 const mentionComponents = { mention: RoomsChatMention };
+const remarkPlugins = [mentionRemark()];
 
 interface RoomsChatMessageProps {
   message: ChatMessage
@@ -55,8 +54,6 @@ export function RoomsChatMessage({
   const reply = message.metadata?.replyTo;
   const [sheet, setSheet] = useState(false);
   const press = useLongPress(() => setSheet(true));
-  const { data: bots } = useSuspenseQuery(rpc.bots.list.queryOptions());
-  const remarkPlugins = [mentionRemark({ bots })];
 
   const { hideVerbose } = useChatHideVerbose();
   const blocks = toolBlocks({ parts: message.parts, hideVerbose });

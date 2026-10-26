@@ -13,7 +13,7 @@ export function ChatTyping({ label, accessibilityLabel }: ChatTypingProps) {
     <View
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="progressbar"
-      className="flex-row items-center gap-3 px-3"
+      className="flex-row items-center gap-3 px-5"
     >
       <View className="h-7 flex-row items-center gap-1 rounded-full bg-secondary px-3">
         {[0, 1, 2].map((index) => (

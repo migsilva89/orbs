@@ -7,6 +7,7 @@ export * from './hooks/use-bot-update';
 export * from './hooks/use-chat-approval';
 export * from './hooks/use-chat-around';
 export * from './hooks/use-chat-arrange';
+export * from './hooks/use-chat-section-move';
 export * from './hooks/use-chat-defaults';
 export * from './hooks/use-chat-hide-verbose';
 export * from './hooks/use-notification-presence';

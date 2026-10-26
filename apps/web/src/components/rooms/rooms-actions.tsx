@@ -2,6 +2,7 @@ import { useChatSettings } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { Link } from '@tanstack/react-router';
 import { RoomsMuteMenu } from '@/components/rooms/rooms-mute-menu';
+import { RoomsSectionMenu } from '@/components/rooms/rooms-section-menu';
 import { RoomsSendModeMenu } from '@/components/rooms/rooms-send-mode-menu';
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import IconEye from '~icons/lucide/eye';
@@ -36,6 +37,7 @@ export function RoomsActions({ chat }: RoomsActionsProps) {
           {chat.isPinned ? m.rooms_action_unpin() : m.rooms_action_pin()}
         </DropdownMenuItem>
       )}
+      {chat.isHidden ? null : <RoomsSectionMenu chat={chat} />}
       <DropdownMenuItem onSelect={() => settings.hide(!chat.isHidden)}>
         {chat.isHidden ? <IconEye className="size-4" /> : <IconEyeOff className="size-4" />}
         {chat.isHidden ? m.rooms_action_unhide() : m.rooms_action_hide()}

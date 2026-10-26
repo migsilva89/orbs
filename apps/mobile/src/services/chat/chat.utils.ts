@@ -99,6 +99,10 @@ export function chatNoticeTitle(message: ChatMessage): string {
     return part.data.peerName ? m.rooms_notice_owner_note({ name: part.data.peerName }) : m.rooms_notice_owner_note_unknown();
   }
 
+  if (part?.type === 'data-routineRun') {
+    return part.data.name ? m.rooms_notice_routine_run({ name: part.data.name }) : m.rooms_notice_routine_run_unnamed();
+  }
+
   if (part?.type === 'data-compaction') {
     return m.rooms_notice_compacted();
   }

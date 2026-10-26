@@ -116,6 +116,7 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
               activity={activity}
               approvals={room.approvals}
               bot={bot}
+              bots={bots}
               draft={messages.find((message) => message.id === CHAT.liveMessageId)}
               failure={room.failure}
               questions={room.questions}

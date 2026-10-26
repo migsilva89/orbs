@@ -1,5 +1,5 @@
 import { AssistantEntry, StorageRequestError, UserEntry } from '@earendil-works/pi-durable';
-import { ATTACHMENT, attachmentMessage, REPLY, replyMessage } from '@repo/contracts/universal';
+import { ATTACHMENT, attachmentMessage, ENTRY, REPLY, replyMessage } from '@repo/contracts/universal';
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { COLLABORATION } from '../collaboration/collaboration.constants';
@@ -26,7 +26,7 @@ export function runtimeHistoryPage(page: PiDurableTypes.Page<PiDurableTypes.Entr
 
 function runtimeHistoryMessage(entry: PiDurableTypes.EntryRecord): ConversationHistoryMessage | undefined {
   return match(entry)
-    .with({ kind: P.union(UserEntry.kind, AssistantEntry.kind, COLLABORATION.message, COLLABORATION.reply) }, (value) => (
+    .with({ kind: P.union(UserEntry.kind, AssistantEntry.kind, ENTRY.routineRun, COLLABORATION.message, COLLABORATION.reply) }, (value) => (
       match(value.model?.[0])
         .with({ role: P.union('user', 'assistant') }, (message) => {
           const text = match(message.content)

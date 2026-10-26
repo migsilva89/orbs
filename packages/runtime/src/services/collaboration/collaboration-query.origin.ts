@@ -1,4 +1,4 @@
-import { ATTACHMENT, entryOwnerNote, entryPeerMessage, REPLY } from '@repo/contracts/universal';
+import { ATTACHMENT, ENTRY, entryOwnerNote, entryPeerMessage, REPLY } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { COLLABORATION } from './collaboration.constants';
 import { collaborationBotId } from './collaboration.utils';
@@ -15,7 +15,7 @@ export async function collaborationQueryOrigin(api: ToolExecutionApi, context: C
       const page = await tx.scanEntries({ conversationId: api.conversationId, order: 'descending' }, 50, cursor);
 
       const input = page.items.find((entry) => (
-        entry.kind === 'pi.user' || entry.kind === REPLY.entryKind || entry.kind === ATTACHMENT.entryKind || entry.kind === COLLABORATION.message || entry.kind === COLLABORATION.reply || entry.kind === COLLABORATION.note
+        entry.kind === 'pi.user' || entry.kind === ENTRY.routineRun || entry.kind === REPLY.entryKind || entry.kind === ATTACHMENT.entryKind || entry.kind === COLLABORATION.message || entry.kind === COLLABORATION.reply || entry.kind === COLLABORATION.note
       ));
 
       return match(input)

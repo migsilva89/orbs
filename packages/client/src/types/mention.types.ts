@@ -44,7 +44,7 @@ export interface MentionLinksParams {
 
 export interface MentionMarkdownParams {
   text: string;
-  bots: Pick<Bot, 'id' | 'handle' | 'name'>[];
+  bots: Pick<Bot, 'id' | 'name'>[];
 }
 
 export interface MentionQuoteParams {

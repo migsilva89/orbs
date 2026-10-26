@@ -1,4 +1,5 @@
 import { defineTask } from '@earendil-works/pi-durable';
+import { ENTRY } from '@repo/contracts/universal';
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { routineScheduleNextRunAt } from './routine-schedule.utils';
@@ -53,11 +54,14 @@ export const routineTask = defineTask<RoutineTaskInput, RoutineTaskState, null>(
           throw new Errors.INTERNAL_ERROR({ internal: 'Routine conversation is missing from runtime storage' });
         });
 
+      const routines = await api.snapshot(routineDocument, api.conversationId, context);
+
       const submission = await conversation.submit({
         type: 'input',
         content: checkpoint.prompt,
         whenBusy: 'followUp',
         requestId: `bots.routine:${task.id}:${checkpoint.occurrence}`,
+        entry: { kind: ENTRY.routineRun, data: { routineId: task.input.routineId, name: routines?.routines[task.input.routineId]?.name ?? '' } },
       }, context);
 
       await api.commit(async (tx) => {

@@ -56,7 +56,7 @@ export async function runtimeActionUpdateSubmission(
       })
       .otherwise(() => undefined);
 
-    match(params.content !== undefined || params.attachments !== undefined || params.replyToEntryId !== undefined)
+    match(params.content !== undefined || params.attachments !== undefined || params.replyToEntryId !== undefined || params.skills !== undefined)
       .with(false, () => undefined)
       .with(true, () => {
         const existing = runtimeMessageData(queued.entry);
@@ -71,7 +71,7 @@ export async function runtimeActionUpdateSubmission(
           .with(P.nonNullable, (files) => files)
           .otherwise(() => existing?.attachments ?? []);
 
-        match(content.trim() === '' && attachments.length === 0)
+        match(content.trim() === '' && attachments.length === 0 && !params.skills)
           .with(true, () => {
             throw new Errors.VALIDATION_ERROR({ fields: { content: { message: 'validation_required', args: { field: 'content' } } } });
           })
@@ -82,7 +82,11 @@ export async function runtimeActionUpdateSubmission(
           .with(undefined, () => existing?.replyTo)
           .otherwise(() => replyTo);
 
-        const input = runtimeMessageInput(conversationId, content, attachments, quote);
+        const input = runtimeMessageInput(conversationId, content, {
+          attachments,
+          replyTo: quote,
+          skills: params.skills,
+        });
 
         match(input)
           .with(P.nonNullable, (value) => {

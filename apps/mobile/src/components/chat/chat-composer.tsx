@@ -8,7 +8,6 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { match } from 'ts-pattern';
 import { Button } from '@/components/ui/button';
-import { GlassButton } from '@/components/ui/glass-button';
 import { Icon } from '@/components/ui/icon';
 import { Menu } from '@/components/ui/menu';
 import { PromptAttachment, PromptAttachments, PromptDock, PromptDrawer, PromptJump, PromptQuote } from '@/components/ui/prompt-drawer';
@@ -232,18 +231,6 @@ export function ChatComposer({
 
   return (
     <PromptDock drawer={drawer} onLayout={onLayout}>
-      <Menu
-        isDisabled={files.isFull}
-        items={[
-          { label: m.mobile_chat_attach_photos(), systemImage: 'photo', onSelect: () => void files.pickPhotos() },
-          { label: m.mobile_chat_attach_camera(), systemImage: 'camera', onSelect: () => void files.takePhoto() },
-          { label: m.mobile_chat_attach_files(), systemImage: 'folder', onSelect: () => void files.pickFiles() },
-        ]}
-      >
-        <GlassButton accessibilityLabel={m.rooms_chat_attach()} disabled={files.isFull}>
-          <Icon icon={Plus} size="action" />
-        </GlassButton>
-      </Menu>
       <View className="flex-1">
         <PromptField
           accessibilityLabel={m.rooms_chat_placeholder()}
@@ -259,6 +246,26 @@ export function ChatComposer({
             </Button>
           )}
           header={attachments}
+          leading={(
+            <Menu
+              isDisabled={files.isFull}
+              items={[
+                { label: m.mobile_chat_attach_photos(), systemImage: 'photo', onSelect: () => void files.pickPhotos() },
+                { label: m.mobile_chat_attach_camera(), systemImage: 'camera', onSelect: () => void files.takePhoto() },
+                { label: m.mobile_chat_attach_files(), systemImage: 'folder', onSelect: () => void files.pickFiles() },
+              ]}
+            >
+              <Button
+                accessibilityLabel={m.rooms_chat_attach()}
+                className="border border-black/10 dark:border-white/15"
+                disabled={files.isFull}
+                size="icon-sm"
+                variant="secondary"
+              >
+                <Icon icon={Plus} />
+              </Button>
+            </Menu>
+          )}
           placeholder={m.rooms_chat_placeholder()}
           onChangeText={setText}
           onSelectionChange={(event) => setCursor(event.nativeEvent.selection.end)}

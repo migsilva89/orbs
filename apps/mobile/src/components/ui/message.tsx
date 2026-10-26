@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Image, Pressable, View } from 'react-native';
 import { useCSSVariable } from 'uniwind';
 import { cn } from '@/lib/cn';
+import { Button } from './button';
 import { Icon } from './icon';
 import { markdownColorContext } from './markdown';
 import { Text, textContext } from './text';
@@ -13,17 +14,17 @@ import type { VariantProps } from 'cva';
 import type { ImageURISource, ViewProps } from 'react-native';
 
 const messageVariants = cva({
-  base: 'w-full flex-row items-end gap-2 px-3 py-1',
+  base: 'w-full flex-row items-end gap-2 px-5 py-1',
   variants: { from: { user: 'justify-end', assistant: 'justify-start' } },
 });
 
 const messageStackVariants = cva({
-  base: 'w-4/5 min-w-0 gap-1',
-  variants: { from: { user: 'items-end', assistant: 'items-start' } },
+  base: 'min-w-0 gap-1',
+  variants: { from: { user: 'w-4/5 items-end', assistant: 'w-full items-start' } },
 });
 
 const messageBubbleVariants = cva({
-  base: 'max-w-full min-w-0 rounded-2xl px-3.5 py-2.5',
+  base: 'max-w-full min-w-0 rounded-3xl border border-black/10 px-3.5 py-2.5 dark:border-white/15',
   variants: {
     from: { user: 'bg-primary', assistant: 'bg-secondary' },
     wide: { true: 'w-full', false: '' },
@@ -70,6 +71,7 @@ export function MessageBubble({ from, wide = false, bubble, readMoreLabel, readL
   const [isOpen, setIsOpen] = useState(false);
   const [height, setHeight] = useState(0);
   const markdownColor = from === 'user' ? bubble?.foreground ?? onPrimary : undefined;
+  const tone = from === 'user' && !bubble ? 'on-primary' : 'default';
   const fill = from === 'user' ? bubble?.background ?? primary : secondary;
   const isCapped = readMoreLabel !== undefined && !isOpen;
   const isLong = readMoreLabel !== undefined && height > MESSAGE_CLAMP_HEIGHT;
@@ -78,10 +80,10 @@ export function MessageBubble({ from, wide = false, bubble, readMoreLabel, readL
     <View
       {...props}
       className={cn(messageBubbleVariants({ from, wide }), className)}
-      style={[style, bubble && from === 'user' ? { backgroundColor: bubble.background } : undefined]}
+      style={[{ borderCurve: 'continuous' }, style, bubble && from === 'user' ? { backgroundColor: bubble.background } : undefined]}
     >
       <markdownColorContext.Provider value={markdownColor}>
-        <textContext.Provider value={{ tone: from === 'user' && !bubble ? 'on-primary' : 'default' }}>
+        <textContext.Provider value={{ tone }}>
           <View style={isCapped ? { maxHeight: MESSAGE_CLAMP_HEIGHT, overflow: 'scroll' } : undefined}>
             <View onLayout={(event) => setHeight(event.nativeEvent.layout.height)}>{children}</View>
             {isCapped && isLong ? (
@@ -93,14 +95,15 @@ export function MessageBubble({ from, wide = false, bubble, readMoreLabel, readL
             ) : null}
           </View>
           {isLong ? (
-            <Pressable
-              accessibilityRole="button"
+            <Button
               accessibilityState={{ expanded: isOpen }}
-              className="mt-1.5 self-start opacity-60"
+              className={cn('self-center active:bg-foreground/10', isOpen ? 'mt-1.5' : '-mt-3')}
+              size="xs"
+              variant="ghost"
               onPress={() => setIsOpen(!isOpen)}
             >
-              <Text variant="button-small">{isOpen ? readLessLabel : readMoreLabel}</Text>
-            </Pressable>
+              <Text style={bubble && from === 'user' ? { color: bubble.foreground } : undefined} tone={tone}>{isOpen ? readLessLabel : readMoreLabel}</Text>
+            </Button>
           ) : null}
         </textContext.Provider>
       </markdownColorContext.Provider>

@@ -12,7 +12,7 @@ export function ChatFailure({ botName, detail }: ChatFailureProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <Trace className="mx-3">
+    <Trace className="mx-5">
       <TraceRow
         icon={CircleAlert}
         open={open}

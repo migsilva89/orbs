@@ -1,5 +1,7 @@
+import { code } from '@streamdown/code';
 import { Link, useRouter } from '@tanstack/react-router';
-import { defaultRemarkPlugins, Streamdown } from 'streamdown';
+import { defaultComponents, defaultRemarkPlugins, Streamdown } from 'streamdown';
+import { ResponseCodeIcon } from '@/components/ui/ai/response-code-icon';
 import { ResponseHtml } from '@/components/ui/ai/response-html';
 import { cn } from '@/lib/cn';
 import { linkInternalPath } from '@/lib/link';
@@ -44,6 +46,19 @@ function responseElement(Tag: ResponseTag, base: string) {
   };
 }
 
+function ResponseCodeBlock({ className, ...props }: ComponentProps<'code'> & ExtraProps) {
+  const language = /language-(\S+)/.exec(className ?? '')?.[1] ?? '';
+
+  return (
+    <div className="relative -mx-1 my-4">
+      <span className="absolute top-3 left-3 z-10 flex">
+        <ResponseCodeIcon language={language} />
+      </span>
+      <defaultComponents.code className={className} {...props} />
+    </div>
+  );
+}
+
 function ResponseTable({ node: _node, className, ...props }: ComponentProps<'table'> & ExtraProps) {
   return (
     <div className="scrollbar max-w-full overflow-x-auto rounded-lg border outline-hidden [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1" data-streamdown="table-wrapper">
@@ -66,6 +81,7 @@ const responseComponents: Components = {
   blockquote: responseElement('blockquote', 'border-l-2 border-current/20 pl-3 text-muted-foreground'),
   hr: responseElement('hr', 'border-current/15'),
   strong: responseElement('strong', 'font-semibold'),
+  code: ResponseCodeBlock,
   table: ResponseTable,
   thead: responseElement('thead', ''),
   tbody: responseElement('tbody', '[&>tr:last-child>td]:border-0'),
@@ -81,9 +97,10 @@ export function ResponseContent({ className, components, remarkPlugins, renderHt
       BlockComponent={renderHtml ? ResponseHtml : undefined}
       parseIncompleteMarkdown={renderHtml ? props.isAnimating === true : undefined}
       parseMarkdownIntoBlocksFn={renderHtml ? htmlReplyBlocks : undefined}
-      className={cn('size-full space-y-3 **:data-[streamdown=code-block]:text-foreground **:data-[streamdown=code-block-body]:scrollbar **:data-[streamdown=code-block-body]:p-3 **:data-[streamdown=code-block-body]:text-xs **:data-[streamdown=code-block-body]:[--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] **:data-[streamdown=code-block-body]:[--scrollbar-track:transparent] **:data-[streamdown=code-block-body]:scrollbar-h-1 **:data-[streamdown=code-block-body]:scrollbar-thumb-rounded-full **:data-[streamdown=code-block-body]:scrollbar-w-1 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0', className)}
+      className={cn('size-full space-y-3 **:data-[streamdown=code-block]:my-0 **:data-[streamdown=code-block]:rounded-none **:data-[streamdown=code-block]:border-0 **:data-[streamdown=code-block]:bg-transparent **:data-[streamdown=code-block]:p-0 **:data-[streamdown=code-block]:text-foreground **:data-[streamdown=code-block-actions]:border-0 **:data-[streamdown=code-block-actions]:bg-background **:data-[streamdown=code-block-actions]:p-0 **:data-[streamdown=code-block-actions]:backdrop-blur-none **:data-[streamdown=code-block-body]:scrollbar **:data-[streamdown=code-block-body]:max-h-80 **:data-[streamdown=code-block-body]:overflow-auto **:data-[streamdown=code-block-body]:rounded-2xl **:data-[streamdown=code-block-body]:p-3 **:data-[streamdown=code-block-body]:pt-9 **:data-[streamdown=code-block-body]:text-xs **:data-[streamdown=code-block-body]:[--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] **:data-[streamdown=code-block-body]:[--scrollbar-track:transparent] **:data-[streamdown=code-block-body]:scrollbar-h-1 **:data-[streamdown=code-block-body]:scrollbar-thumb-rounded-full **:data-[streamdown=code-block-body]:scrollbar-w-1 **:data-[streamdown=code-block-body]:*:*:*:before:mr-3 **:data-[streamdown=code-block-body]:*:*:*:before:w-4 **:data-[streamdown=code-block-header]:hidden [&>*:first-child]:mt-0 [&>*:last-child]:mb-0', className)}
       components={{ ...responseComponents, ...components }}
       controls={{ table: false, code: { copy: true, download: false }, mermaid: false }}
+      plugins={{ code }}
       remarkPlugins={remarkPlugins ? [...Object.values(defaultRemarkPlugins), ...remarkPlugins] : undefined}
       {...props}
     />

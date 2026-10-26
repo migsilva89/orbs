@@ -8,3 +8,7 @@ export const conversationIndex = defineDoc<ConversationIndexDocument>({
   initial: () => ({ conversations: {} }),
   checkpointWhen: () => false,
 });
+
+export const CONVERSATION_INDEX = {
+  mentionLink: /\[([^\]\n]+)\]\((?:bot|skill|command|quote):[^)\s]+\)/gu,
+} as const;

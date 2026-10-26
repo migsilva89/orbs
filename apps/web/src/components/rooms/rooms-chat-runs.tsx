@@ -1,3 +1,5 @@
+import { chatPrivateSource } from '@repo/client/client';
+import { Fragment } from 'react';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { RoomsChatActivity } from '@/components/rooms/rooms-chat-activity';
 import { RoomsChatApproval } from '@/components/rooms/rooms-chat-approval';
@@ -9,6 +11,7 @@ import type { Bot, ConversationQuestion, ToolApproval } from '@repo/contracts/un
 
 interface RoomsChatRunsProps {
   bot: Bot
+  bots?: Bot[]
   activity: ChatActivity
   failure: string | null
   draft?: ChatMessage
@@ -16,23 +19,30 @@ interface RoomsChatRunsProps {
   questions: ConversationQuestion[]
 }
 
-export function RoomsChatRuns({ bot, activity, failure, draft, approvals, questions }: RoomsChatRunsProps) {
+export function RoomsChatRuns({ bot, bots = [], activity, failure, draft, approvals, questions }: RoomsChatRunsProps) {
+  const source = (privateWith: string | null) => {
+    const label = chatPrivateSource({ privateWith, bots });
+
+    return label ? <p className="mt-2 text-xs text-muted-foreground">{label}</p> : null;
+  };
+
   return (
     <MessageScrollerItem>
       {questions.map((question) => (
-        <RoomsChatQuestions
-          className="my-2"
-          key={question.id}
-          question={question}
-        />
+        <Fragment key={question.id}>
+          {source(question.privateWith)}
+          <RoomsChatQuestions className="my-2" question={question} />
+        </Fragment>
       ))}
       {approvals.map((approval) => (
-        <RoomsChatApproval
-          approval={approval}
-          botName={bot.name}
-          className="my-2"
-          key={approval.id}
-        />
+        <Fragment key={approval.id}>
+          {source(approval.privateWith)}
+          <RoomsChatApproval
+            approval={approval}
+            botName={bot.name}
+            className="my-2"
+          />
+        </Fragment>
       ))}
       {failure ? (
         <div className="flex items-center gap-2 py-2">

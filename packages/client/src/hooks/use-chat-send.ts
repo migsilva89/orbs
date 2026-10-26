@@ -68,10 +68,10 @@ export function useChatSend({ botId, conversationId, latestEntryId, onOutgoingCh
     const request = pending.current?.key === key ? pending.current : { key, id: generateId() };
     pending.current = null;
 
-    if (content) {
+    if (text.trim()) {
       onOutgoingChange((items) => [
         ...items.filter((item) => item.requestId !== request.id),
-        { requestId: request.id, botId, text: content, afterEntryId: latestEntryId, createdAt: Date.now() },
+        { requestId: request.id, botId, text: text.trim(), afterEntryId: latestEntryId, createdAt: Date.now() },
       ]);
     }
 

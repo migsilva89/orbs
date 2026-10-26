@@ -11,7 +11,7 @@ import type { PressableProps, ViewProps } from 'react-native';
 /** A prompt the bot is waiting on: an approval or a question with choices. */
 export function QuestionCard({ className, children, ...props }: ViewProps) {
   return (
-    <View {...props} className={cn('mx-3 my-2 gap-3 rounded-2xl bg-secondary p-3', className)}>
+    <View {...props} className={cn('mx-5 my-2 gap-3 rounded-2xl bg-secondary p-3', className)}>
       {children}
     </View>
   );

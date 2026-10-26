@@ -6,13 +6,13 @@ import { skillQueryResolve } from './skill-query.resolve';
 import type { SkillExpandParams, SkillExpandResult, SkillLoaderServiceDeps } from '../../types/skill.types';
 import type { Skill } from '@earendil-works/pi-coding-agent';
 
-export function skillQueryExpand(deps: SkillLoaderServiceDeps, { names, content, ...params }: SkillExpandParams): SkillExpandResult {
+export function skillQueryExpand(deps: SkillLoaderServiceDeps, { names, ...params }: SkillExpandParams): SkillExpandResult {
   return match(names)
-    .with([], () => ({ content }))
+    .with([], () => ({ prompt: '' }))
     .otherwise((selected) => {
       const catalog = new Map(skillQueryResolve(deps, params).skills.map((skill) => [skill.name, skill]));
       const blocks = [...new Set(selected)].map((name) => skillExpandBlock(catalog.get(name), name));
-      return { content: [...blocks, content].filter(Boolean).join('\n\n') };
+      return { prompt: blocks.join('\n\n') };
     });
 
   function skillExpandBlock(skill: Skill | undefined, name: string) {

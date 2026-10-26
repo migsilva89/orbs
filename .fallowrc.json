@@ -29,6 +29,7 @@
     "@iconify-json/logos",
     "@iconify-json/lucide",
     "@iconify-json/svg-spinners",
+    "@iconify-json/vscode-icons",
     "babel-plugin-react-compiler",
     "tailwindcss",
     "@expo-google-fonts/inter",

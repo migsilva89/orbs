@@ -1,5 +1,5 @@
-import { createContext, use } from 'react';
-import { Linking } from 'react-native';
+import { createContext, Fragment, use } from 'react';
+import { Linking, ScrollView, StyleSheet } from 'react-native';
 import { EnrichedMarkdownText } from 'react-native-enriched-markdown';
 import { match } from 'ts-pattern';
 import { useCSSVariable, useUniwind } from 'uniwind';
@@ -37,6 +37,42 @@ const MARKDOWN_SYNTAX = {
   },
 } as const;
 
+/** Tall code blocks scroll inside this height, like the web cap. */
+const MARKDOWN_CODE_MAX_HEIGHT = 320;
+
+interface MarkdownBlock {
+  kind: 'text' | 'code';
+  text: string;
+}
+
+/** Splits top-level fenced code blocks out of the markdown, so each can scroll inside a capped height. An unclosed fence runs to the end, as while streaming. */
+function markdownBlocks(markdown: string) {
+  const blocks: MarkdownBlock[] = [];
+  let fence: string | undefined;
+
+  for (const line of markdown.split('\n')) {
+    const marker = /^ {0,3}(`{3,}|~{3,})/.exec(line)?.[1];
+    const last = blocks.at(-1);
+
+    if (fence === undefined && marker) {
+      fence = marker;
+      blocks.push({ kind: 'code', text: line });
+    } else if (fence !== undefined && last) {
+      last.text += `\n${line}`;
+
+      if (marker?.startsWith(fence) && line.trim() === marker) {
+        fence = undefined;
+      }
+    } else if (last?.kind === 'text') {
+      last.text += `\n${line}`;
+    } else {
+      blocks.push({ kind: 'text', text: line });
+    }
+  }
+
+  return blocks.filter((block) => block.text.trim());
+}
+
 const MARKDOWN_TEXT = { fontFamily: 'Inter', fontSize: 16, lineHeight: 21, marginTop: 0, marginBottom: 8 };
 
 interface MarkdownProps {
@@ -71,7 +107,14 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
     .exhaustive();
 
   const heading = (fontSize: number) => ({ ...text, fontSize, lineHeight: Math.round(fontSize * 1.3), fontWeight: '600', marginTop: 8 });
-  const block = { marginTop: 4, marginBottom: 12, borderRadius: 12, borderWidth: 1, borderColor: border };
+  // T3 Code's block shape: a modest radius and a hairline edge.
+  const block = { marginTop: 4, marginBottom: 12, borderRadius: 8, borderWidth: StyleSheet.hairlineWidth, borderColor: border };
+
+  // Inside a coloured bubble the fence darkens the bubble colour instead of using the muted surface.
+  const fence = match({ color, theme })
+    .with({ color: undefined }, () => codeBackground)
+    .with({ theme: 'dark' }, () => 'rgba(0, 0, 0, 0.28)')
+    .otherwise(() => 'rgba(0, 0, 0, 0.16)');
 
   const markdownStyle: MarkdownStyle = {
     paragraph: text,
@@ -97,7 +140,7 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
       fontFamily: 'Menlo',
       fontSize: 14,
       lineHeight: 20,
-      backgroundColor: codeBackground,
+      backgroundColor: fence,
       padding: 12,
       syntaxColors: theme === 'dark' ? MARKDOWN_SYNTAX.dark : MARKDOWN_SYNTAX.light,
     },
@@ -115,15 +158,30 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
     },
   };
 
-  return (
+  const segments = markdownBlocks(children);
+
+  const render = (markdown: string, isLast: boolean) => (
     <EnrichedMarkdownText
       contextMenuItems={menuItems}
       flavor="github"
       selectable={selectable}
-      markdown={children}
+      markdown={markdown}
       markdownStyle={markdownStyle}
-      streamingAnimation={isStreaming}
+      streamingAnimation={isStreaming && isLast}
       onLinkPress={({ url }) => onLinkPress(url)}
     />
   );
+
+  if (!segments.some((segment) => segment.kind === 'code')) {
+    return render(children, true);
+  }
+
+  return segments.map((segment, index) => match(segment.kind)
+    .with('code', () => (
+      <ScrollView key={index} nestedScrollEnabled style={{ maxHeight: MARKDOWN_CODE_MAX_HEIGHT }}>
+        {render(segment.text, index === segments.length - 1)}
+      </ScrollView>
+    ))
+    .with('text', () => <Fragment key={index}>{render(segment.text, index === segments.length - 1)}</Fragment>)
+    .exhaustive());
 }

@@ -216,6 +216,7 @@ function ChatRoomView({ session, bot, bots, view, focusEntryId, replyToEntryId, 
               activity={activity}
               approvals={room.approvals}
               bot={bot}
+              bots={bots}
               draft={messages.find((message) => message.id === CHAT.liveMessageId)}
               failure={room.failure}
               questions={room.questions}

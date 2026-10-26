@@ -63,7 +63,7 @@ export function QuestionItem({ icon, description, action, className, children, .
   action?: ReactNode
 }) {
   return (
-    <li className="flex min-w-0 items-center transition-colors duration-100 hover:bg-accent has-[>button:focus-visible]:bg-accent" data-slot="question-item">
+    <li className="flex min-w-0 items-center transition-colors duration-100 hover:bg-foreground/5 has-[>button:focus-visible]:bg-foreground/5" data-slot="question-item">
       <button className={cn(questionRow, 'flex-1 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset', className)} type="button" {...props}>
         <span aria-hidden="true" className={cn(questionBadge, '[&_svg]:size-3.5')}>{icon}</span>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -97,8 +97,8 @@ export function QuestionOption({ index, tone, className, children, ...props }: C
       className={cn(
         questionRow,
         'group/option transition-colors duration-100 outline-none',
-        'hover:bg-accent focus-visible:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
-        'disabled:pointer-events-none disabled:opacity-50 aria-checked:bg-accent aria-pressed:bg-accent',
+        'hover:bg-foreground/5 focus-visible:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
+        'disabled:pointer-events-none disabled:opacity-50 aria-checked:bg-foreground/10 aria-pressed:bg-foreground/10',
         className,
       )}
       data-slot="question-option"

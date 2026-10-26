@@ -14,7 +14,7 @@ export function RoomsChatReactions({ groups, disabled = false, onToggle }: Rooms
         <button
           aria-label={m.rooms_reaction_chip({ emoji: group.emoji, names: group.names.join(', ') })}
           aria-pressed={group.isMine}
-          className="flex h-5.5 min-w-5.5 items-center justify-center gap-0.5 rounded-full bg-background px-1 text-xxs shadow-xs ring-2 ring-background transition-colors enabled:hover:bg-accent disabled:cursor-default"
+          className="flex h-5.5 min-w-5.5 items-center justify-center gap-0.5 rounded-full bg-background px-1 text-xxs shadow-xs ring-2 ring-background transition-colors enabled:hover:bg-linear-to-r enabled:hover:from-foreground/10 enabled:hover:to-foreground/10 disabled:cursor-default"
           disabled={disabled || !onToggle}
           key={group.emoji}
           title={group.names.join(', ')}

@@ -9,6 +9,8 @@ import type { TextInputProps } from 'react-native';
 const PROMPT_FIELD_LINE_PADDING = 5;
 
 interface PromptFieldProps extends TextInputProps {
+  /** An action at the start of the field, such as attach. */
+  leading?: ReactNode;
   /** Actions at the end of the field, such as send or stop. */
   actions?: ReactNode;
   /** Content inside the field above the text, such as attachments. */
@@ -16,11 +18,12 @@ interface PromptFieldProps extends TextInputProps {
 }
 
 /** The chat composer's growing glass input. */
-export function PromptField({ actions, header, className, ...props }: PromptFieldProps) {
+export function PromptField({ leading, actions, header, className, ...props }: PromptFieldProps) {
   return (
-    <GlassSurface className={cn('min-h-12 gap-1 py-2 pr-2 pl-4', className)} radius="field">
+    <GlassSurface className={cn('min-h-12 gap-1 py-2 pr-2', leading ? 'pl-2' : 'pl-4', className)} radius="field">
       {header ? <View className="pt-1">{header}</View> : null}
       <View className="flex-row items-end gap-2">
+        {leading}
         <TextField
           multiline
           className="max-h-36 flex-1"

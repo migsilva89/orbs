@@ -27,7 +27,7 @@ export function RoomsMentionCard({ bot, children }: RoomsMentionCardProps) {
     >
       <HoverCardTrigger asChild>
         <button
-          className="align-middle outline-none focus-visible:*:ring-2 focus-visible:*:ring-ring"
+          className="align-baseline outline-none focus-visible:*:ring-2 focus-visible:*:ring-ring"
           type="button"
           onClick={openOnTap}
         >

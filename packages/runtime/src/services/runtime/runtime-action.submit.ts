@@ -10,7 +10,7 @@ import type { Conversation, InputSubmissionDraft } from '@earendil-works/pi-dura
 
 export async function runtimeActionSubmit(
   deps: RuntimeServiceDeps,
-  { botId, conversationId, attachments, replyToEntryId, context, ...params }: RuntimeSubmitParams & RuntimeContextInput,
+  { botId, conversationId, attachments, replyToEntryId, skills, context, ...params }: RuntimeSubmitParams & RuntimeContextInput,
 ) {
   async function runtimeActionSubmitInput(conversation: Conversation, draft: InputSubmissionDraft) {
     try {
@@ -34,7 +34,11 @@ export async function runtimeActionSubmit(
     context,
   });
 
-  const input = runtimeMessageInput(conversation.id, params.content, attachments, replyTo);
+  const input = runtimeMessageInput(conversation.id, params.content, {
+    attachments,
+    replyTo,
+    skills,
+  });
 
   return match(params)
     .with({ whenBusy: 'interrupt' }, (draft) => runtimeActionInterrupt(deps, {

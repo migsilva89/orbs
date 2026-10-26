@@ -37,6 +37,7 @@ export interface ChatMetadata {
 interface ChatDataPartPayloads {
   subagent: UniversalTypes.EntrySubagentReport;
   ownerNote: UniversalTypes.EntryOwnerNote & { peerName: string | null };
+  routineRun: UniversalTypes.EntryRoutineRun;
   compaction: { status: 'done' };
   reset: Record<string, never>;
   failure: { text: string };
@@ -111,6 +112,11 @@ export interface ChatReactParams {
   entryId: number;
   emoji: string;
   groups: RoomsReactionGroup[];
+}
+
+export interface ChatPrivateSourceParams {
+  privateWith: string | null;
+  bots: UniversalTypes.Bot[];
 }
 
 export interface ChatAnswerProblemParams {

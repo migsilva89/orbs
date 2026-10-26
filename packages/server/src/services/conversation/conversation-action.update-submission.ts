@@ -8,15 +8,9 @@ export async function conversationActionUpdateSubmission(
 ) {
   const bot = await bots.queries.get({ botId: params.botId });
 
-  const content = await match(params.content)
-    .with(P.string, (text) => match(params.skills ?? [])
-      .with([], () => text)
-      .otherwise((names) => skill.queries.expand({
-        bot,
-        names,
-        content: text,
-      }).then((expanded) => expanded.content)))
-    .otherwise(() => undefined);
+  const skills = await match(params.skills ?? [])
+    .with([], () => undefined)
+    .otherwise(async (names) => ({ names, prompt: (await skill.queries.expand({ bot, names })).prompt }));
 
   const files = await match(params.attachmentIds)
     .with(P.array(), (attachmentIds) => attachments.actions.prepare({ ...params, attachmentIds }))
@@ -27,7 +21,8 @@ export async function conversationActionUpdateSubmission(
     conversationId: params.conversationId,
     submissionId: params.submissionId,
     replyToEntryId: params.replyToEntryId,
-    content,
+    content: params.content,
+    skills,
     attachments: files,
     whenBusy: params.whenBusy,
   });

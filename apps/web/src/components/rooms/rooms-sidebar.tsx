@@ -207,14 +207,16 @@ export function RoomsSidebar() {
       onDragStart={({ active }) => setDraggedId(String(active.id))}
     >
       {pinned.length === 0 && dragged ? <RoomsPinZone id={pinZone} /> : null}
-      <Sidebar.SidebarGroup className="-mt-2">
-        {chats.length === 0 ? <RoomsSidebarEmpty hasBots={bots.length > 0} /> : null}
-        <SortableContext items={pinned.map((chat) => chat.botId)} strategy={verticalListSortingStrategy}>
-          <Sidebar.SidebarMenu>
-            {pinned.map((chat) => <RoomItem chat={chat} key={chat.botId} />)}
-          </Sidebar.SidebarMenu>
-        </SortableContext>
-      </Sidebar.SidebarGroup>
+      {pinned.length > 0 || chats.length === 0 ? (
+        <Sidebar.SidebarGroup className="-mt-2">
+          {chats.length === 0 ? <RoomsSidebarEmpty hasBots={bots.length > 0} /> : null}
+          <SortableContext items={pinned.map((chat) => chat.botId)} strategy={verticalListSortingStrategy}>
+            <Sidebar.SidebarMenu>
+              {pinned.map((chat) => <RoomItem chat={chat} key={chat.botId} />)}
+            </Sidebar.SidebarMenu>
+          </SortableContext>
+        </Sidebar.SidebarGroup>
+      ) : null}
       <SortableContext items={sections.map((section) => `section:${section.id}`)} strategy={verticalListSortingStrategy}>
         {sections.map((section) => (
           <RoomsSidebarSectionGroup
@@ -229,7 +231,7 @@ export function RoomsSidebar() {
         ))}
       </SortableContext>
       <RoomsSidebarUngrouped id={ungroupedZone}>
-        <Sidebar.SidebarGroup>
+        <Sidebar.SidebarGroup className={sections.length > 0 ? '-mt-2' : undefined}>
           <SortableContext items={others.map((chat) => chat.botId)} strategy={verticalListSortingStrategy}>
             <Sidebar.SidebarMenu>
               {others.map((chat) => <RoomItem chat={chat} key={chat.botId} />)}

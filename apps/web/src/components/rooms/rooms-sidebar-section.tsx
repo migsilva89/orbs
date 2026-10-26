@@ -1,13 +1,15 @@
-import { useSortable } from '@dnd-kit/sortable';
+import { arrayMove, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useSidebarSections } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import * as Sidebar from '@/components/ui/sidebar';
-import IconChevronRight from '~icons/lucide/chevron-right';
-import IconGripVertical from '~icons/lucide/grip-vertical';
+import IconArrowDown from '~icons/lucide/arrow-down';
+import IconArrowUp from '~icons/lucide/arrow-up';
+import IconChevronDown from '~icons/lucide/chevron-down';
 import IconPencil from '~icons/lucide/pencil';
 import IconTrash from '~icons/lucide/trash-2';
 import type { RoomsSidebarSection } from '@repo/client/client';
@@ -20,10 +22,17 @@ interface RoomsSidebarSectionGroupProps {
 }
 
 export function RoomsSidebarSectionGroup({ section, children, onCollapsedChange }: RoomsSidebarSectionGroupProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: `section:${section.id}` });
+  const { listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: `section:${section.id}` });
+  const { onKeyDown: _keyboardDrag, ...pointerDrag } = listeners ?? {};
+  const sidebarSections = useSidebarSections();
+  const sectionIds = sidebarSections.sections.map((item) => item.id);
+  const index = sectionIds.indexOf(section.id);
 
   const { setOpenMobile } = Sidebar.useSidebar();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const count = section.chats.length;
+
+  const move = (offset: number) => sidebarSections.arrange({ sectionIds: arrayMove(sectionIds, index, index + offset) });
 
   return (
     <Collapsible open={!section.isCollapsed} onOpenChange={(open) => onCollapsedChange(!open)}>
@@ -34,29 +43,24 @@ export function RoomsSidebarSectionGroup({ section, children, onCollapsedChange 
         style={{ transform: CSS.Translate.toString(transform), transition }}
       >
         <Sidebar.SidebarGroupLabel
-          className="group/section-label relative"
+          className="group/section-label relative data-[empty=true]:mb-0"
+          data-empty={count === 0}
           onContextMenu={(event) => {
             event.preventDefault();
             setIsMenuOpen(true);
           }}
         >
-          <button
-            aria-label={m.rooms_section_reorder({ name: section.name })}
-            className="absolute top-1/2 -left-2 flex-center -translate-y-1/2 cursor-grab touch-none rounded-sm text-muted-foreground/70 ring-sidebar-ring outline-hidden transition-opacity group-hover/section-label:opacity-100 group-data-[collapsible=icon]:hidden focus-visible:opacity-100 focus-visible:ring-2 md:opacity-0"
-            type="button"
-            {...attributes}
-            {...listeners}
-          >
-            <IconGripVertical className="size-3.5" />
-          </button>
           <CollapsibleTrigger asChild>
             <button
-              className="group/section-trigger flex min-w-0 flex-1 items-center gap-1 rounded-sm text-left ring-sidebar-ring outline-hidden focus-visible:ring-2"
+              className="group/section-trigger -mx-2 flex h-7 min-w-0 flex-1 touch-none items-center gap-1 rounded-md px-2 text-left ring-sidebar-ring outline-hidden transition-colors hover:bg-sidebar-accent focus-visible:ring-2"
               type="button"
+              {...pointerDrag}
             >
               <span className="truncate">{section.name}</span>
-              <IconChevronRight className="size-3.5 shrink-0 transition-transform group-data-[state=open]/section-trigger:rotate-90" />
-              <span className="ml-auto tabular-nums">{section.chats.length}</span>
+              <span className="ml-auto flex w-4 shrink-0 justify-center">
+                {section.isCollapsed && count > 0 ? <span className="tabular-nums group-hover/section-trigger:hidden">{count}</span> : null}
+                <IconChevronDown className="hidden size-3.5 transition-transform group-hover/section-trigger:block group-data-[state=closed]/section-trigger:-rotate-90" />
+              </span>
             </button>
           </CollapsibleTrigger>
           <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -74,6 +78,18 @@ export function RoomsSidebarSectionGroup({ section, children, onCollapsedChange 
                   {m.rooms_section_rename()}
                 </Link>
               </DropdownMenuItem>
+              {index > 0 ? (
+                <DropdownMenuItem onSelect={() => move(-1)}>
+                  <IconArrowUp className="size-4" />
+                  {m.rooms_section_move_up()}
+                </DropdownMenuItem>
+              ) : null}
+              {index < sectionIds.length - 1 ? (
+                <DropdownMenuItem onSelect={() => move(1)}>
+                  <IconArrowDown className="size-4" />
+                  {m.rooms_section_move_down()}
+                </DropdownMenuItem>
+              ) : null}
               <DropdownMenuItem asChild variant="destructive">
                 <Link
                   search={(previous) => ({ ...previous, sectionDelete: section.id })}

@@ -1,7 +1,7 @@
-import { ATTACHMENT, attachmentMessage, ENTRY, entryOwnerNote, entryPeerMessage, entrySubagentReport, REACTION, REPLY, replyMessage, replySilent, toolCallJson } from '@repo/contracts/universal';
+import { ATTACHMENT, attachmentMessage, ENTRY, entryOwnerNote, entryPeerMessage, entryRoutineRun, entrySubagentReport, REACTION, REPLY, replyMessage, replySilent, toolCallJson } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { match, P } from 'ts-pattern';
-import { mentionSubmission } from '../mention/mention.utils';
+import { mentionHref, mentionSubmission } from '../mention/mention.utils';
 import { CHAT, CHAT_FILE_TYPES } from './chat.constants';
 import type * as ChatTypes from '../../types/chat.types';
 import type * as UniversalTypes from '@repo/contracts/universal';
@@ -36,7 +36,7 @@ export function chatMessages({ entries, bot, bots }: ChatTypes.ChatMessagesParam
       .with(REACTION.entryKind, () => undefined)
       .with(ATTACHMENT.entryKind, () => match(attachmentMessage.safeParse(entry.data))
         .with({ success: true }, ({ data }) => messages.push(chatOwnerMessage(entry, {
-          text: data.content,
+          text: [...(data.skills ?? []).map((name) => `[$${name}](${mentionHref({ kind: 'skill', name })})`), data.content].filter(Boolean).join(' '),
           files: data.attachments.map((attachment) => ({
             type: 'file' as const,
             mediaType: attachment.mediaType,
@@ -69,6 +69,12 @@ export function chatMessages({ entries, bot, bots }: ChatTypes.ChatMessagesParam
         .with({ success: true }, ({ data }) => messages.push(chatSystemMessage(entry, createdAt, bot, [
           { type: 'data-ownerNote', data: { ...data, peerName: data.peerBotId ? botsById.get(data.peerBotId)?.name ?? null : null } },
           { type: 'text', text: data.text, state: 'done' },
+        ])))
+        .otherwise(() => undefined))
+      .with(ENTRY.routineRun, () => match(entryRoutineRun.safeParse(entry.data))
+        .with({ success: true }, ({ data }) => messages.push(chatSystemMessage(entry, createdAt, bot, [
+          { type: 'data-routineRun', data },
+          { type: 'text', text: chatEntryText(entry), state: 'done' },
         ])))
         .otherwise(() => undefined))
       .with(ENTRY.compaction, () => messages.push(chatSystemMessage(entry, createdAt, bot, [{ type: 'data-compaction', data: { status: 'done' } }])))
@@ -390,6 +396,12 @@ function chatUsageAdd(current: ChatTypes.ChatUsage | null, usage: ChatTypes.Chat
 
 export function chatEntryIds(messages: ChatTypes.ChatMessage[]): number[] {
   return [...new Set(messages.flatMap((message) => (message.metadata?.entryId ? [message.metadata.entryId] : [])))];
+}
+
+export function chatPrivateSource({ privateWith, bots }: ChatTypes.ChatPrivateSourceParams): string | null {
+  const name = bots.find((bot) => bot.id === privateWith)?.name;
+
+  return name ? m.rooms_chat_private_source({ name }) : null;
 }
 
 export function chatAnswerProblem({ isGone, isError }: ChatTypes.ChatAnswerProblemParams): string | null {

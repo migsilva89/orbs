@@ -1,7 +1,9 @@
-import { BOT_ACTIVITY_LABELS, toolRunning } from '@repo/client/client';
+import { BOT_ACTIVITY_LABELS, chatPrivateSource, toolRunning } from '@repo/client/client';
 import { useChatHideVerbose } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
+import { Fragment } from 'react';
 import { View } from 'react-native';
+import { Text } from '@/components/ui/text';
 import { ChatApproval } from './chat-approval';
 import { ChatFailure } from './chat-failure';
 import { ChatQuestion } from './chat-question';
@@ -11,6 +13,7 @@ import type { Bot, ConversationQuestion, ToolApproval } from '@repo/contracts/un
 
 interface ChatRunsProps {
   bot: Bot;
+  bots?: Bot[];
   activity: ChatActivity;
   failure: string | null;
   draft?: ChatMessage;
@@ -18,7 +21,21 @@ interface ChatRunsProps {
   questions: ConversationQuestion[];
 }
 
-export function ChatRuns({ bot, activity, failure, draft, approvals, questions }: ChatRunsProps) {
+export function ChatRuns({ bot, bots = [], activity, failure, draft, approvals, questions }: ChatRunsProps) {
+  const source = (privateWith: string | null) => {
+    const label = chatPrivateSource({ privateWith, bots });
+
+    return label ? (
+      <Text
+        className="mx-4 mt-2"
+        tone="muted"
+        variant="caption"
+      >
+        {label}
+      </Text>
+    ) : null;
+  };
+
   const { hideVerbose } = useChatHideVerbose();
   const last = draft?.parts.filter((part) => part.type !== 'step-start').at(-1);
   const isWaiting = activity === 'queued';
@@ -34,17 +51,16 @@ export function ChatRuns({ bot, activity, failure, draft, approvals, questions }
   return (
     <View>
       {questions.map((question) => (
-        <ChatQuestion
-          key={question.id}
-          question={question}
-        />
+        <Fragment key={question.id}>
+          {source(question.privateWith)}
+          <ChatQuestion question={question} />
+        </Fragment>
       ))}
       {approvals.map((approval) => (
-        <ChatApproval
-          approval={approval}
-          botName={bot.name}
-          key={approval.id}
-        />
+        <Fragment key={approval.id}>
+          {source(approval.privateWith)}
+          <ChatApproval approval={approval} botName={bot.name} />
+        </Fragment>
       ))}
       {failure ? <ChatFailure botName={bot.name} detail={failure} /> : null}
       <View className="h-7 justify-center">

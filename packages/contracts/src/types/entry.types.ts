@@ -10,6 +10,7 @@ export const ENTRY = {
   peerReply: 'bots.bot-reply',
   subagentReport: 'bots.subagent-report',
   ownerNote: 'bots.owner-note',
+  routineRun: 'bots.routine-run',
 } as const;
 
 export const entryPeerMessage = z.object({
@@ -43,7 +44,13 @@ export const entryOwnerNote = z.object({
   text: z.string(),
 });
 
+export const entryRoutineRun = z.object({
+  routineId: z.string(),
+  name: z.string(),
+});
+
 export type EntryPeerMessage = z.infer<typeof entryPeerMessage>;
 export type EntryPeerReply = z.infer<typeof entryPeerReply>;
 export type EntrySubagentReport = z.infer<typeof entrySubagentReport>;
 export type EntryOwnerNote = z.infer<typeof entryOwnerNote>;
+export type EntryRoutineRun = z.infer<typeof entryRoutineRun>;

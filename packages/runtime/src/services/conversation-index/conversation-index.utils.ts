@@ -2,6 +2,7 @@ import { AssistantEntry, UserEntry } from '@earendil-works/pi-durable';
 import { ATTACHMENT, attachmentMessage, REPLY, replyMessage, replySilent } from '@repo/contracts/universal';
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
+import { CONVERSATION_INDEX } from './conversation-index.constants';
 import type { ConversationIndexDocument, ConversationIndexPreview, ConversationIndexSummary } from '../../types/conversation-index.types';
 import type { Context } from '@earendil-works/chord/context';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
@@ -18,7 +19,7 @@ export function conversationIndexMessage(entry: PiDurableTypes.EntryRecord): Con
               .with({ type: 'text' }, ({ text }) => [text])
               .otherwise(() => [])).join(' '));
 
-          const preview = content.replace(/\s+/g, ' ').trim().slice(0, 160);
+          const preview = conversationIndexText(content).slice(0, 160);
 
           return match(preview)
             .with('', () => null)
@@ -31,13 +32,13 @@ export function conversationIndexMessage(entry: PiDurableTypes.EntryRecord): Con
       .with({ success: true }, ({ data }) => ({
         entryId: entry.id,
         role: 'user' as const,
-        preview: data.content.replace(/\s+/g, ' ').trim().slice(0, 160),
+        preview: conversationIndexText(data.content).slice(0, 160),
         createdAt: entry.model?.[0]?.timestamp ?? 0,
       }))
       .otherwise(() => null))
     .with(ATTACHMENT.entryKind, () => match(attachmentMessage.safeParse(entry.data))
       .with({ success: true, data: P.nonNullable }, ({ data }) => {
-        const preview = (data.content.replace(/\s+/g, ' ').trim() || data.attachments[0]?.name || '').slice(0, 160);
+        const preview = (conversationIndexText(data.content) || data.attachments[0]?.name || '').slice(0, 160);
 
         const createdAt = match(entry.model?.[0])
           .with({ role: 'user', timestamp: P.number }, (value) => value.timestamp)
@@ -87,4 +88,8 @@ export function conversationIndexFind(index: ConversationIndexDocument, botId: s
     .otherwise(() => {
       throw new Errors.NOT_FOUND({ resource: 'conversation', resourceId: botId });
     });
+}
+
+function conversationIndexText(content: string) {
+  return content.replace(CONVERSATION_INDEX.mentionLink, '$1').replace(/\s+/g, ' ').trim();
 }

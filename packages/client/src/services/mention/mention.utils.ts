@@ -40,13 +40,6 @@ export function mentionSubmission({ text }: MentionTypes.MentionTextParams): Men
   };
 }
 
-export function mentionHandle(handle: string): RegExp {
-  const notInsideAWord = String.raw`(?<![\p{L}\p{N}_.-])`;
-  const notInsideALongerHandle = String.raw`(?![\p{L}\p{N}_-])`;
-
-  return new RegExp(`${notInsideAWord}@${handle}${notInsideALongerHandle}`, 'iu');
-}
-
 export function mentionQuery({ text, cursor }: MentionTypes.MentionQueryParams): MentionTypes.MentionQuery | undefined {
   const typed = /(?:^|\s)([@$/])([^\s@$/]*)$/u.exec(text.slice(0, cursor));
 
@@ -62,26 +55,14 @@ export function mentionLinks({ text, items }: MentionTypes.MentionLinksParams): 
 }
 
 export function mentionMarkdown({ text, bots }: MentionTypes.MentionMarkdownParams): string {
-  if (bots.length === 0) {
-    return text;
-  }
-
   const byId = new Map(bots.map((bot) => [bot.id, bot]));
-  const byHandle = new Map(bots.map((bot) => [bot.handle, bot]));
-  const handles = new RegExp(mentionHandle(`(?:${[...byHandle.keys()].join('|')})`).source, 'giu');
 
-  return text.split(/(```[\s\S]*?```|`[^`\n]*`)/u).map((part, index) => (index % 2 === 1 ? part : part
-    .replaceAll(MENTION.link, (link, _label, href: string) => {
-      const target = mentionTarget({ href });
-      const bot = target?.kind === 'bot' ? byId.get(target.name) : undefined;
+  return text.split(/(```[\s\S]*?```|`[^`\n]*`)/u).map((part, index) => (index % 2 === 1 ? part : part.replaceAll(MENTION.link, (link, _label, href: string) => {
+    const target = mentionTarget({ href });
+    const bot = target?.kind === 'bot' ? byId.get(target.name) : undefined;
 
-      return bot ? `[${bot.name}](${href})` : link;
-    })
-    .replaceAll(handles, (handle) => {
-      const bot = byHandle.get(handle.slice(1).toLowerCase());
-
-      return bot ? `[${bot.name}](${mentionHref({ kind: 'bot', name: bot.id })})` : handle;
-    }))).join('');
+    return bot ? `[${bot.name}](${href})` : link;
+  }))).join('');
 }
 
 export function mentionQuote({ text, entryId }: MentionTypes.MentionQuoteParams): MentionTypes.MentionItem {

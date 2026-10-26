@@ -45,6 +45,7 @@ export const attachmentMessage = z.object({
   content: z.string(),
   attachments: z.array(attachment),
   replyTo: replyQuote.optional(),
+  skills: z.array(z.string()).optional(),
 });
 
 export type Attachment = z.infer<typeof attachment>;

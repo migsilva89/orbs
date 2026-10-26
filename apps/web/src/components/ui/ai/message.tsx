@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 import type { UIMessage } from 'ai';
 import type { HTMLAttributes, ReactNode } from 'react';
@@ -22,7 +23,7 @@ export function Message({ className, from, ...props }: MessageProps) {
 }
 
 export function MessageStack({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex w-4/5 min-w-0 flex-col gap-1 group-data-[role=assistant]:items-start group-data-[role=user]:items-end', className)} {...props} />;
+  return <div className={cn('flex w-4/5 min-w-0 flex-col gap-1 group-data-[role=assistant]:w-full group-data-[role=assistant]:items-start group-data-[role=user]:items-end', className)} {...props} />;
 }
 
 export function MessageContent({ children, className, ...props }: HTMLAttributes<HTMLDivElement>) {
@@ -30,7 +31,7 @@ export function MessageContent({ children, className, ...props }: HTMLAttributes
     <div className="w-fit max-w-full min-w-0 has-[[data-message-wide]]:w-full">
       <div
         className={cn(
-          'flex flex-col gap-2 overflow-hidden rounded-2xl px-3 py-2 text-sm leading-snug',
+          'flex flex-col gap-2 overflow-hidden rounded-3xl border border-input px-3 py-2 text-sm leading-snug',
           'group-data-[role=user]:bg-bubble group-data-[role=user]:text-bubble-foreground',
           'group-data-[role=user]:selection:bg-bubble-foreground group-data-[role=user]:selection:text-bubble',
           'group-data-[role=assistant]:bg-secondary group-data-[role=assistant]:text-foreground',
@@ -74,14 +75,16 @@ export function MessageClamp({ expandLabel, collapseLabel, children }: { expandL
         <div className="flex flex-col gap-2" ref={measure}>{children}</div>
       </div>
       {isLong ? (
-        <button
+        <Button
           aria-expanded={isOpen}
-          className="self-start text-xs font-medium opacity-60 transition-opacity hover:opacity-100"
+          className={cn('self-center hover:bg-foreground/10', !isOpen && '-mt-3')}
+          size="xs"
           type="button"
+          variant="ghost"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? collapseLabel : expandLabel}
-        </button>
+        </Button>
       ) : null}
     </>
   );

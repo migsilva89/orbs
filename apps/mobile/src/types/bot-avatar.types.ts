@@ -2,4 +2,4 @@ export interface BotAvatarRouteParams extends Record<string, string | string[] |
   avatarEmoji?: string;
 }
 
-export type BotAvatarFormRoute = 'bots/create' | 'bots/[botId]/edit';
+export type BotAvatarFormRoute = 'bots/create' | 'bots/[botId]/edit' | 'onboarding/[step]';

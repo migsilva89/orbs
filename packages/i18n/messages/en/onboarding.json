@@ -5,7 +5,7 @@
   "onboarding_next": "Next",
   "onboarding_skip": "Skip for now",
   "onboarding_welcome_title": "Welcome to {name}",
-  "onboarding_welcome_description": "Your bots run on this computer, with your own model accounts. Three short steps and you can start chatting.",
+  "onboarding_welcome_description": "Your bots run on your own computer, with your own model accounts. Three short steps and you can start chatting.",
   "onboarding_welcome_model": "Connect a model provider",
   "onboarding_welcome_approvals": "Choose how bots ask before they act",
   "onboarding_welcome_bot": "Create your first bot",
@@ -25,6 +25,10 @@
   "onboarding_done_title": "You're set",
   "onboarding_done_description": "{bot} is ready. Providers, tools and skills live in Settings when you need them.",
   "onboarding_done_description_no_bot": "Providers, tools and skills live in Settings when you need them.",
+  "onboarding_done_next_chat": "Say hi and give it a first task",
+  "onboarding_done_next_customize": "Add instructions, skills and tools on its page",
+  "onboarding_done_next_phone": "Pair your phone in Settings → Devices",
+  "onboarding_done_next_notify": "Turn on notifications so bots can reach you",
   "onboarding_done_open": "Open chat",
   "onboarding_done_rooms": "Start chatting",
   "onboarding_done_error": "Couldn't finish setup. Try again.",
@@ -38,5 +42,9 @@
   "onboarding_scene_risky_line": "This one feels risky…",
   "onboarding_scene_bot_question": "Hey! Who are you?",
   "onboarding_scene_bot_answer": "Hi, I'm {name}. Tell me what to work on.",
-  "onboarding_scene_done": "Let's go!"
+  "onboarding_scene_done_model": "Model",
+  "onboarding_scene_done_permission": "Permissions",
+  "onboarding_scene_done_host": "Runs on",
+  "onboarding_scene_done_host_value": "Your computer",
+  "onboarding_scene_done_ready": "Ready"
 }

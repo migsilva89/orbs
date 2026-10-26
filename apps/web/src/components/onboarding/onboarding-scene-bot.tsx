@@ -12,8 +12,8 @@ export function OnboardingSceneBot() {
   const bot = { name: name.trim() || m.rooms_bot_default_name(), avatar: avatar ?? undefined };
 
   return (
-    <OnboardingScene>
-      <div className="absolute inset-x-10 top-1/2 flex -translate-y-1/2 flex-col overflow-hidden rounded-2xl border bg-background shadow-sm">
+    <OnboardingScene screenshot="bot">
+      <div className="absolute inset-x-10 bottom-10 flex flex-col overflow-hidden rounded-2xl border bg-background shadow-sm">
         <div className="flex items-center gap-2.5 border-b px-4 py-3">
           <BotAvatar
             bot={bot}

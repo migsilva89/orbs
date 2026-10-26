@@ -115,6 +115,8 @@ bun run lint        # Oxlint, architecture rules and import cycles
 bun run lint:dead   # Unused files, exports and dependencies
 ```
 
+`bun run screenshots:web` regenerates the onboarding screenshots in `apps/web/public/img/onboarding/`. It starts a throwaway daemon with demo bots and a mock model, so no account or key is needed. Run `bunx playwright install chromium` once first.
+
 Agent guidance lives in `AGENTS.md` and `.agents/`. Run `bun run agents:sync` after changing it: it links `CLAUDE.md`, `.claude/` and the worktree configs for Paseo, Orca, Conductor and T3 Code from `.agents/orchestrators/`.
 
 [Architecture](.agents/references/architecture.md) shows how the apps and packages fit together and where each kind of file goes. The [API reference](.agents/references/api.md) lists the daemon, RPC and Pi behavior the code does not make obvious.

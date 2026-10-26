@@ -8,6 +8,7 @@ import { ContextConnection } from '@/components/context/context-connection';
 import { ContextToast } from '@/components/context/context-toast';
 import { useConnectionIsConnected } from '@/hooks/use-connection';
 import { useNavigationTheme } from '@/hooks/use-navigation-theme';
+import { useOnboardingGate } from '@/hooks/use-onboarding-gate';
 import { usePush, usePushPresence } from '@/hooks/use-push';
 import { appearanceRead } from '@/services/appearance/appearance.client';
 import '@/application/styles.css';
@@ -45,8 +46,9 @@ function RootLayoutTheme() {
   );
 }
 
-function RootLayoutPresence() {
+function RootLayoutConnected() {
   usePushPresence();
+  useOnboardingGate();
 
   return null;
 }
@@ -57,7 +59,7 @@ function RootLayoutStack() {
 
   return (
     <>
-      {isConnected ? <RootLayoutPresence /> : null}
+      {isConnected ? <RootLayoutConnected /> : null}
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Protected guard={isConnected}>
           <Stack.Screen name="index" />
@@ -92,6 +94,8 @@ function RootLayoutStack() {
           <Stack.Screen name="sections/create" options={SHEET_FIT} />
           <Stack.Screen name="sections/[sectionId]/rename" options={SHEET_FIT} />
           <Stack.Screen name="sections/[sectionId]/delete" options={DIALOG} />
+          <Stack.Screen name="onboarding/[step]" options={{ gestureEnabled: false }} />
+          <Stack.Screen name="onboarding/emoji" options={{ ...SHEET, sheetAllowedDetents: [0.6, 1] }} />
           <Stack.Screen name="artifacts/index" options={{ headerShown: true, title: m.artifacts_title(), headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="bots/[botId]/artifacts/[artifactId]/index" options={{ headerShown: true, title: m.artifacts_title(), headerBackButtonDisplayMode: 'minimal' }} />
         </Stack.Protected>

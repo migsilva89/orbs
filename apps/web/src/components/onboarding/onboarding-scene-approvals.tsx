@@ -39,8 +39,8 @@ export function OnboardingSceneApprovals() {
   }, []);
 
   return (
-    <OnboardingScene>
-      <ul className="absolute inset-x-10 top-[16%] m-0 flex list-none flex-col gap-2 p-0">
+    <OnboardingScene screenshot="approvals">
+      <ul className="absolute inset-x-10 top-[51%] m-0 flex list-none flex-col gap-2 p-0">
         {CALLS.map((item, index) => (
           <li
             className={cn(
@@ -57,13 +57,13 @@ export function OnboardingSceneApprovals() {
           </li>
         ))}
       </ul>
-      <div className="absolute bottom-[16%] left-1/2 flex -translate-x-1/2 flex-col items-center gap-1">
+      <div className="absolute right-10 bottom-5 flex items-center gap-2">
         {call.line ? <OnboardingSceneBubble key={active}>{call.line()}</OnboardingSceneBubble> : null}
         <AvatarBlob
           body="droplet"
           color="turquoise"
           expression={call.expression}
-          size={128}
+          size={88}
           state={call.state}
         />
       </div>

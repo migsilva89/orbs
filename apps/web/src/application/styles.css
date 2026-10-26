@@ -286,7 +286,6 @@ button {
   --animate-scene-float: scene-float 4.6s ease-in-out infinite;
   --animate-scene-orbit: scene-orbit 60s linear infinite;
   --animate-scene-orbit-reverse: scene-orbit 60s linear infinite reverse;
-  --animate-scene-confetti: scene-confetti 3.4s linear infinite;
 
   @keyframes timeline-shine {
     from {
@@ -381,17 +380,6 @@ button {
     }
   }
 
-  @keyframes scene-confetti {
-    from {
-      translate: 0 -10vh;
-      rotate: 0deg;
-    }
-    to {
-      translate: 0 70vh;
-      rotate: 540deg;
-    }
-  }
-
   @keyframes highlight {
     from {
       background-color: var(--accent);
@@ -411,6 +399,11 @@ button {
 @utility electrobun-webkit-app-region-no-drag {
   -webkit-app-region: no-drag;
   app-region: no-drag;
+}
+
+@utility bg-dots {
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 14px 14px;
 }
 
 @utility flex-center {

@@ -44,10 +44,10 @@ export function OnboardingSceneModel({ connected, featured }: OnboardingSceneMod
   const modelName = offered.find((model) => model.id === modelId)?.name ?? active?.name;
 
   return (
-    <OnboardingScene>
+    <OnboardingScene screenshot="model">
       <motion.div
         animate={active ? 'on' : 'off'}
-        className="absolute top-1/2 left-1/2 flex w-75 -translate-1/2 flex-col"
+        className="absolute bottom-10 left-1/2 flex w-75 -translate-x-1/2 flex-col"
         initial={isReduced ? false : 'off'}
         key={active?.id ?? 'none'}
       >

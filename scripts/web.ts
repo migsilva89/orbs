@@ -225,7 +225,7 @@ async function screenshots() {
   ], {
     cwd: path.join(root, 'apps/daemon'),
     env: {
-      ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.endsWith('_API_KEY'))),
+      ...Object.fromEntries(Object.entries(process.env).map(([key, value]) => [key, key.endsWith('_API_KEY') ? '' : value])),
       DATA_DIR: temp,
       PI_CODING_AGENT_DIR: path.join(temp, 'pi'),
       DAEMON_HOST: '127.0.0.1',

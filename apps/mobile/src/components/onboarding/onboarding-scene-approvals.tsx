@@ -41,7 +41,7 @@ export function OnboardingSceneApprovals() {
       <View className="w-full max-w-72 gap-1.5">
         {CALLS.map((item, index) => (
           <View
-            className={cn('flex-row items-center gap-3 rounded-xl border border-border bg-background px-3 py-2', index !== active && 'opacity-45')}
+            className={cn('flex-row items-center gap-3 rounded-2xl border border-border bg-background px-3 py-2', index !== active && 'opacity-45')}
             key={item.command}
           >
             <Text

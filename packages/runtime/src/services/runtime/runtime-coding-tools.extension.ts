@@ -2,7 +2,7 @@ import { defineExtension } from '@earendil-works/pi-durable';
 import { createBashTool, createEditTool, createReadTool, createWriteTool } from '@earendil-works/pi-durable/tools';
 import type { RuntimeCodingToolsParams } from '../../types/runtime.types';
 
-export function runtimeCodingTools({ images, secrets }: RuntimeCodingToolsParams) {
+export function runtimeCodingToolsExtension({ images, secrets }: RuntimeCodingToolsParams) {
   return defineExtension({
     name: 'coding-tools',
     tools: [

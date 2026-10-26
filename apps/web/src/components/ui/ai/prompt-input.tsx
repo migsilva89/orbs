@@ -58,7 +58,7 @@ export function PromptInput({ className, onSubmit, children, ...props }: PromptI
 }
 
 const promptInputDrawerVariants = cva({
-  base: 'flex max-h-72 flex-col overflow-y-auto rounded-t-xl border border-b-0 p-1 pb-5 shadow-sm',
+  base: 'scrollbar flex max-h-72 flex-col overflow-y-auto rounded-t-xl border border-b-0 p-1 pb-5 shadow-sm [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1',
   variants: {
     variant: {
       default: 'bg-popover text-popover-foreground',

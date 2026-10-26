@@ -65,7 +65,7 @@ export interface AgentTimelineConnector {
   from: number
   to: number
   at: number
-  shape: 'out' | 'in' | 'line'
+  route: 'out' | 'in' | 'line'
   x0: number
   x1: number
   isUp: boolean

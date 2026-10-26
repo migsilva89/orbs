@@ -34,14 +34,15 @@ export interface ChatMetadata {
   usage: ChatUsage | null;
 }
 
-interface ChatDataPartShapes {
+interface ChatDataPartPayloads {
   subagent: UniversalTypes.EntrySubagentReport;
+  ownerNote: UniversalTypes.EntryOwnerNote & { peerName: string | null };
   compaction: { status: 'done' };
   reset: Record<string, never>;
   failure: { text: string };
 }
 
-export type ChatDataParts = Pick<ChatDataPartShapes, keyof ChatDataPartShapes>;
+export type ChatDataParts = Pick<ChatDataPartPayloads, keyof ChatDataPartPayloads>;
 
 export type ChatMessage = UIMessage<ChatMetadata, ChatDataParts>;
 
@@ -159,6 +160,7 @@ export interface ChatRoomParams {
   bots: UniversalTypes.Bot[];
   view: UniversalTypes.ConversationView;
   outgoing: ChatOutgoing[];
+  isMain?: boolean;
 }
 
 export interface ChatResetParams {

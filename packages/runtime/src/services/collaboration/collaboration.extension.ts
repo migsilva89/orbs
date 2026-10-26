@@ -1,6 +1,7 @@
 import { Type } from '@earendil-works/pi-ai';
 import { defineExtension, defineTool } from '@earendil-works/pi-durable';
 import * as m from '@repo/i18n/messages';
+import { collaborationActionNotify } from './collaboration-action.notify';
 import { collaborationActionSend } from './collaboration-action.send';
 import { collaborationDeliveryTask } from './collaboration-delivery.task';
 import { COLLABORATION } from './collaboration.constants';
@@ -14,7 +15,7 @@ export function collaborationExtension({ policy, directory }: CollaborationDeps)
   const parameters = Type.Object({
     botId: Type.String({ minLength: 1, maxLength: 128 }),
     message: Type.String({ minLength: 1, maxLength: 64_000 }),
-    context: Type.Optional(Type.Union([Type.Literal('existing'), Type.Literal('temporary')])),
+    context: Type.Optional(Type.Union([Type.Literal('existing'), Type.Literal('private')])),
   });
 
   const listBots = defineTool({
@@ -53,10 +54,22 @@ export function collaborationExtension({ policy, directory }: CollaborationDeps)
     }),
   });
 
+  const notifyOwner = defineTool({
+    name: 'bot_notify_owner',
+    description: m.ui_tool_bot_notify_owner_description(),
+    parameters: Type.Object({ message: Type.String({ minLength: 1, maxLength: 8000 }) }),
+    replay: 'safe',
+    execute: (params, api, context) => collaborationActionNotify(deps, {
+      input: params,
+      api,
+      context,
+    }),
+  });
+
   return {
     extension: defineExtension({
       name: COLLABORATION.extension,
-      tools: [listBots, askBot, messageBot],
+      tools: [listBots, askBot, messageBot, notifyOwner],
       tasks: [delivery],
     }),
     readOnlyTools: [listBots],

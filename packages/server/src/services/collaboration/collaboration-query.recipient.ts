@@ -35,7 +35,6 @@ export async function collaborationQueryRecipient(
       ...pair,
       maxPending: COLLABORATION.maxPending,
       maxHops: COLLABORATION.maxHops,
-      temporaryTtlMs: COLLABORATION.temporaryTtlMs,
     }))
     .otherwise(() => {
       throw new Errors.NOT_FOUND({ resource: 'bot', resourceId: recipientId });

@@ -1,10 +1,10 @@
 import { getAgentDir } from '@earendil-works/pi-coding-agent';
-import { mcpDocument, mcpServer } from '@repo/runtime/server';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { match, P } from 'ts-pattern';
+import { mcpDocument, mcpServer } from '@repo/runtime/server';
 import { mcpFiles } from './mcp-files.utils';
 import type { McpConfigParams, McpServiceDeps } from '../../types/mcp.types';
 import type { McpCatalog } from '@repo/contracts/universal';

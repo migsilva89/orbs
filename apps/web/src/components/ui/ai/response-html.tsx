@@ -43,7 +43,7 @@ export function ResponseHtml(props: BlockProps) {
                 {m.ui_html_source()}
               </Button>
             </DialogHeader>
-            <div className="min-h-0 flex-1 overflow-auto">
+            <div className="scrollbar min-h-0 flex-1 overflow-auto [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1">
               {source ? <pre className="p-3 text-xs"><code>{html}</code></pre> : <HtmlFrame html={html} title={title} />}
             </div>
           </DialogContent>

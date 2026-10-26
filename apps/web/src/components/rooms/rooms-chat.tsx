@@ -33,6 +33,7 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [outgoing, setOutgoing] = useState<ChatOutgoing[]>([]);
   const quote = useChatQuote();
+  const [composerHeight, setComposerHeight] = useState(0);
   const { conversationId } = view;
 
   const room = useChatRoom({
@@ -40,6 +41,7 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
     bots,
     view,
     outgoing,
+    isMain: true,
   });
 
   const { messages, activity, queued, isBusy } = room;
@@ -76,6 +78,17 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
     ignoreEventWhen: () => Boolean(document.querySelector(LAYOUT_SHORTCUT_OVERLAYS)),
   });
 
+  const measureComposer = (node: HTMLDivElement | null) => {
+    if (!node) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => setComposerHeight(node.offsetHeight));
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  };
+
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center px-12 pt-3 *:pointer-events-auto">
@@ -85,6 +98,7 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
         <RoomsChatAround
           bot={bot}
           bots={bots}
+          composerHeight={composerHeight}
           entryId={around}
           key={around}
           view={view}
@@ -95,6 +109,7 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
         <RoomsChatTranscript
           bot={bot}
           bots={bots}
+          composerHeight={composerHeight}
           focusedEntryId={focusEntryId}
           footer={(
             <RoomsChatRuns
@@ -120,21 +135,23 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
           onQuote={quoteSelection}
         />
       ) : null}
-      <RoomsChatComposer
-        bot={bot}
-        bots={bots}
-        conversationId={conversationId}
-        editor={composer}
-        isBusy={isBusy}
-        isCompacting={activity === 'compacting'}
-        latestEntryId={view.latestEntryId}
-        messages={messages}
-        queued={queued}
-        replyTo={replyTo}
-        onOutgoingChange={setOutgoing}
-        onReplyChange={setReplyTo}
-        onSend={focusEntryId ? leaveFocus : undefined}
-      />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 *:pointer-events-auto" ref={measureComposer}>
+        <RoomsChatComposer
+          bot={bot}
+          bots={bots}
+          conversationId={conversationId}
+          editor={composer}
+          isBusy={isBusy}
+          isCompacting={activity === 'compacting'}
+          latestEntryId={view.latestEntryId}
+          messages={messages}
+          queued={queued}
+          replyTo={replyTo}
+          onOutgoingChange={setOutgoing}
+          onReplyChange={setReplyTo}
+          onSend={focusEntryId ? leaveFocus : undefined}
+        />
+      </div>
     </div>
   );
 }

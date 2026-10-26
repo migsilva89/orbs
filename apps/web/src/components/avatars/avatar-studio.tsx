@@ -129,7 +129,7 @@ export function AvatarStudio() {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <LayoutPageHeader />
-      <div className="flex min-h-0 flex-1 flex-col gap-10 overflow-y-auto p-6">
+      <div className="scrollbar flex min-h-0 flex-1 flex-col gap-10 overflow-y-auto p-6 [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1">
         <div className="flex flex-col gap-1">
           <h1 className="font-sans text-xl font-semibold">{m.avatars_title()}</h1>
           <p className="text-sm text-muted-foreground">{m.avatars_intro()}</p>

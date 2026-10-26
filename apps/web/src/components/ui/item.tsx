@@ -5,7 +5,7 @@ import type { VariantProps } from 'cva';
 import type { ComponentProps } from 'react';
 
 const itemGroupVariants = cva({
-  base: 'group/item-group flex flex-col',
+  base: 'group/item-group scrollbar flex flex-col [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1',
   variants: {
     variant: {
       default: '',

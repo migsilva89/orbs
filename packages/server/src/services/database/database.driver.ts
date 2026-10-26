@@ -46,5 +46,6 @@ export function databaseDriverMigrations(params: DatabaseTypes.DatabaseDriverMig
 export function databaseDriverLoadMigrations() {
   return {
     '0001_init': readFileSync(new URL('./migrations/0001_init.sql', import.meta.url), 'utf8'),
+    '0002_onboarding_existing': readFileSync(new URL('./migrations/0002_onboarding_existing.sql', import.meta.url), 'utf8'),
   };
 }

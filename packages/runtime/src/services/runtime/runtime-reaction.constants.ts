@@ -3,6 +3,8 @@ import { REACTION } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import type { RuntimeReaction } from '../../types/runtime-reaction.types';
 
+export const RUNTIME_REACTION_TASK = 'bots.reaction';
+
 export const runtimeReactions = defineDocFamily<RuntimeReaction, null>({
   kind: REACTION.docKind,
   version: 2,

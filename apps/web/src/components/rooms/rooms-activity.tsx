@@ -37,7 +37,7 @@ export function RoomsActivity({ botId }: RoomsActivityProps) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <header className="flex items-center gap-3 border-b px-4 py-3">
+      <header className="relative z-20 flex cursor-default items-center gap-3 border-b px-4 py-3 electrobun-webkit-app-region-drag">
         <Button
           asChild
           aria-label={m.rooms_activity_back()}
@@ -45,7 +45,7 @@ export function RoomsActivity({ botId }: RoomsActivityProps) {
           title={m.rooms_activity_back()}
           variant="outline"
         >
-          <Link {...roomsLink(bot)}>
+          <Link className="electrobun-webkit-app-region-no-drag" {...roomsLink(bot)}>
             <IconChevronLeft className="size-4" />
           </Link>
         </Button>
@@ -55,7 +55,7 @@ export function RoomsActivity({ botId }: RoomsActivityProps) {
           <p className="truncate text-xs text-muted-foreground">{bot.name}</p>
         </div>
       </header>
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="scrollbar min-h-0 flex-1 overflow-y-auto [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1">
         <div className="flex w-full flex-col gap-3 p-6">
           {runs.isPending ? [0, 1, 2, 3].map((key) => (
             <div className="flex flex-col gap-1.5 py-2 pl-8.5" key={key}>

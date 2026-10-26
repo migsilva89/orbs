@@ -5,7 +5,7 @@ import { useChatReactions } from './use-chat-reactions';
 import { useRpc } from './use-rpc';
 import type { ChatRoomParams } from '../types/chat.types';
 
-export function useChatRoom({ bot, bots, view, outgoing }: ChatRoomParams) {
+export function useChatRoom({ bot, bots, view, outgoing, isMain = false }: ChatRoomParams) {
   const rpcs = useRpc();
   const { conversationId } = view;
 
@@ -17,7 +17,7 @@ export function useChatRoom({ bot, bots, view, outgoing }: ChatRoomParams) {
 
   const { data: pending = [] } = useQuery(rpcs.rpc.tools.pending.queryOptions({ input: { botId: bot.id } }));
   const { data: questions = [] } = useQuery(rpcs.rpc.conversation.questions.queryOptions({ input: { botId: bot.id, conversationId } }));
-  const approvals = pending.filter((approval) => approval.conversationId === conversationId);
+  const approvals = pending.filter((approval) => approval.conversationId === conversationId || (isMain && approval.privateWith !== null));
   const older = [...(history.data?.pages.flatMap((page) => page.items) ?? [])].reverse();
   const queued = chatQueued(view);
 

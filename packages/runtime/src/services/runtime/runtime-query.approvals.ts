@@ -1,4 +1,5 @@
 import { match, P } from 'ts-pattern';
+import { runtimeContextPrivateWith } from './runtime-context.utils';
 import { runtimeQueryConversation } from './runtime-query.conversation';
 import { runtimeToolApproval } from './runtime.constants';
 import type { RuntimeContextInput, RuntimeConversationParams, RuntimeServiceDeps } from '../../types/runtime.types';
@@ -22,7 +23,7 @@ export async function runtimeQueryApprovals(
       })),
     );
 
-    return documents.flatMap(({ document, conversationId }) => (
+    const approvals = documents.flatMap(({ document, conversationId }) => (
       match(document?.approval)
         .with({
           botId,
@@ -31,6 +32,11 @@ export async function runtimeQueryApprovals(
         }, (approval) => [{ ...approval, conversationId }])
         .otherwise(() => [])
     ));
+
+    return await Promise.all(approvals.map(async (approval) => ({
+      ...approval,
+      privateWith: await runtimeContextPrivateWith(deps, botId, approval.conversationId, context),
+    })));
   } finally {
     graph.dispose();
   }

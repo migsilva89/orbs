@@ -1,5 +1,5 @@
 import { match, P } from 'ts-pattern';
-import { subagentReporter } from './subagent-reporter.task';
+import { subagentReporterTask } from './subagent-reporter.task';
 import { SUBAGENT, subagentAgents, subagentCall } from './subagent.constants';
 import { subagentDetails, subagentPendingReporters, subagentReply } from './subagent.utils';
 import type { SubagentMessageParams, SubagentReporterInput, SubagentToolParams } from '../../types/subagent.types';
@@ -40,7 +40,7 @@ export async function subagentActionSend({ api, context, ...params }: SubagentMe
                   .otherwise(() => 'steer' as const),
               };
 
-              await tx.createTask(subagentReporter, input, { ownership: { kind: 'conversation' }, background: true });
+              await tx.createTask(subagentReporterTask, input, { ownership: { kind: 'conversation' }, background: true });
               call.text = `Sent to ${params.name}.`;
               call.name = params.name;
               call.conversationId = existing.conversationId;

@@ -9,11 +9,11 @@ import IconLucideArrowDown from '~icons/lucide/arrow-down';
 import { Button } from './button';
 import type { VirtualItem, Virtualizer } from '@tanstack/react-virtual';
 import type { VariantProps } from 'cva';
-import type { ComponentProps, ReactNode, RefObject } from 'react';
+import type * as ReactTypes from 'react';
 
 export interface MessageScrollerRow {
   key: string
-  node: ReactNode
+  node: ReactTypes.ReactNode
 }
 
 interface MessageScrollerScrollable {
@@ -34,8 +34,8 @@ interface MessageScrollerPosition {
 }
 
 interface MessageScrollerState {
-  virtualizer: RefObject<Virtualizer<HTMLElement, Element> | null>
-  keys: RefObject<string[]>
+  virtualizer: ReactTypes.RefObject<Virtualizer<HTMLElement, Element> | null>
+  keys: ReactTypes.RefObject<string[]>
   scrollable: MessageScrollerScrollable
   setScrollable: (scrollable: MessageScrollerScrollable) => void
 }
@@ -68,7 +68,7 @@ function useMessageScrollerState(): MessageScrollerState {
   return state;
 }
 
-function MessageScrollerProvider({ children }: { children: ReactNode }) {
+function MessageScrollerProvider({ children }: { children: ReactTypes.ReactNode }) {
   const virtualizer = useRef<Virtualizer<HTMLElement, Element>>(null);
   const keys = useRef<string[]>([]);
   const [scrollable, setScrollable] = useState<MessageScrollerScrollable>({ start: false, end: false });
@@ -96,7 +96,7 @@ function useMessageScrollerScrollable(): MessageScrollerScrollable {
   return useMessageScrollerState().scrollable;
 }
 
-function MessageScroller({ className, ...props }: ComponentProps<'div'>) {
+function MessageScroller({ className, ...props }: ReactTypes.ComponentProps<'div'>) {
   return (
     <div
       className={cn('group/message-scroller relative flex size-full min-h-0 flex-col overflow-hidden', className)}
@@ -107,7 +107,7 @@ function MessageScroller({ className, ...props }: ComponentProps<'div'>) {
 }
 
 const messageScrollerViewportVariants = cva({
-  base: 'scrollbar-thin size-full min-h-0 min-w-0 scrollbar-gutter-stable overflow-y-auto overscroll-contain outline-hidden [overflow-anchor:none] data-pending-scroll:invisible',
+  base: 'scrollbar size-full min-h-0 min-w-0 scrollbar-gutter-stable overflow-y-auto overscroll-contain outline-hidden [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] [overflow-anchor:none] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1 data-pending-scroll:invisible',
   variants: {
     fade: {
       end: 'scroll-fade-b',
@@ -128,14 +128,18 @@ function MessageScrollerViewport({
   focusKey,
   positionKey,
   fade = 'end',
+  endInset = 0,
   className,
   rowClassName,
+  style,
   ...props
-}: Omit<ComponentProps<'section'>, 'children'> & VariantProps<typeof messageScrollerViewportVariants> & {
+}: Omit<ReactTypes.ComponentProps<'section'>, 'children'> & VariantProps<typeof messageScrollerViewportVariants> & {
   rows: MessageScrollerRow[]
   focusKey?: string
   positionKey?: string
   rowClassName?: string
+  /** Pixels covered by something floating over the end, such as the composer: rows end above it and fade out under it. */
+  endInset?: number
 }) {
   const state = useMessageScrollerState();
   const viewport = useRef<HTMLElement>(null);
@@ -145,6 +149,7 @@ function MessageScrollerViewport({
   const place = useRef<{ key: string | null, offset: number }>({ key: null, offset: 0 });
   const pinned = useRef(true);
   const padding = MESSAGE_SCROLLER.padding[fade];
+  const viewportStyle: ReactTypes.CSSProperties & { '--scroll-fade-b-size'?: string } = { ...style, '--scroll-fade-b-size': endInset ? `${endInset}px` : undefined };
   const keys = rows.map((row) => row.key);
 
   // oxlint-disable-next-line react/incompatible-library -- TanStack Virtual returns live methods; the compiler already skips this component
@@ -159,7 +164,7 @@ function MessageScrollerViewport({
     scrollEndThreshold: MESSAGE_SCROLLER.endThreshold,
     overscan: MESSAGE_SCROLLER.overscan,
     paddingStart: padding.start,
-    paddingEnd: padding.end,
+    paddingEnd: padding.end + endInset,
     // Rows holding the reader's selection stay mounted, or scrolling them away would drop it.
     rangeExtractor: (range) => {
       const indexes = defaultRangeExtractor(range);
@@ -272,7 +277,7 @@ function MessageScrollerViewport({
 
   useLayoutEffect(() => {
     follow();
-  }, [rows.length]);
+  }, [rows.length, endInset]);
 
   useEffect(() => {
     document.addEventListener('selectionchange', select);
@@ -286,6 +291,7 @@ function MessageScrollerViewport({
       data-pending-scroll={ready ? undefined : ''}
       data-slot="message-scroller-viewport"
       ref={viewport}
+      style={viewportStyle}
       onScroll={(event) => track(event.currentTarget)}
       {...props}
     >
@@ -317,7 +323,7 @@ const messageScrollerItemVariants = cva({
   defaultVariants: { variant: 'default' },
 });
 
-function MessageScrollerItem({ className, variant, ...props }: ComponentProps<'div'> & VariantProps<typeof messageScrollerItemVariants>) {
+function MessageScrollerItem({ className, variant, ...props }: ReactTypes.ComponentProps<'div'> & VariantProps<typeof messageScrollerItemVariants>) {
   return <div className={cn(messageScrollerItemVariants({ variant }), className)} data-slot="message-scroller-item" {...props} />;
 }
 
@@ -326,7 +332,7 @@ function MessageScrollerButton({
   variant = 'outline',
   size = 'icon-sm',
   ...props
-}: ComponentProps<typeof Button>) {
+}: ReactTypes.ComponentProps<typeof Button>) {
   const { end } = useMessageScrollerScrollable();
   const scroller = useMessageScroller();
 

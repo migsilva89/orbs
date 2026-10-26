@@ -1,7 +1,7 @@
 import { defineTask } from '@earendil-works/pi-durable';
 import { SUBAGENT } from './subagent.constants';
 
-export const subagentAnchor = defineTask<null, { phase: 'done' }, null>({
+export const subagentAnchorTask = defineTask<null, { phase: 'done' }, null>({
   name: SUBAGENT.anchor,
   version: 1,
   initial: () => ({ phase: 'done' }),

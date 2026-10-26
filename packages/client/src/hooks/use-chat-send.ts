@@ -12,8 +12,8 @@ import type { MutationState } from '@tanstack/react-query';
 export function useChatSend({ botId, conversationId, latestEntryId, onOutgoingChange, onResetDone }: ChatSendParams) {
   const { rpc } = useRpc();
   const pending = useRef<{ key: string; id: string } | null>(null);
-  const submit = useMutation(rpc.conversation.submit.mutationOptions({ meta: { error: m.rooms_chat_send_failed() } }));
-  const execute = useMutation(rpc.commands.execute.mutationOptions({ meta: { error: m.rooms_chat_send_failed() } }));
+  const submit = useMutation(rpc.conversation.submit.mutationOptions());
+  const execute = useMutation(rpc.commands.execute.mutationOptions());
   const stop = useMutation(rpc.conversation.stop.mutationOptions({ meta: { error: m.rooms_chat_stop_failed() } }));
 
   const executed = useMutationState<MutationState<void, Error, CommandExecuteInput>>({
@@ -37,6 +37,9 @@ export function useChatSend({ botId, conversationId, latestEntryId, onOutgoingCh
   }, [resetAt]);
 
   async function send({ text, attachmentIds, replyToEntryId }: ChatSendInput): Promise<ChatSendResult> {
+    submit.reset();
+    execute.reset();
+
     const { content, skills, command } = mentionSubmission({ text });
     const reset = chatResetCommand(text);
 
@@ -96,7 +99,7 @@ export function useChatSend({ botId, conversationId, latestEntryId, onOutgoingCh
   return {
     send,
     isSending: submit.isPending,
-    isSendFailed: submit.isError,
+    problem: submit.isError || execute.isError ? m.rooms_chat_send_failed() : null,
     stop: () => stop.mutate({ botId, conversationId }),
   };
 }

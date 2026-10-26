@@ -23,7 +23,7 @@ export function ArtifactList() {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <LayoutPageHeader />
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="scrollbar min-h-0 flex-1 overflow-y-auto [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1">
         <div className="mx-auto w-full max-w-3xl px-4 py-6 md:px-6">
           {artifacts.length === 0 ? (
             <Empty>

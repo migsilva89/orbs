@@ -2,8 +2,8 @@ import { ATTACHMENT, ENTRY, REACTION, REPLY, toolCallJson, toolCallText } from '
 import { match, P } from 'ts-pattern';
 import { activityStoredTrace } from '../../types/activity.types';
 import { questionDocument } from '../question/question.constants';
-import { routineTask } from '../routine/routine.task';
-import { runtimeReactionTask } from '../runtime/runtime-reaction.task';
+import { ROUTINE } from '../routine/routine.constants';
+import { RUNTIME_REACTION_TASK } from '../runtime/runtime-reaction.constants';
 import { runtimeToolApproval } from '../runtime/runtime.constants';
 import { SUBAGENT } from '../subagent/subagent.constants';
 import { ACTIVITY } from './activity.constants';
@@ -163,10 +163,10 @@ export function activityGroups(traces: readonly ActivityTypes.ActivityTrace[], c
 
 function activityTrigger(info: ActivityTypes.ActivityTraceInfo): ContractTypes.ActivityTrigger {
   return match({ kind: info.entryKind, task: info.linkedTask })
-    .with({ task: routineTask.definition.name }, () => 'routine' as const)
-    .with({ task: runtimeReactionTask.definition.name }, { kind: REACTION.entryKind }, () => 'reaction' as const)
+    .with({ task: ROUTINE.task }, () => 'routine' as const)
+    .with({ task: RUNTIME_REACTION_TASK }, { kind: REACTION.entryKind }, () => 'reaction' as const)
     .with({ kind: ENTRY.subagentReport }, () => 'subagent' as const)
-    .with({ kind: P.union(ENTRY.peerMessage, ENTRY.peerReply) }, () => 'peer' as const)
+    .with({ kind: P.union(ENTRY.peerMessage, ENTRY.peerReply, ENTRY.ownerNote) }, () => 'peer' as const)
     .with({ kind: P.union(ENTRY.user, ATTACHMENT.entryKind, REPLY.entryKind) }, () => 'message' as const)
     .otherwise(() => 'other' as const);
 }

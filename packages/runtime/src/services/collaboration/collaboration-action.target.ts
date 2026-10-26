@@ -3,7 +3,7 @@ import { AgentDoc } from '@earendil-works/pi-durable';
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { runtimeBot, runtimeBotConversations } from '../runtime/runtime.constants';
-import { collaborationTemporaryBinding, collaborationTemporaryContext } from './collaboration.constants';
+import { collaborationPrivateBinding, collaborationPrivateContext } from './collaboration.constants';
 import type { CollaborationHarnessDeps, CollaborationTargetParams } from '../../types/collaboration.types';
 import type * as PiDurableTypes from '@earendil-works/pi-durable';
 
@@ -17,40 +17,27 @@ export function collaborationActionTarget({ harness }: CollaborationHarnessDeps,
         throw new Errors.NOT_FOUND({ resource: 'bot', resourceId: params.recipientId });
       });
 
-    return match(params.target ?? 'existing')
+    return match(params.target)
       .with('existing', () => mainConversationId)
-      .with('temporary', () => collaborationTemporaryTarget(tx, mainConversationId))
+      .with('private', () => collaborationPrivateTarget(tx, mainConversationId))
       .exhaustive();
   }, context);
 
-  async function collaborationTemporaryTarget(tx: PiDurableTypes.Tx, mainConversationId: PiDurableTypes.ConversationId) {
-    const binding = await tx.doc(collaborationTemporaryBinding, `${params.senderId}:${params.senderStoreId}:${params.sourceConversationId}`, null);
-    const now = Date.now();
+  async function collaborationPrivateTarget(tx: PiDurableTypes.Tx, mainConversationId: PiDurableTypes.ConversationId) {
+    const binding = await tx.doc(collaborationPrivateBinding, `${params.senderId}:${params.senderStoreId}`, null);
 
-    const conversationId = await match(binding)
-      .with({ conversationId: P.nonNullable, expiresAt: P.number.gt(now) }, (current) => current.conversationId)
+    const conversationId = await match(binding.conversationId)
+      .with(P.nonNullable, (id) => id)
       .otherwise(async () => {
-        await match(binding.conversationId)
-          .with(P.nonNullable, async (id) => {
-            const previous = await tx.doc(collaborationTemporaryContext, id);
-            previous.archivedAt = now;
-          })
-          .otherwise(() => undefined);
-
         const conversation = await tx.createConversation({ ownership: { kind: 'ownerless' } });
-        const metadata = await tx.doc(collaborationTemporaryContext, conversation.id);
-        const expiresAt = now + params.temporaryTtlMs;
+        const metadata = await tx.doc(collaborationPrivateContext, conversation.id);
 
         Object.assign(metadata, {
           senderId: params.senderId,
-          sourceConversationId: params.sourceConversationId,
           recipientId: params.recipientId,
-          createdAt: now,
-          expiresAt,
-          archivedAt: null,
+          createdAt: Date.now(),
         });
         binding.conversationId = conversation.id;
-        binding.expiresAt = expiresAt;
 
         return conversation.id;
       });

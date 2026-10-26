@@ -16,7 +16,7 @@ function agentTimelineConnector({ handoff, index, from, to, byRow, agents }: Tim
   const leadIn = ending ? at - ending.end : 0;
   const leadOut = starting ? starting.start - at : 0;
 
-  const shape = match({ leadIn, leadOut })
+  const route = match({ leadIn, leadOut })
     .when(({ leadIn: value }) => value > 0.05 && value > leadOut, () => 'in' as const)
     .when(({ leadOut: value }) => value > 0.05 || (!ending && !agentTimelineCovering(byRow[to])), () => 'out' as const)
     .otherwise(() => 'line' as const);
@@ -27,12 +27,12 @@ function agentTimelineConnector({ handoff, index, from, to, byRow, agents }: Tim
     from,
     to,
     at,
-    shape,
+    route,
     isUp: to < from,
-    color: shape === 'in' ? agents[from].color : agents[to].color,
-    x0: shape === 'in' ? ending?.end ?? at : at,
-    x1: shape === 'out' ? starting?.start ?? at : at,
-    sourceSpan: (shape === 'in' ? ending : source ?? ending)?.id,
+    color: route === 'in' ? agents[from].color : agents[to].color,
+    x0: route === 'in' ? ending?.end ?? at : at,
+    x1: route === 'out' ? starting?.start ?? at : at,
+    sourceSpan: (route === 'in' ? ending : source ?? ending)?.id,
     targetSpan: (starting ?? agentTimelineCovering(byRow[to]))?.id,
   };
 }
@@ -196,10 +196,10 @@ export function agentTimelineLinkStyle(link: TimelineTypes.AgentTimelineConnecto
   const agentTimelineBottom = (row: number) => agentTimelineCenter(row) + bar / 2;
 
   const [y0, y1] = match(link)
-    .with({ shape: 'out', isUp: true }, () => [agentTimelineCenter(link.to) - line / 2, agentTimelineTop(link.from)])
-    .with({ shape: 'out' }, () => [agentTimelineBottom(link.from), agentTimelineCenter(link.to) + line / 2])
-    .with({ shape: 'in', isUp: true }, () => [agentTimelineBottom(link.to), agentTimelineCenter(link.from) + line / 2])
-    .with({ shape: 'in' }, () => [agentTimelineCenter(link.from) - line / 2, agentTimelineTop(link.to)])
+    .with({ route: 'out', isUp: true }, () => [agentTimelineCenter(link.to) - line / 2, agentTimelineTop(link.from)])
+    .with({ route: 'out' }, () => [agentTimelineBottom(link.from), agentTimelineCenter(link.to) + line / 2])
+    .with({ route: 'in', isUp: true }, () => [agentTimelineBottom(link.to), agentTimelineCenter(link.from) + line / 2])
+    .with({ route: 'in' }, () => [agentTimelineCenter(link.from) - line / 2, agentTimelineTop(link.to)])
     .with({ isUp: true }, () => [agentTimelineBottom(link.to), agentTimelineTop(link.from)])
     .otherwise(() => [agentTimelineBottom(link.from), agentTimelineTop(link.to)]);
 
@@ -207,18 +207,18 @@ export function agentTimelineLinkStyle(link: TimelineTypes.AgentTimelineConnecto
     '--c': link.color,
     top: y0,
     height: Math.max(0, y1 - y0),
-    left: `calc(${agentTimelineAt(link.x0)} - ${link.shape === 'in' ? 0 : line / 2}px)`,
-    width: link.shape === 'line' ? line : `calc(${agentTimelineAt(link.x1 - link.x0)} + ${line / 2}px)`,
+    left: `calc(${agentTimelineAt(link.x0)} - ${link.route === 'in' ? 0 : line / 2}px)`,
+    width: link.route === 'line' ? line : `calc(${agentTimelineAt(link.x1 - link.x0)} + ${line / 2}px)`,
   };
 }
 
 export function agentTimelinePortStyle(link: TimelineTypes.AgentTimelineConnector): TimelineTypes.AgentTimelineStyle {
-  const row = link.shape === 'in' ? link.to : link.from;
-  const isBelow = link.shape === 'in' ? link.isUp : !link.isUp;
+  const row = link.route === 'in' ? link.to : link.from;
+  const isBelow = link.route === 'in' ? link.isUp : !link.isUp;
 
   return {
     '--c': link.color,
-    '--delay': link.shape === 'in' ? '260ms' : '0ms',
+    '--delay': link.route === 'in' ? '260ms' : '0ms',
     top: agentTimelineCenter(row) + (isBelow ? AGENT_TIMELINE.bar / 2 : -AGENT_TIMELINE.bar / 2),
     left: `calc(${agentTimelineAt(link.at)})`,
   };

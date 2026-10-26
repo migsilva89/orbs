@@ -338,6 +338,8 @@
   "rooms_subagent_empty": "No answer yet.",
   "rooms_notice_subagent_answered": "{name} finished",
   "rooms_notice_subagent_failed": "{name} failed",
+  "rooms_notice_owner_note": "Raised from a private chat with {name}",
+  "rooms_notice_owner_note_unknown": "Raised from a private chat",
   "rooms_notice_compacted": "Earlier messages were summarized",
   "rooms_notice_reset": "New session started",
   "mobile_bot_discard_title": "Discard your changes?",

@@ -145,7 +145,7 @@ export function ToolContent({ className, children, ...props }: ComponentProps<ty
 }
 
 const toolCodeVariants = cva({
-  base: 'scrollbar-thin max-h-64 max-w-full overflow-auto font-mono text-xxs leading-relaxed whitespace-pre outline-hidden',
+  base: 'scrollbar max-h-64 max-w-full overflow-auto font-mono text-xxs leading-relaxed whitespace-pre outline-hidden [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1',
   variants: {
     variant: {
       default: 'text-muted-foreground',

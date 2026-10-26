@@ -3,11 +3,11 @@ import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
 import { routineScheduleNextRunAt } from './routine-schedule.utils';
 import { routineWait } from './routine-wait.utils';
-import { routineDocument } from './routine.constants';
+import { ROUTINE, routineDocument } from './routine.constants';
 import type { RoutineTaskInput, RoutineTaskState } from '../../types/routine.types';
 
 export const routineTask = defineTask<RoutineTaskInput, RoutineTaskState, null>({
-  name: 'bots.routine',
+  name: ROUTINE.task,
   version: 1,
   initial: () => ({ phase: 'check' }),
   phases: {

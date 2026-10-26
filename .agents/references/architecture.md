@@ -213,7 +213,6 @@ packages/
 ├── i18n/src/                           Paraglide config and entries; src/paraglide/ is generated
 ├── avatar-blobs/src/<concern>.ts       the blob avatar engine, player and skins
 ├── tanstack-helpers/src/<concern>.ts   head, metadata and favicon helpers
-├── tooling/src/vitest/                 shared Vitest config
 ├── <package>/src/types/<prefix>.types.ts  a shared package's types and zod schemas
 └── typescript-config/{base,react}.json    compiler options every package extends
 ```
@@ -247,7 +246,7 @@ packages/
 | `packages/runtime` | Pi integration: Harness, conversations, tools, hooks, approvals, tasks, watches, recovery, skill, instruction and plugin loading, MCP clients. |
 | `packages/contracts` | Public schemas, input and output types, oRPC contracts and errors, including the schemas clients validate forms, search params, pairing codes and stored preferences with. No implementations. |
 | `packages/client` | Typed RPC calls, reconnect, applying Pi view updates, and the data and view helpers web and mobile share. Chat and bot hooks live here, not in the apps. `./client` stays free of React. No UI components; apps keep route-bound hooks, toasts and navigation. |
-| Shared packages | Env, errors, logging, i18n, avatars, the secret proxy and tooling. No application dependencies. |
+| Shared packages | Env, errors, logging, i18n, avatars and the secret proxy. No application dependencies. |
 
 Native code stays in its owning package behind `/native`. Using files, SQLite or subprocesses does **not** make code daemon logic.
 

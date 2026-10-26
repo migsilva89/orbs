@@ -28,6 +28,7 @@ export const toolApproval = z.object({
   id: z.number().int().positive(),
   botId: z.uuid(),
   conversationId: z.number().int().positive(),
+  privateWith: z.uuid().nullable(),
   toolName: z.string(),
   arguments: z.json(),
   createdAt: z.number().int(),

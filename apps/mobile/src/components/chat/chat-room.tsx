@@ -132,6 +132,7 @@ function ChatRoomView({ session, bot, bots, view, focusEntryId, replyToEntryId, 
     bots,
     view,
     outgoing,
+    isMain: true,
   });
 
   const { activity, queued } = room;

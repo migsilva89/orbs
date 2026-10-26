@@ -42,7 +42,7 @@ export function ReasoningTrigger({ className, children, botName, ...props }: Com
 export function ReasoningContent({ className, children, ...props }: Omit<ComponentProps<typeof CollapsibleContent>, 'children'> & { children: string }) {
   return (
     <CollapsibleContent className={cn('mt-2 text-sm text-muted-foreground motion-reduce:animate-none', className)} {...props}>
-      <div className="scrollbar-thin max-h-64 overflow-y-auto overscroll-contain pr-2 wrap-anywhere">
+      <div className="scrollbar max-h-64 overflow-y-auto overscroll-contain pr-2 wrap-anywhere [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1">
         <Response className="space-y-1 leading-snug">{children}</Response>
       </div>
     </CollapsibleContent>

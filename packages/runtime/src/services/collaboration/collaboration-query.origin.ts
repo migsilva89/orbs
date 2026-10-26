@@ -1,4 +1,4 @@
-import { ATTACHMENT, entryPeerMessage, REPLY } from '@repo/contracts/universal';
+import { ATTACHMENT, entryOwnerNote, entryPeerMessage, REPLY } from '@repo/contracts/universal';
 import { match, P } from 'ts-pattern';
 import { COLLABORATION } from './collaboration.constants';
 import { collaborationBotId } from './collaboration.utils';
@@ -15,13 +15,14 @@ export async function collaborationQueryOrigin(api: ToolExecutionApi, context: C
       const page = await tx.scanEntries({ conversationId: api.conversationId, order: 'descending' }, 50, cursor);
 
       const input = page.items.find((entry) => (
-        entry.kind === 'pi.user' || entry.kind === REPLY.entryKind || entry.kind === ATTACHMENT.entryKind || entry.kind === COLLABORATION.message || entry.kind === COLLABORATION.reply
+        entry.kind === 'pi.user' || entry.kind === REPLY.entryKind || entry.kind === ATTACHMENT.entryKind || entry.kind === COLLABORATION.message || entry.kind === COLLABORATION.reply || entry.kind === COLLABORATION.note
       ));
 
       return match(input)
         .with({ kind: P.union(COLLABORATION.message, COLLABORATION.reply) }, (entry) => (
           entryPeerMessage.safeParse(entry.data).data?.hops ?? Number.POSITIVE_INFINITY
         ))
+        .with({ kind: COLLABORATION.note }, (entry) => entryOwnerNote.safeParse(entry.data).data?.hops ?? Number.POSITIVE_INFINITY)
         .with(P.nonNullable, () => 0)
         .otherwise(() => match(page.next)
           .with(P.nonNullable, collaborationReadOrigin)

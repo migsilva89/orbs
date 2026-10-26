@@ -1,8 +1,7 @@
 import { match, P } from 'ts-pattern';
 import { questionDocument } from '../question/question.constants';
-import { routineDocument } from '../routine/routine.constants';
-import { routineTask } from '../routine/routine.task';
-import { subagentAnchor } from '../subagent/subagent-anchor.task';
+import { ROUTINE, routineDocument } from '../routine/routine.constants';
+import { SUBAGENT } from '../subagent/subagent.constants';
 import { RUNTIME_ALARM_HEARTBEAT_MS, runtimeBotConversations, runtimeToolApproval } from './runtime.constants';
 import type { RuntimeServiceDeps } from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
@@ -26,7 +25,7 @@ export async function runtimeQueryNextDeadline({ harness, botId }: RuntimeServic
       (await harness.snapshot(questionDocument, task.id, context))?.question,
     ]));
 
-    const isLive = tasks.some((task) => task.kind !== routineTask.definition.name && task.kind !== subagentAnchor.definition.name);
+    const isLive = tasks.some((task) => task.kind !== ROUTINE.task && task.kind !== SUBAGENT.anchor);
 
     const deadlines = [
       ...Object.values(routines?.routines ?? {}).flatMap((routine) => match(routine)

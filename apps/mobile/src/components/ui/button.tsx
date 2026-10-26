@@ -65,7 +65,7 @@ export function Button({ variant = 'primary', size = 'default', className, child
 
   const textVariant = match(size).with('xs', 'icon-xs', () => 'button-small' as const).otherwise(() => 'button' as const);
 
-  const shape = match(size)
+  const radius = match(size)
     .with('pill', 'icon', 'icon-xs', 'icon-sm', () => 'round' as const)
     .with('inline', () => 'inline' as const)
     .otherwise(() => 'default' as const);
@@ -79,7 +79,7 @@ export function Button({ variant = 'primary', size = 'default', className, child
       disabled={disabled || loading}
       hitSlop={props.hitSlop ?? 3}
     >
-      {match(variant).with('primary', 'red', () => <Surface shape={shape} />).otherwise(() => null)}
+      {match(variant).with('primary', 'red', () => <Surface radius={radius} />).otherwise(() => null)}
       <textContext.Provider value={{ variant: textVariant, tone }}>
         {match(loading)
           .with(true, () => loadingIcon?.() ?? (

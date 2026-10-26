@@ -32,7 +32,7 @@ export function Toast({ message, variant, onHide }: ToastProps) {
       style={{ top: insets.top + 8 }}
     >
       <Pressable accessibilityLiveRegion="polite" accessibilityRole="alert" onPress={onHide}>
-        <GlassSurface className="min-h-14 flex-row items-center gap-3 py-2.5 pr-2.5 pl-3" shape="field">
+        <GlassSurface className="min-h-14 flex-row items-center gap-3 py-2.5 pr-2.5 pl-3" radius="field">
           <View className="size-9 items-center justify-center rounded-xl bg-muted">
             <Icon icon={look.icon} size="action" tone={look.tone} />
           </View>

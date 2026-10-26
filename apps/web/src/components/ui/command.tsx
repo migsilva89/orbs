@@ -46,7 +46,7 @@ function CommandInput({ className, start, ...props }: ComponentProps<typeof Comm
 }
 
 function CommandList({ className, ...props }: ComponentProps<typeof CommandPrimitive.List>) {
-  return <CommandPrimitive.List className={cn('max-h-72 scroll-py-1 overflow-x-hidden overflow-y-auto outline-hidden', className)} data-slot="command-list" {...props} />;
+  return <CommandPrimitive.List className={cn('scrollbar max-h-72 scroll-py-1 overflow-x-hidden overflow-y-auto outline-hidden [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1', className)} data-slot="command-list" {...props} />;
 }
 
 function CommandEmpty(props: ComponentProps<typeof CommandPrimitive.Empty>) {

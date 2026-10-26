@@ -9,6 +9,7 @@ export const ENTRY = {
   peerMessage: 'bots.bot-message',
   peerReply: 'bots.bot-reply',
   subagentReport: 'bots.subagent-report',
+  ownerNote: 'bots.owner-note',
 } as const;
 
 export const entryPeerMessage = z.object({
@@ -35,6 +36,14 @@ export const entrySubagentReport = z.object({
   status: z.enum(['answered', 'failed']),
 });
 
+export const entryOwnerNote = z.object({
+  peerBotId: z.uuid().nullable(),
+  conversationId: z.number().int().positive(),
+  hops: z.number().int().nonnegative(),
+  text: z.string(),
+});
+
 export type EntryPeerMessage = z.infer<typeof entryPeerMessage>;
 export type EntryPeerReply = z.infer<typeof entryPeerReply>;
 export type EntrySubagentReport = z.infer<typeof entrySubagentReport>;
+export type EntryOwnerNote = z.infer<typeof entryOwnerNote>;

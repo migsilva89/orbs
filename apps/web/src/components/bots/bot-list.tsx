@@ -26,7 +26,7 @@ export function BotList() {
           </Link>
         </Button>
       </LayoutPageHeader>
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="scrollbar min-h-0 flex-1 overflow-y-auto [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1">
         <div className="mx-auto w-full max-w-3xl px-4 py-6 md:px-6">
           <ul className="grid gap-2 sm:grid-cols-2">
             {bots.map((bot) => (

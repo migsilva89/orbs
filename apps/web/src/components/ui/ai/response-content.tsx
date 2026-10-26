@@ -46,7 +46,7 @@ function responseElement(Tag: ResponseTag, base: string) {
 
 function ResponseTable({ node: _node, className, ...props }: ComponentProps<'table'> & ExtraProps) {
   return (
-    <div className="scrollbar-thin max-w-full overflow-x-auto rounded-lg border outline-hidden" data-streamdown="table-wrapper">
+    <div className="scrollbar max-w-full overflow-x-auto rounded-lg border outline-hidden [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1" data-streamdown="table-wrapper">
       <table className={cn('w-max min-w-full border-collapse text-xs', className)} {...props} />
     </div>
   );
@@ -81,7 +81,7 @@ export function ResponseContent({ className, components, remarkPlugins, renderHt
       BlockComponent={renderHtml ? ResponseHtml : undefined}
       parseIncompleteMarkdown={renderHtml ? props.isAnimating === true : undefined}
       parseMarkdownIntoBlocksFn={renderHtml ? htmlReplyBlocks : undefined}
-      className={cn('size-full space-y-3 **:data-[streamdown=code-block-body]:p-3 **:data-[streamdown=code-block-body]:text-xs [&>*:first-child]:mt-0 [&>*:last-child]:mb-0', className)}
+      className={cn('size-full space-y-3 **:data-[streamdown=code-block]:text-foreground **:data-[streamdown=code-block-body]:scrollbar **:data-[streamdown=code-block-body]:p-3 **:data-[streamdown=code-block-body]:text-xs **:data-[streamdown=code-block-body]:[--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] **:data-[streamdown=code-block-body]:[--scrollbar-track:transparent] **:data-[streamdown=code-block-body]:scrollbar-h-1 **:data-[streamdown=code-block-body]:scrollbar-thumb-rounded-full **:data-[streamdown=code-block-body]:scrollbar-w-1 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0', className)}
       components={{ ...responseComponents, ...components }}
       controls={{ table: false, code: { copy: true, download: false }, mermaid: false }}
       remarkPlugins={remarkPlugins ? [...Object.values(defaultRemarkPlugins), ...remarkPlugins] : undefined}

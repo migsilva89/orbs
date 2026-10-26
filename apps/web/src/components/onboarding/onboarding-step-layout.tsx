@@ -25,7 +25,7 @@ export function OnboardingStepLayout({ title, description, back, actions, scene,
   return (
     <>
       <div className="flex min-h-0 flex-col">
-        <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-8">
+        <div className="scrollbar flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-8 [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1">
           <div className="flex flex-col gap-2">
             <p className="sr-only">{m.onboarding_progress({ current: current + 1, total: steps.length })}</p>
             <div aria-hidden="true" className="flex gap-1">

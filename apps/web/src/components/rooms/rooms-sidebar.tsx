@@ -15,12 +15,9 @@ import { RoomsPinZone } from '@/components/rooms/rooms-pin-zone';
 import { RoomsSidebarSectionGroup } from '@/components/rooms/rooms-sidebar-section';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader } from '@/components/ui/empty';
 import * as Sidebar from '@/components/ui/sidebar';
 import { rpc } from '@/services/rpc/rpc.client';
-import IconFolderPlus from '~icons/lucide/folder-plus';
-import IconMessageSquarePlus from '~icons/lucide/message-square-plus';
 import IconPlus from '~icons/lucide/plus';
 import IconSearch from '~icons/lucide/search';
 import type { DragEndEvent } from '@dnd-kit/core';
@@ -46,40 +43,21 @@ export function RoomsSidebarActions() {
           <IconSearch className="size-4" />
         </Link>
       </Button>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            aria-label={m.rooms_new()}
-            size="icon-sm"
-            title={m.rooms_new()}
-            variant="outline"
-          >
-            <IconPlus className="size-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem asChild>
-            <Link
-              search={{ start: true }}
-              to="/rooms"
-              onClick={() => setOpenMobile(false)}
-            >
-              <IconMessageSquarePlus className="size-4" />
-              {m.rooms_new_chat()}
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link
-              search={(previous) => ({ ...previous, section: 'create' })}
-              to="."
-              onClick={() => setOpenMobile(false)}
-            >
-              <IconFolderPlus className="size-4" />
-              {m.rooms_section_new()}
-            </Link>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Button
+        asChild
+        size="icon-sm"
+        variant="outline"
+      >
+        <Link
+          aria-label={m.rooms_new()}
+          search={{ start: true }}
+          title={m.rooms_new()}
+          to="/rooms"
+          onClick={() => setOpenMobile(false)}
+        >
+          <IconPlus className="size-4" />
+        </Link>
+      </Button>
     </div>
   );
 }

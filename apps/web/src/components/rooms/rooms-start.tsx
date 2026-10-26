@@ -9,6 +9,7 @@ import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui
 import { InputGroupAddon } from '@/components/ui/input-group';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { rpc } from '@/services/rpc/rpc.client';
+import IconFolderPlus from '~icons/lucide/folder-plus';
 import IconPlus from '~icons/lucide/plus';
 import IconX from '~icons/lucide/x';
 import type { FocusEvent, KeyboardEvent, ReactNode } from 'react';
@@ -85,11 +86,11 @@ export function RoomsStart() {
       onKeyDown={closeOnEscape}
       onValueChange={setSelected}
     >
-      <div className="flex h-12 shrink-0 items-center gap-2 border-b pr-2 pl-12 md:pl-4">
+      <div className="relative z-20 flex h-12 shrink-0 cursor-default items-center gap-2 border-b pr-2 pl-12 electrobun-webkit-app-region-drag md:pl-4">
         <label className="text-sm text-muted-foreground" htmlFor={inputId}>{m.rooms_start_to()}</label>
         <input
           autoComplete="off"
-          className="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground md:text-sm"
+          className="h-full min-w-0 flex-1 bg-transparent text-base electrobun-webkit-app-region-no-drag outline-none placeholder:text-muted-foreground md:text-sm"
           id={inputId}
           placeholder={m.rooms_start_placeholder()}
           ref={inputRef}
@@ -99,15 +100,17 @@ export function RoomsStart() {
           onFocus={openList}
         />
         {canGoBack ? (
-          <Button
-            aria-label={m.rooms_start_close()}
-            size="icon-sm"
-            title={m.rooms_start_close()}
-            variant="ghost"
-            onClick={() => router.history.back()}
-          >
-            <IconX className="size-4" />
-          </Button>
+          <span className="electrobun-webkit-app-region-no-drag">
+            <Button
+              aria-label={m.rooms_start_close()}
+              size="icon-sm"
+              title={m.rooms_start_close()}
+              variant="ghost"
+              onClick={() => router.history.back()}
+            >
+              <IconX className="size-4" />
+            </Button>
+          </span>
         ) : null}
       </div>
       {open ? (
@@ -118,6 +121,10 @@ export function RoomsStart() {
                 <CommandItem value="create-bot" onSelect={() => void navigate({ to: '/bots/create' })}>
                   <RoomsStartIcon><IconPlus /></RoomsStartIcon>
                   {m.rooms_bot_title()}
+                </CommandItem>
+                <CommandItem value="create-section" onSelect={() => void navigate({ to: '/rooms', search: { section: 'create' } })}>
+                  <RoomsStartIcon><IconFolderPlus /></RoomsStartIcon>
+                  {m.rooms_section_new()}
                 </CommandItem>
                 {matches.map((bot) => (
                   <CommandItem

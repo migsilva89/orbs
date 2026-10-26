@@ -323,7 +323,7 @@ export function PromptInputEditor({
         'aria-label': props['aria-label'],
         'aria-multiline': 'true',
         'data-slot': 'input-group-control',
-        class: 'max-h-48 overflow-y-auto px-2 py-2.5 text-base outline-none md:py-3 md:text-sm',
+        class: 'scrollbar scrollbar-w-1 scrollbar-h-1 scrollbar-thumb-rounded-full [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] max-h-48 overflow-y-auto px-2 py-2.5 text-base outline-none md:py-3 md:text-sm',
         role: 'textbox',
       },
     },

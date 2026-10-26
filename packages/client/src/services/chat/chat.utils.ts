@@ -1,4 +1,4 @@
-import { ATTACHMENT, attachmentMessage, ENTRY, entryPeerMessage, entrySubagentReport, REACTION, REPLY, replyMessage, replySilent, toolCallJson } from '@repo/contracts/universal';
+import { ATTACHMENT, attachmentMessage, ENTRY, entryOwnerNote, entryPeerMessage, entrySubagentReport, REACTION, REPLY, replyMessage, replySilent, toolCallJson } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { match, P } from 'ts-pattern';
 import { mentionSubmission } from '../mention/mention.utils';
@@ -63,6 +63,12 @@ export function chatMessages({ entries, bot, bots }: ChatTypes.ChatMessagesParam
         .with({ success: true }, ({ data }) => messages.push(chatSystemMessage(entry, createdAt, bot, [
           { type: 'data-subagent', data },
           { type: 'text', text: chatEntryText(entry), state: 'done' },
+        ])))
+        .otherwise(() => undefined))
+      .with(ENTRY.ownerNote, () => match(entryOwnerNote.safeParse(entry.data))
+        .with({ success: true }, ({ data }) => messages.push(chatSystemMessage(entry, createdAt, bot, [
+          { type: 'data-ownerNote', data: { ...data, peerName: data.peerBotId ? botsById.get(data.peerBotId)?.name ?? null : null } },
+          { type: 'text', text: data.text, state: 'done' },
         ])))
         .otherwise(() => undefined))
       .with(ENTRY.compaction, () => messages.push(chatSystemMessage(entry, createdAt, bot, [{ type: 'data-compaction', data: { status: 'done' } }])))

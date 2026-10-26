@@ -9,19 +9,19 @@ const LinearGradient = withUniwind(NativeLinearGradient);
 
 const surfaceVariants = cva({
   base: 'absolute inset-0 overflow-hidden',
-  variants: { shape: { default: 'rounded-lg', round: 'rounded-full', inline: 'rounded-sm' } },
-  defaultVariants: { shape: 'default' },
+  variants: { radius: { default: 'rounded-lg', round: 'rounded-full', inline: 'rounded-sm' } },
+  defaultVariants: { radius: 'default' },
 });
 
 interface SurfaceProps extends VariantProps<typeof surfaceVariants> {
   className?: string;
 }
 
-export function Surface({ shape, className }: SurfaceProps) {
+export function Surface({ radius, className }: SurfaceProps) {
   return (
-    <View className={cn(surfaceVariants({ shape }), className)} pointerEvents="none">
+    <View className={cn(surfaceVariants({ radius }), className)} pointerEvents="none">
       <LinearGradient className="absolute inset-0 opacity-[0.16]" colors={['#ffffff', '#ffffff00']} />
-      <View className={cn(surfaceVariants({ shape }), 'border-t border-white/12')} />
+      <View className={cn(surfaceVariants({ radius }), 'border-t border-white/12')} />
     </View>
   );
 }

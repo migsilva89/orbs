@@ -579,7 +579,7 @@ export function AgentTimeline({ run, live = false }: AgentTimelineProps) {
         </header>
 
         <div
-          className="group/scroller min-w-0 [scrollbar-width:thin] [scrollbar-color:var(--input)_transparent] overflow-x-auto overflow-y-hidden overscroll-x-contain"
+          className="group/scroller scrollbar min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-contain [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1"
           ref={scrollerRef}
           onScroll={onScroll}
         >
@@ -625,18 +625,18 @@ export function AgentTimeline({ run, live = false }: AgentTimelineProps) {
                     <span
                       className={cn(
                         'absolute box-border border-0 border-solid border-(--c) transition-opacity duration-150 motion-reduce:animate-none motion-reduce:transition-none',
-                        'data-[shape=out]:data-[dir=down]:rounded-bl-[7px] data-[shape=out]:data-[dir=down]:border-b-[1.5px] data-[shape=out]:data-[dir=down]:border-l-[1.5px]',
-                        'data-[shape=out]:data-[dir=up]:rounded-tl-[7px] data-[shape=out]:data-[dir=up]:border-t-[1.5px] data-[shape=out]:data-[dir=up]:border-l-[1.5px]',
-                        'data-[shape=in]:data-[dir=up]:rounded-br-[7px] data-[shape=in]:data-[dir=up]:border-r-[1.5px] data-[shape=in]:data-[dir=up]:border-b-[1.5px]',
-                        'data-[shape=in]:data-[dir=down]:rounded-tr-[7px] data-[shape=in]:data-[dir=down]:border-t-[1.5px] data-[shape=in]:data-[dir=down]:border-r-[1.5px]',
-                        'data-[shape=line]:border-l-[1.5px]',
+                        'data-[route=out]:data-[dir=down]:rounded-bl-[7px] data-[route=out]:data-[dir=down]:border-b-[1.5px] data-[route=out]:data-[dir=down]:border-l-[1.5px]',
+                        'data-[route=out]:data-[dir=up]:rounded-tl-[7px] data-[route=out]:data-[dir=up]:border-t-[1.5px] data-[route=out]:data-[dir=up]:border-l-[1.5px]',
+                        'data-[route=in]:data-[dir=up]:rounded-br-[7px] data-[route=in]:data-[dir=up]:border-r-[1.5px] data-[route=in]:data-[dir=up]:border-b-[1.5px]',
+                        'data-[route=in]:data-[dir=down]:rounded-tr-[7px] data-[route=in]:data-[dir=down]:border-t-[1.5px] data-[route=in]:data-[dir=down]:border-r-[1.5px]',
+                        'data-[route=line]:border-l-[1.5px]',
                         'data-draw:data-[dir=down]:animate-timeline-draw-down data-draw:data-[dir=up]:animate-timeline-draw-up',
                         'group-data-path/plot:not-data-hot:opacity-15',
                       )}
                       data-dir={link.isUp ? 'up' : 'down'}
                       data-draw={(canDraw && (hasInteracted || live || !initialLinks.has(link.id))) || undefined}
                       data-hot={path?.links.has(link.id) ? true : undefined}
-                      data-shape={link.shape}
+                      data-route={link.route}
                       key={link.id}
                       style={agentTimelineLinkStyle(link)}
                     />

@@ -1,5 +1,6 @@
 import { env } from '@repo/env/server';
 import { log } from '@repo/logger/server';
+import { join } from 'node:path';
 import {
   makeAlarmService,
   makeImageService,
@@ -14,7 +15,6 @@ import {
   runtimeEnvNative,
 } from '@repo/runtime/native';
 import { makeSecretBrokerService, makeSecretProxyService } from '@repo/secret-proxy/native';
-import { join } from 'node:path';
 import { credentialsKeyNative, makeAttachmentStorageService, makeAvatarImageService, makeDatabaseService, makeMcpService, makeServerNetworkService, makeWorkspaceService, workspacePathsNative } from '@repo/server/native';
 import { makeCredentialsService, makeSecretService, makeServices, makeSettingsService } from '@repo/server/server';
 import { coreLocalNative } from './core-local.native';

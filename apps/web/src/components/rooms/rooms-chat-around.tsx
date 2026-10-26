@@ -9,11 +9,12 @@ interface RoomsChatAroundProps {
   bots: Bot[]
   view: ConversationView
   entryId: number
+  composerHeight: number
   onLatest: () => void
   onReply: (message: ChatMessage) => void
 }
 
-export function RoomsChatAround({ bot, bots, view, entryId, onLatest, onReply }: RoomsChatAroundProps) {
+export function RoomsChatAround({ bot, bots, view, entryId, composerHeight, onLatest, onReply }: RoomsChatAroundProps) {
   const around = useChatAround({
     bot,
     bots,
@@ -33,6 +34,7 @@ export function RoomsChatAround({ bot, bots, view, entryId, onLatest, onReply }:
     <RoomsChatTranscript
       bot={bot}
       bots={bots}
+      composerHeight={composerHeight}
       focusedEntryId={entryId}
       messages={around.messages}
       newer={around.newer}

@@ -13,6 +13,7 @@ import { Icon } from '@/components/ui/icon';
 import { Menu } from '@/components/ui/menu';
 import { PromptAttachment, PromptAttachments, PromptDock, PromptDrawer, PromptJump, PromptQuote } from '@/components/ui/prompt-drawer';
 import { PromptField, PromptMention } from '@/components/ui/prompt-field';
+import { Text } from '@/components/ui/text';
 import { useToast } from '@/hooks/use-toast';
 import { ChatMentions } from './chat-mentions';
 import { ChatQueue } from './chat-queue';
@@ -169,7 +170,7 @@ export function ChatComposer({
       .otherwise(() => void send());
   }
 
-  const hasDrawer = queued.length > 0 || replyTo !== null;
+  const hasDrawer = queued.length > 0 || replyTo !== null || chat.problem !== null;
 
   const drawer = (
     <>
@@ -185,6 +186,16 @@ export function ChatComposer({
       ) : null}
       {hasDrawer ? (
         <PromptDrawer>
+          {chat.problem ? (
+            <Text
+              accessibilityRole="alert"
+              className="mx-2 my-1"
+              tone="destructive"
+              variant="small"
+            >
+              {chat.problem}
+            </Text>
+          ) : null}
           <ChatQueue
             botId={bot.id}
             botName={bot.name}

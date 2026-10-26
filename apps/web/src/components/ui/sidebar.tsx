@@ -288,7 +288,7 @@ function Sidebar({
             <DrawerTitle>{m.layout_sidebar_title()}</DrawerTitle>
             <DrawerDescription>{m.layout_sidebar_description()}</DrawerDescription>
           </DrawerHeader>
-          <div className="flex size-full flex-col overflow-y-auto">{children}</div>
+          <div className="scrollbar flex size-full flex-col overflow-y-auto [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1">{children}</div>
         </DrawerContent>
       </Drawer>
     );

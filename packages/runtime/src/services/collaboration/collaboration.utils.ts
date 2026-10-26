@@ -39,3 +39,9 @@ export function collaborationPeerNote({ senderName, hops, maxHops }: Pick<Collab
     .with(false, () => `[Private message from ${senderName}. Answer this request; it cannot be forwarded to another bot.]`)
     .exhaustive();
 }
+
+export function collaborationOwnerNote(peerName: string | null) {
+  const source = peerName ? `your private chat with ${peerName}` : 'a private chat with another bot';
+
+  return `[You raised this from ${source}, which the owner cannot see. Tell the owner about it now, in your own words. Do not answer the other bot from here.]`;
+}

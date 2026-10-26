@@ -2,11 +2,11 @@ import { defineTask } from '@earendil-works/pi-durable';
 import { REACTION } from '@repo/contracts/universal';
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
-import { runtimeReactions } from './runtime-reaction.constants';
+import { RUNTIME_REACTION_TASK, runtimeReactions } from './runtime-reaction.constants';
 import type { RuntimeReactionTaskInput, RuntimeReactionTaskState } from '../../types/runtime-reaction.types';
 
 export const runtimeReactionTask = defineTask<RuntimeReactionTaskInput, RuntimeReactionTaskState, null>({
-  name: 'bots.reaction',
+  name: RUNTIME_REACTION_TASK,
   version: 1,
   initial: () => ({ phase: 'wait' }),
   phases: {

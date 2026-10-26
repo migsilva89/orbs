@@ -6,9 +6,9 @@ import { subagentActionRun } from './subagent-action.run';
 import { subagentActionSend } from './subagent-action.send';
 import { subagentActionSpawn } from './subagent-action.spawn';
 import { subagentActionStop } from './subagent-action.stop';
-import { subagentAnchor } from './subagent-anchor.task';
+import { subagentAnchorTask } from './subagent-anchor.task';
 import { subagentQueryStatus } from './subagent-query.status';
-import { subagentReporter } from './subagent-reporter.task';
+import { subagentReporterTask } from './subagent-reporter.task';
 import { SUBAGENT } from './subagent.constants';
 import { subagentReply } from './subagent.utils';
 
@@ -28,7 +28,7 @@ const subagentMessage = Type.String({
 export function subagentExtension() {
   return defineExtension({
     name: SUBAGENT.extension,
-    tasks: [subagentAnchor, subagentReporter],
+    tasks: [subagentAnchorTask, subagentReporterTask],
     tools: [
       defineTool({
         name: SUBAGENT.tool,

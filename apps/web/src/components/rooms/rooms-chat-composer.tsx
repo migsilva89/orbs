@@ -11,7 +11,7 @@ import { RoomsChatAttachments } from '@/components/rooms/rooms-chat-attachments'
 import { RoomsChatQueue } from '@/components/rooms/rooms-chat-queue';
 import { RoomsMention } from '@/components/rooms/rooms-mention';
 import { RoomsMentionOption } from '@/components/rooms/rooms-mention-option';
-import { PromptInput, PromptInputActionMenu, PromptInputActionMenuContent, PromptInputActionMenuItem, PromptInputActionMenuTrigger, PromptInputQuote, PromptInputSubmit } from '@/components/ui/ai/prompt-input';
+import { PromptInput, PromptInputActionMenu, PromptInputActionMenuContent, PromptInputActionMenuItem, PromptInputActionMenuTrigger, PromptInputDrawer, PromptInputQuote, PromptInputSubmit } from '@/components/ui/ai/prompt-input';
 import { InputGroupAddon } from '@/components/ui/input-group';
 import { useMessageScroller } from '@/components/ui/message-scroller';
 import { toasty } from '@/components/ui/sonner';
@@ -114,10 +114,7 @@ export function RoomsChatComposer({
   const isStopping = isBusy && !text.trim() && files.attachments.length === 0;
   const isSendingFiles = chat.isSending && files.readyIds.length > 0;
 
-  const submitStatus = match({ isStopping, isSendFailed: chat.isSendFailed })
-    .with({ isStopping: true }, () => 'streaming' as const)
-    .with({ isSendFailed: true }, () => 'error' as const)
-    .otherwise(() => 'ready' as const);
+  const submitStatus = isStopping ? 'streaming' : 'ready';
 
   const skillsEmpty = match(skills)
     .with({ isPending: true }, () => m.rooms_mention_skills_loading())
@@ -200,6 +197,11 @@ export function RoomsChatComposer({
           queued={queued}
           onOutgoingChange={onOutgoingChange}
         />
+        {chat.problem ? (
+          <PromptInputDrawer variant="destructive">
+            <output className="block px-2 py-1.5 text-xs" role="alert">{chat.problem}</output>
+          </PromptInputDrawer>
+        ) : null}
         <RoomsChatAttachments files={files} />
         {replyTo ? (
           <PromptInputQuote removeLabel={m.rooms_chat_reply_clear()} onRemove={() => onReplyChange(null)}>

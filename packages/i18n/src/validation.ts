@@ -1,5 +1,5 @@
 import { match, P } from 'ts-pattern';
-// oxlint-disable-next-line arch/no-local-schema-construction -- bootZodErrors sets zod's global error map for hosts to call at startup; it builds no schema
+// oxlint-disable-next-line arch/schemas-local -- bootZodErrors sets zod's global error map for hosts to call at startup; it builds no schema
 import { config } from 'zod';
 import { m } from './paraglide/messages.js';
 import type { core } from 'zod';
@@ -28,7 +28,7 @@ function issueToKey(issue: core.$ZodRawIssue): string | undefined {
 }
 
 export function bootZodErrors() {
-  // oxlint-disable-next-line arch/no-local-schema-construction -- bootZodErrors sets zod's global error map for hosts to call at startup; it builds no schema
+  // oxlint-disable-next-line arch/schemas-local -- bootZodErrors sets zod's global error map for hosts to call at startup; it builds no schema
   config({
     customError: issueToKey,
   });

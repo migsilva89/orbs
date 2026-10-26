@@ -61,7 +61,7 @@ export const conversationSubmit = conversationTarget.extend({
   attachmentIds: attachmentIds.default([]),
   skills: z.array(z.string().trim().min(1).max(128)).max(10).optional(),
   whenBusy: z.enum(['followUp', 'steer', 'reject', 'interrupt']).optional(),
-}).refine((value) => value.content.length > 0 || value.attachmentIds.length > 0);
+}).refine((value) => value.content.length > 0 || value.attachmentIds.length > 0 || (value.skills?.length ?? 0) > 0);
 
 export const conversationUpdateSubmission = conversationTarget.extend({
   submissionId: z.number().int().positive(),
@@ -100,7 +100,7 @@ export type ConversationUpdateSubmissionInput = z.infer<typeof conversationUpdat
 export type ConversationTarget = z.infer<typeof conversationTarget>;
 
 export const conversationContexts = conversationTarget.extend({
-  kind: z.enum(['subagent', 'temporary']),
+  kind: z.enum(['subagent', 'private']),
   limit: z.number().int().min(1).max(100).default(50),
   cursor: z.record(z.string(), z.json()).optional(),
 });
@@ -119,10 +119,8 @@ export const conversationContextItem = z.discriminatedUnion('kind', [
     isBackground: z.boolean(),
   }),
   conversationContext.extend({
-    kind: z.literal('temporary'),
+    kind: z.literal('private'),
     createdAt: z.number(),
-    expiresAt: z.number(),
-    archivedAt: z.number().nullable(),
   }),
 ]);
 
@@ -256,6 +254,7 @@ export const conversationQuestion = z.object({
   id: z.number().int().positive(),
   botId: z.uuid(),
   conversationId: z.number().int().positive(),
+  privateWith: z.uuid().nullable(),
   text: questionText,
   choices: questionChoices,
   isMultiSelect: z.boolean(),

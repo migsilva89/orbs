@@ -83,7 +83,7 @@ export function ArtifactPage({ botId, conversationId, artifactId }: ArtifactPage
           </DropdownMenu.DropdownMenuContent>
         </DropdownMenu.DropdownMenu>
       </LayoutPageHeader>
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="scrollbar min-h-0 flex-1 overflow-y-auto [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1">
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-6 md:px-6">
           <ArtifactView
             spec={artifact.spec}

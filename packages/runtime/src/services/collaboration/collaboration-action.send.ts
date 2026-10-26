@@ -3,7 +3,7 @@ import { match, P } from 'ts-pattern';
 import { collaborationDeliveryTarget } from '../../types/collaboration.types';
 import { collaborationActionTarget } from './collaboration-action.target';
 import { collaborationQueryOrigin } from './collaboration-query.origin';
-import { COLLABORATION, collaborationCall, collaborationStore, collaborationTemporaryLinks } from './collaboration.constants';
+import { COLLABORATION, collaborationCall, collaborationPrivateLinks, collaborationStore } from './collaboration.constants';
 import { collaborationFailureNote } from './collaboration.utils';
 import type { CollaborationSendCall, CollaborationToolDeps } from '../../types/collaboration.types';
 
@@ -14,7 +14,8 @@ export async function collaborationActionSend(deps: CollaborationToolDeps, { inp
     .with(P.nonNullable, (id) => id)
     .otherwise(async () => {
       const origin = await collaborationQueryOrigin(api, context);
-      const { sender, recipient, maxPending, maxHops, temporaryTtlMs } = await deps.policy.queries.recipient({ ...origin, recipientId: params.botId });
+      const target = params.context ?? 'private';
+      const { sender, recipient, maxPending, maxHops } = await deps.policy.queries.recipient({ ...origin, recipientId: params.botId });
 
       const senderStoreId = await api.commit(async (tx) => {
         const store = await tx.doc(collaborationStore);
@@ -26,10 +27,8 @@ export async function collaborationActionSend(deps: CollaborationToolDeps, { inp
       const recipientConversationId = await collaborationActionTarget({ harness: await deps.directory.harness(recipient.id) }, {
         senderId: sender.id,
         senderStoreId,
-        sourceConversationId: api.conversationId,
         recipientId: recipient.id,
-        target: params.context,
-        temporaryTtlMs,
+        target,
         context,
       });
 
@@ -57,14 +56,14 @@ export async function collaborationActionSend(deps: CollaborationToolDeps, { inp
               .with('send', () => ({ ownership: { kind: 'conversation' as const }, background: true }))
               .exhaustive();
 
-            await match(params.context ?? 'existing')
-              .with('temporary', async () => {
-                const temporary = await tx.doc(collaborationTemporaryLinks, api.conversationId);
+            await match(target)
+              .with('private', async () => {
+                const privateLinks = await tx.doc(collaborationPrivateLinks, api.conversationId);
 
-                match(temporary.links.some((link) => link.recipientId === recipient.id && link.conversationId === recipientConversationId))
+                match(privateLinks.links.some((link) => link.recipientId === recipient.id && link.conversationId === recipientConversationId))
                   .with(true, () => undefined)
                   .with(false, () => {
-                    temporary.links.push({
+                    privateLinks.links.push({
                       recipientId: recipient.id,
                       conversationId: recipientConversationId,
                       createdAt: Date.now(),

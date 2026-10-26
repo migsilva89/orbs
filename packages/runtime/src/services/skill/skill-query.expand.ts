@@ -12,7 +12,7 @@ export function skillQueryExpand(deps: SkillLoaderServiceDeps, { names, content,
     .otherwise((selected) => {
       const catalog = new Map(skillQueryResolve(deps, params).skills.map((skill) => [skill.name, skill]));
       const blocks = [...new Set(selected)].map((name) => skillExpandBlock(catalog.get(name), name));
-      return { content: `${blocks.join('\n\n')}\n\n${content}` };
+      return { content: [...blocks, content].filter(Boolean).join('\n\n') };
     });
 
   function skillExpandBlock(skill: Skill | undefined, name: string) {

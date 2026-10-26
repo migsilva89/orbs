@@ -36,7 +36,7 @@ import { runtimeActionUpdateSubmission } from './runtime-action.update-submissio
 import { runtimeActionUpdateTodo } from './runtime-action.update-todo';
 import { runtimeBotCall, runtimeBotOpen } from './runtime-bot.utils';
 import { runtimeChatToolsExtension } from './runtime-chat-tools.extension';
-import { runtimeCodingTools } from './runtime-coding-tools.extension';
+import { runtimeCodingToolsExtension } from './runtime-coding-tools.extension';
 import { runtimeDirectory } from './runtime-directory.utils';
 import { runtimeModels } from './runtime-model.utils';
 import { runtimeQueryActivity } from './runtime-query.activity';
@@ -69,7 +69,7 @@ import { runtimeQueryWatch } from './runtime-query.watch';
 import { runtimeQueryWatchContexts } from './runtime-query.watch-contexts';
 import { runtimeReactionExtension } from './runtime-reaction.extension';
 import { runtimeSecretsExtension } from './runtime-secrets.extension';
-import { runtimeSkills } from './runtime-skills.extension';
+import { runtimeSkillsExtension } from './runtime-skills.extension';
 import { runtimeWatchMerge } from './runtime-watch-merge.utils';
 import { RUNTIME_ALARM_HEARTBEAT_MS } from './runtime.constants';
 import type { ConversationIndexSummary } from '../../types/conversation-index.types';
@@ -90,7 +90,7 @@ export function makeRuntimeService({
   secrets,
   toolExtensions = [],
 }: RuntimeTypes.RuntimeServiceParams) {
-  const codingTools = runtimeCodingTools({ images, secrets });
+  const codingTools = runtimeCodingToolsExtension({ images, secrets });
   const readOnlyTools = codingTools.tools?.filter((tool) => tool.name === 'read') ?? [];
   const directory = runtimeDirectory({ open: (botId) => runtimeBotOpen(shared, botId) });
   const collaboration = collaborationExtension({ policy, directory });
@@ -109,7 +109,7 @@ export function makeRuntimeService({
     directory,
     extensions: [
       codingTools,
-      runtimeSkills,
+      runtimeSkillsExtension,
       collaboration.extension,
       questions.extension,
       chatTools.extension,

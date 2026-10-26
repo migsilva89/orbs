@@ -10,23 +10,23 @@ import type { ViewProps } from 'react-native';
 const NativeGlass = withUniwind(GlassView, { style: { fromClassName: 'className' } });
 const hasGlass = isGlassEffectAPIAvailable() && isLiquidGlassAvailable();
 
-const glassShapeVariants = cva({
-  variants: { shape: { pill: 'rounded-full', field: 'rounded-3xl' } },
-  defaultVariants: { shape: 'pill' },
+const glassRadiusVariants = cva({
+  variants: { radius: { pill: 'rounded-full', field: 'rounded-3xl' } },
+  defaultVariants: { radius: 'pill' },
 });
 
 const glassVariants = cva({
-  composes: glassShapeVariants,
+  composes: glassRadiusVariants,
   variants: { native: { false: 'bg-card', true: 'bg-transparent' } },
 });
 
-interface GlassSurfaceProps extends ViewProps, VariantProps<typeof glassShapeVariants> {
+interface GlassSurfaceProps extends ViewProps, VariantProps<typeof glassRadiusVariants> {
   interactive?: boolean;
 }
 
-export function GlassSurface({ className, shape, interactive = false, children, ...props }: GlassSurfaceProps) {
+export function GlassSurface({ className, radius, interactive = false, children, ...props }: GlassSurfaceProps) {
   const { theme } = useUniwind();
-  const classes = cn(glassVariants({ native: hasGlass, shape }), className);
+  const classes = cn(glassVariants({ native: hasGlass, radius }), className);
   // Dark glass over a near-black page reads as a hole; a faint white tint lifts it like iOS controls.
   const tint = match(theme).with('dark', () => 'rgba(255,255,255,0.12)').otherwise(() => undefined);
 
@@ -34,7 +34,7 @@ export function GlassSurface({ className, shape, interactive = false, children, 
   const content = (
     <>
       {children}
-      <View className={cn('absolute inset-0 border border-black/10 dark:border-white/15', glassShapeVariants({ shape }))} pointerEvents="none" style={{ borderCurve: 'continuous' }} />
+      <View className={cn('absolute inset-0 border border-black/10 dark:border-white/15', glassRadiusVariants({ radius }))} pointerEvents="none" style={{ borderCurve: 'continuous' }} />
     </>
   );
 

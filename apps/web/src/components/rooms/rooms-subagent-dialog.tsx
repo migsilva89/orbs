@@ -53,7 +53,7 @@ export function RoomsSubagentDialog({ botId, bot, conversationId, name, task, on
             </div>
           </DialogDescription>
         </DialogHeader>
-        <div className="-mx-6 min-h-0 flex-1 overflow-y-auto px-6">
+        <div className="-mx-6 scrollbar min-h-0 flex-1 overflow-y-auto px-6 [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1">
           {replies.map((message) => (
             <Message from="assistant" key={message.id}>
               <MessageStack>

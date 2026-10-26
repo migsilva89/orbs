@@ -1,6 +1,6 @@
 import { match, P } from 'ts-pattern';
-import { subagentAnchor } from './subagent-anchor.task';
-import { subagentReporter } from './subagent-reporter.task';
+import { subagentAnchorTask } from './subagent-anchor.task';
+import { subagentReporterTask } from './subagent-reporter.task';
 import { SUBAGENT, subagentAgents, subagentCall } from './subagent.constants';
 import { subagentCreateChild, subagentDetails, subagentPendingReporters, subagentReply } from './subagent.utils';
 import type { SubagentMessageParams, SubagentReporterInput, SubagentToolParams } from '../../types/subagent.types';
@@ -35,7 +35,7 @@ export async function subagentActionSpawn({ api, context, ...params }: SubagentM
             })
             .with(false, async () => {
               const background = { ownership: { kind: 'conversation' as const }, background: true };
-              const anchor = await tx.createTask(subagentAnchor, null, background);
+              const anchor = await tx.createTask(subagentAnchorTask, null, background);
               const conversationId = await subagentCreateChild(tx, anchor, api.conversationId);
               state.agents[params.name] = { conversationId };
 
@@ -46,7 +46,7 @@ export async function subagentActionSpawn({ api, context, ...params }: SubagentM
                 whenBusy: 'steer',
               };
 
-              await tx.createTask(subagentReporter, input, background);
+              await tx.createTask(subagentReporterTask, input, background);
               call.text = `Started ${params.name}.`;
               call.name = params.name;
               call.conversationId = conversationId;

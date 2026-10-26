@@ -1,5 +1,5 @@
 import { match, P } from 'ts-pattern';
-import { collaborationTemporaryLinks } from '../collaboration/collaboration.constants';
+import { collaborationPrivateLinks } from '../collaboration/collaboration.constants';
 import { subagentAgents } from '../subagent/subagent.constants';
 import type { CommitChange, ConversationId, TaskGraph } from '@earendil-works/pi-durable';
 
@@ -17,7 +17,7 @@ export function runtimeContextWatchIsRelevant(changes: readonly CommitChange[], 
     .with({
       type: 'document',
       conversationId: sourceConversationId,
-      record: { kind: P.union(subagentAgents.definition.kind, collaborationTemporaryLinks.definition.kind) },
+      record: { kind: P.union(subagentAgents.definition.kind, collaborationPrivateLinks.definition.kind) },
     }, () => true)
     .otherwise(() => false));
 }

@@ -287,7 +287,7 @@ export interface RuntimeInterruptParams extends RuntimeInterruptDraft, RuntimeCo
   conversationId: PiDurableTypes.ConversationId;
 }
 
-export const runtimeTemporaryCursor = z.object({ offset: z.number().int().nonnegative() });
+export const runtimePrivateCursor = z.object({ offset: z.number().int().nonnegative() });
 
 export const runtimeCommandArgumentsSchema = z.record(z.string(), z.json()).parse(z.toJSONSchema(commandArguments));
 

@@ -18,7 +18,7 @@ function Breadcrumb({
 function BreadcrumbList({ className, ref, ...props }: ComponentProps<'ol'> & { ref?: React.Ref<HTMLOListElement> }) {
   return (
     <ol
-      className={cn('flex flex-wrap items-center gap-1.5 text-sm wrap-break-word text-muted-foreground sm:gap-2.5', className)}
+      className={cn('scrollbar flex flex-wrap items-center gap-1.5 text-sm wrap-break-word text-muted-foreground [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1 sm:gap-2.5', className)}
       data-slot="breadcrumb-list"
       ref={ref}
       {...props}

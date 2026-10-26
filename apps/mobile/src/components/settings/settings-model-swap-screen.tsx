@@ -82,7 +82,7 @@ export function SettingsModelSwapScreen({ from }: SettingsModelSwapScreenProps) 
                 })),
               }))}
               title={m.rooms_bot_model()}
-              value={targetModel?.name ?? '—'}
+              value={targetModel?.name ?? '…'}
             />
             <BotSettingsMenuRow
               icon={Brain}
@@ -93,7 +93,7 @@ export function SettingsModelSwapScreen({ from }: SettingsModelSwapScreenProps) 
                 onSelect: () => target && setTarget({ ...target, thinkingLevel: level }),
               }))}
               title={m.rooms_bot_thinking_level()}
-              value={target ? BOT_THINKING_LEVEL_LABELS[target.thinkingLevel]() : '—'}
+              value={target ? BOT_THINKING_LEVEL_LABELS[target.thinkingLevel]() : '…'}
             />
             <Item>
               <ItemMedia>

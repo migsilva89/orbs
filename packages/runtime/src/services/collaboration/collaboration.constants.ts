@@ -18,16 +18,16 @@ export const collaborationStore = defineDoc<CollaborationTypes.CollaborationStor
   checkpointWhen: () => false,
 });
 
-export const collaborationTemporaryBinding = defineDocFamily<CollaborationTypes.CollaborationTemporaryBinding, null>({
+export const collaborationPrivateBinding = defineDocFamily<CollaborationTypes.CollaborationPrivateBinding, null>({
   kind: 'bots.bot-temporary-binding',
   version: 1,
   scope: 'session',
   family: true,
-  initial: () => ({ conversationId: null, expiresAt: null }),
+  initial: () => ({ conversationId: null }),
   checkpointWhen: () => false,
 });
 
-export const collaborationTemporaryLinks = defineDoc<CollaborationTypes.CollaborationTemporaryLinks>({
+export const collaborationPrivateLinks = defineDoc<CollaborationTypes.CollaborationPrivateLinks>({
   kind: 'bots.bot-temporary-links',
   version: 1,
   scope: 'conversation',
@@ -37,7 +37,7 @@ export const collaborationTemporaryLinks = defineDoc<CollaborationTypes.Collabor
   checkpointWhen: () => false,
 });
 
-export const collaborationTemporaryContext = defineDoc<CollaborationTypes.CollaborationTemporaryContext>({
+export const collaborationPrivateContext = defineDoc<CollaborationTypes.CollaborationPrivateContext>({
   kind: 'bots.bot-temporary-context',
   version: 1,
   scope: 'conversation',
@@ -45,11 +45,8 @@ export const collaborationTemporaryContext = defineDoc<CollaborationTypes.Collab
   fork: 'initial',
   initial: () => ({
     senderId: null,
-    sourceConversationId: null,
     recipientId: null,
     createdAt: null,
-    expiresAt: null,
-    archivedAt: null,
   }),
   checkpointWhen: () => false,
 });
@@ -59,4 +56,5 @@ export const COLLABORATION = {
   delivery: 'bots.bot-delivery',
   message: ENTRY.peerMessage,
   reply: ENTRY.peerReply,
+  note: ENTRY.ownerNote,
 } as const;

@@ -30,7 +30,6 @@ export interface CollaborationPolicy {
       recipient: CollaborationBot;
       maxPending: number;
       maxHops: number;
-      temporaryTtlMs: number;
     }>;
   };
 }
@@ -73,7 +72,7 @@ export interface CollaborationSendParams {
   botId: string;
   message: string;
   mode: 'ask' | 'send';
-  context?: 'existing' | 'temporary';
+  context?: 'existing' | 'private';
 }
 
 export interface CollaborationContextParams {
@@ -85,6 +84,11 @@ export interface CollaborationSendCall extends CollaborationContextParams {
   api: PiDurableTypes.ToolExecutionApi;
 }
 
+export interface CollaborationNotifyCall extends CollaborationContextParams {
+  input: { message: string };
+  api: PiDurableTypes.ToolExecutionApi;
+}
+
 export interface CollaborationHarnessDeps {
   harness: PiDurableTypes.Harness;
 }
@@ -92,10 +96,8 @@ export interface CollaborationHarnessDeps {
 export interface CollaborationTargetParams extends CollaborationContextParams {
   senderId: string;
   senderStoreId: string;
-  sourceConversationId: PiDurableTypes.ConversationId;
   recipientId: string;
-  target?: 'existing' | 'temporary';
-  temporaryTtlMs: number;
+  target: 'existing' | 'private';
 }
 
 export interface CollaborationDeliverParams extends CollaborationContextParams {
@@ -103,21 +105,17 @@ export interface CollaborationDeliverParams extends CollaborationContextParams {
   input: CollaborationDeliveryInput;
 }
 
-export interface CollaborationTemporaryBinding extends PiDurableTypes.JsonObject {
+export interface CollaborationPrivateBinding extends PiDurableTypes.JsonObject {
   conversationId: PiDurableTypes.ConversationId | null;
-  expiresAt: number | null;
 }
 
-export interface CollaborationTemporaryContext extends PiDurableTypes.JsonObject {
+export interface CollaborationPrivateContext extends PiDurableTypes.JsonObject {
   senderId: string | null;
-  sourceConversationId: PiDurableTypes.ConversationId | null;
   recipientId: string | null;
   createdAt: number | null;
-  expiresAt: number | null;
-  archivedAt: number | null;
 }
 
-export interface CollaborationTemporaryLinks extends PiDurableTypes.JsonObject {
+export interface CollaborationPrivateLinks extends PiDurableTypes.JsonObject {
   links: { recipientId: string; conversationId: PiDurableTypes.ConversationId; createdAt: number }[];
 }
 

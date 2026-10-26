@@ -4,7 +4,7 @@ import { SUBAGENT } from './subagent.constants';
 import { subagentAnswer } from './subagent.utils';
 import type { SubagentReporterInput, SubagentReporterState } from '../../types/subagent.types';
 
-export const subagentReporter = defineTask<SubagentReporterInput, SubagentReporterState, null>({
+export const subagentReporterTask = defineTask<SubagentReporterInput, SubagentReporterState, null>({
   name: SUBAGENT.reporter,
   version: 1,
   initial: () => ({ phase: 'deliver' }),

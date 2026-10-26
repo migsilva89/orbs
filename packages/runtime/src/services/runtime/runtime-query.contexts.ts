@@ -1,9 +1,9 @@
 import { StorageRequestError } from '@earendil-works/pi-durable';
 import { Errors } from '@repo/errors/universal';
 import { match, P } from 'ts-pattern';
-import { runtimeTemporaryCursor } from '../../types/runtime.types';
-import { collaborationTemporaryLinks } from '../collaboration/collaboration.constants';
-import { runtimeContextItem, runtimeContextTemporaryItem } from './runtime-context.utils';
+import { runtimePrivateCursor } from '../../types/runtime.types';
+import { collaborationPrivateLinks } from '../collaboration/collaboration.constants';
+import { runtimeContextItem, runtimeContextPrivateItem } from './runtime-context.utils';
 import { runtimeQueryConversation } from './runtime-query.conversation';
 import type { RuntimeContextInput, RuntimeServiceDeps } from '../../types/runtime.types';
 import type { ConversationId } from '@earendil-works/pi-durable';
@@ -48,17 +48,17 @@ export async function runtimeQueryContexts(
 
   return match(params.kind)
     .with('subagent', () => runtimeQuerySubagentContexts(conversation.id))
-    .with('temporary', async () => {
-      const { offset } = match(runtimeTemporaryCursor.safeParse(params.cursor ?? { offset: 0 }))
+    .with('private', async () => {
+      const { offset } = match(runtimePrivateCursor.safeParse(params.cursor ?? { offset: 0 }))
         .with({ success: true }, ({ data }) => data)
         .otherwise(({ error }) => {
           throw new Errors.VALIDATION_ERROR({ fields: {}, cause: error });
         });
 
-      const links = await deps.harness.snapshot(collaborationTemporaryLinks, conversation.id, context);
+      const links = await deps.harness.snapshot(collaborationPrivateLinks, conversation.id, context);
       const sorted = [...(links?.links ?? [])].sort((left, right) => right.createdAt - left.createdAt);
       const page = sorted.slice(offset, offset + params.limit);
-      const items = await Promise.all(page.map((link) => runtimeContextTemporaryItem(deps, link, conversation.id, context)));
+      const items = await Promise.all(page.map((link) => runtimeContextPrivateItem(deps, link, context)));
 
       return {
         items: items.flatMap((item) => item ?? []),

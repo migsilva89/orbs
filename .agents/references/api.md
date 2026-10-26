@@ -58,7 +58,7 @@ Bot-local sources win, then configured shared sources, then Pi's global ones; sh
 
 ## Peers and subagents
 
-Peers reuse the recipient's main chat unless `context: 'temporary'` (48 hours, rotated lazily). Forwarding stops after three bots. Subagents cannot spawn children or contact peers. Silent answers are dropped before reaching the asking bot.
+Peers talk in one persistent private conversation per sender and recipient by default (`context: 'private'`; a new one starts after the sender's history is cleared); `context: 'existing'` posts into the recipient's main chat instead. Forwarding stops after three bots. Subagents cannot spawn children or contact peers. Silent answers are dropped before reaching the asking bot.
 
 ## Routines
 

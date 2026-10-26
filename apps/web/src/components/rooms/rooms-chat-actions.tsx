@@ -111,7 +111,7 @@ export function RoomsChatActions({
           </DrawerTrigger>
           <DrawerContent aria-describedby={undefined}>
             <DrawerTitle className="sr-only">{m.rooms_chat_actions()}</DrawerTitle>
-            <div className="flex flex-col gap-2 overflow-y-auto px-3 pt-3 pb-[max(--spacing(4),env(safe-area-inset-bottom))]">
+            <div className="scrollbar flex flex-col gap-2 overflow-y-auto px-3 pt-3 pb-[max(--spacing(4),env(safe-area-inset-bottom))] [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1">
               {onReact ? (
                 <RoomsChatEmojiChoices
                   disabled={reacting}
@@ -168,7 +168,7 @@ export function RoomsChatActions({
             </DrawerHeader>
             <div
               data-vaul-no-drag
-              className="min-h-0 flex-1 overflow-y-auto px-4 pb-[max(--spacing(4),env(safe-area-inset-bottom))] text-sm leading-relaxed wrap-break-word whitespace-pre-wrap select-text"
+              className="scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-[max(--spacing(4),env(safe-area-inset-bottom))] text-sm leading-relaxed wrap-break-word whitespace-pre-wrap select-text [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1"
             >
               {roomsMessageText(message)}
             </div>

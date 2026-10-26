@@ -18,7 +18,7 @@ interface PromptFieldProps extends TextInputProps {
 /** The chat composer's growing glass input. */
 export function PromptField({ actions, header, className, ...props }: PromptFieldProps) {
   return (
-    <GlassSurface className={cn('min-h-12 gap-1 py-2 pr-2 pl-4', className)} shape="field">
+    <GlassSurface className={cn('min-h-12 gap-1 py-2 pr-2 pl-4', className)} radius="field">
       {header ? <View className="pt-1">{header}</View> : null}
       <View className="flex-row items-end gap-2">
         <TextField

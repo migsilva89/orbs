@@ -44,7 +44,7 @@ export function PromptDrawerList({ children }: ViewProps) {
 
 /** Glass card above the composer: mention choices, queued messages and the reply quote. */
 export function PromptDrawer({ className, ...props }: ViewProps) {
-  return <GlassSurface {...props} className={cn('p-1.5', className)} shape="field" />;
+  return <GlassSurface {...props} className={cn('p-1.5', className)} radius="field" />;
 }
 
 interface PromptDrawerItemProps extends Omit<PressableProps, 'children'> {

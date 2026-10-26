@@ -22,6 +22,7 @@ interface RoomsChatTranscriptProps {
   newer?: RoomsHistoryLoader
   footer?: ReactNode
   isReadOnly?: boolean
+  composerHeight?: number
   onReply: (message: ChatMessage) => void
 }
 
@@ -36,6 +37,7 @@ export function RoomsChatTranscript({
   newer,
   footer,
   isReadOnly = false,
+  composerHeight = 0,
   onReply,
 }: RoomsChatTranscriptProps) {
   const now = new Date();
@@ -80,13 +82,14 @@ export function RoomsChatTranscript({
     <MessageScroller className="flex-1" style={botBubbleStyle(bot)}>
       <MessageScrollerViewport
         aria-label={m.rooms_chat_transcript()}
+        endInset={composerHeight}
         fade="both"
         focusKey={focusedId}
         positionKey={bot.id}
         rowClassName="max-w-3xl"
         rows={rows}
       />
-      <MessageScrollerButton />
+      <MessageScrollerButton style={composerHeight ? { bottom: composerHeight + 16 } : undefined} />
     </MessageScroller>
   );
 }

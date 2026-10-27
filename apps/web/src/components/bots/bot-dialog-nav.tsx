@@ -37,29 +37,46 @@ export function BotDialogNav({ bots, bot, section }: BotDialogNavProps) {
         </Button>
       )}
       header={(
-        <Combobox
-          aria-label={m.bots_switch()}
-          className="w-full"
-          groups={[{
-            options: bots.map((item) => ({
-              value: item.id,
-              label: item.name,
-              icon: <BotAvatar
-                animate={false}
-                bot={item}
-                size={20}
-              />,
-            })),
-          }]}
-          placeholder={m.bots_new()}
-          search={{ placeholder: m.bots_search(), empty: m.bots_search_empty() }}
-          value={bot?.id ?? ''}
-          onValueChange={(botId) => void navigate({
-            to: '/bots/$botId/$tab',
-            params: { botId, tab: section ?? 'profile' },
-            replace: true,
-          })}
-        />
+        <div className="flex items-center gap-1">
+          <Combobox
+            aria-label={m.bots_switch()}
+            className="min-w-0 flex-1"
+            groups={[{
+              options: bots.map((item) => ({
+                value: item.id,
+                label: item.name,
+                icon: <BotAvatar
+                  animate={false}
+                  bot={item}
+                  size={20}
+                />,
+              })),
+            }]}
+            placeholder={m.bots_new()}
+            search={{ placeholder: m.bots_search(), empty: m.bots_search_empty() }}
+            value={bot?.id ?? ''}
+            onValueChange={(botId) => void navigate({
+              to: '/bots/$botId/$tab',
+              params: { botId, tab: section ?? 'profile' },
+              replace: true,
+            })}
+          />
+          <Button
+            asChild
+            aria-label={m.bots_create()}
+            className="@min-[720px]/section-dialog:hidden"
+            size="icon"
+            title={m.bots_create()}
+            variant="ghost"
+          >
+            <Link
+              replace
+              to="/bots/create"
+            >
+              <IconPlus />
+            </Link>
+          </Button>
+        </div>
       )}
       label={m.bots_sections()}
     >

@@ -49,7 +49,7 @@ export function ArtifactList({ selected, onClose }: ArtifactListProps) {
           <SectionDialogNavLabel key={bot.id}>
             <button
               aria-expanded={!collapsed.has(bot.id)}
-              className="-mx-1 flex min-w-0 flex-1 items-center gap-1.5 rounded-md px-1 py-0.5 text-left transition-colors outline-none hover:text-foreground focus-visible:bg-muted/70"
+              className="-mx-1 flex min-w-0 flex-1 items-center gap-1.5 rounded-md px-1 py-0.5 text-left transition-colors outline-none hover:text-foreground focus-visible:bg-muted/70 @max-[720px]/section-dialog:pointer-events-none"
               type="button"
               onClick={() => setCollapsed((current) => {
                 const next = new Set(current);
@@ -67,12 +67,12 @@ export function ArtifactList({ selected, onClose }: ArtifactListProps) {
                 size={16}
               />
               <span className="truncate">{bot.name}</span>
-              <IconChevronRight className={cn('ml-auto size-3.5 shrink-0 transition-transform', !collapsed.has(bot.id) && 'rotate-90')} />
+              <IconChevronRight className={cn('ml-auto hidden size-3.5 shrink-0 transition-transform @min-[720px]/section-dialog:block', !collapsed.has(bot.id) && 'rotate-90')} />
             </button>
           </SectionDialogNavLabel>,
-          ...(collapsed.has(bot.id) ? [] : artifacts).map((artifact) => (
+          ...artifacts.map((artifact) => (
             <Tooltip key={artifact.id}>
-              <SectionDialogNavItem isActive={artifact.id === selected?.artifactId}>
+              <SectionDialogNavItem className={cn(collapsed.has(bot.id) && '@min-[720px]/section-dialog:hidden')} isActive={artifact.id === selected?.artifactId}>
                 <TooltipTrigger asChild>
                   <Link
                     replace
@@ -81,7 +81,7 @@ export function ArtifactList({ selected, onClose }: ArtifactListProps) {
                     to="/artifacts/$botId/$conversationId/$artifactId"
                   >
                     <span className="flex min-w-0 flex-col @min-[720px]/section-dialog:py-1.5">
-                      <span className="truncate">{`${artifact.emoji} ${artifact.title}`}</span>
+                      <span className="truncate">{artifact.title}</span>
                       <span className="hidden truncate text-xs text-muted-foreground @min-[720px]/section-dialog:block">
                         {m.artifacts_meta({ version: artifact.version, date: hydrated ? dates.format(new Date(artifact.updatedAt)) : '' })}
                       </span>
@@ -90,7 +90,7 @@ export function ArtifactList({ selected, onClose }: ArtifactListProps) {
                 </TooltipTrigger>
               </SectionDialogNavItem>
               <TooltipContent className="flex flex-col" side="right">
-                <span className="font-medium">{`${artifact.emoji} ${artifact.title}`}</span>
+                <span className="font-medium">{artifact.title}</span>
                 <span>{m.artifacts_meta({ version: artifact.version, date: hydrated ? dates.format(new Date(artifact.updatedAt)) : '' })}</span>
               </TooltipContent>
             </Tooltip>

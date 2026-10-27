@@ -78,7 +78,7 @@ export function SectionDialogNav({ label, header, activeKey, footer, children }:
 
   return (
     <nav aria-label={label} className="flex min-w-0 shrink-0 flex-col gap-2 border-b bg-muted/40 py-3.5 @min-[720px]/section-dialog:w-54 @min-[720px]/section-dialog:gap-4 @min-[720px]/section-dialog:border-r @min-[720px]/section-dialog:border-b-0 @min-[720px]/section-dialog:px-2 @min-[720px]/section-dialog:pt-4 @min-[720px]/section-dialog:pb-2">
-      <div className="px-5 @min-[720px]/section-dialog:px-1">{header}</div>
+      <div className="pr-14 pl-5 @min-[720px]/section-dialog:px-1">{header}</div>
       <ul className="flex snap-x snap-mandatory scroll-px-2 [scrollbar-width:none] gap-0.5 overflow-x-auto mask-r-from-85% pr-16 pl-2 @min-[720px]/section-dialog:min-h-0 @min-[720px]/section-dialog:flex-1 @min-[720px]/section-dialog:snap-none @min-[720px]/section-dialog:flex-col @min-[720px]/section-dialog:overflow-x-visible @min-[720px]/section-dialog:overflow-y-auto @min-[720px]/section-dialog:mask-none @min-[720px]/section-dialog:px-0" ref={list}>
         {children}
       </ul>
@@ -92,18 +92,19 @@ export function SectionDialogNavTitle({ className, ...props }: ComponentProps<'p
 }
 
 export function SectionDialogNavLabel({ className, ...props }: ComponentProps<'li'>) {
-  return <li className={cn('hidden items-center gap-1.5 px-3 pt-3 pb-1 text-xs text-muted-foreground first:pt-0 @min-[720px]/section-dialog:flex', className)} {...props} />;
+  return <li className={cn('flex shrink-0 items-center gap-1.5 pr-1 pl-3 text-xs text-muted-foreground @min-[720px]/section-dialog:px-3 @min-[720px]/section-dialog:pt-3 @min-[720px]/section-dialog:pb-1 @min-[720px]/section-dialog:first:pt-0', className)} {...props} />;
 }
 
 interface SectionDialogNavItemProps {
   isActive: boolean
+  className?: string
   children: ReactNode
 }
 
 /** Wraps one link; the link gets the item styles and `aria-current` when active. */
-export function SectionDialogNavItem({ isActive, children }: SectionDialogNavItemProps) {
+export function SectionDialogNavItem({ isActive, className, children }: SectionDialogNavItemProps) {
   return (
-    <li className="shrink-0 snap-start">
+    <li className={cn('shrink-0 snap-start', className)}>
       <SlotPrimitive.Slot
         aria-current={isActive ? 'page' : undefined}
         className={cn(
@@ -134,13 +135,13 @@ export function SectionDialogBody({ title, description, actions, footer, childre
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <header
         className={cn(
-          'flex min-h-7 shrink-0 items-start gap-3 border-b px-5 pt-5 pr-14 transition-colors @min-[720px]/section-dialog:px-8 @min-[720px]/section-dialog:pt-6 @min-[720px]/section-dialog:pr-16',
+          'flex min-h-7 shrink-0 flex-wrap items-start gap-3 border-b px-5 pt-5 pr-14 transition-colors @min-[720px]/section-dialog:px-8 @min-[720px]/section-dialog:pt-6 @min-[720px]/section-dialog:pr-16',
           title ? 'pb-4' : 'pb-2',
           isScrolled ? 'border-border' : 'border-transparent',
         )}
       >
         {title ? (
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <div className="flex min-w-0 flex-1 basis-full flex-col gap-0.5 @min-[720px]/section-dialog:basis-0">
             <h2 className="truncate text-lg font-semibold">{title}</h2>
             {description ? <p className="truncate text-sm text-muted-foreground">{description}</p> : null}
           </div>

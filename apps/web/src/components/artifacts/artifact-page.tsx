@@ -48,7 +48,7 @@ export function ArtifactPage({ botId, conversationId, artifactId, isExpanded, on
   return (
     <SectionDialogBody
       actions={(
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 @max-[720px]/section-dialog:-ml-3">
           <DropdownMenu.DropdownMenu>
             <DropdownMenu.DropdownMenuTrigger asChild>
               <Button
@@ -99,7 +99,7 @@ export function ArtifactPage({ botId, conversationId, artifactId, isExpanded, on
       )}
       description={m.artifacts_meta({ version: artifact.version, date: hydrated ? dates.format(new Date(artifact.updatedAt)) : '' })}
       key={artifactId}
-      title={`${artifact.emoji} ${artifact.title}`}
+      title={artifact.title}
     >
       <ArtifactView
         spec={artifact.spec}

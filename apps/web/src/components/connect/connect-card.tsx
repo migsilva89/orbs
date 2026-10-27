@@ -1,14 +1,14 @@
 import { connectionLostMessage } from '@repo/client/client';
 import { env } from '@repo/env/client';
 import { m } from '@repo/i18n/client';
+import { Alert, AlertDescription } from '@repo/ui/alert';
+import * as Card from '@repo/ui/card';
+import { ConnectFriends } from '@repo/ui/connect/connect-friends';
+import { LayoutBrand } from '@repo/ui/layout/layout-brand';
 import { useSearch } from '@tanstack/react-router';
-import { LayoutBrand } from '@/components/layout/layout-brand';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import * as Card from '@/components/ui/card';
 import BrandsLogo from '~icons/brands/logo';
 import IconLock from '~icons/lucide/lock';
 import { ConnectForm } from './connect-form';
-import { ConnectFriends } from './connect-friends';
 
 export function ConnectCard() {
   const { reason } = useSearch({ from: '/connect' });

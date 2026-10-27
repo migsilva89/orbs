@@ -2,12 +2,12 @@ import { ROOMS, roomsSearchSnippet } from '@repo/client/client';
 import { useChatSearch } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
+import { BotAvatar } from '@repo/ui/bots/bot-avatar';
+import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@repo/ui/command';
+import { Kbd } from '@repo/ui/kbd';
+import { Skeleton } from '@repo/ui/skeleton';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useState } from 'react';
-import { BotAvatar } from '@/components/bots/bot-avatar';
-import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Kbd } from '@/components/ui/kbd';
-import { Skeleton } from '@/components/ui/skeleton';
 import { roomsLink } from '@/services/rooms/rooms.client';
 import type { RoomsSearchEntry } from '@repo/client/client';
 

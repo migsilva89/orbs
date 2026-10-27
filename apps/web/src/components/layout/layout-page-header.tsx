@@ -1,4 +1,4 @@
-import { LayoutBreadcrumbs } from '@/components/layout/layout-breadcrumbs';
+import { LayoutBreadcrumbs } from '@repo/ui/layout/layout-breadcrumbs';
 import type { ReactNode } from 'react';
 
 interface LayoutPageHeaderProps {

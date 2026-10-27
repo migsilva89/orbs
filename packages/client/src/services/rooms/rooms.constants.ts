@@ -19,7 +19,6 @@ export const ROOMS = {
   moreReactions: ['🔥', '👀', '🙏', '😢', '💯'],
   emojiSlowMs: 6000,
   emojiSkeletonCells: 40,
-  copiedMs: 2000,
   quoteDelayMs: 1200,
   unreadSeenMs: 2500,
   mediaRecentMs: 7 * 24 * 60 * 60 * 1000,
@@ -47,3 +46,5 @@ export const ROOMS_APPROVAL_CHOICES = [
   { decision: 'always', label: m.rooms_chat_approval_always, tone: 'info' },
   { decision: 'deny', label: m.rooms_chat_approval_deny, tone: 'muted' },
 ] as const;
+
+export const ROOMS_PRESENCE_EVENTS = ['pointerdown', 'keydown', 'wheel', 'focus'] as const;

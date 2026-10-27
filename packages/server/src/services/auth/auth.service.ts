@@ -9,9 +9,9 @@ import { authQueryDevices } from './auth-query.devices';
 import type * as AuthTypes from '../../types/auth.types';
 import type { AuthRedeemInput } from '@repo/contracts/universal';
 
-export function makeAuthService({ database }: AuthTypes.AuthServiceParams) {
+export function makeAuthService({ database, appScheme }: AuthTypes.AuthServiceParams) {
   const revocations = new Set<AuthTypes.AuthRevocationListener>();
-  const deps = { database, revocations };
+  const deps = { database, appScheme, revocations };
 
   return {
     onRevoke: (listener: AuthTypes.AuthRevocationListener) => {

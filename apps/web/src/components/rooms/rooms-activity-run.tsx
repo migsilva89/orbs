@@ -1,10 +1,10 @@
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
+import { agentTimelineCost, agentTimelineSeconds } from '@repo/ui/agent-timeline.utils';
+import { cn } from '@repo/ui/cn';
 import { Link, useHydrated } from '@tanstack/react-router';
 import { match } from 'ts-pattern';
 import { RoomsActivityTimeline } from '@/components/rooms/rooms-activity-timeline';
-import { cn } from '@/lib/cn';
-import { agentTimelineCost, agentTimelineSeconds } from '@/services/agent-timeline/agent-timeline.utils';
 import IconActivity from '~icons/lucide/activity';
 import IconAlarmClock from '~icons/lucide/alarm-clock';
 import IconBot from '~icons/lucide/bot';

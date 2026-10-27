@@ -1,19 +1,19 @@
 import { m } from '@repo/i18n/client';
+import { Button } from '@repo/ui/button';
+import { SettingsAppearance } from '@repo/ui/settings/settings-appearance';
+import { SettingsDevices } from '@repo/ui/settings/settings-devices';
+import { SettingsProviders } from '@repo/ui/settings/settings-providers';
+import { SettingsSecrets } from '@repo/ui/settings/settings-secrets';
+import { SettingsServer } from '@repo/ui/settings/settings-server';
+import { SettingsSources } from '@repo/ui/settings/settings-sources';
 import { ClientOnly, Link } from '@tanstack/react-router';
 import { LayoutPageHeader } from '@/components/layout/layout-page-header';
-import { SettingsAppearance } from '@/components/settings/settings-appearance';
 import { SettingsChat } from '@/components/settings/settings-chat';
 import { SettingsDesktop } from '@/components/settings/settings-desktop';
-import { SettingsDevices } from '@/components/settings/settings-devices';
 import { SettingsGeneral } from '@/components/settings/settings-general';
 import { SettingsModels } from '@/components/settings/settings-models';
-import { SettingsProviders } from '@/components/settings/settings-providers';
-import { SettingsSecrets } from '@/components/settings/settings-secrets';
-import { SettingsServer } from '@/components/settings/settings-server';
-import { SettingsSources } from '@/components/settings/settings-sources';
 import { SettingsTools } from '@/components/settings/settings-tools';
-import { Button } from '@/components/ui/button';
-import type { ConnectionInfo } from '@/types/connection.types';
+import type { ConnectionInfo } from '@repo/client/client';
 
 interface SettingsPageProps {
   connection: ConnectionInfo

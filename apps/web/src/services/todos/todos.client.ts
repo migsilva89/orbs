@@ -1,6 +1,6 @@
 import { notFound } from '@tanstack/react-router';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { TodosFindParams } from '@/types/todos.types';
+import type { TodosFindParams } from '@repo/ui/todos.types';
 import type { QueryClient } from '@tanstack/react-query';
 
 export async function todosFind(queryClient: QueryClient, { botId, todoId }: TodosFindParams) {

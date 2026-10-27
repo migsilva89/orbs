@@ -1,5 +1,5 @@
+import { SettingsDeviceRevokeDialog } from '@repo/ui/settings/settings-device-revoke-dialog';
 import { createFileRoute, notFound } from '@tanstack/react-router';
-import { SettingsDeviceRevokeDialog } from '@/components/settings/settings-device-revoke-dialog';
 import { useDialogNavigation } from '@/hooks/use-dialog-navigation';
 import { rpc } from '@/services/rpc/rpc.client';
 

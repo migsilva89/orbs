@@ -1,20 +1,20 @@
 import { botUsageLabel } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
+import { BotAvatar } from '@repo/ui/bots/bot-avatar';
+import { Button } from '@repo/ui/button';
+import { Item, ItemActions, ItemContent, ItemGroup, ItemLink, ItemMedia, ItemTitle, ItemValue } from '@repo/ui/item';
+import { RoomsDetailsSection } from '@repo/ui/rooms/rooms-details-section';
+import { RoomsSettingsMenu } from '@repo/ui/rooms/rooms-settings-menu';
+import * as Sidebar from '@repo/ui/sidebar';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useHydrated, useMatch, useMatchRoute } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
 import { match, P } from 'ts-pattern';
-import { BotAvatar } from '@/components/bots/bot-avatar';
 import { RoomsDetailsBot } from '@/components/rooms/rooms-details-bot';
 import { RoomsDetailsMedia } from '@/components/rooms/rooms-details-media';
-import { RoomsDetailsSection } from '@/components/rooms/rooms-details-section';
-import { RoomsSettingsMenu } from '@/components/rooms/rooms-settings-menu';
 import { RoutinesList } from '@/components/routines/routines-list';
 import { TodosList } from '@/components/todos/todos-list';
-import { Button } from '@/components/ui/button';
-import { Item, ItemActions, ItemContent, ItemGroup, ItemLink, ItemMedia, ItemTitle, ItemValue } from '@/components/ui/item';
-import * as Sidebar from '@/components/ui/sidebar';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconActivity from '~icons/lucide/activity';
 import IconCalendarClock from '~icons/lucide/calendar-clock';
@@ -23,9 +23,9 @@ import IconChevronRight from '~icons/lucide/chevron-right';
 import IconImages from '~icons/lucide/images';
 import IconListTodo from '~icons/lucide/list-todo';
 import IconX from '~icons/lucide/x';
-import type { RoomsDetailsPage } from '@/types/rooms.types';
 import type { RoomsChat } from '@repo/client/client';
 import type { Bot } from '@repo/contracts/universal';
+import type { RoomsDetailsPage } from '@repo/ui/rooms.types';
 
 export function RoomsDetails() {
   const direct = useMatch({ from: '/_chat/rooms/direct/$handle', shouldThrow: false });

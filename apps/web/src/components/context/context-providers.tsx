@@ -1,14 +1,19 @@
 import { rpcContext } from '@repo/client/react';
+import { useTheme } from '@repo/client/web';
+import { ContextTheme } from '@repo/ui/context/context-theme';
+import { LayoutPullToRefresh } from '@repo/ui/layout/layout-pull-to-refresh';
+import { Toaster } from '@repo/ui/sonner';
 import { LazyMotion } from 'motion/react';
-import { LayoutPullToRefresh } from '@/components/layout/layout-pull-to-refresh';
-import { Toaster } from '@/components/ui/sonner';
-import { useTheme } from '@/hooks/use-theme';
+import { useEffect } from 'react';
 import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
-import { ContextTheme } from './context-theme';
 import type { ReactNode } from 'react';
 
 function ContextToaster() {
   const { resolved } = useTheme();
+
+  useEffect(() => {
+    window.__electrobunSendToHost?.({ theme: resolved });
+  }, [resolved]);
 
   return <Toaster theme={resolved} />;
 }
@@ -23,7 +28,7 @@ export function ContextProviders({ children }: ContextProvidersProps) {
       <ContextTheme>
         <LazyMotion
           strict
-          features={() => import('@/lib/motion').then((module) => module.motionFeatures)}
+          features={() => import('@repo/ui/motion').then((module) => module.motionFeatures)}
         >
           {children}
           <LayoutPullToRefresh />

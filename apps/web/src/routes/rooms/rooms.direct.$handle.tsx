@@ -1,6 +1,6 @@
 import { chatQueries } from '@repo/client/react';
+import { LayoutNotFound } from '@repo/ui/layout/layout-error';
 import { createFileRoute, Outlet, useMatch } from '@tanstack/react-router';
-import { LayoutNotFound } from '@/components/layout/layout-error';
 import { RoomsPage } from '@/components/rooms/rooms-page';
 import { roomsDirectBot } from '@/services/rooms/rooms.client';
 import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';

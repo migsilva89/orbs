@@ -1,16 +1,16 @@
+import { cn } from '@repo/ui/cn';
+import { MessageScrollerProvider } from '@repo/ui/message-scroller';
+import { PaneHost, usePaneHost } from '@repo/ui/pane';
+import { RoomsChatPill } from '@repo/ui/rooms/rooms-chat-pill';
+import { RoomsChatRuns } from '@repo/ui/rooms/rooms-chat-runs';
+import { RoomsChatStatus } from '@repo/ui/rooms/rooms-chat-status';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import { RoomsChatComposer } from '@/components/rooms/rooms-chat-composer';
-import { RoomsChatPill } from '@/components/rooms/rooms-chat-pill';
-import { RoomsChatRuns } from '@/components/rooms/rooms-chat-runs';
-import { RoomsChatStatus } from '@/components/rooms/rooms-chat-status';
 import { RoomsChatTranscript } from '@/components/rooms/rooms-chat-transcript';
-import { MessageScrollerProvider } from '@/components/ui/message-scroller';
-import { PaneHost, usePaneHost } from '@/components/ui/pane';
-import { cn } from '@/lib/cn';
-import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
 import type { LabChatFixture } from '@/types/lab.types';
 import type { ChatMessage } from '@repo/client/client';
+import type { PromptInputEditorHandle } from '@repo/ui/ai/prompt-input-editor';
 import type { QueryClient } from '@tanstack/react-query';
 
 interface LabChatViewProps {

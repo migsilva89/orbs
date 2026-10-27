@@ -1,31 +1,28 @@
 import { chatResetCommand, mentionHref, mentionSegments, ROOMS, roomsMessageText } from '@repo/client/client';
 import { useChatSend } from '@repo/client/react';
-import { useChatAttachmentsWeb, useChatDraft } from '@repo/client/web';
+import { useChatAttachmentsWeb, useChatDraft, useIsMobile, useIsTouch, usePreferences } from '@repo/client/web';
 import { ATTACHMENT } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
+import { PromptInput, PromptInputActionMenu, PromptInputActionMenuContent, PromptInputActionMenuItem, PromptInputActionMenuTrigger, PromptInputDrawer, PromptInputDrawerAlert, PromptInputQuote, PromptInputSubmit } from '@repo/ui/ai/prompt-input';
+import { InputGroupAddon } from '@repo/ui/input-group';
+import { useMessageScroller } from '@repo/ui/message-scroller';
+import { RoomsChatAttachments } from '@repo/ui/rooms/rooms-chat-attachments';
+import { RoomsChatQueue } from '@repo/ui/rooms/rooms-chat-queue';
+import { toasty } from '@repo/ui/sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { match, P } from 'ts-pattern';
-import { RoomsChatAttachments } from '@/components/rooms/rooms-chat-attachments';
-import { RoomsChatQueue } from '@/components/rooms/rooms-chat-queue';
 import { RoomsMention } from '@/components/rooms/rooms-mention';
 import { RoomsMentionOption } from '@/components/rooms/rooms-mention-option';
-import { PromptInput, PromptInputActionMenu, PromptInputActionMenuContent, PromptInputActionMenuItem, PromptInputActionMenuTrigger, PromptInputDrawer, PromptInputDrawerAlert, PromptInputQuote, PromptInputSubmit } from '@/components/ui/ai/prompt-input';
-import { InputGroupAddon } from '@/components/ui/input-group';
-import { useMessageScroller } from '@/components/ui/message-scroller';
-import { toasty } from '@/components/ui/sonner';
-import { useIsMobile } from '@/hooks/use-is-mobile';
-import { useIsTouch } from '@/hooks/use-is-touch';
-import { usePreferences } from '@/hooks/use-preferences';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconPaperclip from '~icons/lucide/paperclip';
-import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
 import type * as ClientTypes from '@repo/client/client';
 import type { Bot } from '@repo/contracts/universal';
+import type { PromptInputEditorHandle } from '@repo/ui/ai/prompt-input-editor';
 import type * as ReactTypes from 'react';
 
-const PromptInputEditor = lazy(() => import('@/components/ui/ai/prompt-input-editor').then((module) => ({ default: module.PromptInputEditor })));
+const PromptInputEditor = lazy(() => import('@repo/ui/ai/prompt-input-editor').then((module) => ({ default: module.PromptInputEditor })));
 
 interface RoomsChatComposerProps {
   bot: Bot

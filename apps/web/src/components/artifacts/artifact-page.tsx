@@ -1,13 +1,13 @@
 import { artifactsStore } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
+import { ArtifactView } from '@repo/ui/artifact-view';
+import { Button } from '@repo/ui/button';
+import * as DropdownMenu from '@repo/ui/dropdown-menu';
+import { toasty } from '@repo/ui/sonner';
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Outlet, useHydrated } from '@tanstack/react-router';
-import { ArtifactView } from '@/components/artifacts/artifact-view';
 import { LayoutPageHeader } from '@/components/layout/layout-page-header';
-import { Button } from '@/components/ui/button';
-import * as DropdownMenu from '@/components/ui/dropdown-menu';
-import { toasty } from '@/components/ui/sonner';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCheck from '~icons/lucide/check';
 import IconChevronDown from '~icons/lucide/chevron-down';

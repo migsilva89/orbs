@@ -1,19 +1,19 @@
 import { routinesScheduleText } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link, useHydrated } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
+import { Button } from '@repo/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
-import { toasty } from '@/components/ui/sonner';
-import { Switch } from '@/components/ui/switch';
+} from '@repo/ui/dropdown-menu';
+import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@repo/ui/item';
+import { toasty } from '@repo/ui/sonner';
+import { Switch } from '@repo/ui/switch';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Link, useHydrated } from '@tanstack/react-router';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconEllipsisVertical from '~icons/lucide/ellipsis-vertical';
 import IconPencil from '~icons/lucide/pencil';

@@ -1,7 +1,7 @@
 import { useChatReaction } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
+import { RoomsChatReactions } from '@repo/ui/rooms/rooms-chat-reactions';
 import { RoomsChatMessage } from '@/components/rooms/rooms-chat-message';
-import { RoomsChatReactions } from '@/components/rooms/rooms-chat-reactions';
 import type { RoomsReactionGroup } from '@repo/client/client';
 import type { ComponentProps } from 'react';
 

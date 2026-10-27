@@ -35,6 +35,7 @@ export async function makeServices({
   mcp,
   mcpAuth,
   network,
+  appScheme,
   providers,
   runtime: runtimeOptions,
 }: CoreServicesParams) {
@@ -55,7 +56,7 @@ export async function makeServices({
   try {
     const server = makeServerService({ settings, network });
     await server.queries.info();
-    const auth = makeAuthService({ database });
+    const auth = makeAuthService({ database, appScheme });
     const limits = makeLimitService({ settings });
     await limits.ready;
     auth.onRevoke((deviceId) => {

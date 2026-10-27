@@ -1,20 +1,20 @@
+import { useIsMobile } from '@repo/client/web';
 import { m } from '@repo/i18n/client';
+import { PromptInput, PromptInputActionMenu, PromptInputActionMenuTrigger, PromptInputSubmit } from '@repo/ui/ai/prompt-input';
+import { BotAvatar } from '@repo/ui/bots/bot-avatar';
+import { Button } from '@repo/ui/button';
+import { Command, CommandGroup, CommandItem, CommandList } from '@repo/ui/command';
+import { InputGroupAddon } from '@repo/ui/input-group';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useCanGoBack, useNavigate, useRouter, useSearch } from '@tanstack/react-router';
 import { lazy, useEffect, useId, useRef, useState } from 'react';
-import { BotAvatar } from '@/components/bots/bot-avatar';
-import { PromptInput, PromptInputActionMenu, PromptInputActionMenuTrigger, PromptInputSubmit } from '@/components/ui/ai/prompt-input';
-import { Button } from '@/components/ui/button';
-import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
-import { InputGroupAddon } from '@/components/ui/input-group';
-import { useIsMobile } from '@/hooks/use-is-mobile';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconFolderPlus from '~icons/lucide/folder-plus';
 import IconPlus from '~icons/lucide/plus';
 import IconX from '~icons/lucide/x';
 import type { FocusEvent, KeyboardEvent, ReactNode } from 'react';
 
-const PromptInputEditor = lazy(() => import('@/components/ui/ai/prompt-input-editor').then((module) => ({ default: module.PromptInputEditor })));
+const PromptInputEditor = lazy(() => import('@repo/ui/ai/prompt-input-editor').then((module) => ({ default: module.PromptInputEditor })));
 
 interface RoomsStartIconProps {
   children: ReactNode

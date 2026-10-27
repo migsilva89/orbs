@@ -1,6 +1,6 @@
 import { m } from '@repo/i18n/client';
+import { ConfirmationDialog } from '@repo/ui/alert-dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ConfirmationDialog } from '@/components/ui/alert-dialog';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { Bot, Routine } from '@repo/contracts/universal';
 

@@ -1,6 +1,6 @@
 import { botSkillName, mentionTarget } from '@repo/client/client';
+import { BotAvatar } from '@repo/ui/bots/bot-avatar';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { BotAvatar } from '@/components/bots/bot-avatar';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconBox from '~icons/lucide/box';
 import IconSquareSlash from '~icons/lucide/square-slash';

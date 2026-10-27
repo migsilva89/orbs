@@ -2,16 +2,16 @@ import { BOT_PERMISSION_HINTS, BOT_PERMISSION_LABELS } from '@repo/client/client
 import { useSettingsTools } from '@repo/client/react';
 import { botFields } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
+import { Button } from '@repo/ui/button';
+import { ButtonLoading } from '@repo/ui/button-loading';
+import { FormErrors } from '@repo/ui/forms/form';
+import { Input } from '@repo/ui/input';
+import { Label, LabelDescription } from '@repo/ui/label';
+import { OnboardingSceneApprovals } from '@repo/ui/onboarding/onboarding-scene-approvals';
+import { OnboardingStepLayout } from '@repo/ui/onboarding/onboarding-step-layout';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useId, useState } from 'react';
-import { OnboardingSceneApprovals } from '@/components/onboarding/onboarding-scene-approvals';
-import { OnboardingStepLayout } from '@/components/onboarding/onboarding-step-layout';
-import { Button } from '@/components/ui/button';
-import { ButtonLoading } from '@/components/ui/button-loading';
-import { FormErrors } from '@/components/ui/forms/form';
-import { Input } from '@/components/ui/input';
-import { Label, LabelDescription } from '@/components/ui/label';
 import { rpc } from '@/services/rpc/rpc.client';
 
 export function OnboardingStepApprovals() {

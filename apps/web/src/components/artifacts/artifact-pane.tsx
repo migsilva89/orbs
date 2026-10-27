@@ -1,13 +1,13 @@
 import { artifactsStore } from '@repo/client/client';
 import { ARTIFACT } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
+import { ArtifactView } from '@repo/ui/artifact-view';
+import { Pane, PaneBody, PaneContent, PaneHeader, PaneTitle } from '@repo/ui/pane';
+import { Skeleton } from '@repo/ui/skeleton';
+import { toasty } from '@repo/ui/sonner';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArtifactView } from '@/components/artifacts/artifact-view';
-import { Pane, PaneBody, PaneContent, PaneHeader, PaneTitle } from '@/components/ui/pane';
-import { Skeleton } from '@/components/ui/skeleton';
-import { toasty } from '@/components/ui/sonner';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { ArtifactsRef } from '@/types/artifacts.types';
+import type { ArtifactsRef } from '@repo/ui/artifacts.types';
 
 interface ArtifactPaneProps extends ArtifactsRef {
   title: string

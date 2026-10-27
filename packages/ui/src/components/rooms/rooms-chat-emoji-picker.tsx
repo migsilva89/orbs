@@ -1,0 +1,28 @@
+import { m } from '@repo/i18n/client';
+import { getLocale } from '@repo/i18n/runtime';
+import { EmojiPicker, EmojiPickerContent, EmojiPickerSearch } from '../emoji-picker';
+import { RoomsChatEmojiLoading } from './rooms-chat-emoji-loading';
+
+interface RoomsChatEmojiPickerProps {
+  layout: 'popover' | 'sheet';
+  onPick: (emoji: string) => void;
+  onRetry: () => void
+}
+
+export function RoomsChatEmojiPicker({ layout, onPick, onRetry }: RoomsChatEmojiPickerProps) {
+  return (
+    <EmojiPicker
+      className={layout === 'sheet' ? 'h-72 w-full **:data-[slot=emoji-picker-row]:flex **:data-[slot=emoji-picker-row]:justify-between' : 'h-80'}
+      columns={8}
+      locale={getLocale()}
+      onEmojiSelect={({ emoji }) => onPick(emoji)}
+    >
+      <EmojiPickerSearch
+        aria-label={m.rooms_reaction_search()}
+        placeholder={m.rooms_reaction_search()}
+        ref={(node) => node?.focus()}
+      />
+      <EmojiPickerContent empty={m.rooms_reaction_empty()} loading={<RoomsChatEmojiLoading onRetry={onRetry} />} />
+    </EmojiPicker>
+  );
+}

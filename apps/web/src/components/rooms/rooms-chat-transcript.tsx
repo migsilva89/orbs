@@ -1,14 +1,14 @@
 import { CHAT, roomsReactionGroups, roomsTimeLabel } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
-import { RoomsChatHistory } from '@/components/rooms/rooms-chat-history';
+import { botBubbleStyle } from '@repo/ui/bot.client';
+import { MessageScroller, MessageScrollerButton, MessageScrollerViewport } from '@repo/ui/message-scroller';
+import { RoomsChatHistory } from '@repo/ui/rooms/rooms-chat-history';
+import { RoomsChatUnread } from '@repo/ui/rooms/rooms-chat-unread';
 import { RoomsChatTranscriptItem } from '@/components/rooms/rooms-chat-transcript-item';
-import { RoomsChatUnread } from '@/components/rooms/rooms-chat-unread';
-import { MessageScroller, MessageScrollerButton, MessageScrollerViewport } from '@/components/ui/message-scroller';
-import { botBubbleStyle } from '@/services/bot/bot.client';
-import type { MessageScrollerRow } from '@/components/ui/message-scroller';
 import type { ChatMessage, RoomsHistoryLoader, RoomsUnread } from '@repo/client/client';
 import type { Bot, ConversationReaction } from '@repo/contracts/universal';
+import type { MessageScrollerRow } from '@repo/ui/message-scroller';
 import type { ReactNode } from 'react';
 
 interface RoomsChatTranscriptProps {

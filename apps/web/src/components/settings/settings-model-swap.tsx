@@ -2,15 +2,15 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
 import { useSettingsModelSwap } from '@repo/client/react';
 import { botSwapModels } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
+import { BotAvatar } from '@repo/ui/bots/bot-avatar';
+import { ButtonLoading } from '@repo/ui/button-loading';
+import { Checkbox } from '@repo/ui/checkbox';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@repo/ui/dialog';
+import { Form, FormErrors, FormErrorsAndHint, FormField, FormItem, FormLabel } from '@repo/ui/forms/form';
+import { Item, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@repo/ui/item';
 import { useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
-import { BotAvatar } from '@/components/bots/bot-avatar';
 import { BotSettingsFields } from '@/components/bots/bot-settings-fields';
-import { ButtonLoading } from '@/components/ui/button-loading';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Form, FormErrors, FormErrorsAndHint, FormField, FormItem, FormLabel } from '@/components/ui/forms/form';
-import { Item, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
 import type { BotModelUsage } from '@repo/client/client';
 
 interface SettingsModelSwapProps {

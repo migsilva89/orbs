@@ -1,15 +1,8 @@
 import type { makeServices } from '@repo/server/server';
+import type { Server } from 'bun';
 
-export interface CoreRpcNativeParams {
-  isLocal?: boolean;
-}
+export type CoreServices = Awaited<ReturnType<typeof makeServices>>;
 
-export interface CoreLocalNativeParams {
-  directory: string;
-}
+export type CoreHandler<T extends Request> = (request: T, server: Server<undefined>) => Response | undefined | Promise<Response | undefined>;
 
-export interface CoreServerAvatarParams {
-  services: Awaited<ReturnType<typeof makeServices>>;
-  path: string;
-  peer: string | null;
-}
+export type CorePairingCode = Awaited<ReturnType<CoreServices['auth']['actions']['bootstrap']>>['qr'];

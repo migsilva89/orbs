@@ -1,7 +1,7 @@
 import { bootZodErrors } from '@repo/i18n/validation';
+import { LayoutError, LayoutNotFound } from '@repo/ui/layout/layout-error';
 import { createRouter as createTanStackRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
-import { LayoutError, LayoutNotFound } from '@/components/layout/layout-error';
 import { tanstackQueryContext } from '@/services/tanstack/tanstack.client';
 import { routeTree } from './routes.tree';
 

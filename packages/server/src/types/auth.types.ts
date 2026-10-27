@@ -3,6 +3,7 @@ import type { ServerAddress } from '@repo/contracts/universal';
 
 export interface AuthServiceParams {
   database: DatabaseService;
+  appScheme: string;
 }
 
 export interface AuthServiceDeps extends AuthServiceParams {

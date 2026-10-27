@@ -1,11 +1,11 @@
+import { useIsStandalone } from '@repo/client/web';
 import { env } from '@repo/env/client';
 import { m } from '@repo/i18n/client';
+import { Alert, AlertDescription, AlertTitle } from '@repo/ui/alert';
+import { Button } from '@repo/ui/button';
+import { LAYOUT_INSTALL_DISMISSED_KEY } from '@repo/ui/layout.constants';
 import { useState } from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { useIsStandalone } from '@/hooks/use-is-standalone';
 import { layoutShowInstallPrompt } from '@/services/layout/layout.client';
-import { LAYOUT_INSTALL_DISMISSED_KEY } from '@/services/layout/layout.constants';
 import IconShare from '~icons/lucide/share';
 import IconX from '~icons/lucide/x';
 

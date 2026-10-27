@@ -1,15 +1,15 @@
 import { roomsMessageText } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
+import { Event, EventBody, EventContent, EventLabel, EventLine, EventList, EventName, EventTrigger } from '@repo/ui/ai/event';
+import { Response } from '@repo/ui/ai/response';
+import { BotMention } from '@repo/ui/bots/bot-mention';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { match, P } from 'ts-pattern';
-import { BotMention } from '@/components/bots/bot-mention';
-import { Event, EventBody, EventContent, EventLabel, EventLine, EventList, EventName, EventTrigger } from '@/components/ui/ai/event';
-import { Response } from '@/components/ui/ai/response';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconLucideAlarmClock from '~icons/lucide/alarm-clock';
 import IconLucideWorkflow from '~icons/lucide/workflow';
-import type { EventStatus } from '@/components/ui/ai/event';
 import type { ChatMessage, ChatPart } from '@repo/client/client';
+import type { EventStatus } from '@repo/ui/ai/event';
 import type { ReactNode } from 'react';
 
 interface RoomsChatNoticeLine {

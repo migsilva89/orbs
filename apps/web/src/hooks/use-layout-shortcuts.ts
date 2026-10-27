@@ -1,9 +1,9 @@
 import { roomsSidebarOrder } from '@repo/client/client';
 import { useSidebarSections } from '@repo/client/react';
+import { LAYOUT_SHORTCUT_OPTIONS, LAYOUT_SHORTCUTS } from '@repo/ui/layout.constants';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useMatch, useNavigate } from '@tanstack/react-router';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { LAYOUT_SHORTCUT_OPTIONS, LAYOUT_SHORTCUTS } from '@/services/layout/layout.constants';
 import { roomsLink } from '@/services/rooms/rooms.client';
 import { rpc } from '@/services/rpc/rpc.client';
 

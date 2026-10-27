@@ -1,13 +1,13 @@
 import { CHAT, ROOMS } from '@repo/client/client';
 import { useChatAttachmentUrl } from '@repo/client/web';
 import { m } from '@repo/i18n/client';
+import { EmptyCompact } from '@repo/ui/empty';
+import { FormErrors } from '@repo/ui/forms/form';
+import { Item, ItemContent, ItemGroup, ItemLink, ItemMedia, ItemTitle } from '@repo/ui/item';
+import { RoomsDetailsSection } from '@repo/ui/rooms/rooms-details-section';
+import { Skeleton } from '@repo/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { RoomsDetailsSection } from '@/components/rooms/rooms-details-section';
-import { EmptyCompact } from '@/components/ui/empty';
-import { FormErrors } from '@/components/ui/forms/form';
-import { Item, ItemContent, ItemGroup, ItemLink, ItemMedia, ItemTitle } from '@/components/ui/item';
-import { Skeleton } from '@/components/ui/skeleton';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconFileText from '~icons/lucide/file-text';
 import IconImages from '~icons/lucide/images';

@@ -1,11 +1,11 @@
+import { Dialog, DialogContent } from '@repo/ui/dialog';
+import { OnboardingStepWelcome } from '@repo/ui/onboarding/onboarding-step-welcome';
 import { useParams } from '@tanstack/react-router';
 import { match } from 'ts-pattern';
 import { OnboardingStepApprovals } from '@/components/onboarding/onboarding-step-approvals';
 import { OnboardingStepBot } from '@/components/onboarding/onboarding-step-bot';
 import { OnboardingStepDone } from '@/components/onboarding/onboarding-step-done';
 import { OnboardingStepModel } from '@/components/onboarding/onboarding-step-model';
-import { OnboardingStepWelcome } from '@/components/onboarding/onboarding-step-welcome';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 export function OnboardingPage() {
   const { step } = useParams({ from: '/_chat/onboarding/$step' });

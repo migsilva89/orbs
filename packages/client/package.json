@@ -28,8 +28,8 @@
   },
   "devDependencies": {
     "@legendapp/list": "catalog:mobile",
-    "@repo/typescript-config": "workspace:*",
     "@orpc/tanstack-query": "catalog:",
+    "@repo/typescript-config": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",

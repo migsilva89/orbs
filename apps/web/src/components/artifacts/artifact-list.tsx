@@ -1,10 +1,10 @@
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@repo/ui/empty';
+import { Item, ItemActions, ItemContent, ItemDescription, ItemLink, ItemMedia, ItemTitle, ItemValue } from '@repo/ui/item';
 import { useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useHydrated } from '@tanstack/react-router';
 import { LayoutPageHeader } from '@/components/layout/layout-page-header';
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
-import { Item, ItemActions, ItemContent, ItemDescription, ItemLink, ItemMedia, ItemTitle, ItemValue } from '@/components/ui/item';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconChevronRight from '~icons/lucide/chevron-right';
 

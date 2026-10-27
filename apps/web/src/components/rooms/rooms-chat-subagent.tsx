@@ -1,10 +1,10 @@
 import { useChatSubagent } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
+import { Question, QuestionDescription, QuestionHeader, QuestionHeading, QuestionIcon, QuestionItem, QuestionList, QuestionTitle } from '@repo/ui/ai/question';
+import { Button } from '@repo/ui/button';
 import { useState } from 'react';
 import { match } from 'ts-pattern';
 import { RoomsSubagentPane } from '@/components/rooms/rooms-subagent-pane';
-import { Question, QuestionDescription, QuestionHeader, QuestionHeading, QuestionIcon, QuestionItem, QuestionList, QuestionTitle } from '@/components/ui/ai/question';
-import { Button } from '@/components/ui/button';
 import IconLucideCheck from '~icons/lucide/check';
 import IconLucideLoaderCircle from '~icons/lucide/loader-circle';
 import IconLucideSquare from '~icons/lucide/square';

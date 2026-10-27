@@ -1,9 +1,9 @@
 import { connectionLostReason } from '@repo/client/client';
 import { queryMutationCache } from '@repo/client/react';
 import { log } from '@repo/logger/client';
+import { toasty } from '@repo/ui/sonner';
 import { isCancelledError, QueryCache, QueryClient } from '@tanstack/react-query';
 import { match, P } from 'ts-pattern';
-import { toasty } from '@/components/ui/sonner';
 import { connectionLost } from '@/services/connection/connection.client';
 
 export function tanstackQueryContext() {

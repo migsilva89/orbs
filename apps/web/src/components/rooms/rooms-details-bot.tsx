@@ -2,12 +2,12 @@ import { BOT_PERMISSION_LABELS, BOT_THINKING_LEVEL_LABELS, ROOMS_SEND_MODE_DEFAU
 import { useBotUpdate, useChatSettings } from '@repo/client/react';
 import { botFields, conversationWhenBusy } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
+import { Item, ItemActions, ItemContent, ItemGroup, ItemLink, ItemMedia, ItemTitle, ItemValue } from '@repo/ui/item';
+import { RoomsDetailsSection } from '@repo/ui/rooms/rooms-details-section';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/select';
+import { SettingsProviderLogo } from '@repo/ui/settings/settings-provider-logo';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { RoomsDetailsSection } from '@/components/rooms/rooms-details-section';
-import { SettingsProviderLogo } from '@/components/settings/settings-provider-logo';
-import { Item, ItemActions, ItemContent, ItemGroup, ItemLink, ItemMedia, ItemTitle, ItemValue } from '@/components/ui/item';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconChevronRight from '~icons/lucide/chevron-right';
 import IconListOrdered from '~icons/lucide/list-ordered';

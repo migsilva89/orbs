@@ -3,18 +3,18 @@ import { botDefaultSettings } from '@repo/client/client';
 import { useBotCreate } from '@repo/client/react';
 import { botForm } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
+import { BotFormAvatar } from '@repo/ui/bots/bot-form-avatar';
+import { BotFormProfile } from '@repo/ui/bots/bot-form-profile';
+import { BotPermissionSelect } from '@repo/ui/bots/bot-permission-select';
+import { Button } from '@repo/ui/button';
+import { ButtonLoading } from '@repo/ui/button-loading';
+import { Form, FormErrors, FormField, FormItem, FormLabel } from '@repo/ui/forms/form';
+import { OnboardingSceneBot } from '@repo/ui/onboarding/onboarding-scene-bot';
+import { OnboardingStepLayout } from '@repo/ui/onboarding/onboarding-step-layout';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
-import { BotFormAvatar } from '@/components/bots/bot-form-avatar';
 import { BotFormModel } from '@/components/bots/bot-form-model';
-import { BotFormProfile } from '@/components/bots/bot-form-profile';
-import { BotPermissionSelect } from '@/components/bots/bot-permission-select';
-import { OnboardingSceneBot } from '@/components/onboarding/onboarding-scene-bot';
-import { OnboardingStepLayout } from '@/components/onboarding/onboarding-step-layout';
-import { Button } from '@/components/ui/button';
-import { ButtonLoading } from '@/components/ui/button-loading';
-import { Form, FormErrors, FormField, FormItem, FormLabel } from '@/components/ui/forms/form';
 import { rpc } from '@/services/rpc/rpc.client';
 
 export function OnboardingStepBot() {

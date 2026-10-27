@@ -1,18 +1,18 @@
 import { env } from '@repo/env/client';
 import { m } from '@repo/i18n/client';
+import * as DropdownMenu from '@repo/ui/dropdown-menu';
+import { LAYOUT_MENU } from '@repo/ui/layout.constants';
+import * as Sidebar from '@repo/ui/sidebar';
+import { StatusDot } from '@repo/ui/status-dot';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { match } from 'ts-pattern';
-import * as DropdownMenu from '@/components/ui/dropdown-menu';
-import * as Sidebar from '@/components/ui/sidebar';
-import { StatusDot } from '@/components/ui/status-dot';
 import { connectionForget } from '@/services/connection/connection.client';
-import { LAYOUT_MENU } from '@/services/layout/layout.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import BrandsLogo from '~icons/brands/logo';
 import LucideChevronsUpDown from '~icons/lucide/chevrons-up-down';
 import IconLogOut from '~icons/lucide/log-out';
-import type { ConnectionInfo } from '@/types/connection.types';
+import type { ConnectionInfo } from '@repo/client/client';
 
 interface LayoutNavDeviceProps {
   connection: ConnectionInfo

@@ -1,6 +1,6 @@
+import { LAYOUT_INSTALL_DISMISSED_KEY, LAYOUT_SIDEBAR_COOKIES } from '@repo/ui/layout.constants';
 import { createIsomorphicFn } from '@tanstack/react-start';
-import { LAYOUT_INSTALL_DISMISSED_KEY, LAYOUT_SIDEBAR_COOKIES } from './layout.constants';
-import type { LayoutSidebarsOpen } from '@/types/layout.types';
+import type { LayoutSidebarsOpen } from '@repo/ui/layout.types';
 
 const layoutCookies = createIsomorphicFn()
   .server(async () => {

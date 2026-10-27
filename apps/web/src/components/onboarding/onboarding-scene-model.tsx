@@ -1,11 +1,11 @@
 import { botDefaultSettings } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
+import { AvatarBlob } from '@repo/ui/avatars/avatar-blob';
+import { OnboardingScene } from '@repo/ui/onboarding/onboarding-scene';
+import { SettingsProviderLogo } from '@repo/ui/settings/settings-provider-logo';
 import { useQuery } from '@tanstack/react-query';
 import { useReducedMotion } from 'motion/react';
 import * as motion from 'motion/react-m';
-import { AvatarBlob } from '@/components/avatars/avatar-blob';
-import { OnboardingScene } from '@/components/onboarding/onboarding-scene';
-import { SettingsProviderLogo } from '@/components/settings/settings-provider-logo';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCheck from '~icons/lucide/check';
 import IconEllipsis from '~icons/lucide/ellipsis';

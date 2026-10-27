@@ -1,12 +1,12 @@
 import { ROOMS_SEND_MODES } from '@repo/client/client';
 import { useChatDefaults } from '@repo/client/react';
+import { usePreferences } from '@repo/client/web';
 import { conversationWhenBusy, preferencesEnterAction } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
+import { PanelContent, PanelRow, PanelTitle } from '@repo/ui/panel';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/select';
+import { SettingsPanel } from '@repo/ui/settings/settings-panel';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { SettingsPanel } from '@/components/settings/settings-panel';
-import { PanelContent, PanelRow, PanelTitle } from '@/components/ui/panel';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { usePreferences } from '@/hooks/use-preferences';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconListOrdered from '~icons/lucide/list-ordered';
 import IconMessageSquare from '~icons/lucide/message-square';

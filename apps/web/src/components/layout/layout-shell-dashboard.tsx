@@ -1,9 +1,9 @@
+import { LAYOUT_SIDEBAR_COOKIES } from '@repo/ui/layout.constants';
+import * as Sidebar from '@repo/ui/sidebar';
 import { useLocation } from '@tanstack/react-router';
-import * as Sidebar from '@/components/ui/sidebar';
-import { LAYOUT_SIDEBAR_COOKIES } from '@/services/layout/layout.constants';
 import { LayoutAppSidebar } from './layout-app-sidebar';
-import type { ConnectionInfo } from '@/types/connection.types';
-import type { LayoutSidebarsOpen } from '@/types/layout.types';
+import type { ConnectionInfo } from '@repo/client/client';
+import type { LayoutSidebarsOpen } from '@repo/ui/layout.types';
 import type { ReactNode } from 'react';
 
 interface LayoutShellDashboardProps {

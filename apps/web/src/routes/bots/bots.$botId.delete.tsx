@@ -1,5 +1,5 @@
+import { BotDeleteDialog } from '@repo/ui/bots/bot-delete-dialog';
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
-import { BotDeleteDialog } from '@/components/bots/bot-delete-dialog';
 import { useDialogNavigation } from '@/hooks/use-dialog-navigation';
 import { rpc } from '@/services/rpc/rpc.client';
 

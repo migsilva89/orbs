@@ -1,7 +1,7 @@
 import { m } from '@repo/i18n/client';
-import { SettingsPanel } from '@/components/settings/settings-panel';
+import { PanelRow } from '@repo/ui/panel';
+import { SettingsPanel } from '@repo/ui/settings/settings-panel';
 import { TodosList } from '@/components/todos/todos-list';
-import { PanelRow } from '@/components/ui/panel';
 import IconListTodo from '~icons/lucide/list-todo';
 import type { Bot } from '@repo/contracts/universal';
 

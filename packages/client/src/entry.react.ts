@@ -1,5 +1,7 @@
 export * from './context/rpc';
+export * from './hooks/use-bot-avatar-flash';
 export * from './hooks/use-bot-avatar-upload';
+export * from './hooks/use-bot-cheer';
 export * from './hooks/use-bot-create';
 export * from './hooks/use-bot-delete';
 export * from './hooks/use-bot-mcp';

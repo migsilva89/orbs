@@ -1,6 +1,6 @@
 import { m } from '@repo/i18n/client';
+import { LayoutNotFound } from '@repo/ui/layout/layout-error';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { LayoutNotFound } from '@/components/layout/layout-error';
 import { SettingsPage } from '@/components/settings/settings-page';
 import { rpc } from '@/services/rpc/rpc.client';
 import { seoHead } from '@/services/seo/seo.utils';

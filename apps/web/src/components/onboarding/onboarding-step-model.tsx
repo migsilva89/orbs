@@ -1,16 +1,16 @@
 import { useSettingsProviders } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
+import { Button } from '@repo/ui/button';
+import { Combobox } from '@repo/ui/combobox';
+import { FormErrors } from '@repo/ui/forms/form';
+import { OnboardingStepLayout } from '@repo/ui/onboarding/onboarding-step-layout';
+import { PanelRow } from '@repo/ui/panel';
+import { SettingsProviderLogo } from '@repo/ui/settings/settings-provider-logo';
+import { SettingsProviderRow } from '@repo/ui/settings/settings-provider-row';
+import { SettingsProviderSession } from '@repo/ui/settings/settings-provider-session';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { OnboardingSceneModel } from '@/components/onboarding/onboarding-scene-model';
-import { OnboardingStepLayout } from '@/components/onboarding/onboarding-step-layout';
-import { SettingsProviderLogo } from '@/components/settings/settings-provider-logo';
-import { SettingsProviderRow } from '@/components/settings/settings-provider-row';
-import { SettingsProviderSession } from '@/components/settings/settings-provider-session';
-import { Button } from '@/components/ui/button';
-import { Combobox } from '@/components/ui/combobox';
-import { FormErrors } from '@/components/ui/forms/form';
-import { PanelRow } from '@/components/ui/panel';
 
 export function OnboardingStepModel() {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
 import { botSkillName, mentionTarget } from '@repo/client/client';
+import { BotMention } from '@repo/ui/bots/bot-mention';
+import { Mention } from '@repo/ui/mention';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { BotMention } from '@/components/bots/bot-mention';
-import { Mention } from '@/components/ui/mention';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconBox from '~icons/lucide/box';
 import IconQuote from '~icons/lucide/quote';

@@ -1,10 +1,10 @@
 import { m } from '@repo/i18n/client';
+import { BotAvatar } from '@repo/ui/bots/bot-avatar';
+import { Button } from '@repo/ui/button';
+import { Item, ItemContent, ItemDescription, ItemTitle } from '@repo/ui/item';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { BotAvatar } from '@/components/bots/bot-avatar';
 import { LayoutPageHeader } from '@/components/layout/layout-page-header';
-import { Button } from '@/components/ui/button';
-import { Item, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconChevronRight from '~icons/lucide/chevron-right';
 import IconPlus from '~icons/lucide/plus';

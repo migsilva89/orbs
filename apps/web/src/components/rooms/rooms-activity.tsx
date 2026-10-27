@@ -1,11 +1,11 @@
 import { m } from '@repo/i18n/client';
+import { BotAvatar } from '@repo/ui/bots/bot-avatar';
+import { Button } from '@repo/ui/button';
+import { EmptyCompact } from '@repo/ui/empty';
+import { Skeleton } from '@repo/ui/skeleton';
 import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useMatch } from '@tanstack/react-router';
-import { BotAvatar } from '@/components/bots/bot-avatar';
 import { RoomsActivityRun } from '@/components/rooms/rooms-activity-run';
-import { Button } from '@/components/ui/button';
-import { EmptyCompact } from '@/components/ui/empty';
-import { Skeleton } from '@/components/ui/skeleton';
 import { roomsLink } from '@/services/rooms/rooms.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconActivity from '~icons/lucide/activity';

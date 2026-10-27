@@ -1,5 +1,5 @@
+import { SettingsThemeDialog } from '@repo/ui/settings/settings-theme-dialog';
 import { ClientOnly, createFileRoute } from '@tanstack/react-router';
-import { SettingsThemeDialog } from '@/components/settings/settings-theme-dialog';
 import { useDialogNavigation } from '@/hooks/use-dialog-navigation';
 
 export const Route = createFileRoute('/_chat/settings/themes/create')({

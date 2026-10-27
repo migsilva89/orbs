@@ -1,3 +1,4 @@
+import type { ThemeConfig, ThemeSnapshot } from '../../types/theme.types';
 import type { ThemePalette } from '@repo/contracts/universal';
 
 export const THEME_PRESETS: ThemePalette[] = [
@@ -27,3 +28,58 @@ export const THEME_PRESETS: ThemePalette[] = [
     dark: { '--primary': 'oklch(0.81 0.117 11.638)', '--primary-foreground': 'oklch(0.145 0 0)', '--ring': 'oklch(0.645 0.246 16.439)' },
   },
 ];
+
+export const THEME_IMPORT_LIMITS = { nameLength: 80, cssLength: 64_000 };
+
+export const THEME_CONFIG: ThemeConfig = {
+  modeKey: 'bots.theme',
+  palettesKey: 'bots.palettes',
+  tokens: [
+    '--background',
+    '--foreground',
+    '--card',
+    '--card-foreground',
+    '--popover',
+    '--popover-foreground',
+    '--primary',
+    '--primary-foreground',
+    '--secondary',
+    '--secondary-foreground',
+    '--muted',
+    '--muted-foreground',
+    '--accent',
+    '--accent-foreground',
+    '--destructive',
+    '--destructive-foreground',
+    '--border',
+    '--input',
+    '--ring',
+    '--sidebar',
+    '--sidebar-foreground',
+    '--sidebar-primary',
+    '--sidebar-primary-foreground',
+    '--sidebar-accent',
+    '--sidebar-accent-foreground',
+    '--sidebar-border',
+    '--sidebar-ring',
+    '--chart-1',
+    '--chart-2',
+    '--chart-3',
+    '--chart-4',
+    '--chart-5',
+    '--success',
+    '--success-foreground',
+    '--warning',
+    '--warning-foreground',
+    '--skill',
+    '--radius',
+  ],
+  presets: THEME_PRESETS,
+};
+
+export const THEME_SERVER_SNAPSHOT: ThemeSnapshot = {
+  choice: 'system',
+  resolved: 'light',
+  selected: 'default',
+  themes: THEME_PRESETS,
+};

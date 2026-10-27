@@ -1,13 +1,13 @@
 import { artifactsStore } from '@repo/client/client';
 import { ARTIFACT } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
+import { ArtifactView } from '@repo/ui/artifact-view';
+import { PreviewCard } from '@repo/ui/preview-card';
+import { toasty } from '@repo/ui/sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { match, P } from 'ts-pattern';
 import { ArtifactPane } from '@/components/artifacts/artifact-pane';
-import { ArtifactView } from '@/components/artifacts/artifact-view';
-import { PreviewCard } from '@/components/ui/preview-card';
-import { toasty } from '@/components/ui/sonner';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { ToolCallArtifact } from '@repo/contracts/universal';
 

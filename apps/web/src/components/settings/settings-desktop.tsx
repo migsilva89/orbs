@@ -1,12 +1,12 @@
+import { useClipboardCopy } from '@repo/client/web';
 import { env } from '@repo/env/client';
 import { m } from '@repo/i18n/client';
+import { Button } from '@repo/ui/button';
+import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@repo/ui/panel';
+import { SettingsPanel } from '@repo/ui/settings/settings-panel';
+import { toasty } from '@repo/ui/sonner';
+import { StatusDot } from '@repo/ui/status-dot';
 import { useQuery } from '@tanstack/react-query';
-import { SettingsPanel } from '@/components/settings/settings-panel';
-import { Button } from '@/components/ui/button';
-import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@/components/ui/panel';
-import { toasty } from '@/components/ui/sonner';
-import { StatusDot } from '@/components/ui/status-dot';
-import { clipboardCopy } from '@/lib/clipboard';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCopy from '~icons/lucide/copy';
 import IconMonitor from '~icons/lucide/monitor';
@@ -15,6 +15,7 @@ import IconShare from '~icons/lucide/share-2';
 export function SettingsDesktop() {
   const desktop = window.__electrobunSendToHost;
   const server = useQuery({ ...rpc.server.info.queryOptions(), enabled: Boolean(desktop) });
+  const clipboard = useClipboardCopy();
   let status = m.desktop_connection_checking();
   let variant: 'default' | 'success' | 'destructive' = 'default';
 
@@ -62,7 +63,7 @@ export function SettingsDesktop() {
                   size="sm"
                   type="button"
                   variant="ghost"
-                  onClick={() => void clipboardCopy(address)
+                  onClick={() => void clipboard.copy(address)
                     .then(() => toasty(m.desktop_connection_copied(), '📋'))
                     .catch(() => toasty(m.ui_copy_failed(), '🔴'))}
                 >

@@ -1,8 +1,8 @@
+import { MessageScrollerProvider } from '@repo/ui/message-scroller';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { match, P } from 'ts-pattern';
 import { RoomsChat } from '@/components/rooms/rooms-chat';
 import { RoomsStart } from '@/components/rooms/rooms-start';
-import { MessageScrollerProvider } from '@/components/ui/message-scroller';
 import { rpc } from '@/services/rpc/rpc.client';
 
 interface RoomsPageProps {

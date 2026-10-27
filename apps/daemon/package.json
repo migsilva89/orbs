@@ -7,10 +7,10 @@
     "orbs": "./src/entry.native.ts"
   },
   "scripts": {
-    "dev": "DATA_DIR=$HOME/.config/orbs-dev DAEMON_HOST=0.0.0.0 DAEMON_PORT=47191 WEB_PUBLIC_URL=http://localhost:47190 bun --env-file=../../.env --watch src/entry.native.ts",
+    "dev": "DATA_DIR=$HOME/.config/orbs-dev MOBILE_SCHEME=orbs-dev DAEMON_HOST=0.0.0.0 DAEMON_PORT=47191 WEB_PUBLIC_URL=http://localhost:47190 bun --env-file=../../.env --watch src/entry.native.ts",
     "dev:pair": "DATA_DIR=$HOME/.config/orbs-dev bun --env-file=../../.env src/entry.native.ts pair --url http://localhost:47190",
     "start": "bun --env-file=../../.env src/entry.native.ts",
-    "backup": "bun --env-file=../../.env src/entry-backup.native.ts",
+    "backup": "bun --env-file=../../.env src/entry.native.ts backup",
     "check": "tsrs --noEmit",
     "lint": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",
     "lint:fix": "oxlint src/ -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config --fix"
@@ -22,16 +22,17 @@
     "@types/bun": "catalog:"
   },
   "dependencies": {
-    "@repo/contracts": "workspace:*",
-    "@repo/errors": "workspace:*",
-    "@repo/server": "workspace:*",
-    "@repo/runtime": "workspace:*",
-    "@repo/secret-proxy": "workspace:*",
-    "@repo/env": "workspace:*",
-    "@repo/logger": "workspace:*",
     "@orpc/client": "catalog:",
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",
+    "@repo/contracts": "workspace:*",
+    "@repo/env": "workspace:*",
+    "@repo/errors": "workspace:*",
+    "@repo/logger": "workspace:*",
+    "@repo/runtime": "workspace:*",
+    "@repo/secret-proxy": "workspace:*",
+    "@repo/server": "workspace:*",
+    "@repo/ui": "workspace:*",
     "ts-pattern": "catalog:",
     "uqr": "catalog:"
   }

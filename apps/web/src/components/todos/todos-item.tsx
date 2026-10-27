@@ -1,12 +1,12 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { m } from '@repo/i18n/client';
+import { Button } from '@repo/ui/button';
+import { Checkbox } from '@repo/ui/checkbox';
+import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from '@repo/ui/item';
+import { toasty } from '@repo/ui/sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from '@/components/ui/item';
-import { toasty } from '@/components/ui/sonner';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconGripVertical from '~icons/lucide/grip-vertical';
 import IconX from '~icons/lucide/x';

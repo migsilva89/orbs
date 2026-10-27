@@ -3,12 +3,12 @@ import { env } from '@repo/env/server';
 import { isAppError } from '@repo/errors/universal';
 import { initNativeLogger, log } from '@repo/logger/server';
 import { match } from 'ts-pattern';
-import { coreCommandNative } from './core/core-command.native';
+import { coreNativeCommand } from './core/core.native';
 
 initNativeLogger(env.LOG_LEVEL);
 
 try {
-  await coreCommandNative();
+  await coreNativeCommand();
 } catch (error) {
   process.exitCode = 1;
   log.error({

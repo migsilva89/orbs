@@ -2,11 +2,12 @@ import { artifactsStore } from '@repo/client/client';
 import { getLocale, m } from '@repo/i18n/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
+import { View } from 'react-native';
 import { match, P } from 'ts-pattern';
 import { BotLoadState } from '@/components/bots/bot-load-state';
-import { Screen } from '@/components/ui/screen';
 import { useConnection } from '@/hooks/use-connection';
 import { useToast } from '@/hooks/use-toast';
+import { ArtifactFrame } from './artifact-frame';
 import { ArtifactView } from './artifact-view';
 import type { RpcSession } from '@/types/rpc.types';
 import type { Artifact } from '@repo/contracts/universal';
@@ -73,7 +74,7 @@ function ArtifactScreenView({ session, artifact }: ArtifactScreenViewProps) {
   });
 
   return (
-    <Screen padding="none" scroll={false}>
+    <View className="flex-1 bg-background">
       <Stack.Screen options={{ title: `${artifact.emoji} ${artifact.title}` }} />
       <Stack.Toolbar placement="right">
         <Stack.Toolbar.Menu
@@ -100,11 +101,21 @@ function ArtifactScreenView({ session, artifact }: ArtifactScreenViewProps) {
           ))}
         </Stack.Toolbar.Menu>
       </Stack.Toolbar>
-      <ArtifactView
-        spec={artifact.spec}
-        store={store}
-        title={artifact.title}
-      />
-    </Screen>
+      {match(artifact.spec)
+        .with({ html: P.string }, (spec) => (
+          <ArtifactView
+            spec={spec}
+            store={store}
+            title={artifact.title}
+          />
+        ))
+        .otherwise(() => (
+          <ArtifactFrame
+            artifact={artifact}
+            session={session}
+            store={store}
+          />
+        ))}
+    </View>
   );
 }

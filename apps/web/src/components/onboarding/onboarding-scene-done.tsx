@@ -1,12 +1,12 @@
 import { BOT_PERMISSION_LABELS, botModelBrand } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
+import { AvatarBlob } from '@repo/ui/avatars/avatar-blob';
+import { BotAvatar } from '@repo/ui/bots/bot-avatar';
+import { BotBrandLogo } from '@repo/ui/bots/bot-brand-logo';
+import { OnboardingScene } from '@repo/ui/onboarding/onboarding-scene';
 import { useQuery } from '@tanstack/react-query';
 import { useReducedMotion } from 'motion/react';
 import * as motion from 'motion/react-m';
-import { AvatarBlob } from '@/components/avatars/avatar-blob';
-import { BotAvatar } from '@/components/bots/bot-avatar';
-import { BotBrandLogo } from '@/components/bots/bot-brand-logo';
-import { OnboardingScene } from '@/components/onboarding/onboarding-scene';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCheck from '~icons/lucide/check';
 import IconCpu from '~icons/lucide/cpu';

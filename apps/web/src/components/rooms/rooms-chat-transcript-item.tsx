@@ -1,9 +1,9 @@
+import { MessageScrollerItem } from '@repo/ui/message-scroller';
+import { RoomsChatReactions } from '@repo/ui/rooms/rooms-chat-reactions';
 import { match } from 'ts-pattern';
 import { RoomsChatMessage } from '@/components/rooms/rooms-chat-message';
 import { RoomsChatNotice } from '@/components/rooms/rooms-chat-notice';
-import { RoomsChatReactions } from '@/components/rooms/rooms-chat-reactions';
 import { RoomsChatReply } from '@/components/rooms/rooms-chat-reply';
-import { MessageScrollerItem } from '@/components/ui/message-scroller';
 import type { ChatMessage, RoomsReactionGroup } from '@repo/client/client';
 import type { Bot } from '@repo/contracts/universal';
 

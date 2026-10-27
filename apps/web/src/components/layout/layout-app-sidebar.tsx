@@ -1,10 +1,10 @@
+import { LayoutBrand } from '@repo/ui/layout/layout-brand';
+import * as Sidebar from '@repo/ui/sidebar';
 import { Link } from '@tanstack/react-router';
 import { RoomsSidebar, RoomsSidebarActions } from '@/components/rooms/rooms-sidebar';
-import * as Sidebar from '@/components/ui/sidebar';
 import BrandsLogo from '~icons/brands/logo';
-import { LayoutBrand } from './layout-brand';
 import { LayoutNavDevice } from './layout-nav-device';
-import type { ConnectionInfo } from '@/types/connection.types';
+import type { ConnectionInfo } from '@repo/client/client';
 import type { ComponentProps } from 'react';
 
 interface LayoutAppSidebarProps extends ComponentProps<typeof Sidebar.Sidebar> {

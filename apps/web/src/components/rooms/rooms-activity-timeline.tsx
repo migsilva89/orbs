@@ -1,16 +1,16 @@
 import { botModelBrand, toolPresentation, toolPreview } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
+import { AgentTimeline } from '@repo/ui/agent-timeline';
+import { BotBrandLogo } from '@repo/ui/bots/bot-brand-logo';
+import { Button } from '@repo/ui/button';
+import { Skeleton } from '@repo/ui/skeleton';
+import { ToolIcon } from '@repo/ui/tools/tool-icon';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { match, P } from 'ts-pattern';
-import { BotBrandLogo } from '@/components/bots/bot-brand-logo';
-import { ToolIcon } from '@/components/tools/tool-icon';
-import { AgentTimeline } from '@/components/ui/agent-timeline';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { rpc } from '@/services/rpc/rpc.client';
-import type { AgentTimelineRun } from '@/types/agent-timeline.types';
 import type * as UniversalTypes from '@repo/contracts/universal';
+import type { AgentTimelineRun } from '@repo/ui/agent-timeline.types';
 
 interface RoomsActivityTimelineProps {
   bot: UniversalTypes.Bot

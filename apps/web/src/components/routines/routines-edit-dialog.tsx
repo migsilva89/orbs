@@ -1,14 +1,14 @@
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
 import { routineEditForm } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
+import { ButtonLoading } from '@repo/ui/button-loading';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@repo/ui/dialog';
+import { Form, FormControl, FormErrors, FormErrorsAndHint, FormField, FormItem, FormLabel } from '@repo/ui/forms/form';
+import { FormInput } from '@repo/ui/forms/form-input';
+import { RoutinesScheduleFields } from '@repo/ui/routines/routines-schedule-fields';
+import { Textarea } from '@repo/ui/textarea';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { RoutinesScheduleFields } from '@/components/routines/routines-schedule-fields';
-import { ButtonLoading } from '@/components/ui/button-loading';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Form, FormControl, FormErrors, FormErrorsAndHint, FormField, FormItem, FormLabel } from '@/components/ui/forms/form';
-import { FormInput } from '@/components/ui/forms/form-input';
-import { Textarea } from '@/components/ui/textarea';
 import { rpc } from '@/services/rpc/rpc.client';
 import type { Bot, Routine, RoutineEditForm } from '@repo/contracts/universal';
 

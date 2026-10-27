@@ -1,6 +1,6 @@
 import { chatResetSearch } from '@repo/contracts/universal';
+import { RoomsResetDialog } from '@repo/ui/rooms/rooms-reset-dialog';
 import { createFileRoute } from '@tanstack/react-router';
-import { RoomsResetDialog } from '@/components/rooms/rooms-reset-dialog';
 import { useDialogNavigation } from '@/hooks/use-dialog-navigation';
 import { roomsDirectBot } from '@/services/rooms/rooms.client';
 

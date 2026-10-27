@@ -369,6 +369,8 @@ export const artifactRestore = conversationTarget.extend({
 
 export const artifactVersionsInput = conversationTarget.extend({ artifactId: z.uuid() });
 
+export const artifactEmbedMessage = z.object({ type: z.literal('bots.artifact-state'), state: artifactState });
+
 export const artifactBlocks = z.record(z.string(), z.object({
   description: z.string(),
   props: z.record(z.string(), z.json()),

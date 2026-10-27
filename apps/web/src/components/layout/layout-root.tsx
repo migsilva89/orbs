@@ -1,9 +1,9 @@
 import { getLocale } from '@repo/i18n/runtime';
+import { ContextThemeScript } from '@repo/ui/context/context-theme';
+import { LayoutError, LayoutNotFound } from '@repo/ui/layout/layout-error';
 import { ClientOnly, HeadContent, Scripts } from '@tanstack/react-router';
 import { ContextProviders } from '@/components/context/context-providers';
 import { ContextShellScript } from '@/components/context/context-shell';
-import { ContextThemeScript } from '@/components/context/context-theme';
-import { LayoutError, LayoutNotFound } from '@/components/layout/layout-error';
 import { LayoutInstallPrompt } from '@/components/layout/layout-install-prompt';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import type { ReactNode } from 'react';

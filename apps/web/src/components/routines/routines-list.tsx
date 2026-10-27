@@ -1,12 +1,12 @@
 import { ROOMS } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
+import { EmptyCompact } from '@repo/ui/empty';
+import { FormErrors } from '@repo/ui/forms/form';
+import { ItemGroup } from '@repo/ui/item';
+import { Skeleton } from '@repo/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { RoomsPrefillLink } from '@/components/rooms/rooms-prefill-link';
 import { RoutinesItem } from '@/components/routines/routines-item';
-import { EmptyCompact } from '@/components/ui/empty';
-import { FormErrors } from '@/components/ui/forms/form';
-import { ItemGroup } from '@/components/ui/item';
-import { Skeleton } from '@/components/ui/skeleton';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCalendarClock from '~icons/lucide/calendar-clock';
 import type { Bot } from '@repo/contracts/universal';

@@ -1,9 +1,9 @@
 import { m } from '@repo/i18n/client';
+import { BotAvatar } from '@repo/ui/bots/bot-avatar';
+import { Button } from '@repo/ui/button';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@repo/ui/hover-card';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
-import { BotAvatar } from '@/components/bots/bot-avatar';
-import { Button } from '@/components/ui/button';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { roomsLink } from '@/services/rooms/rooms.client';
 import IconMessageCircle from '~icons/lucide/message-circle';
 import type { Bot } from '@repo/contracts/universal';

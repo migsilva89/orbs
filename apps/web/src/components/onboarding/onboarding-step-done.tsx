@@ -1,11 +1,11 @@
 import { m } from '@repo/i18n/client';
+import { ButtonLoading } from '@repo/ui/button-loading';
+import { FormErrors } from '@repo/ui/forms/form';
+import { OnboardingStepLayout } from '@repo/ui/onboarding/onboarding-step-layout';
+import { OnboardingStepList } from '@repo/ui/onboarding/onboarding-step-list';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { OnboardingSceneDone } from '@/components/onboarding/onboarding-scene-done';
-import { OnboardingStepLayout } from '@/components/onboarding/onboarding-step-layout';
-import { OnboardingStepList } from '@/components/onboarding/onboarding-step-list';
-import { ButtonLoading } from '@/components/ui/button-loading';
-import { FormErrors } from '@/components/ui/forms/form';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconMessageCircle from '~icons/lucide/message-circle';
 import IconSmartphone from '~icons/lucide/smartphone';

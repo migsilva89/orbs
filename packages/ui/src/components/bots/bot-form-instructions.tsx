@@ -1,0 +1,37 @@
+import { m } from '@repo/i18n/client';
+import { useFormContext } from 'react-hook-form';
+import IconMessageSquareText from '~icons/lucide/message-square-text';
+import { FormControl, FormErrorsAndHint, FormField, FormItem, FormLabel } from '../forms/form';
+import { PanelRow } from '../panel';
+import { Textarea } from '../textarea';
+import type { BotForm } from '@repo/contracts/universal';
+
+export function BotFormInstructions() {
+  const form = useFormContext<BotForm>();
+
+  return (
+    <PanelRow className="items-start">
+      <IconMessageSquareText />
+      <div className="min-w-0 flex-1">
+        <FormField
+          control={form.control}
+          name="instructions"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{m.rooms_bot_instructions()}</FormLabel>
+              <FormControl>
+                <Textarea
+                  className="min-h-40"
+                  maxLength={16000}
+                  placeholder={m.rooms_bot_instructions_placeholder()}
+                  {...field}
+                />
+              </FormControl>
+              <FormErrorsAndHint />
+            </FormItem>
+          )}
+        />
+      </div>
+    </PanelRow>
+  );
+}

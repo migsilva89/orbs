@@ -1,25 +1,25 @@
 import { CHAT, mentionQuote } from '@repo/client/client';
 import { chatQueries, useChatRoom } from '@repo/client/react';
 import { useChatQuote, useChatRead } from '@repo/client/web';
+import { cn } from '@repo/ui/cn';
+import { LAYOUT_SHORTCUT_OPTIONS, LAYOUT_SHORTCUT_OVERLAYS, LAYOUT_SHORTCUTS } from '@repo/ui/layout.constants';
+import { PaneHost, usePaneHost } from '@repo/ui/pane';
+import { RoomsChatPill } from '@repo/ui/rooms/rooms-chat-pill';
+import { RoomsChatQuote } from '@repo/ui/rooms/rooms-chat-quote';
+import { RoomsChatRuns } from '@repo/ui/rooms/rooms-chat-runs';
+import { RoomsChatStatus } from '@repo/ui/rooms/rooms-chat-status';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { RoomsChatAround } from '@/components/rooms/rooms-chat-around';
 import { RoomsChatComposer } from '@/components/rooms/rooms-chat-composer';
-import { RoomsChatPill } from '@/components/rooms/rooms-chat-pill';
-import { RoomsChatQuote } from '@/components/rooms/rooms-chat-quote';
-import { RoomsChatRuns } from '@/components/rooms/rooms-chat-runs';
-import { RoomsChatStatus } from '@/components/rooms/rooms-chat-status';
 import { RoomsChatTranscript } from '@/components/rooms/rooms-chat-transcript';
-import { PaneHost, usePaneHost } from '@/components/ui/pane';
-import { cn } from '@/lib/cn';
-import { LAYOUT_SHORTCUT_OPTIONS, LAYOUT_SHORTCUT_OVERLAYS, LAYOUT_SHORTCUTS } from '@/services/layout/layout.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
-import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
 import type { ChatMessage, ChatOutgoing, RoomsChat as RoomsChatItem } from '@repo/client/client';
 import type { Bot, ConversationView } from '@repo/contracts/universal';
+import type { PromptInputEditorHandle } from '@repo/ui/ai/prompt-input-editor';
 
 interface RoomsChatViewProps {
   bot: Bot

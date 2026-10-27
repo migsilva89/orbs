@@ -14,4 +14,6 @@ export const envServerSchema = {
   WEB_HOST: z.string().trim().min(1).default('127.0.0.1'),
   WEB_PORT: z.coerce.number().int().min(1).max(65535).default(47190),
   WEB_PUBLIC_URL: z.url({ protocol: /^https?$/ }).default('http://127.0.0.1:47190'),
+
+  MOBILE_SCHEME: z.string().trim().min(1).default('orbs'),
 };

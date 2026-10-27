@@ -25,6 +25,7 @@ export interface CoreServicesParams {
   mcp: McpService;
   mcpAuth: ServerTypes.McpAuthService;
   network: ServerNetworkService;
+  appScheme: string;
   providers: ServerTypes.ProviderService;
   runtime: Omit<ServerTypes.RuntimeServiceParams, 'permissions' | 'collaboration'>;
 }

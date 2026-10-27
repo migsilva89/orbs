@@ -14,7 +14,11 @@ export const authRedeem = z.object({
 export const authPairResult = z.object({
   pin: authPin,
   expiresAt: z.number().int(),
-  qr: z.object({ payload: z.string(), svg: z.string() }),
+  qr: z.object({
+    payload: z.string(),
+    svg: z.string(),
+    link: z.string(),
+  }),
 });
 
 export const authPairPayload = z.object({

@@ -1,5 +1,5 @@
+import { SettingsProviderLogoutDialog } from '@repo/ui/settings/settings-provider-logout-dialog';
 import { createFileRoute, notFound } from '@tanstack/react-router';
-import { SettingsProviderLogoutDialog } from '@/components/settings/settings-provider-logout-dialog';
 import { useDialogNavigation } from '@/hooks/use-dialog-navigation';
 import { rpc } from '@/services/rpc/rpc.client';
 

@@ -1,6 +1,6 @@
 import { useChatDraft } from '@repo/client/web';
+import { useSidebar } from '@repo/ui/sidebar';
 import { Link } from '@tanstack/react-router';
-import { useSidebar } from '@/components/ui/sidebar';
 import { roomsLink } from '@/services/rooms/rooms.client';
 import type { Bot } from '@repo/contracts/universal';
 import type { ReactNode } from 'react';

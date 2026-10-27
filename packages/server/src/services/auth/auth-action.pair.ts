@@ -15,5 +15,7 @@ export async function authActionPair(deps: AuthServiceDeps, params: AuthPairPara
 
   const svg = renderSVG(payload, { ecc: 'M', border: 4 });
 
-  return { ...grant, qr: { payload, svg } };
+  const link = `${deps.appScheme}://connect#code=${payload}`;
+
+  return { ...grant, qr: { payload, svg, link } };
 }

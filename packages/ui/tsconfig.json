@@ -1,0 +1,17 @@
+{
+  "extends": "@repo/typescript-config/react.json",
+  "compilerOptions": {
+    "types": [
+      "node",
+      "bun",
+      "unplugin-icons/types/react"
+    ],
+    "tsBuildInfoFile": "./node_modules/.cache/typescript/tsbuildinfo.json"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

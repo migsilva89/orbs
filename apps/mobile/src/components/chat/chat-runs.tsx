@@ -1,9 +1,10 @@
-import { BOT_ACTIVITY_LABELS, chatPrivateSource, toolRunning } from '@repo/client/client';
+import { BOT_ACTIVITY_LABELS, toolRunning } from '@repo/client/client';
 import { useChatHideVerbose } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { Fragment } from 'react';
 import { View } from 'react-native';
-import { Text } from '@/components/ui/text';
+import { BotMention } from '@/components/bots/bot-mention';
+import { EventLabel, EventLine, EventList } from '@/components/ui/event';
 import { ChatApproval } from './chat-approval';
 import { ChatFailure } from './chat-failure';
 import { ChatQuestion } from './chat-question';
@@ -23,16 +24,15 @@ interface ChatRunsProps {
 
 export function ChatRuns({ bot, bots = [], activity, failure, draft, approvals, questions }: ChatRunsProps) {
   const source = (privateWith: string | null) => {
-    const label = chatPrivateSource({ privateWith, bots });
+    const peer = bots.find((item) => item.id === privateWith);
 
-    return label ? (
-      <Text
-        className="mx-4 mt-2"
-        tone="muted"
-        variant="caption"
-      >
-        {label}
-      </Text>
+    return peer ? (
+      <EventList>
+        <EventLine>
+          <EventLabel>{m.rooms_event_private_source()}</EventLabel>
+          <BotMention bot={peer} />
+        </EventLine>
+      </EventList>
     ) : null;
   };
 
@@ -62,7 +62,7 @@ export function ChatRuns({ bot, bots = [], activity, failure, draft, approvals, 
           <ChatApproval approval={approval} botName={bot.name} />
         </Fragment>
       ))}
-      {failure ? <ChatFailure botName={bot.name} detail={failure} /> : null}
+      {failure ? <ChatFailure bot={bot} detail={failure} /> : null}
       <View className="h-7 justify-center">
         {isActive ? <ChatTyping accessibilityLabel={label} label={activity === 'thinking' ? undefined : label} /> : null}
       </View>

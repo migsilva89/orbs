@@ -114,11 +114,6 @@ export interface ChatReactParams {
   groups: RoomsReactionGroup[];
 }
 
-export interface ChatPrivateSourceParams {
-  privateWith: string | null;
-  bots: UniversalTypes.Bot[];
-}
-
 export interface ChatAnswerProblemParams {
   isGone: boolean;
   isError: boolean;

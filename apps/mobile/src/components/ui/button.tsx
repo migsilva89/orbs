@@ -35,6 +35,7 @@ const buttonVariants = cva({
       inline: 'h-auto rounded-sm p-0',
       icon: 'size-10 rounded-full',
       'icon-xs': 'size-6 rounded-full',
+      'icon-md': 'size-7 rounded-full',
       'icon-sm': 'size-8 rounded-full',
     },
   },
@@ -66,7 +67,7 @@ export function Button({ variant = 'primary', size = 'default', className, child
   const textVariant = match(size).with('xs', 'icon-xs', () => 'button-small' as const).otherwise(() => 'button' as const);
 
   const radius = match(size)
-    .with('pill', 'icon', 'icon-xs', 'icon-sm', () => 'round' as const)
+    .with('pill', 'icon', 'icon-xs', 'icon-md', 'icon-sm', () => 'round' as const)
     .with('inline', () => 'inline' as const)
     .otherwise(() => 'default' as const);
 

@@ -54,7 +54,7 @@ export interface ChatTextRouteParams extends ChatSearchParams {
 }
 
 export type ChatMessagePart =
-  | { key: string; kind: 'markdown' | 'html' | 'failure' | 'reasoning'; text: string; isStreaming: boolean }
+  | { key: string; kind: 'markdown' | 'html'; text: string; isStreaming: boolean }
   | { key: string; kind: 'artifact'; artifact: ToolCallArtifact }
   | { key: string; kind: 'files'; files: ClientTypes.RoomsFilePart[] };
 
@@ -62,4 +62,6 @@ export type ChatMessageSegment =
   | { key: string; kind: 'bubbles'; parts: ChatMessagePart[] }
   | { key: string; kind: 'tools'; parts: ClientTypes.ToolPart[] }
   | { key: string; kind: 'events'; events: ClientTypes.ToolEvent[] }
+  | { key: string; kind: 'reasoning'; text: string; isStreaming: boolean }
+  | { key: string; kind: 'failure'; text: string }
   | { key: string; kind: 'subagent'; part: ClientTypes.ToolPart; subagent: ClientTypes.ToolSubagent };

@@ -1,6 +1,7 @@
 import { ROOMS_APPROVAL_CHOICES, roomsApprovalText, toolPresentation } from '@repo/client/client';
 import { useChatApproval } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
+import { MessageCode } from '@/components/ui/message';
 import { QuestionCard, QuestionCardHeader, QuestionCardOption, QuestionCardOptions } from '@/components/ui/question-card';
 import { Text } from '@/components/ui/text';
 import type { ToolApproval } from '@repo/contracts/universal';
@@ -18,16 +19,7 @@ export function ChatApproval({ approval, botName }: ChatApprovalProps) {
   return (
     <QuestionCard>
       <QuestionCardHeader descriptions={[label, ...(text.description ? [text.description] : [])]} title={m.rooms_chat_approval_title({ bot: botName })} />
-      {text.code ? (
-        <Text
-          selectable
-          className="mx-1"
-          tone="muted"
-          variant="trace-code"
-        >
-          {text.code}
-        </Text>
-      ) : null}
+      {text.code ? <MessageCode>{text.code}</MessageCode> : null}
       <QuestionCardOptions>
         {ROOMS_APPROVAL_CHOICES.map((choice, index) => (
           <QuestionCardOption

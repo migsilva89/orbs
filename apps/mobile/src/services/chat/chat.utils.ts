@@ -31,6 +31,25 @@ export function chatMessageSegments(message: ChatMessage, hideVerbose: boolean):
       continue;
     }
 
+    if (block.kind === 'reasoning') {
+      segments.push({
+        key: `reasoning-${block.index}`,
+        kind: 'reasoning',
+        text: block.parts.map((part) => part.text).join('\n\n'),
+        isStreaming: block.parts.some((part) => part.state === 'streaming'),
+      });
+      continue;
+    }
+
+    if (block.kind === 'failure') {
+      segments.push({
+        key: `failure-${block.index}`,
+        kind: 'failure',
+        text: block.text,
+      });
+      continue;
+    }
+
     if (block.kind === 'subagent') {
       segments.push({
         key: `subagent-${block.index}`,
@@ -46,18 +65,6 @@ export function chatMessageSegments(message: ChatMessage, hideVerbose: boolean):
       .with({ kind: 'text' }, (text) => text.parts.flatMap((part, index) => match(isReply && part.state !== 'streaming')
         .with(true, () => htmlReplySegments(part.text).map((segment, at) => ({ key: `${block.index}-${index}-${at}`, ...segment, isStreaming: false })))
         .otherwise(() => [{ key: `${block.index}-${index}`, kind: 'markdown', text: part.text, isStreaming: part.state === 'streaming' }])))
-      .with({ kind: 'reasoning' }, (reasoning) => [{
-        key: `${block.index}`,
-        kind: 'reasoning',
-        text: reasoning.parts.map((part) => part.text).join('\n\n'),
-        isStreaming: reasoning.parts.some((part) => part.state === 'streaming'),
-      }])
-      .with({ kind: 'failure' }, (failure) => [{
-        key: `${block.index}`,
-        kind: 'failure',
-        text: failure.text,
-        isStreaming: false,
-      }])
       .with({ kind: 'artifact' }, (artifact) => [{
         key: `${block.index}`,
         kind: 'artifact',
@@ -85,28 +92,5 @@ export function chatMessageSegments(message: ChatMessage, hideVerbose: boolean):
   }
 
   return segments;
-}
-
-export function chatNoticeTitle(message: ChatMessage): string {
-  const name = message.metadata?.authorName ?? '';
-  const part = message.parts.at(0);
-
-  if (part?.type === 'data-subagent') {
-    return part.data.status === 'answered' ? m.rooms_notice_subagent_answered({ name: part.data.name }) : m.rooms_notice_subagent_failed({ name: part.data.name });
-  }
-
-  if (part?.type === 'data-ownerNote') {
-    return part.data.peerName ? m.rooms_notice_owner_note({ name: part.data.peerName }) : m.rooms_notice_owner_note_unknown();
-  }
-
-  if (part?.type === 'data-routineRun') {
-    return part.data.name ? m.rooms_notice_routine_run({ name: part.data.name }) : m.rooms_notice_routine_run_unnamed();
-  }
-
-  if (part?.type === 'data-compaction') {
-    return m.rooms_notice_compacted();
-  }
-
-  return part?.type === 'data-reset' ? m.rooms_notice_reset() : name;
 }
 

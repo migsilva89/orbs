@@ -80,7 +80,7 @@ export function ChatMessage({
     return (
       <>
         {timeLabel}
-        <ChatNotice bot={bot} message={message} />
+        <ChatNotice bots={bots} message={message} />
       </>
     );
   }
@@ -112,14 +112,6 @@ export function ChatMessage({
           <Markdown isStreaming={text.isStreaming} onLinkPress={openLink}>{mentionMarkdown({ text: text.text, bots })}</Markdown>
         </MessageBubble>
       ))
-      .with({ kind: 'reasoning' }, (reasoning) => (
-        <ChatReasoning
-          isStreaming={isLive ? reasoning.isStreaming : false}
-          key={reasoning.key}
-          name={name}
-          text={reasoning.text}
-        />
-      ))
       .with({ kind: 'html' }, (html) => (
         <ChatHtml
           botId={bot.id}
@@ -142,13 +134,6 @@ export function ChatMessage({
           session={session}
         />
       ))
-      .with({ kind: 'failure' }, (failure) => (
-        <ChatFailure
-          botName={bot.name}
-          detail={failure.text}
-          key={failure.key}
-        />
-      ))
       .exhaustive();
   }
 
@@ -164,6 +149,21 @@ export function ChatMessage({
             key={events.key}
             senderId={bot.id}
             session={session}
+          />
+        ))
+        .with({ kind: 'reasoning' }, (reasoning) => (
+          <ChatReasoning
+            bot={{ name, avatar: bot.avatar }}
+            isStreaming={isLive ? reasoning.isStreaming : false}
+            key={reasoning.key}
+            text={reasoning.text}
+          />
+        ))
+        .with({ kind: 'failure' }, (failure) => (
+          <ChatFailure
+            bot={bot}
+            detail={failure.text}
+            key={failure.key}
           />
         ))
         .with({ kind: 'subagent' }, (block) => (

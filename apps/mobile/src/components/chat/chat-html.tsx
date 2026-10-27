@@ -16,6 +16,7 @@ export function ChatHtml({ botId, html }: ChatHtmlProps) {
 
   return (
     <PreviewCard
+      content="page"
       icon={Code}
       kind={m.ui_html_page()}
       label={m.artifacts_expand()}

@@ -3,6 +3,8 @@ import { Linking, ScrollView, StyleSheet } from 'react-native';
 import { EnrichedMarkdownText } from 'react-native-enriched-markdown';
 import { match } from 'ts-pattern';
 import { useCSSVariable, useUniwind } from 'uniwind';
+import { MarkdownTable } from './markdown-table';
+import type { MarkdownTableAlign, MarkdownTableData } from './markdown-table';
 import type { ComponentProps } from 'react';
 import type { MarkdownStyle } from 'react-native-enriched-markdown';
 
@@ -41,23 +43,35 @@ const MARKDOWN_SYNTAX = {
 const MARKDOWN_CODE_MAX_HEIGHT = 320;
 
 /** The web code block's shape: a rounded panel with a 1pt edge. */
-const MARKDOWN_CODE_BLOCK = { marginTop: 4, marginBottom: 12, borderRadius: 16, borderWidth: 1 };
+const MARKDOWN_CODE_BLOCK = { marginTop: 4, marginBottom: 12, borderRadius: 14, borderWidth: 1 };
 
 interface MarkdownBlock {
-  kind: 'text' | 'code';
+  kind: 'text' | 'code' | 'table';
   text: string;
 }
 
-/** Splits top-level fenced code blocks out of the markdown, so each can scroll inside a capped height. An unclosed fence runs to the end, as while streaming. */
+const MARKDOWN_TABLE_ROW = /^ {0,3}\S.*\|/;
+const MARKDOWN_TABLE_SEPARATOR = /^ {0,3}\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$|^ {0,3}\|\s*:?-+:?\s*\|\s*$/;
+
+/**
+ * Splits top-level fenced code blocks and tables out of the markdown: code scrolls inside a capped height, and a
+ * table fills the width. An unclosed fence runs to the end, as while streaming.
+ */
 function markdownBlocks(markdown: string) {
   const blocks: MarkdownBlock[] = [];
+  const lines = markdown.split('\n');
   let fence: string | undefined;
 
-  for (const line of markdown.split('\n')) {
+  for (const [index, line] of lines.entries()) {
     const marker = /^ {0,3}(`{3,}|~{3,})/.exec(line)?.[1];
     const last = blocks.at(-1);
+    const isTableStart = MARKDOWN_TABLE_ROW.test(line) && MARKDOWN_TABLE_SEPARATOR.test(lines[index + 1] ?? '');
 
-    if (fence === undefined && marker) {
+    if (fence === undefined && isTableStart) {
+      blocks.push({ kind: 'table', text: line });
+    } else if (fence === undefined && last?.kind === 'table' && MARKDOWN_TABLE_ROW.test(line)) {
+      last.text += `\n${line}`;
+    } else if (fence === undefined && marker) {
       fence = marker;
       blocks.push({ kind: 'code', text: line });
     } else if (fence !== undefined && last) {
@@ -74,6 +88,23 @@ function markdownBlocks(markdown: string) {
   }
 
   return blocks.filter((block) => block.text.trim());
+}
+
+function markdownTableCells(line: string) {
+  const cells = line.trim().replace(/^\|/, '').replace(/(?<!\\)\|$/, '').split(/(?<!\\)\|/);
+
+  return cells.map((cell) => cell.trim().replaceAll('\\|', '|'));
+}
+
+function markdownTable(text: string): MarkdownTableData {
+  const [header = '', separator = '', ...rows] = text.split('\n');
+
+  const aligns = markdownTableCells(separator).map((cell): MarkdownTableAlign => match([cell.startsWith(':'), cell.endsWith(':')])
+    .with([true, true], () => 'center' as const)
+    .with([false, true], () => 'right' as const)
+    .otherwise(() => 'left' as const));
+
+  return { header: markdownTableCells(header), aligns, rows: rows.map(markdownTableCells) };
 }
 
 const MARKDOWN_TEXT = { fontFamily: 'Inter', fontSize: 16, lineHeight: 21, marginTop: 0, marginBottom: 8 };
@@ -110,8 +141,8 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
     .exhaustive();
 
   const heading = (fontSize: number) => ({ ...text, fontSize, lineHeight: Math.round(fontSize * 1.3), fontWeight: '600', marginTop: 8 });
-  // T3 Code's block shape: a modest radius and a hairline edge.
-  const block = { marginTop: 4, marginBottom: 12, borderRadius: 8, borderWidth: StyleSheet.hairlineWidth, borderColor: border };
+  // Blocks nest in the 24pt bubble: its radius less its padding, with a hairline edge.
+  const block = { marginTop: 4, marginBottom: 12, borderRadius: 14, borderWidth: StyleSheet.hairlineWidth, borderColor: border };
 
   // Like web, a fence is a page-coloured panel; inside a coloured bubble it darkens the bubble colour instead.
   const fence = match({ color, theme })
@@ -166,7 +197,8 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
 
   // A capped code block's scroll box draws the block's edge, so the bottom stays rounded while it scrolls.
   const capped: MarkdownStyle = { ...markdownStyle, codeBlock: { ...markdownStyle.codeBlock, marginTop: 0, marginBottom: 0, borderWidth: 0, borderRadius: 0 } };
-  const cap = { ...MARKDOWN_CODE_BLOCK, borderColor: border, maxHeight: MARKDOWN_CODE_MAX_HEIGHT };
+  // A scroll view grows to its cap by default; flexGrow 0 keeps a short block its own height.
+  const cap = { ...MARKDOWN_CODE_BLOCK, borderColor: border, maxHeight: MARKDOWN_CODE_MAX_HEIGHT, flexGrow: 0 };
 
   const render = (markdown: string, isLast: boolean, style = markdownStyle) => (
     <EnrichedMarkdownText
@@ -180,15 +212,29 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
     />
   );
 
-  if (!segments.some((segment) => segment.kind === 'code')) {
+  if (segments.every((segment) => segment.kind === 'text')) {
     return render(children, true);
   }
+
+  const cell = (content: string, isHeader: boolean, align: MarkdownTableAlign) => {
+    const paragraph = { ...text, fontSize: 14, lineHeight: 20, marginBottom: 0, textAlign: align, fontFamily: isHeader ? 'Inter-Medium' : text.fontFamily, color: isHeader ? muted : text.color };
+
+    return render(content, false, { ...markdownStyle, paragraph });
+  };
 
   return segments.map((segment, index) => match(segment.kind)
     .with('code', () => (
       <ScrollView key={index} nestedScrollEnabled style={cap}>
         {render(segment.text, index === segments.length - 1, capped)}
       </ScrollView>
+    ))
+    .with('table', () => (
+      <MarkdownTable
+        borderColor={border}
+        key={index}
+        renderCell={cell}
+        table={markdownTable(segment.text)}
+      />
     ))
     .with('text', () => <Fragment key={index}>{render(segment.text, index === segments.length - 1)}</Fragment>)
     .exhaustive());

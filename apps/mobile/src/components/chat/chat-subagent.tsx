@@ -1,7 +1,7 @@
 import { useChatSubagent } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
-import { Check, ChevronRight, Square, X } from 'lucide-react-native';
+import { Check, ChevronRight, Square, Workflow, X } from 'lucide-react-native';
 import { ActivityIndicator, Pressable } from 'react-native';
 import { match } from 'ts-pattern';
 import { Button } from '@/components/ui/button';
@@ -54,6 +54,7 @@ export function ChatSubagent({ botId, part, subagent }: ChatSubagentProps) {
       <QuestionCardHeader
         action={stop}
         descriptions={[status]}
+        icon={Workflow}
         title={name}
       />
       <QuestionCardOptions>

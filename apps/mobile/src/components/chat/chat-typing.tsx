@@ -1,6 +1,8 @@
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { messageSurface } from '@/components/ui/message';
 import { Text } from '@/components/ui/text';
+import { cn } from '@/lib/cn';
 import { CHAT_TYPING } from '@/services/chat/chat.constants';
 
 interface ChatTypingProps {
@@ -15,7 +17,7 @@ export function ChatTyping({ label, accessibilityLabel }: ChatTypingProps) {
       accessibilityRole="progressbar"
       className="flex-row items-center gap-3 px-5"
     >
-      <View className="h-7 flex-row items-center gap-1 rounded-full bg-secondary px-3">
+      <View className={cn(messageSurface, 'h-7 flex-row items-center gap-1 rounded-full px-3')}>
         {[0, 1, 2].map((index) => (
           <Animated.View
             className="size-1.5 rounded-full bg-muted-foreground"

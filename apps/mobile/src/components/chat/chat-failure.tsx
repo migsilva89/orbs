@@ -1,30 +1,28 @@
 import { m } from '@repo/i18n/client';
-import { CircleAlert } from 'lucide-react-native';
-import { useState } from 'react';
-import { Trace, TraceCode, TraceContent, TraceRow } from '@/components/ui/trace';
+import { BotMention } from '@/components/bots/bot-mention';
+import { Event, EventBody, EventContent, EventLabel, EventList, EventTrigger } from '@/components/ui/event';
+import { Text } from '@/components/ui/text';
+import type { Bot } from '@repo/contracts/universal';
 
 interface ChatFailureProps {
-  botName: string;
+  bot: Pick<Bot, 'name' | 'avatar'>;
   detail: string;
 }
 
-export function ChatFailure({ botName, detail }: ChatFailureProps) {
-  const [open, setOpen] = useState(false);
-
+export function ChatFailure({ bot, detail }: ChatFailureProps) {
   return (
-    <Trace className="mx-5">
-      <TraceRow
-        icon={CircleAlert}
-        open={open}
-        status="error"
-        title={m.rooms_chat_failed({ bot: botName })}
-        onPress={() => setOpen(!open)}
-      />
-      {open ? (
-        <TraceContent>
-          <TraceCode tone="destructive">{detail}</TraceCode>
-        </TraceContent>
-      ) : null}
-    </Trace>
+    <EventList>
+      <Event>
+        <EventTrigger status="error">
+          <EventLabel>{m.rooms_event_failed()}</EventLabel>
+          <BotMention bot={bot} />
+        </EventTrigger>
+        <EventContent>
+          <EventBody>
+            <Text selectable>{detail}</Text>
+          </EventBody>
+        </EventContent>
+      </Event>
+    </EventList>
   );
 }

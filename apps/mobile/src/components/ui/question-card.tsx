@@ -3,29 +3,40 @@ import { LinearGradient as NativeLinearGradient } from 'expo-linear-gradient';
 import { Pressable, View } from 'react-native';
 import { withUniwind } from 'uniwind';
 import { cn } from '@/lib/cn';
+import { Icon } from './icon';
+import { messageInset, messageSurface, messageTile } from './message';
 import { Text, textContext } from './text';
+import { TextField } from './text-field';
 import type { VariantProps } from 'cva';
-import type { ReactNode } from 'react';
+import type { LucideIcon } from 'lucide-react-native';
+import type { ComponentProps, ReactNode } from 'react';
 import type { PressableProps, ViewProps } from 'react-native';
 
-/** A prompt the bot is waiting on: an approval or a question with choices. */
-export function QuestionCard({ className, children, ...props }: ViewProps) {
+/** A prompt the bot is waiting on: an approval or a question with choices. It wears the bubble's surface. */
+export function QuestionCard({ className, style, children, ...props }: ViewProps) {
   return (
-    <View {...props} className={cn('mx-5 my-2 gap-3 rounded-2xl bg-secondary p-3', className)}>
+    <View {...props} className={cn(messageSurface, 'mx-5 my-2 gap-3 p-3', className)} style={[{ borderCurve: 'continuous' }, style]}>
       {children}
     </View>
   );
 }
 
 interface QuestionCardHeaderProps {
+  /** Leads the header in an icon tile, such as a subagent's. */
+  icon?: LucideIcon;
   title: string;
   descriptions?: string[];
   action?: ReactNode;
 }
 
-export function QuestionCardHeader({ title, descriptions = [], action }: QuestionCardHeaderProps) {
+export function QuestionCardHeader({ icon, title, descriptions = [], action }: QuestionCardHeaderProps) {
   return (
     <View className="flex-row items-start gap-2 pt-0.5 pl-1">
+      {icon ? (
+        <View className={messageTile}>
+          <Icon icon={icon} tone="muted" />
+        </View>
+      ) : null}
       <View className="flex-1 gap-0.5">
         <Text variant="item-title">{title}</Text>
         {descriptions.map((description) => <Text key={description} tone="muted" variant="small">{description}</Text>)}
@@ -37,7 +48,7 @@ export function QuestionCardHeader({ title, descriptions = [], action }: Questio
 
 /** The choices as one bordered list, like the web card. */
 export function QuestionCardOptions({ className, ...props }: ViewProps) {
-  return <View {...props} className={cn('overflow-hidden rounded-xl border border-border bg-background', className)} />;
+  return <View {...props} className={cn('overflow-hidden', messageInset, className)} />;
 }
 
 const LinearGradient = withUniwind(NativeLinearGradient);
@@ -83,5 +94,20 @@ export function QuestionCardOption({ index, tone = 'default', children, selected
       </View>
       <textContext.Provider value={{ variant: 'body', tone: 'default' }}>{children}</textContext.Provider>
     </Pressable>
+  );
+}
+
+interface QuestionCardFieldProps extends ComponentProps<typeof TextField> {
+  /** The send button, inside the field's end. */
+  action: ReactNode;
+}
+
+/** A one-line answer, rounded like the options above it, with its send button inside. */
+export function QuestionCardField({ action, editable = true, ...props }: QuestionCardFieldProps) {
+  return (
+    <View className={cn('min-h-11.5 flex-row items-center gap-2 pr-2 pl-4', messageInset, !editable && 'opacity-50')}>
+      <TextField {...props} className="h-11 flex-1" editable={editable} />
+      {action}
+    </View>
   );
 }

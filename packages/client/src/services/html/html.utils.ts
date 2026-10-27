@@ -1,4 +1,5 @@
-import type { HtmlBridgeMessage, HtmlReplySegment } from '../../types/html.types';
+import { HTML_BOOTSTRAP } from './html.constants';
+import type { HtmlReplySegment } from '../../types/html.types';
 
 export function htmlReplyContent(content: string): string | undefined {
   if (/^(?:[\t ]*\r?\n)*(?: {4}|\t)/.test(content)) {
@@ -27,71 +28,13 @@ export function htmlTitle(html: string): string | undefined {
   return title === '' ? undefined : title;
 }
 
-function htmlBootstrap() {
-  const htmlPost = (message: HtmlBridgeMessage) => {
-    const native = window.ReactNativeWebView;
-
-    if (native) {
-      native.postMessage(JSON.stringify(message));
-    } else {
-      window.parent.postMessage(message, '*');
-    }
-  };
-
-  window.addEventListener('message', (event) => {
-    if (event.source !== window.parent || event.data?.type !== 'bots.html-theme') {
-      return;
-    }
-
-    document.documentElement.style.colorScheme = event.data.appearance;
-    document.documentElement.classList.toggle('dark', event.data.appearance === 'dark');
-    for (const [name, value] of Object.entries(event.data.tokens)) {
-      document.documentElement.style.setProperty(name, String(value));
-    }
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    let previousHeight = 0;
-
-    const htmlResize = () => {
-      const height = Math.ceil(document.body.getBoundingClientRect().height);
-
-      if (height !== previousHeight) {
-        previousHeight = height;
-        htmlPost({ type: 'bots.html-height', height });
-      }
-    };
-
-    new ResizeObserver(htmlResize).observe(document.body);
-    htmlResize();
-  });
-
-  document.addEventListener('click', (event) => {
-    const link = event.target instanceof Element ? event.target.closest('a') : null;
-
-    if (link === null) {
-      return;
-    }
-
-    const href = link.getAttribute('href');
-
-    if (href?.startsWith('#')) {
-      return;
-    }
-    event.preventDefault();
-    if (event.isTrusted && href) {
-      htmlPost({ type: 'bots.html-link', url: href });
-    }
-  });
-}
-
 export function htmlDocument(html: string) {
   return `<!doctype html><html><head>
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; connect-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>:root{color-scheme:light dark}html{background:var(--background,transparent);color:var(--foreground,inherit);font-family:system-ui,sans-serif}body{margin:0}*,*::before,*::after{box-sizing:border-box}img,svg,canvas{max-width:100%}</style>
-<script>(${htmlBootstrap.toString()})();</script>
+<script>${HTML_BOOTSTRAP}</script>
 </head><body>${html}</body></html>`;
 }
 

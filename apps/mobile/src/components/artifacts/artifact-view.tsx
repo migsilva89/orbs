@@ -318,9 +318,10 @@ interface ArtifactViewProps {
   spec: ArtifactSpec;
   store: StateStore;
   title: string;
+  isPreview?: boolean;
 }
 
-export function ArtifactView({ spec, store, title }: ArtifactViewProps) {
+export function ArtifactView({ spec, store, title, isPreview = false }: ArtifactViewProps) {
   return match(spec)
     .with({ html: P.string }, ({ html }) => (
       <View className="flex-1 px-4">
@@ -333,8 +334,8 @@ export function ArtifactView({ spec, store, title }: ArtifactViewProps) {
         />
       </View>
     ))
-    .otherwise((structured) => (
-      <ScrollView contentContainerClassName="gap-6 px-4 pt-4 pb-12" contentInsetAdjustmentBehavior="automatic">
+    .otherwise((structured) => {
+      const content = (
         <JSONUIProvider
           key={JSON.stringify(structured.elements)}
           registry={registry}
@@ -342,6 +343,12 @@ export function ArtifactView({ spec, store, title }: ArtifactViewProps) {
         >
           <Renderer registry={registry} spec={structured} />
         </JSONUIProvider>
-      </ScrollView>
-    ));
+      );
+
+      return isPreview ? <View className="gap-6">{content}</View> : (
+        <ScrollView contentContainerClassName="gap-6 px-4 pt-4 pb-12" contentInsetAdjustmentBehavior="automatic">
+          {content}
+        </ScrollView>
+      );
+    });
 }

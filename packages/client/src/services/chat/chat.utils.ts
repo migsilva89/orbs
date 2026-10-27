@@ -398,12 +398,6 @@ export function chatEntryIds(messages: ChatTypes.ChatMessage[]): number[] {
   return [...new Set(messages.flatMap((message) => (message.metadata?.entryId ? [message.metadata.entryId] : [])))];
 }
 
-export function chatPrivateSource({ privateWith, bots }: ChatTypes.ChatPrivateSourceParams): string | null {
-  const name = bots.find((bot) => bot.id === privateWith)?.name;
-
-  return name ? m.rooms_chat_private_source({ name }) : null;
-}
-
 export function chatAnswerProblem({ isGone, isError }: ChatTypes.ChatAnswerProblemParams): string | null {
   return match({ isGone, isError })
     .with({ isGone: true }, () => m.rooms_chat_approval_gone())

@@ -4,12 +4,15 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { AlarmClock, AlarmClockCheck, AlarmClockOff, AlarmClockPlus, CircleCheck, ListPlus, ListTodo, ListX } from 'lucide-react-native';
 import { Fragment } from 'react';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { match } from 'ts-pattern';
+import { BotMention } from '@/components/bots/bot-mention';
 import { Avatar } from '@/components/ui/avatar';
+import { EventLabel, EventLine, EventList, EventName } from '@/components/ui/event';
 import { Icon } from '@/components/ui/icon';
 import { Menu } from '@/components/ui/menu';
 import { Text } from '@/components/ui/text';
+import type { EventStatus } from '@/components/ui/event';
 import type { RpcSession } from '@/types/rpc.types';
 import type * as ClientTypes from '@repo/client/client';
 import type { Bot } from '@repo/contracts/universal';
@@ -30,37 +33,35 @@ const CHAT_EVENTS_ICONS = {
 interface ChatEventsLineProps {
   label: string;
   isDeleted?: boolean;
+  status?: EventStatus;
   children: ReactNode;
 }
 
-function ChatEventsLine({ label, isDeleted = false, children }: ChatEventsLineProps) {
+function ChatEventsLine({ label, isDeleted = false, status, children }: ChatEventsLineProps) {
   return (
-    <View className="flex-row flex-wrap items-center justify-center gap-1 px-4 py-1.5">
-      <Text variant="muted">{label}</Text>
+    <EventLine status={status}>
+      <EventLabel>{label}</EventLabel>
       {children}
-      {isDeleted ? <Text variant="muted">{m.rooms_event_deleted()}</Text> : null}
-    </View>
+      {isDeleted ? <EventLabel>{m.rooms_event_deleted()}</EventLabel> : null}
+    </EventLine>
   );
 }
 
-interface ChatEventsChipProps {
-  icon: ReactNode;
-  name: string;
+interface ChatEventsLinkProps {
   onPress?: () => void;
+  children: ReactNode;
 }
 
-function ChatEventsChip({ icon, name, onPress }: ChatEventsChipProps) {
-  return (
+function ChatEventsLink({ onPress, children }: ChatEventsLinkProps) {
+  return onPress ? (
     <Pressable
-      accessibilityRole={onPress ? 'link' : undefined}
-      className="flex-row items-center gap-1 rounded-full px-1.5 py-0.5 active:bg-accent"
-      disabled={!onPress}
+      accessibilityRole="link"
+      className="min-w-0 shrink"
       onPress={onPress}
     >
-      {icon}
-      <Text tone="subtle" variant="featured-name">{name}</Text>
+      {children}
     </Pressable>
-  );
+  ) : children;
 }
 
 interface ChatEventsPeersProps {
@@ -73,6 +74,15 @@ function ChatEventsPeers({ parts, bots, senderId }: ChatEventsPeersProps) {
   const router = useRouter();
   const peers = toolPeers(parts, bots);
 
+  const stack = peers.slice(0, 3).map(({ peer }) => (
+    <Avatar
+      avatar={peer.avatar}
+      key={peer.id}
+      name={peer.name}
+      size="xs"
+    />
+  ));
+
   function openPair({ peer, conversationId }: ClientTypes.ToolPeer) {
     if (conversationId !== undefined) {
       router.push({ pathname: '/chat/[botId]/with/[peerId]', params: { botId: senderId, peerId: peer.id, conversationId } });
@@ -80,7 +90,7 @@ function ChatEventsPeers({ parts, bots, senderId }: ChatEventsPeersProps) {
   }
 
   return (
-    <ChatEventsLine label={parts.length > 1 ? m.rooms_pair_messages({ count: parts.length }) : m.rooms_pair_messaged()}>
+    <ChatEventsLine label={parts.length > 1 ? m.rooms_pair_messages({ count: parts.length }) : m.rooms_pair_messaged()} status={parts.some(toolRunning) ? 'running' : undefined}>
       {peers.length > 2 ? (
         <Menu
           items={peers.map((target) => ({
@@ -88,38 +98,17 @@ function ChatEventsPeers({ parts, bots, senderId }: ChatEventsPeersProps) {
             onSelect: () => openPair(target),
           }))}
         >
-          <View className="flex-row items-center gap-1 rounded-full px-1.5 py-0.5">
-            <View className="flex-row">
-              {peers.slice(0, 3).map(({ peer }, index) => (
-                <View className={index > 0 ? '-ml-1.5 rounded-full border-2 border-background' : 'rounded-full border-2 border-background'} key={peer.id}>
-                  <Avatar
-                    avatar={peer.avatar}
-                    name={peer.name}
-                    size="xs"
-                  />
-                </View>
-              ))}
-            </View>
-            <Text tone="subtle" variant="featured-name">{m.rooms_pair_bots({ count: peers.length })}</Text>
-          </View>
+          <EventName icon={stack}>{m.rooms_pair_bots({ count: peers.length })}</EventName>
         </Menu>
       ) : peers.map((target, index) => (
         <Fragment key={target.peer.id}>
-          {index > 0 ? <Text variant="muted">{index === peers.length - 1 ? m.rooms_pair_and() : ','}</Text> : null}
-          <ChatEventsChip
-            icon={(
-              <Avatar
-                avatar={target.peer.avatar}
-                name={target.peer.name}
-                size="xs"
-              />
-            )}
-            name={target.peer.name}
-            onPress={target.conversationId === undefined ? undefined : () => openPair(target)}
-          />
+          {index > 0 && index === peers.length - 1 ? <EventLabel>{m.rooms_pair_and()}</EventLabel> : null}
+          {index > 0 && index < peers.length - 1 ? <Text className="-ml-1.5">,</Text> : null}
+          <ChatEventsLink onPress={target.conversationId === undefined ? undefined : () => openPair(target)}>
+            <BotMention animate={target.conversationId === undefined && parts.some(toolRunning)} bot={target.peer} />
+          </ChatEventsLink>
         </Fragment>
       ))}
-      {parts.some(toolRunning) ? <ActivityIndicator size="small" /> : null}
     </ChatEventsLine>
   );
 }
@@ -145,11 +134,9 @@ function ChatEventsRoutine({ event, senderId, session }: ChatEventsRoutineProps)
 
   return (
     <ChatEventsLine isDeleted={isDeleted} label={label}>
-      <ChatEventsChip
-        icon={<Icon icon={CHAT_EVENTS_ICONS[event.icon]} tone="subtle" />}
-        name={event.routine.name}
-        onPress={isRemoved || isDeleted ? undefined : () => router.push({ pathname: '/bots/[botId]/routines', params: { botId: senderId } })}
-      />
+      <ChatEventsLink onPress={isRemoved || isDeleted ? undefined : () => router.push({ pathname: '/bots/[botId]/routines', params: { botId: senderId } })}>
+        <EventName icon={<Icon icon={CHAT_EVENTS_ICONS[event.icon]} tone="subtle" />}>{event.routine.name}</EventName>
+      </ChatEventsLink>
     </ChatEventsLine>
   );
 }
@@ -175,11 +162,9 @@ function ChatEventsTodo({ event, senderId, session }: ChatEventsTodoProps) {
 
   return (
     <ChatEventsLine isDeleted={isDeleted} label={label}>
-      <ChatEventsChip
-        icon={<Icon icon={CHAT_EVENTS_ICONS[event.icon]} tone="subtle" />}
-        name={event.todo.title}
-        onPress={isRemoved || isDeleted ? undefined : () => router.push({ pathname: '/bots/[botId]/todos', params: { botId: senderId } })}
-      />
+      <ChatEventsLink onPress={isRemoved || isDeleted ? undefined : () => router.push({ pathname: '/bots/[botId]/todos', params: { botId: senderId } })}>
+        <EventName icon={<Icon icon={CHAT_EVENTS_ICONS[event.icon]} tone="subtle" />}>{event.todo.title}</EventName>
+      </ChatEventsLink>
     </ChatEventsLine>
   );
 }
@@ -208,17 +193,9 @@ function ChatEventsBot({ event, session }: ChatEventsBotProps) {
 
   return (
     <ChatEventsLine isDeleted={isDeleted} label={label}>
-      <ChatEventsChip
-        icon={(
-          <Avatar
-            avatar={bot?.avatar ?? null}
-            name={name}
-            size="xs"
-          />
-        )}
-        name={name}
-        onPress={bot ? () => router.push({ pathname: '/chat/[botId]', params: { botId: bot.id } }) : undefined}
-      />
+      <ChatEventsLink onPress={bot ? () => router.push({ pathname: '/chat/[botId]', params: { botId: bot.id } }) : undefined}>
+        <BotMention bot={bot ?? { name }} />
+      </ChatEventsLink>
     </ChatEventsLine>
   );
 }
@@ -232,7 +209,7 @@ interface ChatEventsProps {
 
 export function ChatEvents({ events, bots, senderId, session }: ChatEventsProps) {
   return (
-    <View className="py-0.5">
+    <EventList>
       {events.map((event) => match(event)
         .with({ kind: 'peers' }, (peers) => (
           <ChatEventsPeers
@@ -266,6 +243,6 @@ export function ChatEvents({ events, bots, senderId, session }: ChatEventsProps)
           />
         ))
         .exhaustive())}
-    </View>
+    </EventList>
   );
 }

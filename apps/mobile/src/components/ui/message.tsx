@@ -2,7 +2,7 @@ import { cva } from 'cva';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FileText } from 'lucide-react-native';
 import { useState } from 'react';
-import { Image, Pressable, View } from 'react-native';
+import { Image, Pressable, ScrollView, View } from 'react-native';
 import { useCSSVariable } from 'uniwind';
 import { cn } from '@/lib/cn';
 import { Button } from './button';
@@ -23,8 +23,20 @@ const messageStackVariants = cva({
   variants: { from: { user: 'w-4/5 items-end', assistant: 'w-full items-start' } },
 });
 
+/** The bubble's outline. Every card in the transcript wears it, so they read as one family. */
+export const messageOutline = 'border border-black/10 dark:border-white/15';
+
+/** The assistant bubble's surface: cards, previews and the typing pill use it as is. */
+export const messageSurface = cn('rounded-3xl bg-secondary', messageOutline);
+
+/** The icon tile that leads a card's header or footer. */
+export const messageTile = cn('size-8 items-center justify-center rounded-lg bg-background', messageOutline);
+
+/** An inner block of a card, such as an options list, a field or tool output. */
+export const messageInset = cn('rounded-xl bg-background', messageOutline);
+
 const messageBubbleVariants = cva({
-  base: 'max-w-full min-w-0 rounded-3xl border border-black/10 px-3.5 py-2.5 dark:border-white/15',
+  base: cn('max-w-full min-w-0 rounded-3xl px-3.5 py-2.5', messageOutline),
   variants: {
     from: { user: 'bg-primary', assistant: 'bg-secondary' },
     wide: { true: 'w-full', false: '' },
@@ -132,7 +144,7 @@ interface MessageImageProps {
 /** A sent photo; a muted block holds its place while it loads. */
 export function MessageImage({ source, name }: MessageImageProps) {
   return (
-    <View accessibilityLabel={name} accessibilityRole="image" className="size-48 overflow-hidden rounded-2xl bg-muted">
+    <View accessibilityLabel={name} accessibilityRole="image" className={cn('size-48 overflow-hidden rounded-3xl bg-muted', messageOutline)} style={{ borderCurve: 'continuous' }}>
       <Image className="size-full" resizeMode="cover" source={source} />
     </View>
   );
@@ -144,9 +156,23 @@ interface MessageFileProps {
 
 export function MessageFile({ name }: MessageFileProps) {
   return (
-    <View className="max-w-full flex-row items-center gap-2 rounded-2xl border border-border px-3 py-2">
+    <View className={cn(messageSurface, 'h-8 max-w-full flex-row items-center gap-1.5 rounded-full px-3')}>
       <Icon icon={FileText} tone="muted" />
-      <Text className="shrink" numberOfLines={1} variant="button">{name}</Text>
+      <Text className="shrink" numberOfLines={1} variant="featured-name">{name}</Text>
     </View>
+  );
+}
+
+interface MessageCodeProps {
+  children: string;
+  tone?: 'default' | 'destructive';
+}
+
+/** Code a tool ran or returned, framed like the other inner blocks of a card. */
+export function MessageCode({ children, tone = 'default' }: MessageCodeProps) {
+  return (
+    <ScrollView className={cn('max-h-64 grow-0', messageInset)} contentContainerClassName="px-3 py-2" nestedScrollEnabled>
+      <Text selectable tone={tone === 'destructive' ? 'destructive' : 'muted'} variant="trace-code">{children}</Text>
+    </ScrollView>
   );
 }

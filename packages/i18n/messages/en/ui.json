@@ -110,8 +110,6 @@
   "tool_label_react": "React",
   "tool_field_yes": "Yes",
   "tool_field_no": "No",
-  "ui_reasoning_streaming": "{name} is thinking…",
-  "ui_reasoning_complete": "{name}’s thought process",
   "tool_label_bot_swap_models": "Replace bot models",
   "tool_label_agent_stop": "Stop agent",
   "tool_label_bot_catalog": "Read bot catalog",

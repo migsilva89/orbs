@@ -1,12 +1,11 @@
 import { roomsChoice } from '@repo/client/client';
 import { useChatQuestion } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
-import { ArrowUp, X } from 'lucide-react-native';
+import { ArrowRight, X } from 'lucide-react-native';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import { Input } from '@/components/ui/input';
-import { QuestionCard, QuestionCardHeader, QuestionCardOption, QuestionCardOptions } from '@/components/ui/question-card';
+import { QuestionCard, QuestionCardField, QuestionCardHeader, QuestionCardOption, QuestionCardOptions } from '@/components/ui/question-card';
 import { Text } from '@/components/ui/text';
 import type { ConversationQuestion } from '@repo/contracts/universal';
 
@@ -47,6 +46,7 @@ export function ChatQuestion({ question }: ChatQuestionProps) {
                 index={index}
                 key={choice}
                 selected={card.picked.includes(choice)}
+                tone={recommended ? 'success' : 'muted'}
                 onPress={() => card.choose(choice)}
               >
                 <Text className="flex-1">{label}</Text>
@@ -56,8 +56,18 @@ export function ChatQuestion({ question }: ChatQuestionProps) {
           })}
         </QuestionCardOptions>
       ) : null}
-      <Input
+      <QuestionCardField
         accessibilityLabel={card.isSecret ? m.rooms_chat_question_secret_placeholder() : m.rooms_chat_question_other()}
+        action={(
+          <Button
+            accessibilityLabel={m.rooms_chat_question_send()}
+            disabled={card.isAnswered || !card.canSend}
+            size="icon-md"
+            onPress={card.send}
+          >
+            <Icon icon={ArrowRight} size="sm" />
+          </Button>
+        )}
         autoCapitalize={card.isSecret ? 'none' : undefined}
         autoCorrect={!card.isSecret}
         editable={!card.isAnswered}
@@ -68,14 +78,6 @@ export function ChatQuestion({ question }: ChatQuestionProps) {
         onChangeText={card.setTyped}
         onSubmitEditing={card.send}
       />
-      <Button
-        accessibilityLabel={m.rooms_chat_question_send()}
-        disabled={card.isAnswered || !card.canSend}
-        onPress={card.send}
-      >
-        <Icon icon={ArrowUp} />
-        {m.rooms_chat_question_send()}
-      </Button>
       {card.problem ? <Text tone="destructive" variant="small">{card.problem}</Text> : null}
     </QuestionCard>
   );

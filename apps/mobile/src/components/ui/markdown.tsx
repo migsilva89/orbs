@@ -140,7 +140,8 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
     .with('default', () => ({ ...MARKDOWN_TEXT, color: color ?? foreground }))
     .exhaustive();
 
-  const heading = (fontSize: number) => ({ ...text, fontSize, lineHeight: Math.round(fontSize * 1.3), fontWeight: '600', marginTop: 8 });
+  // Like web: space above a heading, little below, so it reads with the block it introduces.
+  const heading = (fontSize: number) => ({ ...text, fontSize, lineHeight: Math.round(fontSize * 1.3), fontWeight: '600', marginTop: 12, marginBottom: 4 });
   // Blocks nest in the 24pt bubble: its radius less its padding, with a hairline edge.
   const block = { marginTop: 4, marginBottom: 12, borderRadius: 14, borderWidth: StyleSheet.hairlineWidth, borderColor: border };
 
@@ -166,7 +167,8 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
     linkVariants: { '^(bot|quote):': { color: text.color, fontFamily: 'Inter-Medium', underline: false } },
     code: { fontFamily: 'Menlo', fontSize: 14, color: text.color, backgroundColor: codeBackground, borderColor: 'transparent' },
     blockquote: { ...text, color: muted, borderColor: border, borderWidth: 3, gapWidth: 12, backgroundColor: 'transparent' },
-    list: { ...text, bulletColor: muted, markerColor: muted, gapWidth: 8 },
+    // Web's list geometry: text 22pt in (a 14pt marker column and an 8pt gap), each nested level 20pt further, 4pt between items.
+    list: { ...text, bulletColor: muted, markerColor: muted, bulletSize: 5, markerMinWidth: 14, gapWidth: 8, marginLeft: 20, itemSpacing: 4 },
     thematicBreak: { color: border, height: 1, marginTop: 8, marginBottom: 8 },
     codeBlock: {
       ...text,

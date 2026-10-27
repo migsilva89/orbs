@@ -38,6 +38,7 @@ export const botFields = z.object({
   permission: z.enum(['read-only', 'ask', 'auto', 'full']),
   inherit: botInherit,
   sharedSkills: z.array(z.string().trim().min(1).max(128)).max(500).nullable(),
+  sharedMcp: z.array(z.string().trim().min(1).max(128)).max(200).nullable(),
 });
 
 export const bot = botFields.extend({
@@ -57,6 +58,7 @@ export const botCreate = botFields.extend({
   permission: botFields.shape.permission.default('ask'),
   inherit: botInherit.default(['skills', 'mcp', 'plugins']),
   sharedSkills: botFields.shape.sharedSkills.default(null),
+  sharedMcp: botFields.shape.sharedMcp.default(null),
 });
 
 export const botUpdate = botFields.partial().extend(botGet.shape);

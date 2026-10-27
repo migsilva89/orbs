@@ -75,7 +75,7 @@ import {
   mcpAuthStatusResult,
   mcpAuthTarget,
 } from '../types/mcp-auth.types';
-import { mcpCatalog, mcpConfigure, mcpDiscover, mcpSettings } from '../types/mcp.types';
+import { mcpCatalog, mcpConfigure, mcpDiscover, mcpSettings, mcpShared } from '../types/mcp.types';
 import { modelList } from '../types/model.types';
 import { notificationConfigure, notificationPresence, notificationPush, notificationSettings, notificationVoid } from '../types/notification.types';
 import { onboardingState } from '../types/onboarding.types';
@@ -255,6 +255,7 @@ export const contract = {
 
   mcp: {
     discover: ocFind.input(mcpDiscover).output(mcpCatalog),
+    shared: ocFind.input(mcpDiscover).output(mcpShared),
 
     connect: ocFind.input(mcpDiscover).output(mcpCatalog),
 

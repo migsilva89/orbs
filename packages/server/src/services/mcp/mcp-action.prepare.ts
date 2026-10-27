@@ -10,6 +10,7 @@ export async function mcpActionPrepare(deps: McpServiceDeps, { bot, settings }: 
     botId: bot.id,
     paths: settings.paths,
     isInherited: bot.inherit.includes('mcp'),
+    sharedMcp: bot.sharedMcp,
   });
 
   const results = await Promise.allSettled(config.servers.map(async (entry) => match(entry.config.enabled !== false && entry.config.disabled !== true)

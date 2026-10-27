@@ -11,6 +11,7 @@ export function botRecord(row: DatabaseBot): Bot {
     inherit: botInherit.parse(JSON.parse(row.inherit)),
     fallbackModel: modelSelection.nullable().parse(JSON.parse(row.fallbackModel ?? 'null')),
     sharedSkills: botFields.shape.sharedSkills.parse(JSON.parse(row.sharedSkills ?? 'null')),
+    sharedMcp: botFields.shape.sharedMcp.parse(JSON.parse(row.sharedMcp ?? 'null')),
   };
 }
 
@@ -20,7 +21,8 @@ export function botValues(bot: BotCreateInput) {
     avatar: JSON.stringify(bot.avatar),
     inherit: JSON.stringify(bot.inherit),
     fallbackModel: JSON.stringify(bot.fallbackModel),
-    sharedSkills: JSON.stringify(bot.sharedSkills),
+    sharedSkills: JSON.stringify(bot.sharedSkills?.length ? bot.sharedSkills : null),
+    sharedMcp: JSON.stringify(bot.sharedMcp?.length ? bot.sharedMcp : null),
   };
 }
 

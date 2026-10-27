@@ -48,5 +48,6 @@ export function databaseDriverLoadMigrations() {
     '0001_init': readFileSync(new URL('./migrations/0001_init.sql', import.meta.url), 'utf8'),
     '0002_onboarding_existing': readFileSync(new URL('./migrations/0002_onboarding_existing.sql', import.meta.url), 'utf8'),
     '0003_bot_shared_skills': readFileSync(new URL('./migrations/0003_bot_shared_skills.sql', import.meta.url), 'utf8'),
+    '0004_bot_shared_mcp': readFileSync(new URL('./migrations/0004_bot_shared_mcp.sql', import.meta.url), 'utf8'),
   };
 }

@@ -23,6 +23,7 @@ export function useSettingsSources() {
   }));
 
   const saveMcp = useMutation(rpc.mcp.configure.mutationOptions({
+    meta: { invalidates: [rpc.mcp.shared.key(), rpc.mcp.discover.key()] },
     onSuccess: (saved) => queryClient.setQueryData(rpc.mcp.settings.queryKey(), saved),
   }));
 

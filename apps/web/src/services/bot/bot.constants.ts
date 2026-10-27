@@ -35,4 +35,5 @@ export const BOT_FORM_SECTIONS = {
   permission: 'tools',
   inherit: 'tools',
   sharedSkills: 'skills',
+  sharedMcp: 'mcp',
 } satisfies Record<keyof BotForm, BotSection>;

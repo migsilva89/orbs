@@ -2,7 +2,6 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
 import { useBotDelete, useBotUpdate, useChatReset } from '@repo/client/react';
 import { botForm } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
-import { BotFormInherit } from '@repo/ui/bots/bot-form-inherit';
 import { BotMcpPanel } from '@repo/ui/bots/bot-mcp-panel';
 import { Button } from '@repo/ui/button';
 import { Form } from '@repo/ui/forms/form';
@@ -17,6 +16,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { match, P } from 'ts-pattern';
 import { BotDialogNav } from '@/components/bots/bot-dialog-nav';
+import { BotFormMcp } from '@/components/bots/bot-form-mcp';
 import { BotFormSection } from '@/components/bots/bot-form-section';
 import { BotFormSkills } from '@/components/bots/bot-form-skills';
 import { RoutinesEdit } from '@/components/routines/routines-edit';
@@ -54,6 +54,7 @@ export function BotEdit({ bot, bots, view }: BotEditProps) {
       permission: bot.permission,
       inherit: bot.inherit,
       sharedSkills: bot.sharedSkills,
+      sharedMcp: bot.sharedMcp,
     },
   });
 
@@ -157,14 +158,7 @@ export function BotEdit({ bot, bots, view }: BotEditProps) {
               <>
                 <form onSubmit={submit}>
                   <fieldset className="contents" disabled={save.isPending}>
-                    <SettingsGroup isTitleVisible title={m.bots_shared()}>
-                      <BotFormInherit
-                        busy={save.isPending}
-                        description={m.bots_mcp_shared_hint()}
-                        label={m.bots_mcp_shared()}
-                        resource="mcp"
-                      />
-                    </SettingsGroup>
+                    <BotFormMcp botId={bot.id} busy={save.isPending} />
                   </fieldset>
                 </form>
                 <BotMcpPanel bot={bot} />

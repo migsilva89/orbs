@@ -9,7 +9,7 @@ export function useBotUpdate(success?: string) {
     meta: {
       success,
       error: m.rooms_bot_save_error(),
-      invalidates: [rpc.bots.list.key(), rpc.bots.catalog.key(), rpc.skills.discover.key()],
+      invalidates: [rpc.bots.list.key(), rpc.bots.catalog.key(), rpc.skills.discover.key(), rpc.mcp.discover.key()],
     },
   }));
 }

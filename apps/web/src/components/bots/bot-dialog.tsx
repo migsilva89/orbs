@@ -69,6 +69,7 @@ function BotDialogCreate() {
       permission: 'ask',
       inherit: ['skills', 'mcp', 'plugins'],
       sharedSkills: null,
+      sharedMcp: null,
     },
   });
 

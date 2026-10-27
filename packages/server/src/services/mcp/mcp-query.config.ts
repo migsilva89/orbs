@@ -12,7 +12,7 @@ import type { McpConfig, McpSource } from '@repo/runtime/server';
 
 export async function mcpQueryConfig(
   { root }: McpServiceDeps,
-  { botId, paths, isInherited }: McpConfigParams,
+  { botId, paths, isInherited, sharedMcp }: McpConfigParams,
 ): Promise<McpConfig> {
   const defaults = [join(getAgentDir(), 'mcp.json'), join(homedir(), '.agents/mcp.json')];
   const directory = join(root, 'agents', botId);
@@ -50,7 +50,9 @@ export async function mcpQueryConfig(
       .with(P.string, (message) => diagnostics.push({ source, message }))
       .otherwise(() => undefined);
 
-    for (const [name, value] of Object.entries(entries)) {
+    const picked = Object.entries(entries).filter(([name]) => isBotLocal || sharedMcp === null || sharedMcp.includes(name));
+
+    for (const [name, value] of picked) {
       servers.delete(name);
 
       match({ result: mcpServer.safeParse(value), isBotLocal })

@@ -11,6 +11,7 @@ export async function mcpQueryTarget(deps: McpServiceDeps, { bot, name }: McpTar
     botId: bot.id,
     paths: settings.paths,
     isInherited: bot.inherit.includes('mcp'),
+    sharedMcp: bot.sharedMcp,
   });
 
   return match(config.servers.find((entry) => entry.name === name))

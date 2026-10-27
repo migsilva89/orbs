@@ -11,5 +11,6 @@ export function useSettingsDeviceRevoke({ onDone }: SettingsDoneParams) {
     isPending: revoke.isPending,
     problem: revoke.isError ? m.settings_devices_revoke_error() : null,
     revoke: (id: string) => revoke.mutate({ id }),
+    reset: revoke.reset,
   };
 }

@@ -8,11 +8,12 @@ import { RoomsChatEmojiLoading } from '../rooms/rooms-chat-emoji-loading';
 const RoomsChatEmojiPicker = lazy(() => import('../rooms/rooms-chat-emoji-picker').then((module) => ({ default: module.RoomsChatEmojiPicker })));
 
 interface BotAvatarEmojiProps {
+  density?: 'default' | 'compact'
   disabled: boolean
   onPick: (emoji: string) => void
 }
 
-export function BotAvatarEmoji({ disabled, onPick }: BotAvatarEmojiProps) {
+export function BotAvatarEmoji({ density = 'default', disabled, onPick }: BotAvatarEmojiProps) {
   const [open, setOpen] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const retry = () => setAttempt((count) => count + 1);
@@ -26,13 +27,15 @@ export function BotAvatarEmoji({ disabled, onPick }: BotAvatarEmojiProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          aria-label={m.avatars_emoji()}
           disabled={disabled}
-          size="sm"
+          size={density === 'compact' ? 'icon-sm' : 'sm'}
+          title={m.avatars_emoji()}
           type="button"
           variant="ghost"
         >
           <IconSmile />
-          {m.avatars_emoji()}
+          {density === 'compact' ? null : m.avatars_emoji()}
         </Button>
       </PopoverTrigger>
       <PopoverContent arrow={false} className="w-auto p-0">

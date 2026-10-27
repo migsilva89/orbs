@@ -3,14 +3,12 @@ import { env } from '@repo/env/client';
 import { m } from '@repo/i18n/client';
 import { Button } from '@repo/ui/button';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@repo/ui/panel';
-import { SettingsPanel } from '@repo/ui/settings/settings-panel';
+import { SettingsGroup } from '@repo/ui/settings/settings-group';
 import { toasty } from '@repo/ui/sonner';
 import { StatusDot } from '@repo/ui/status-dot';
 import { useQuery } from '@tanstack/react-query';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconCopy from '~icons/lucide/copy';
-import IconMonitor from '~icons/lucide/monitor';
-import IconShare from '~icons/lucide/share-2';
 
 export function SettingsDesktop() {
   const desktop = window.__electrobunSendToHost;
@@ -31,11 +29,7 @@ export function SettingsDesktop() {
   const addresses = window.__botsAddresses ?? [];
 
   return (
-    <SettingsPanel
-      icon={IconMonitor}
-      id="desktop"
-      title={m.settings_desktop()}
-    >
+    <SettingsGroup title={m.settings_desktop()}>
       <PanelRow>
         <span className="flex size-4 shrink-0 items-center justify-center"><StatusDot label={status} variant={variant} /></span>
         <PanelContent>
@@ -53,7 +47,6 @@ export function SettingsDesktop() {
       </PanelRow>
       {addresses.length > 0 ? (
         <PanelRow className="items-start">
-          <IconShare />
           <div className="flex min-w-0 flex-1 flex-col gap-2">
             <PanelTitle asChild><h3>{m.desktop_connection_share({ name: env.VITE_APP_NAME })}</h3></PanelTitle>
             {addresses.map((address) => (
@@ -75,6 +68,6 @@ export function SettingsDesktop() {
           </div>
         </PanelRow>
       ) : null}
-    </SettingsPanel>
+    </SettingsGroup>
   );
 }

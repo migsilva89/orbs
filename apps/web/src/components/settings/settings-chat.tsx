@@ -5,17 +5,13 @@ import { conversationWhenBusy, preferencesEnterAction } from '@repo/contracts/un
 import { m } from '@repo/i18n/client';
 import { PanelContent, PanelRow, PanelTitle } from '@repo/ui/panel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/select';
-import { SettingsPanel } from '@repo/ui/settings/settings-panel';
+import { SettingsGroup } from '@repo/ui/settings/settings-group';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { rpc } from '@/services/rpc/rpc.client';
-import IconListOrdered from '~icons/lucide/list-ordered';
-import IconMessageSquare from '~icons/lucide/message-square';
-import IconMonitor from '~icons/lucide/monitor';
-import IconSmartphone from '~icons/lucide/smartphone';
 
 const SETTINGS_ENTER_KEYS = [
-  { device: 'desktop', icon: IconMonitor, label: m.settings_chat_enter_desktop },
-  { device: 'mobile', icon: IconSmartphone, label: m.settings_chat_enter_mobile },
+  { device: 'desktop', label: m.settings_chat_enter_desktop },
+  { device: 'mobile', label: m.settings_chat_enter_mobile },
 ] as const;
 
 const SETTINGS_ENTER_ACTIONS = { send: m.settings_chat_enter_send, newline: m.settings_chat_enter_newline };
@@ -26,14 +22,9 @@ export function SettingsChat() {
   const configure = useChatDefaults();
 
   return (
-    <SettingsPanel
-      icon={IconMessageSquare}
-      id="chat"
-      title={m.settings_chat()}
-    >
+    <SettingsGroup title={m.settings_chat()}>
       {SETTINGS_ENTER_KEYS.map((row) => (
         <PanelRow key={row.device}>
-          <row.icon />
           <PanelContent>
             <PanelTitle>{row.label()}</PanelTitle>
           </PanelContent>
@@ -51,7 +42,6 @@ export function SettingsChat() {
         </PanelRow>
       ))}
       <PanelRow>
-        <IconListOrdered />
         <PanelContent>
           <PanelTitle>{m.rooms_send_mode()}</PanelTitle>
         </PanelContent>
@@ -68,6 +58,6 @@ export function SettingsChat() {
           </SelectContent>
         </Select>
       </PanelRow>
-    </SettingsPanel>
+    </SettingsGroup>
   );
 }

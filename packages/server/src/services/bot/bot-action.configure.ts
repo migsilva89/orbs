@@ -61,6 +61,7 @@ export function botActionConfigure(deps: BotServiceDeps, { botId }: BotGetInput)
   function botConfigureState({ bot, ...settings }: BotConfiguration) {
     return JSON.stringify({
       inherit: bot.inherit,
+      sharedSkills: bot.sharedSkills,
       modelProvider: bot.modelProvider,
       modelId: bot.modelId,
       thinkingLevel: bot.thinkingLevel,

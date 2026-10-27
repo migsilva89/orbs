@@ -1,14 +1,11 @@
 import { useSettingsSecrets } from '@repo/client/react';
 import { secretMode } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
-import IconKeyRound from '~icons/lucide/key-round';
-import IconLock from '~icons/lucide/lock';
-import IconRoute from '~icons/lucide/route';
 import IconTrash from '~icons/lucide/trash-2';
 import { Button } from '../button';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '../panel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
-import { SettingsPanel } from './settings-panel';
+import { SettingsGroup } from './settings-group';
 import type { SecretMode } from '@repo/contracts/universal';
 
 const SETTINGS_SECRETS_MODE = {
@@ -21,13 +18,8 @@ export function SettingsSecrets() {
   const secrets = useSettingsSecrets();
 
   return (
-    <SettingsPanel
-      icon={IconLock}
-      id="secrets"
-      title={m.settings_secrets()}
-    >
+    <SettingsGroup title={m.settings_secrets()}>
       <PanelRow>
-        <IconRoute />
         <PanelContent>
           <PanelTitle>{m.settings_secrets_mode()}</PanelTitle>
           <PanelDescription>
@@ -62,14 +54,12 @@ export function SettingsSecrets() {
       </PanelRow>
       {secrets.secrets.length === 0 ? (
         <PanelRow>
-          <IconKeyRound />
           <PanelContent>
             <PanelDescription>{m.settings_secrets_empty()}</PanelDescription>
           </PanelContent>
         </PanelRow>
       ) : secrets.secrets.map((secret) => (
         <PanelRow key={secret.name}>
-          <IconKeyRound />
           <PanelContent>
             <PanelTitle>{secret.name}</PanelTitle>
             <PanelDescription>{secret.hosts.join(', ')}</PanelDescription>
@@ -86,6 +76,6 @@ export function SettingsSecrets() {
           </Button>
         </PanelRow>
       ))}
-    </SettingsPanel>
+    </SettingsGroup>
   );
 }

@@ -89,6 +89,7 @@ export function TodosItem({ bot, todo, handle, isSortable = false }: TodosItemPr
             </Link>
           ) : (
             <Link
+              replace
               params={{ botId: bot.id, todoId }}
               resetScroll={false}
               to="/bots/$botId/todos/$todoId/delete"

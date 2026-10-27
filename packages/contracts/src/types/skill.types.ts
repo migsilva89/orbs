@@ -15,6 +15,7 @@ export const skill = z.object({
   isModelInvocable: z.boolean(),
   argumentsSchema: z.record(z.string(), z.json()),
   argumentHint: z.string().nullable(),
+  isShared: z.boolean(),
 });
 
 export const skillCatalog = z.array(skill);

@@ -85,6 +85,7 @@ export function RoutinesItem({ bot, routine }: RoutinesItemProps) {
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link
+                replace
                 params={params}
                 resetScroll={false}
                 to="/bots/$botId/routines/$routineId/edit"
@@ -96,6 +97,7 @@ export function RoutinesItem({ bot, routine }: RoutinesItemProps) {
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild variant="destructive">
               <Link
+                replace
                 params={params}
                 resetScroll={false}
                 to="/bots/$botId/routines/$routineId/delete"

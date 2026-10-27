@@ -24,6 +24,7 @@ export function skillQueryLoad(deps: SkillLoaderServiceDeps, params: SkillLoadPa
       isModelInvocable: !skill.disableModelInvocation,
       argumentsSchema: skillArgumentsSchema,
       argumentHint: skill.argumentHint,
+      isShared: skill.isShared,
     })),
   };
 }

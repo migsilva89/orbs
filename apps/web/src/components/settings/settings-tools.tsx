@@ -5,17 +5,13 @@ import { m } from '@repo/i18n/client';
 import { ButtonLoading } from '@repo/ui/button-loading';
 import { Form, FormErrors } from '@repo/ui/forms/form';
 import { FormInput } from '@repo/ui/forms/form-input';
-import { PanelContent, PanelDescription, PanelFooter, PanelRow, PanelTitle } from '@repo/ui/panel';
+import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@repo/ui/panel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/select';
-import { SettingsPanel } from '@repo/ui/settings/settings-panel';
+import { SettingsGroup } from '@repo/ui/settings/settings-group';
 import { SettingsToolsRules } from '@repo/ui/settings/settings-tools-rules';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { rpc } from '@/services/rpc/rpc.client';
-import IconKeyRound from '~icons/lucide/key-round';
-import IconListChecks from '~icons/lucide/list-checks';
-import IconShieldCheck from '~icons/lucide/shield-check';
-import IconTimer from '~icons/lucide/timer';
 
 export function SettingsTools() {
   const { data: settings } = useSuspenseQuery(rpc.tools.settings.queryOptions());
@@ -35,20 +31,16 @@ export function SettingsTools() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(save.save)}>
-        <fieldset className="contents" disabled={save.isPending}>
-          <SettingsPanel
-            icon={IconShieldCheck}
-            id="tools"
-            title={m.settings_tools()}
-          >
+        <fieldset className="flex flex-col gap-4" disabled={save.isPending}>
+          <SettingsGroup title={m.settings_tools_rules()}>
             <PanelRow className="items-start">
-              <IconListChecks />
               <div className="min-w-0 flex-1">
                 <SettingsToolsRules disabled={save.isPending} />
               </div>
             </PanelRow>
+          </SettingsGroup>
+          <SettingsGroup title={m.settings_tools_timeout()}>
             <PanelRow>
-              <IconTimer />
               <PanelContent>
                 <PanelTitle>{m.settings_tools_timeout()}</PanelTitle>
                 <PanelDescription>{m.settings_tools_timeout_hint()}</PanelDescription>
@@ -74,30 +66,32 @@ export function SettingsTools() {
                 )}
               />
             </PanelRow>
+          </SettingsGroup>
+          <SettingsGroup title={m.settings_tools_jev()}>
             <PanelRow className="items-start">
-              <IconKeyRound />
-              <div className="min-w-0 flex-1">
+              <div className="flex min-w-0 flex-1 flex-col gap-3">
+                <h3 className="text-sm font-medium">{m.settings_tools_jev()}</h3>
                 <FormInput
+                  aria-label={m.settings_tools_jev()}
                   autoComplete="off"
-                  label={m.settings_tools_jev()}
                   name="jevApiKey"
                   placeholder={settings.isJevConfigured ? m.settings_secret_saved() : m.settings_tools_jev_placeholder()}
                   type="password"
                 />
               </div>
             </PanelRow>
-            <PanelFooter>
-              <FormErrors className="mr-auto" error={save.problem} />
-              <ButtonLoading
-                disabled={save.isPending}
-                loading={save.isPending}
-                size="sm"
-                type="submit"
-              >
-                {m.settings_save()}
-              </ButtonLoading>
-            </PanelFooter>
-          </SettingsPanel>
+          </SettingsGroup>
+          <div className="flex items-center justify-end gap-2">
+            <FormErrors className="mr-auto" error={save.problem} />
+            <ButtonLoading
+              disabled={save.isPending}
+              loading={save.isPending}
+              size="sm"
+              type="submit"
+            >
+              {m.settings_save()}
+            </ButtonLoading>
+          </div>
         </fieldset>
       </form>
     </Form>

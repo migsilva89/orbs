@@ -214,5 +214,8 @@
   "ui_heatmap_levels": "Highlight days by level",
   "ui_heatmap_highlight": "Highlight days with {range}",
   "ui_heatmap_less": "Less",
-  "ui_heatmap_more": "More"
+  "ui_heatmap_more": "More",
+  "ui_unsaved_changes": "You have unsaved changes",
+  "ui_discard": "Discard",
+  "ui_save": "Save"
 }

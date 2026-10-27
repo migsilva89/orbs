@@ -8,7 +8,7 @@ export interface SkillServiceDeps {
 }
 
 export interface SkillBotParams {
-  bot: Pick<Bot, 'id' | 'inherit'>;
+  bot: Pick<Bot, 'id' | 'inherit' | 'sharedSkills'>;
 }
 
 export interface SkillLoadParams extends SkillBotParams {

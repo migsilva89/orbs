@@ -1,4 +1,4 @@
-import { botAvatar, botInherit, modelSelection } from '@repo/contracts/universal';
+import { botAvatar, botFields, botInherit, modelSelection } from '@repo/contracts/universal';
 import { match } from 'ts-pattern';
 import type { BotServiceDeps } from '../../types/bot.types';
 import type { DatabaseBot } from '../../types/database.types';
@@ -10,6 +10,7 @@ export function botRecord(row: DatabaseBot): Bot {
     avatar: botAvatar.nullable().parse(JSON.parse(row.avatar ?? 'null')),
     inherit: botInherit.parse(JSON.parse(row.inherit)),
     fallbackModel: modelSelection.nullable().parse(JSON.parse(row.fallbackModel ?? 'null')),
+    sharedSkills: botFields.shape.sharedSkills.parse(JSON.parse(row.sharedSkills ?? 'null')),
   };
 }
 
@@ -19,6 +20,7 @@ export function botValues(bot: BotCreateInput) {
     avatar: JSON.stringify(bot.avatar),
     inherit: JSON.stringify(bot.inherit),
     fallbackModel: JSON.stringify(bot.fallbackModel),
+    sharedSkills: JSON.stringify(bot.sharedSkills),
   };
 }
 

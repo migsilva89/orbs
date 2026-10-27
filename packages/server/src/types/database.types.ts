@@ -3,10 +3,11 @@ import type { Bot, ConversationWhenBusy } from '@repo/contracts/universal';
 import type { Generated } from 'kysely';
 import type { DatabaseSync } from 'node:sqlite';
 
-export interface DatabaseBot extends Omit<Bot, 'avatar' | 'inherit' | 'fallbackModel'> {
+export interface DatabaseBot extends Omit<Bot, 'avatar' | 'inherit' | 'fallbackModel' | 'sharedSkills'> {
   avatar: string | null;
   inherit: string;
   fallbackModel: string | null;
+  sharedSkills: string | null;
 }
 
 export interface DatabaseBotPreference {

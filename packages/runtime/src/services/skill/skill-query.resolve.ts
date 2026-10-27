@@ -8,13 +8,14 @@ import type { SkillLoaderServiceDeps, SkillLoadParams, SkillResolvedResult } fro
 export function skillQueryResolve(deps: SkillLoaderServiceDeps, params: SkillLoadParams): SkillResolvedResult {
   const agentDir = getAgentDir();
   const key = JSON.stringify([agentDir, params.directories, params.isInherited]);
+  const cacheId = `${params.botId}:${params.isInherited}`;
   const now = Date.now();
 
-  return match(deps.catalogs.get(params.botId))
+  const catalog = match(deps.catalogs.get(cacheId))
     .with({ key, expiresAt: P.number.gt(now) }, ({ result }) => result)
     .otherwise(() => {
       const result = skillResolveCatalog();
-      deps.catalogs.set(params.botId, {
+      deps.catalogs.set(cacheId, {
         key,
         expiresAt: now + 30_000,
         result,
@@ -22,6 +23,13 @@ export function skillQueryResolve(deps: SkillLoaderServiceDeps, params: SkillLoa
 
       return result;
     });
+
+  return match(params.sharedSkills)
+    .with(null, () => catalog)
+    .otherwise((names) => ({
+      ...catalog,
+      skills: catalog.skills.filter((skill) => !skill.isShared || names.includes(skill.name)),
+    }));
 
   function skillResolveCatalog(): SkillResolvedResult {
     const { root } = deps;
@@ -43,7 +51,11 @@ export function skillQueryResolve(deps: SkillLoaderServiceDeps, params: SkillLoa
 
     return {
       ...result,
-      skills: result.skills.map((skill) => ({ ...skill, argumentHint: skillArgumentHint(skill.filePath) })),
+      skills: result.skills.map((skill) => ({
+        ...skill,
+        argumentHint: skillArgumentHint(skill.filePath),
+        isShared: !localPaths.some((path) => skill.filePath.startsWith(`${path}/`)),
+      })),
     };
   }
 

@@ -38,12 +38,14 @@ function DialogOverlay({ className, ...props }: ComponentProps<typeof DialogPrim
 
 function DialogContent({
   close = true,
+  flush = false,
   closeLabel = m.ui_close(),
   className,
   children,
   ...props
 }: ComponentProps<typeof DialogPrimitive.Content> & {
   close?: boolean
+  flush?: boolean
   closeLabel?: string
 }) {
   return (
@@ -54,6 +56,7 @@ function DialogContent({
             'bg-background data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
             'relative z-50 my-4 grid w-full max-w-lg gap-3 rounded-lg border p-5 shadow-lg duration-200 dark:border-border/30',
             'scrollbar [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1',
+            flush && 'gap-0 p-0 outline-none',
             className,
           )}
           data-slot="dialog-content"

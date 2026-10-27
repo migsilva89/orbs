@@ -70,7 +70,7 @@ function RootLayoutStack() {
           <Stack.Screen name="chat/[botId]/react" options={{ ...SHEET, sheetAllowedDetents: [0.6, 1] }} />
           <Stack.Screen name="chat/[botId]/text" options={{ ...SHEET, sheetAllowedDetents: [0.9] }} />
           <Stack.Screen name="chat/[botId]/reset" options={DIALOG} />
-          <Stack.Screen name="chat/[botId]/html" options={{ headerShown: true, title: m.ui_html_preview(), headerBackButtonDisplayMode: 'minimal' }} />
+          <Stack.Screen name="chat/[botId]/html" />
           <Stack.Screen name="settings/index" options={{ headerShown: true, title: m.settings_title(), headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="settings/models/swap" options={{ headerShown: true, title: m.settings_models_replace(), headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="settings/themes/create" options={{ headerShown: true, title: m.settings_theme_add(), headerBackButtonDisplayMode: 'minimal' }} />

@@ -25,6 +25,7 @@ export function artifactSummary(record: ArtifactRecord): ArtifactSummary {
     botId: record.botId,
     conversationId: record.conversationId,
     title: record.title,
+    emoji: record.emoji ?? ARTIFACT.emojiDefault,
     version: record.version,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,

@@ -25,6 +25,7 @@ export async function artifactActionCreate(
           botId: params.botId,
           conversationId: params.conversationId,
           title: params.title,
+          emoji: params.emoji ?? null,
           version: 0,
           createdAt: now,
           updatedAt: now,

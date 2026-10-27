@@ -16,6 +16,8 @@ const selectTriggerVariants = cva({
     variant: {
       default: 'h-9 w-full border border-input bg-transparent px-3 shadow-xs dark:bg-input/30',
       ghost: 'h-8 w-auto border border-transparent bg-transparent px-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+      // The chat's answer fields: the composer's fill at a card's inner radius.
+      field: 'h-11.5 w-full rounded-xl border border-input bg-background px-4 shadow-sm dark:bg-card',
     },
   },
   defaultVariants: {

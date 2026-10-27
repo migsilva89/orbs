@@ -1,7 +1,6 @@
-import { htmlTitle } from '@repo/client/client';
+import { htmlEmoji, htmlTitle } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
-import { Code } from 'lucide-react-native';
 import { HtmlFrame } from '@/components/ui/html-frame';
 import { PreviewCard } from '@/components/ui/preview-card';
 
@@ -17,7 +16,7 @@ export function ChatHtml({ botId, html }: ChatHtmlProps) {
   return (
     <PreviewCard
       content="page"
-      icon={Code}
+      emoji={htmlEmoji(html)}
       kind={m.ui_html_page()}
       label={m.artifacts_expand()}
       title={title}

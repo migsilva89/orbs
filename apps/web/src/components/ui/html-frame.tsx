@@ -1,8 +1,10 @@
 import { htmlDocument } from '@repo/client/client';
 import { htmlFrameMessage } from '@repo/contracts/universal';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
 import { useTheme } from '@/hooks/use-theme';
+import { htmlFrameFonts } from '@/services/html/html.client';
 import { THEME_CONFIG } from '@/services/theme/theme.constants';
 
 interface HtmlFrameProps {
@@ -14,6 +16,7 @@ export function HtmlFrame({ html, title }: HtmlFrameProps) {
   const frame = useRef<HTMLIFrameElement>(null);
   const [height, setHeight] = useState(320);
   const theme = useTheme();
+  const { data: fonts } = useQuery(htmlFrameFonts);
   const document = htmlDocument(html);
 
   const postTheme = () => {
@@ -22,10 +25,11 @@ export function HtmlFrame({ html, title }: HtmlFrameProps) {
       type: 'bots.html-theme',
       appearance: theme.resolved,
       tokens: Object.fromEntries(THEME_CONFIG.tokens.map((token) => [token, styles.getPropertyValue(token)])),
+      fonts: fonts ?? [],
     }, '*');
   };
 
-  useEffect(postTheme, [theme.resolved, theme.selected, theme.themes]);
+  useEffect(postTheme, [theme.resolved, theme.selected, theme.themes, fonts]);
 
   useLayoutEffect(() => {
     const onMessage = (event: MessageEvent) => {

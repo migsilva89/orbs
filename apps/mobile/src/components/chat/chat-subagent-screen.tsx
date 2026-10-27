@@ -2,21 +2,17 @@ import { botBubble, roomsMessageText } from '@repo/client/client';
 import { chatQueries, useChatPendingSync, useChatRoom } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
-import { ChevronLeft } from 'lucide-react-native';
 import { View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { match, P } from 'ts-pattern';
-import { FloatingBar } from '@/components/ui/floating-bar';
-import { GlassButton } from '@/components/ui/glass-button';
-import { GlassSurface } from '@/components/ui/glass-surface';
-import { Icon } from '@/components/ui/icon';
 import { MessageList } from '@/components/ui/message-list';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
+import { CHAT_PANE } from '@/services/chat/chat.constants';
 import { ChatMessage } from './chat-message';
+import { ChatPaneClose, ChatPaneHeader, ChatPaneTitle } from './chat-pane';
 import { ChatRuns } from './chat-runs';
 import type { RpcSession } from '@/types/rpc.types';
 import type { Bot, ConversationView } from '@repo/contracts/universal';
@@ -41,7 +37,6 @@ interface ChatSubagentScreenContentProps extends ChatSubagentScreenProps {
 }
 
 function ChatSubagentScreenContent({ session, botId, conversationId, name, task }: ChatSubagentScreenContentProps) {
-  const router = useRouter();
   const bots = useQuery(session.rpc.bots.list.queryOptions());
   const view = useQuery(chatQueries.view(session, { botId, conversationId }));
 
@@ -66,17 +61,10 @@ function ChatSubagentScreenContent({ session, botId, conversationId, name, task 
             <Text tone={isError ? 'destructive' : 'muted'}>{isError ? m.mobile_chat_error_title() : m.mobile_chat_loading()}</Text>
           </View>
         ))}
-      <FloatingBar edge="top">
-        <GlassButton accessibilityLabel={m.mobile_chat_back()} onPress={() => router.back()}>
-          <Icon icon={ChevronLeft} size="action" />
-        </GlassButton>
-        <GlassSurface className="h-11 shrink">
-          <View className="flex-1 justify-center px-4">
-            <Text numberOfLines={1} variant="chat-title">{name}</Text>
-          </View>
-        </GlassSurface>
-        <View className="size-11" />
-      </FloatingBar>
+      <ChatPaneHeader>
+        <ChatPaneTitle>{name}</ChatPaneTitle>
+      </ChatPaneHeader>
+      <ChatPaneClose />
     </Screen>
   );
 }
@@ -91,7 +79,7 @@ interface ChatSubagentScreenViewProps {
 
 function ChatSubagentScreenView({ session, bot, bots, view, task }: ChatSubagentScreenViewProps) {
   const insets = useSafeAreaInsets();
-  const bottomInset = useSharedValue(insets.bottom);
+  const bottomInset = useSharedValue(insets.bottom + CHAT_PANE.barHeight);
   useChatPendingSync();
 
   const room = useChatRoom({

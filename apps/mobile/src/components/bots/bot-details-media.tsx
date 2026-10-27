@@ -2,7 +2,7 @@ import { ROOMS } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { ChevronRight, FileText, Images, LayoutDashboard } from 'lucide-react-native';
+import { ChevronRight, FileText, Images } from 'lucide-react-native';
 import { Image, View } from 'react-native';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { Empty } from '@/components/ui/empty';
@@ -70,7 +70,7 @@ export function BotDetailsMedia({ session, botId }: BotDetailsMediaProps) {
                 })}
               >
                 <ItemMedia>
-                  <Icon icon={LayoutDashboard} tone="muted" />
+                  <Text variant="body">{artifact.emoji}</Text>
                 </ItemMedia>
                 <ItemContent>
                   <ItemTitle numberOfLines={1}>{artifact.title}</ItemTitle>

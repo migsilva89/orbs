@@ -2,24 +2,21 @@ import { botBubble, CHAT, chatPairMessages, roomsTimeLabel } from '@repo/client/
 import { chatQueries, useChatPendingSync, useChatRoom } from '@repo/client/react';
 import { getLocale, m } from '@repo/i18n/client';
 import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
 import { View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { match, P } from 'ts-pattern';
-import { FloatingBar } from '@/components/ui/floating-bar';
-import { GlassButton } from '@/components/ui/glass-button';
 import { MessageList } from '@/components/ui/message-list';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
+import { CHAT_PANE } from '@/services/chat/chat.constants';
 import { ChatMessage } from './chat-message';
 import { ChatPairHeader } from './chat-pair-header';
+import { ChatPaneClose } from './chat-pane';
 import { ChatRuns } from './chat-runs';
 import type { RpcSession } from '@/types/rpc.types';
 import type { Bot, ConversationView } from '@repo/contracts/universal';
-
-const CHAT_PAIR_BAR_HEIGHT = 56;
 
 interface ChatPairProps {
   botId: string;
@@ -82,9 +79,8 @@ interface ChatPairViewProps {
 }
 
 function ChatPairView({ session, asker, peer, bots, view }: ChatPairViewProps) {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
-  const bottomInset = useSharedValue(insets.bottom + CHAT_PAIR_BAR_HEIGHT);
+  const bottomInset = useSharedValue(insets.bottom + CHAT_PANE.barHeight);
 
   const room = useChatRoom({
     bot: peer,
@@ -148,15 +144,7 @@ function ChatPairView({ session, asker, peer, bots, view }: ChatPairViewProps) {
         }}
       />
       <ChatPairHeader asker={asker} peer={peer} />
-      <FloatingBar className="justify-center" edge="bottom">
-        <GlassButton
-          accessibilityLabel={m.rooms_pair_close()}
-          size="pill"
-          onPress={() => router.back()}
-        >
-          <Text variant="button">{m.rooms_pair_close()}</Text>
-        </GlassButton>
-      </FloatingBar>
+      <ChatPaneClose label={m.rooms_pair_close()} />
     </View>
   );
 }

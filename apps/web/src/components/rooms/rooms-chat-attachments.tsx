@@ -1,5 +1,5 @@
 import { m } from '@repo/i18n/client';
-import { PromptInputAttachment, PromptInputDrawer } from '@/components/ui/ai/prompt-input';
+import { PromptInputAttachment, PromptInputDrawer, PromptInputDrawerAlert } from '@/components/ui/ai/prompt-input';
 import { InputGroupAddon } from '@/components/ui/input-group';
 import type { useChatAttachmentsWeb } from '@repo/client/web';
 
@@ -18,7 +18,7 @@ export function RoomsChatAttachments({ files }: RoomsChatAttachmentsProps) {
     <>
       {problem ? (
         <PromptInputDrawer variant="destructive">
-          <output className="block px-2 py-1.5 text-xs" role="alert">{problem}</output>
+          <PromptInputDrawerAlert>{problem}</PromptInputDrawerAlert>
         </PromptInputDrawer>
       ) : null}
       <InputGroupAddon align="block-start">

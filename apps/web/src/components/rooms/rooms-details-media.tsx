@@ -11,7 +11,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconFileText from '~icons/lucide/file-text';
 import IconImages from '~icons/lucide/images';
-import IconLayoutDashboard from '~icons/lucide/layout-dashboard';
 import type { Attachment } from '@repo/contracts/universal';
 
 interface RoomsDetailsMediaProps {
@@ -57,7 +56,7 @@ export function RoomsDetailsMedia({ botId }: RoomsDetailsMediaProps) {
           <ItemGroup variant="outline">
             {artifacts.data.map((artifact) => (
               <Item key={artifact.id} size="sm">
-                <ItemMedia variant="icon"><IconLayoutDashboard /></ItemMedia>
+                <ItemMedia variant="icon">{artifact.emoji}</ItemMedia>
                 <ItemContent className="min-w-0">
                   <ItemTitle className="w-full">
                     <ItemLink asChild>

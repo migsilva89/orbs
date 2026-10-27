@@ -38,8 +38,8 @@ const tabsTriggerVariants = cva({
   variants: {
     variant: {
       default: [
-        'h-[calc(100%-1px)] border font-medium text-foreground focus-visible:border-ring dark:border-transparent dark:text-muted-foreground',
-        'data-[state=active]:bg-background dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 dark:data-[state=active]:text-foreground',
+        'h-[calc(100%-1px)] border border-transparent font-medium text-muted-foreground hover:text-foreground focus-visible:border-ring',
+        'data-[state=active]:border-input data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-xs dark:data-[state=active]:bg-input/30',
       ],
       muted: 'min-h-7 flex-auto whitespace-normal text-muted-foreground hover:text-foreground data-[state=active]:bg-foreground/5 data-[state=active]:text-foreground sm:min-w-0 sm:flex-auto',
     },

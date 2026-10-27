@@ -47,10 +47,12 @@ interface HtmlFrameProps {
   fill?: boolean;
   /** Keep the page clear of a see-through navigation header. */
   isUnderHeader?: boolean;
+  /** Room to keep clear of bars floating over the top and bottom of a filled page. */
+  inset?: { top: number; bottom: number };
 }
 
 /** A model-written HTML page, sandboxed, themed like the app and sized to its content. */
-export function HtmlFrame({ html, title, fill = false, isUnderHeader = false }: HtmlFrameProps) {
+export function HtmlFrame({ html, title, fill = false, isUnderHeader = false, inset }: HtmlFrameProps) {
   const view = useRef<WebView<object>>(null);
   const [height, setHeight] = useState(HTML_FRAME_HEIGHT.initial);
   const { theme } = useUniwind();
@@ -85,6 +87,7 @@ export function HtmlFrame({ html, title, fill = false, isUnderHeader = false }: 
       accessibilityLabel={title}
       bounces={false}
       containerStyle={fill ? undefined : { flex: 0, height }}
+      contentInset={inset}
       contentInsetAdjustmentBehavior={isUnderHeader ? 'automatic' : 'never'}
       injectedJavaScriptBeforeContentLoaded={themeScript}
       originWhitelist={['about:blank']}

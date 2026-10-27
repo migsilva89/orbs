@@ -2,7 +2,7 @@ import { useChatSubagent } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { useState } from 'react';
 import { match } from 'ts-pattern';
-import { RoomsSubagentDialog } from '@/components/rooms/rooms-subagent-dialog';
+import { RoomsSubagentPane } from '@/components/rooms/rooms-subagent-pane';
 import { Question, QuestionDescription, QuestionHeader, QuestionHeading, QuestionIcon, QuestionItem, QuestionList, QuestionTitle } from '@/components/ui/ai/question';
 import { Button } from '@/components/ui/button';
 import IconLucideCheck from '~icons/lucide/check';
@@ -69,7 +69,7 @@ export function RoomsChatSubagent({ botId, bot, part, subagent }: RoomsChatSubag
       </QuestionList>
       {live.stopFailed ? <p className="px-1 text-xs text-destructive" role="alert">{m.rooms_subagents_stop_error()}</p> : null}
       {isOpen && subagent.conversationId ? (
-        <RoomsSubagentDialog
+        <RoomsSubagentPane
           bot={bot}
           botId={botId}
           conversationId={subagent.conversationId}

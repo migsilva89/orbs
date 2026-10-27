@@ -11,7 +11,7 @@ import { RoomsChatAttachments } from '@/components/rooms/rooms-chat-attachments'
 import { RoomsChatQueue } from '@/components/rooms/rooms-chat-queue';
 import { RoomsMention } from '@/components/rooms/rooms-mention';
 import { RoomsMentionOption } from '@/components/rooms/rooms-mention-option';
-import { PromptInput, PromptInputActionMenu, PromptInputActionMenuContent, PromptInputActionMenuItem, PromptInputActionMenuTrigger, PromptInputDrawer, PromptInputQuote, PromptInputSubmit } from '@/components/ui/ai/prompt-input';
+import { PromptInput, PromptInputActionMenu, PromptInputActionMenuContent, PromptInputActionMenuItem, PromptInputActionMenuTrigger, PromptInputDrawer, PromptInputDrawerAlert, PromptInputQuote, PromptInputSubmit } from '@/components/ui/ai/prompt-input';
 import { InputGroupAddon } from '@/components/ui/input-group';
 import { useMessageScroller } from '@/components/ui/message-scroller';
 import { toasty } from '@/components/ui/sonner';
@@ -23,7 +23,7 @@ import IconPaperclip from '~icons/lucide/paperclip';
 import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
 import type * as ClientTypes from '@repo/client/client';
 import type { Bot } from '@repo/contracts/universal';
-import type { Dispatch, RefObject, SetStateAction } from 'react';
+import type * as ReactTypes from 'react';
 
 const PromptInputEditor = lazy(() => import('@/components/ui/ai/prompt-input-editor').then((module) => ({ default: module.PromptInputEditor })));
 
@@ -36,11 +36,12 @@ interface RoomsChatComposerProps {
   isBusy: boolean
   isCompacting: boolean
   latestEntryId: number
-  editor: RefObject<PromptInputEditorHandle | null>
+  editor: ReactTypes.RefObject<PromptInputEditorHandle | null>
   replyTo: ClientTypes.ChatMessage | null
-  onReplyChange: Dispatch<SetStateAction<ClientTypes.ChatMessage | null>>
-  onOutgoingChange: Dispatch<SetStateAction<ClientTypes.ChatOutgoing[]>>
+  onReplyChange: ReactTypes.Dispatch<ReactTypes.SetStateAction<ClientTypes.ChatMessage | null>>
+  onOutgoingChange: ReactTypes.Dispatch<ReactTypes.SetStateAction<ClientTypes.ChatOutgoing[]>>
   onSend?: () => void
+  status?: ReactTypes.ReactNode
 }
 
 export function RoomsChatComposer({
@@ -57,6 +58,7 @@ export function RoomsChatComposer({
   onReplyChange,
   onOutgoingChange,
   onSend,
+  status,
 }: RoomsChatComposerProps) {
   const queryClient = useQueryClient();
   const scroller = useMessageScroller();
@@ -115,6 +117,7 @@ export function RoomsChatComposer({
   const isSendingFiles = chat.isSending && files.readyIds.length > 0;
 
   const submitStatus = isStopping ? 'streaming' : 'ready';
+  const hasWarning = Boolean(chat.problem) || files.failed;
 
   const skillsEmpty = match(skills)
     .with({ isPending: true }, () => m.rooms_mention_skills_loading())
@@ -136,6 +139,7 @@ export function RoomsChatComposer({
     <div className="mx-auto w-full max-w-3xl shrink-0 px-4 pb-4 keyboard:pb-1">
       <PromptInput
         key={bot.id}
+        status={hasWarning ? undefined : status}
         onDragOver={files.onDragOver}
         onDrop={files.onDrop}
         onPaste={files.onPaste}
@@ -190,16 +194,18 @@ export function RoomsChatComposer({
           return true;
         }}
       >
-        <RoomsChatQueue
-          botId={bot.id}
-          botName={bot.name}
-          conversationId={conversationId}
-          queued={queued}
-          onOutgoingChange={onOutgoingChange}
-        />
+        {status ? null : (
+          <RoomsChatQueue
+            botId={bot.id}
+            botName={bot.name}
+            conversationId={conversationId}
+            queued={queued}
+            onOutgoingChange={onOutgoingChange}
+          />
+        )}
         {chat.problem ? (
           <PromptInputDrawer variant="destructive">
-            <output className="block px-2 py-1.5 text-xs" role="alert">{chat.problem}</output>
+            <PromptInputDrawerAlert>{chat.problem}</PromptInputDrawerAlert>
           </PromptInputDrawer>
         ) : null}
         <RoomsChatAttachments files={files} />

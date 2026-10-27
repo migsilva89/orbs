@@ -22,13 +22,15 @@ export interface PromptInputMessage {
 
 export type PromptInputProps = Omit<ReactTypes.HTMLAttributes<HTMLFormElement>, 'onSubmit'> & {
   onSubmit: (message: PromptInputMessage, event: ReactTypes.FormEvent<HTMLFormElement>) => boolean | Promise<boolean>
+  /** A `PromptInputStatus` line framed together with the composer, such as what the bot is doing. */
+  status?: ReactTypes.ReactNode
 }
 
 // Where `PromptInputDrawer` renders: outside the `InputGroup`, whose `overflow-hidden` would clip it.
 const PromptInputDrawerSlot = createContext<HTMLDivElement | null>(null);
 
 /** The composer, following Vercel AI Elements: an `InputGroup` whose addons hold the actions around the field; it resets once `onSubmit` reports the message sent, so a failed send keeps what was typed. */
-export function PromptInput({ className, onSubmit, children, ...props }: PromptInputProps) {
+export function PromptInput({ status, className, onSubmit, children, ...props }: PromptInputProps) {
   const [drawer, setDrawer] = useState<HTMLDivElement | null>(null);
 
   const handleSubmit: ReactTypes.FormEventHandler<HTMLFormElement> = (event) => {
@@ -45,20 +47,58 @@ export function PromptInput({ className, onSubmit, children, ...props }: PromptI
     });
   };
 
+  const field = (
+    <PromptInputDrawerSlot value={drawer}>
+      {/* Actions sit on the last line, so they stay put while the field grows; the solid dark fill hides the drawer behind it. */}
+      <InputGroup className="relative flex-wrap items-end overflow-hidden duration-240 ease-panel group-data-status/prompt-input:shadow-none has-[>[data-align=block-start]]:flex-row motion-reduce:transition-none has-[[data-multiline=true]]:[&>[data-align=inline-end]]:ml-auto has-[[data-multiline=true]]:[&>[data-align=inline-start]]:order-last" variant="prompt">{children}</InputGroup>
+    </PromptInputDrawerSlot>
+  );
+
   return (
-    <form className={cn('relative w-full', className)} onSubmit={handleSubmit} {...props}>
+    <form
+      className={cn('group/prompt-input relative w-full', className)}
+      data-status={status ? '' : undefined}
+      onSubmit={handleSubmit}
+      {...props}
+    >
       {/* The drawer's bottom edge runs 1rem under the composer, so it looks pulled out from behind it. */}
       <div className="absolute inset-x-5 bottom-[calc(100%-1rem)]" ref={setDrawer} />
-      <PromptInputDrawerSlot value={drawer}>
-        {/* Actions sit on the last line, so they stay put while the field grows; the solid dark fill hides the drawer behind it. */}
-        <InputGroup className="relative flex-wrap items-end overflow-hidden duration-240 ease-panel has-[>[data-align=block-start]]:flex-row motion-reduce:transition-none has-[[data-multiline=true]]:[&>[data-align=inline-end]]:ml-auto has-[[data-multiline=true]]:[&>[data-align=inline-start]]:order-last" variant="prompt">{children}</InputGroup>
-      </PromptInputDrawerSlot>
+      {status ? (
+        // The status shares one frame with the field; the frame's fill also hides the drawer behind it.
+        <div className="relative rounded-[1.75rem] border bg-background p-1 shadow-sm dark:bg-card">
+          {status}
+          {field}
+        </div>
+      ) : field}
     </form>
   );
 }
 
+interface PromptInputStatusProps {
+  avatar: ReactTypes.ReactNode
+  /** Work in progress shimmers; a message waiting to be read does not. */
+  isLive: boolean
+  children: string
+  onClick: () => void
+}
+
+/** One line above the composer, in the same frame: the bot's avatar and what it is doing, or its latest unread message. */
+export function PromptInputStatus({ avatar, isLive, children, onClick }: PromptInputStatusProps) {
+  return (
+    <button
+      className="flex h-9 w-full min-w-0 cursor-pointer items-center gap-2.5 rounded-full px-2.5 text-left text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      title={children}
+      type="button"
+      onClick={onClick}
+    >
+      <span className="flex size-6 shrink-0 items-center justify-center">{avatar}</span>
+      <span className={cn('min-w-0 truncate', isLive ? 'shimmer text-muted-foreground motion-reduce:shimmer-none' : 'text-foreground/80')}>{children}</span>
+    </button>
+  );
+}
+
 const promptInputDrawerVariants = cva({
-  base: 'scrollbar flex max-h-72 flex-col overflow-y-auto rounded-t-xl border border-b-0 p-1 pb-5 shadow-sm [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1',
+  base: 'scrollbar flex max-h-72 flex-col overflow-y-auto rounded-t-xl border border-b-0 px-1 pt-0.5 pb-[1.125rem] shadow-sm [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1',
   variants: {
     variant: {
       default: 'bg-popover text-popover-foreground',
@@ -88,6 +128,11 @@ export function PromptInputDrawer({
     </div>,
     drawer,
   );
+}
+
+/** A warning in a destructive drawer, such as a message or file that failed to send. */
+export function PromptInputDrawerAlert({ children }: { children: ReactTypes.ReactNode }) {
+  return <output className="block px-2 py-1 text-xs" role="alert">{children}</output>;
 }
 
 export function PromptInputQuote({ children, removeLabel, onRemove }: { children: ReactTypes.ReactNode; removeLabel: string; onRemove: () => void }) {

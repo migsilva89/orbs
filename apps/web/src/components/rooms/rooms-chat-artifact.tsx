@@ -1,14 +1,14 @@
 import { artifactsStore } from '@repo/client/client';
+import { ARTIFACT } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { match, P } from 'ts-pattern';
-import { ArtifactDialog } from '@/components/artifacts/artifact-dialog';
+import { ArtifactPane } from '@/components/artifacts/artifact-pane';
 import { ArtifactView } from '@/components/artifacts/artifact-view';
 import { PreviewCard } from '@/components/ui/preview-card';
 import { toasty } from '@/components/ui/sonner';
 import { rpc } from '@/services/rpc/rpc.client';
-import IconLayoutDashboard from '~icons/lucide/layout-dashboard';
 import type { ToolCallArtifact } from '@repo/contracts/universal';
 
 interface RoomsChatArtifactProps {
@@ -33,7 +33,7 @@ export function RoomsChatArtifact({ artifact }: RoomsChatArtifactProps) {
   return (
     <>
       <PreviewCard
-        icon={<IconLayoutDashboard />}
+        icon={saved?.emoji ?? ARTIFACT.emojiDefault}
         kind={match(saved?.spec).with({ html: P.string }, () => m.ui_html_page()).otherwise(() => m.artifacts_kind())}
         label={m.artifacts_expand()}
         title={saved?.title ?? artifact.title}
@@ -48,7 +48,7 @@ export function RoomsChatArtifact({ artifact }: RoomsChatArtifactProps) {
         ) : null}
       </PreviewCard>
       {expanded ? (
-        <ArtifactDialog
+        <ArtifactPane
           artifactId={artifact.id}
           botId={artifact.botId}
           conversationId={artifact.conversationId}

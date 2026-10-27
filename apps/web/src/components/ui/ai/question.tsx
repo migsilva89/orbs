@@ -1,5 +1,5 @@
 import { cva } from 'cva';
-import { messageSurface, messageTile } from '@/components/ui/ai/message';
+import { messageList, messageRow, messageSurface, messageTile } from '@/components/ui/ai/message';
 import { buttonGlossyEffects } from '@/components/ui/button';
 import { InputGroup, InputGroupAddon } from '@/components/ui/input-group';
 import { cn } from '@/lib/cn';
@@ -32,10 +32,6 @@ export function QuestionDescription({ className, ...props }: ComponentProps<'p'>
   return <p className={cn('text-xs text-pretty wrap-break-word whitespace-pre-line text-muted-foreground', className)} data-slot="question-description" {...props} />;
 }
 
-const questionList = 'flex min-w-0 flex-col divide-y overflow-hidden rounded-xl border border-input bg-background';
-
-const questionRow = 'flex w-full min-w-0 items-center gap-3 px-3 py-2.5 text-left text-sm';
-
 const questionBadge = 'flex-center size-6 shrink-0 rounded-md text-xs font-medium tabular-nums';
 
 const questionBadgeTones = cva({
@@ -52,11 +48,11 @@ const questionBadgeTones = cva({
 });
 
 export function QuestionOptions({ className, ...props }: ComponentProps<'fieldset'>) {
-  return <fieldset className={cn(questionList, className)} data-slot="question-options" {...props} />;
+  return <fieldset className={cn(messageList, className)} data-slot="question-options" {...props} />;
 }
 
 export function QuestionList({ className, ...props }: ComponentProps<'ul'>) {
-  return <ul className={cn(questionList, className)} data-slot="question-list" {...props} />;
+  return <ul className={cn(messageList, className)} data-slot="question-list" {...props} />;
 }
 
 export function QuestionItem({ icon, description, action, className, children, ...props }: ComponentProps<'button'> & {
@@ -66,7 +62,7 @@ export function QuestionItem({ icon, description, action, className, children, .
 }) {
   return (
     <li className="flex min-w-0 items-center transition-colors duration-100 hover:bg-foreground/5 has-[>button:focus-visible]:bg-foreground/5" data-slot="question-item">
-      <button className={cn(questionRow, 'flex-1 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset', className)} type="button" {...props}>
+      <button className={cn(messageRow, 'flex-1 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset', className)} type="button" {...props}>
         <span aria-hidden="true" className={cn(questionBadge, '[&_svg]:size-3.5')}>{icon}</span>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="truncate">{children}</span>
@@ -97,7 +93,7 @@ export function QuestionOption({ index, tone, className, children, ...props }: C
   return (
     <button
       className={cn(
-        questionRow,
+        messageRow,
         'group/option transition-colors duration-100 outline-none',
         'hover:bg-foreground/5 focus-visible:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
         'disabled:pointer-events-none disabled:opacity-50 aria-checked:bg-foreground/10 aria-pressed:bg-foreground/10',

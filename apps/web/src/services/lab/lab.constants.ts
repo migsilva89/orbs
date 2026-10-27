@@ -7,9 +7,34 @@ export const LAB_CHAT = {
     ledger: '8b3e4d0a-5c6f-4071-9c3d-4e5f6a7b8c9d',
     nova: '9c4f5e1b-6d70-4182-8d4e-5f6a7b8c9d0e',
     artifact: 'a0d16f2c-7e81-4293-9e5f-6a7b8c9d0e1f',
+    blocks: 'c2f3814e-9a03-44b5-9071-8c9d0e1f2a3b',
+    page: 'd3a4925f-0b14-45c6-a182-9d0e1f2a3b4c',
     routine: 'b1e2703d-8f92-43a4-8f60-7b8c9d0e1f2a',
   },
   minuteMs: 60_000,
+  page: `<meta name="emoji" content="🚀">
+<title>Launch status page</title>
+<div class="o-stack">
+  <div class="o-grid">
+    <div class="o-stat"><span class="o-label">Uptime</span><span class="o-value">99.98%</span><span class="o-up">+0.02%</span></div>
+    <div class="o-stat"><span class="o-label">Paired devices</span><span class="o-value">412</span><span class="o-up">+38 this week</span></div>
+  </div>
+  <div class="o-list">
+    <div class="o-row"><span>Pairing service</span><span class="o-muted">Operational</span></div>
+    <div class="o-row"><span>Push notifications</span><span class="o-muted">Operational</span></div>
+    <div class="o-row"><span>Model gateway</span><span class="o-muted">Degraded since 09:12</span></div>
+  </div>
+  <div class="o-card">
+    <div><div class="o-title">Incidents this week</div><div class="o-muted">Two short outages, both resolved.</div></div>
+    <div class="o-list">
+      <table class="o-table">
+        <thead><tr><th>Service</th><th>Started</th><th style="text-align:right">Duration</th></tr></thead>
+        <tbody><tr><td>Push</td><td>Tue 14:02</td><td style="text-align:right">6 min</td></tr><tr><td>Gateway</td><td>Thu 09:12</td><td style="text-align:right">18 min</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="o-row-wrap"><span class="o-badge">Launch week</span><button type="button" class="o-button">Refresh</button></div>
+</div>`,
   changelog: '**Launch week**\n\n- New onboarding gets you to a first message in under two minutes.\n- Pair iOS devices with a QR code.\n- Bots can build dashboards and pages.\n- Fixed pairing failures on iOS 18.4.',
   chart: `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
 <rect width="640" height="360" fill="#f4f4f5"/>

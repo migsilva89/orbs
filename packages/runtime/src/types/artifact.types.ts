@@ -44,6 +44,7 @@ export interface ArtifactRecord extends PiTypes.JsonObject {
   botId: string;
   conversationId: number;
   title: string;
+  emoji: string | null;
   version: number;
   createdAt: number;
   updatedAt: number;

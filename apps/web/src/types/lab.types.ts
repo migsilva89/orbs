@@ -9,7 +9,7 @@ export interface LabChatFixture {
   reactions: Map<number, UniversalTypes.ConversationReaction>;
   approvals: UniversalTypes.ToolApproval[];
   questions: UniversalTypes.ConversationQuestion[];
-  artifact: UniversalTypes.Artifact;
+  artifacts: UniversalTypes.Artifact[];
   activity: ChatActivity;
   queued: ChatQueued[];
   subagentViews: UniversalTypes.ConversationView[];

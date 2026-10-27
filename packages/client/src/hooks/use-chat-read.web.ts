@@ -1,11 +1,11 @@
 import { useEffect, useEffectEvent, useState } from 'react';
 import { useChatMarkRead } from './use-chat-mark-read';
 
-export function useChatRead(botId: string, readThroughEntryId: number, latestEntryId: number) {
+export function useChatRead(botId: string, readThroughEntryId: number, latestEntryId: number, isPaused = false) {
   const [divider, setDivider] = useState(readThroughEntryId);
   const [isSeen, setIsSeen] = useState(false);
   const markRead = useChatMarkRead(botId);
-  const isPending = () => latestEntryId > readThroughEntryId && document.visibilityState === 'visible' && document.hasFocus();
+  const isPending = () => !isPaused && latestEntryId > readThroughEntryId && document.visibilityState === 'visible' && document.hasFocus();
 
   const read = useEffectEvent(() => {
     if (isPending()) {
@@ -26,6 +26,10 @@ export function useChatRead(botId: string, readThroughEntryId: number, latestEnt
   useEffect(() => {
     read();
   }, [latestEntryId]);
+
+  useEffect(() => {
+    read();
+  }, [isPaused]);
 
   useEffect(() => {
     const returned = () => back();

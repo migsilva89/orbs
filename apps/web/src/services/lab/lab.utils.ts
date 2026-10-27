@@ -1,6 +1,7 @@
 import { CHAT, mentionHref, ROOMS } from '@repo/client/client';
 import { ENTRY } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
+import { labArtifacts } from './lab-artifacts.utils';
 import { LAB_CHAT } from './lab.constants';
 import type { LabChatFixture, LabSubagentViewParams } from '@/types/lab.types';
 import type { ChatMessage, ChatPart } from '@repo/client/client';
@@ -132,6 +133,7 @@ export function labChatFixture(now: number): LabChatFixture {
     botId: atlas.id,
     conversationId: 1,
     title: 'Launch week dashboard',
+    emoji: '📈',
     version: 2,
     createdAt: labAgo(40),
     updatedAt: labAgo(38),
@@ -175,6 +177,8 @@ export function labChatFixture(now: number): LabChatFixture {
       },
     },
   };
+
+  const [blocks, page] = labArtifacts(atlas.id, labAgo(43));
 
   const messages: ChatMessage[] = [
     labMessage(1, labAgo(yesterday), atlas, 'system', [{ type: 'data-routineRun', data: { routineId: LAB_CHAT.ids.routine, name: 'Morning briefing' } }, labText('Run the morning briefing: calendar, inbox and open todos.')]),
@@ -257,6 +261,17 @@ export function labChatFixture(now: number): LabChatFixture {
       labTool('call-13', 'bot_create', { name: 'Nova', handle: 'nova' }, JSON.stringify({ id: LAB_CHAT.ids.nova, name: 'Nova' })),
       labText('Done. The dashboard is above, the todo and the Monday routine are set, and I created **Nova** to watch support tickets during launch.'),
     ]),
+    labMessage(33, labAgo(43), null, 'user', [labText('Show me every artifact block, and the status as an HTML page.')]),
+    labMessage(34, labAgo(42), atlas, 'assistant', [
+      ...[blocks, page].map((item, index) => labTool(`call-${40 + index}`, 'bot_artifact_create', { title: item.title, emoji: item.emoji }, JSON.stringify({
+        id: item.id,
+        botId: item.botId,
+        conversationId: item.conversationId,
+        title: item.title,
+        version: item.version,
+      }))),
+      labText('Here is every block in one artifact, and the status as a page.'),
+    ]),
     labMessage(15, labAgo(40), atlas, 'system', [{ type: 'data-compaction', data: { status: 'done' } }]),
     labMessage(16, labAgo(30), null, 'user', [labText('Can you show the launch countdown as a page?')]),
     labMessage(17, labAgo(29), atlas, 'assistant', [labText(LAB_CHAT.html)]),
@@ -331,7 +346,7 @@ export function labChatFixture(now: number): LabChatFixture {
     bots: [atlas, scout, ledger],
     messages,
     draft,
-    artifact,
+    artifacts: [artifact, blocks, page],
     activity: 'working',
     queued: [{ submissionId: 1, mode: 'followUp', text: 'Also send the recap to Ledger when it is merged.' }],
     reactions: new Map([

@@ -4,33 +4,45 @@ import { schema } from '@json-render/react/schema';
 import { artifactComponents } from '@repo/contracts/universal';
 import { Children, lazy, Suspense, useId } from 'react';
 import { match, P } from 'ts-pattern';
+import { Event, EventLabel, EventTrigger } from '@/components/ui/ai/event';
+import { messageList, messageRow, messageSurface } from '@/components/ui/ai/message';
 import { Response } from '@/components/ui/ai/response';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { CollapsibleContent } from '@/components/ui/collapsible';
 import { HtmlFrame } from '@/components/ui/html-frame';
-import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from '@/components/ui/item';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatusDot } from '@/components/ui/status-dot';
 import { Switch } from '@/components/ui/switch';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/cn';
 import { ARTIFACTS } from '@/services/artifacts/artifacts.constants';
-import IconChevronDown from '~icons/lucide/chevron-down';
 import IconExternalLink from '~icons/lucide/external-link';
 import IconInfo from '~icons/lucide/info';
 import type { StateStore } from '@json-render/core';
 import type { ArtifactSpec } from '@repo/contracts/universal';
+import type { ReactNode } from 'react';
 
 const ArtifactChart = lazy(() => import('@/components/artifacts/artifact-chart').then((module) => ({ default: module.ArtifactChart })));
+
+interface ArtifactViewRowTextProps {
+  description?: string
+  children: ReactNode
+}
+
+function ArtifactViewRowText({ description, children }: ArtifactViewRowTextProps) {
+  return (
+    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+      <span className="wrap-break-word">{children}</span>
+      {description ? <span className="text-xs text-pretty text-muted-foreground">{description}</span> : null}
+    </span>
+  );
+}
 
 const { registry } = defineRegistry(defineCatalog(schema, { components: artifactComponents, actions: {} }), {
   components: {
@@ -39,20 +51,18 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
     ),
     Grid: ({ props, children }) => <div className={cn('grid min-w-0 gap-4', ARTIFACTS.columns[props.columns ?? '2'])}>{children}</div>,
     Card: ({ props, children }) => (
-      <Card>
+      <section className={cn(messageSurface, 'flex min-w-0 flex-col gap-3 p-3')}>
         {props.title || props.description ? (
-          <CardHeader>
-            {props.title ? <CardTitle>{props.title}</CardTitle> : null}
-            {props.description ? <CardDescription>{props.description}</CardDescription> : null}
-          </CardHeader>
+          <header className="flex min-w-0 flex-col gap-0.5 pt-0.5">
+            {props.title ? <h3 className="text-sm font-medium text-balance">{props.title}</h3> : null}
+            {props.description ? <p className="text-xs text-pretty text-muted-foreground">{props.description}</p> : null}
+          </header>
         ) : null}
-        <CardContent>
-          <div className="flex flex-col gap-4">{children}</div>
-        </CardContent>
-      </Card>
+        <div className="flex flex-col gap-3">{children}</div>
+      </section>
     ),
     Heading: ({ props }) => <h2 className={ARTIFACTS.headings[props.level ?? '2']}>{props.text}</h2>,
-    Text: ({ props }) => <p className={cn('text-sm text-pretty', props.variant === 'muted' && 'text-muted-foreground')}>{props.text}</p>,
+    Text: ({ props }) => <p className={cn('text-sm leading-snug text-pretty', props.variant === 'muted' && 'text-muted-foreground')}>{props.text}</p>,
     Stat: ({ props }) => {
       const Trend = props.trend ? ARTIFACTS.trendIcons[props.trend] : null;
 
@@ -70,49 +80,45 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
         </div>
       );
     },
-    Badge: ({ props }) => <Badge variant={props.variant ?? 'secondary'}>{props.text}</Badge>,
+    Badge: ({ props }) => <Badge variant={ARTIFACTS.badges[props.variant ?? 'secondary']}>{props.text}</Badge>,
     List: ({ props }) => (
-      <ItemGroup variant="outline">
+      <ul className={messageList}>
         {props.items.map((item, index) => (
-          <Item key={`${item.title}-${index}`} size="sm">
-            <ItemContent className="min-w-0">
-              <ItemTitle>
-                {item.url ? (
-                  <a
-                    href={item.url}
-                    rel="noreferrer"
-                    target="_blank"
-                  >{item.title}</a>
-                ) : item.title}
-              </ItemTitle>
-              {item.description ? <ItemDescription>{item.description}</ItemDescription> : null}
-            </ItemContent>
-            {item.meta ? (
-              <ItemActions>
-                <ItemDescription>{item.meta}</ItemDescription>
-              </ItemActions>
-            ) : null}
-          </Item>
+          <li className={messageRow} key={`${item.title}-${index}`}>
+            <ArtifactViewRowText description={item.description}>
+              {item.url ? (
+                <a
+                  className="underline decoration-current/35 underline-offset-2 hover:decoration-current"
+                  href={item.url}
+                  rel="noreferrer"
+                  target="_blank"
+                >{item.title}</a>
+              ) : item.title}
+            </ArtifactViewRowText>
+            {item.meta ? <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{item.meta}</span> : null}
+          </li>
         ))}
-      </ItemGroup>
+      </ul>
     ),
     Table: ({ props }) => (
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {props.columns.map((column) => <TableHead className={cn(column.align === 'right' && 'text-right')} key={column.key}>{column.label}</TableHead>)}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {props.rows.map((row, index) => (
-            <TableRow key={index}>
-              {props.columns.map((column) => (
-                <TableCell className={cn(column.align === 'right' && 'text-right')} key={column.key}>{row[column.key]}</TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <div className={cn(messageList, 'scrollbar block overflow-x-auto [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full')}>
+        <table className="w-max min-w-full border-collapse text-sm">
+          <thead>
+            <tr>
+              {props.columns.map((column) => <th className={cn('px-3 py-2.5 text-left text-xs font-medium whitespace-nowrap text-muted-foreground', column.align === 'right' && 'text-right')} key={column.key}>{column.label}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {props.rows.map((row, index) => (
+              <tr className="border-t" key={index}>
+                {props.columns.map((column) => (
+                  <td className={cn('px-3 py-2.5 whitespace-nowrap tabular-nums', column.align === 'right' && 'text-right')} key={column.key}>{row[column.key]}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     ),
     Progress: ({ props }) => (
       <div className="flex flex-col gap-2">
@@ -140,23 +146,20 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
       const [items = [], setItems] = useBoundProp(props.items, bindings?.items);
 
       return (
-        <ItemGroup variant="outline">
+        <ul className={messageList}>
           {items.map((item, index) => (
-            <Item key={`${item.title}-${index}`} size="sm">
+            <li className={messageRow} key={`${item.title}-${index}`}>
               <Checkbox
                 checked={item.done}
                 id={`${id}-${index}`}
                 onCheckedChange={(checked) => setItems(items.map((entry, position) => (position === index ? { ...entry, done: checked === true } : entry)))}
               />
-              <ItemContent className="min-w-0">
-                <ItemTitle>
-                  <label className={cn(item.done && 'text-muted-foreground line-through')} htmlFor={`${id}-${index}`}>{item.title}</label>
-                </ItemTitle>
-                {item.description ? <ItemDescription>{item.description}</ItemDescription> : null}
-              </ItemContent>
-            </Item>
+              <ArtifactViewRowText description={item.description}>
+                <label className={cn('cursor-pointer', item.done && 'text-muted-foreground line-through')} htmlFor={`${id}-${index}`}>{item.title}</label>
+              </ArtifactViewRowText>
+            </li>
           ))}
-        </ItemGroup>
+        </ul>
       );
     },
     Toggle: ({ props, bindings }) => {
@@ -164,23 +167,18 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
       const [checked = false, setChecked] = useBoundProp(props.checked, bindings?.checked);
 
       return (
-        <ItemGroup variant="outline">
-          <Item size="sm">
-            <ItemContent className="min-w-0">
-              <ItemTitle>
-                <label htmlFor={id}>{props.label}</label>
-              </ItemTitle>
-              {props.description ? <ItemDescription>{props.description}</ItemDescription> : null}
-            </ItemContent>
-            <ItemActions>
-              <Switch
-                checked={checked}
-                id={id}
-                onCheckedChange={setChecked}
-              />
-            </ItemActions>
-          </Item>
-        </ItemGroup>
+        <div className={messageList}>
+          <div className={messageRow}>
+            <ArtifactViewRowText description={props.description}>
+              <label className="cursor-pointer" htmlFor={id}>{props.label}</label>
+            </ArtifactViewRowText>
+            <Switch
+              checked={checked}
+              id={id}
+              onCheckedChange={setChecked}
+            />
+          </div>
+        </div>
       );
     },
     Tabs: ({ props, children }) => (
@@ -196,37 +194,29 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
       </Tabs>
     ),
     Section: ({ props, children }) => (
-      <Collapsible className="flex flex-col" defaultOpen={props.open ?? true}>
-        <CollapsibleTrigger asChild>
-          <Button
-            className="group self-start"
-            size="sm"
-            type="button"
-            variant="link-muted"
-          >
-            {props.title}
-            <IconChevronDown className="group-data-[state=open]:rotate-180" />
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <div className="-m-1 flex flex-col gap-4 p-1 pt-3">{children}</div>
+      <Event defaultOpen={props.open ?? true}>
+        <EventTrigger>
+          <EventLabel>{props.title}</EventLabel>
+        </EventTrigger>
+        <CollapsibleContent className="w-full">
+          <div className="flex flex-col gap-4 pt-2">{children}</div>
         </CollapsibleContent>
-      </Collapsible>
+      </Event>
     ),
-    Markdown: ({ props }) => <Response>{props.text}</Response>,
+    Markdown: ({ props }) => (
+      <div className="text-sm leading-snug">
+        <Response>{props.text}</Response>
+      </div>
+    ),
     KeyValue: ({ props }) => (
-      <ItemGroup variant="outline">
+      <dl className={messageList}>
         {props.items.map((item, index) => (
-          <Item key={`${item.label}-${index}`} size="sm">
-            <ItemContent className="min-w-0">
-              <ItemDescription>{item.label}</ItemDescription>
-            </ItemContent>
-            <ItemActions>
-              <ItemTitle>{item.value}</ItemTitle>
-            </ItemActions>
-          </Item>
+          <div className={messageRow} key={`${item.label}-${index}`}>
+            <dt className="min-w-0 flex-1 truncate text-muted-foreground">{item.label}</dt>
+            <dd className="shrink-0 tabular-nums">{item.value}</dd>
+          </div>
         ))}
-      </ItemGroup>
+      </dl>
     ),
     Status: ({ props }) => (
       <div className="flex items-start gap-2">
@@ -234,17 +224,16 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
           <StatusDot label={props.label} variant={props.state} />
         </span>
         <div className="flex min-w-0 flex-col">
-          <span className="text-sm font-medium">{props.label}</span>
+          <span className="text-sm leading-snug font-medium">{props.label}</span>
           {props.description ? <span className="text-xs text-muted-foreground">{props.description}</span> : null}
         </div>
       </div>
     ),
     Alert: ({ props }) => (
-      <Alert variant={props.variant ?? 'default'}>
-        <IconInfo />
-        <AlertTitle>{props.title}</AlertTitle>
-        {props.description ? <AlertDescription>{props.description}</AlertDescription> : null}
-      </Alert>
+      <div className={cn(messageList, 'flex-row items-start gap-3 px-3 py-2.5 text-sm', props.variant === 'destructive' && 'text-destructive')} role="alert">
+        <IconInfo className="mt-0.5 size-4 shrink-0" />
+        <ArtifactViewRowText description={props.description}>{props.title}</ArtifactViewRowText>
+      </div>
     ),
     LinkButton: ({ props }) => (
       <Button
@@ -267,7 +256,7 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
       <figure className="flex flex-col gap-2">
         <img
           alt={props.alt}
-          className="max-h-96 w-full rounded-xl object-cover"
+          className="max-h-96 w-full rounded-xl border object-cover"
           loading="lazy"
           src={props.url}
         />
@@ -292,7 +281,7 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium" htmlFor={id}>{props.label}</label>
           <Select value={value} onValueChange={setValue}>
-            <SelectTrigger id={id}>
+            <SelectTrigger id={id} variant="field">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -314,6 +303,7 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
             id={id}
             key={value}
             placeholder={props.placeholder}
+            variant="field"
             onBlur={(event) => event.target.value !== value && setValue(event.target.value)}
           />
         </div>

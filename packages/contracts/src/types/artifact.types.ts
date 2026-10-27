@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { conversationTarget } from './conversation.types';
+import { reactionEmoji } from './reaction.types';
 
 export const ARTIFACT = {
   docKind: 'bots.artifacts',
@@ -10,6 +11,7 @@ export const ARTIFACT = {
   specBytesMax: 200_000,
   titleMax: 120,
   depthMax: 32,
+  emojiDefault: '📊',
 } as const;
 
 const artifactLink = z.url({ protocol: /^https?$/ });
@@ -218,6 +220,7 @@ export type ArtifactBlockName = keyof typeof artifactComponents;
 
 const artifactTitle = z.string().trim().min(1).max(ARTIFACT.titleMax);
 const artifactState = z.record(z.string(), z.json());
+const artifactEmoji = reactionEmoji.describe('One emoji for what the artifact is, such as 📈 for a chart or 🗓️ for a plan.');
 
 const artifactStructuredSpec = z.object({
   root: z.string().min(1),
@@ -242,6 +245,7 @@ export const artifactSummary = z.object({
   botId: z.uuid(),
   conversationId: z.number().int().positive(),
   title: artifactTitle,
+  emoji: artifactEmoji,
   version: z.number().int().positive(),
   createdAt: z.number().int(),
   updatedAt: z.number().int(),
@@ -267,6 +271,7 @@ export const artifactGet = conversationTarget.extend({
 
 export const artifactCreate = conversationTarget.extend({
   title: artifactTitle,
+  emoji: artifactEmoji.optional(),
   spec: artifactSpec,
 });
 
@@ -274,12 +279,13 @@ export const artifactUpdateFields = conversationTarget.extend({
   artifactId: z.uuid(),
   version: z.number().int().positive(),
   title: artifactTitle.optional(),
+  emoji: artifactEmoji.optional(),
   spec: artifactSpec.optional(),
   state: artifactState.optional(),
 });
 
 export const artifactUpdate = artifactUpdateFields.refine((value) => (
-  value.title !== undefined || value.spec !== undefined || value.state !== undefined
+  value.title !== undefined || value.emoji !== undefined || value.spec !== undefined || value.state !== undefined
 ));
 
 export const artifactSaveState = conversationTarget.extend({

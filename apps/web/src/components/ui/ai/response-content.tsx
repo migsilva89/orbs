@@ -59,10 +59,18 @@ function ResponseCodeBlock({ className, ...props }: ComponentProps<'code'> & Ext
   );
 }
 
+const responseTable = {
+  wrapper: 'scrollbar max-w-full overflow-x-auto rounded-xl border outline-hidden [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1',
+  table: 'w-max min-w-full border-collapse text-xs',
+  body: '[&>tr:last-child>td]:border-0',
+  head: 'border-b px-3 py-1.5 text-left font-medium whitespace-nowrap text-muted-foreground',
+  cell: 'border-b px-3 py-1.5 whitespace-nowrap tabular-nums',
+};
+
 function ResponseTable({ node: _node, className, ...props }: ComponentProps<'table'> & ExtraProps) {
   return (
-    <div className="scrollbar max-w-full overflow-x-auto rounded-xl border outline-hidden [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1" data-streamdown="table-wrapper">
-      <table className={cn('w-max min-w-full border-collapse text-xs', className)} {...props} />
+    <div className={responseTable.wrapper} data-streamdown="table-wrapper">
+      <table className={cn(responseTable.table, className)} {...props} />
     </div>
   );
 }
@@ -84,10 +92,10 @@ const responseComponents: Components = {
   code: ResponseCodeBlock,
   table: ResponseTable,
   thead: responseElement('thead', ''),
-  tbody: responseElement('tbody', '[&>tr:last-child>td]:border-0'),
+  tbody: responseElement('tbody', responseTable.body),
   tr: responseElement('tr', ''),
-  th: responseElement('th', 'border-b px-3 py-1.5 text-left font-medium whitespace-nowrap text-muted-foreground'),
-  td: responseElement('td', 'border-b px-3 py-1.5 whitespace-nowrap tabular-nums'),
+  th: responseElement('th', responseTable.head),
+  td: responseElement('td', responseTable.cell),
   inlineCode: responseElement('code', 'rounded-md bg-current/10 px-1 py-0.5 font-mono text-xs'),
 };
 

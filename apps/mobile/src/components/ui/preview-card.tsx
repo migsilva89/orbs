@@ -1,11 +1,9 @@
 import { cva } from 'cva';
 import { Pressable, View } from 'react-native';
 import { cn } from '@/lib/cn';
-import { Icon } from './icon';
 import { messageSurface, messageTile } from './message';
 import { Text } from './text';
 import type { VariantProps } from 'cva';
-import type { LucideIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 
 const PREVIEW_CARD = { maxHeight: 320, fadeHeight: 80 };
@@ -23,7 +21,7 @@ const previewCardContentVariants = cva({
 });
 
 interface PreviewCardProps extends VariantProps<typeof previewCardContentVariants> {
-  icon: LucideIcon;
+  emoji: string;
   title: string;
   kind: string;
   label: string;
@@ -32,7 +30,7 @@ interface PreviewCardProps extends VariantProps<typeof previewCardContentVariant
 }
 
 /** A live preview inside the transcript, cut to a fixed height with a fade, named in a footer; the whole card opens it. */
-export function PreviewCard({ icon, title, kind, label, content, children, onOpen }: PreviewCardProps) {
+export function PreviewCard({ emoji, title, kind, label, content, children, onOpen }: PreviewCardProps) {
   return (
     <Pressable
       accessibilityLabel={label}
@@ -52,7 +50,7 @@ export function PreviewCard({ icon, title, kind, label, content, children, onOpe
       </View>
       <View className="flex-row items-center gap-3 border-t border-border px-4 py-3">
         <View className={messageTile}>
-          <Icon icon={icon} tone="muted" />
+          <Text variant="body">{emoji}</Text>
         </View>
         <View className="flex-1">
           <Text numberOfLines={1} variant="item-title">{title}</Text>

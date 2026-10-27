@@ -12,7 +12,8 @@ export const ARTIFACTS = {
     'color-mix(in srgb, var(--foreground) 12%, var(--background))',
   ],
   trendIcons: { up: IconTrendingUp, down: IconTrendingDown, flat: IconMinus },
+  badges: { secondary: 'outline-secondary', outline: 'outline', destructive: 'destructive' },
   gaps: { sm: 'gap-2', md: 'gap-4', lg: 'gap-6' },
   columns: { '1': 'grid-cols-1', '2': 'sm:grid-cols-2', '3': 'sm:grid-cols-2 lg:grid-cols-3', '4': 'sm:grid-cols-2 lg:grid-cols-4' },
-  headings: { '1': 'text-xl font-semibold text-balance', '2': 'text-lg font-semibold text-balance', '3': 'text-base font-medium text-balance' },
+  headings: { '1': 'text-base font-semibold text-balance', '2': 'text-base font-semibold text-balance', '3': 'text-sm font-semibold text-balance' },
 } as const;

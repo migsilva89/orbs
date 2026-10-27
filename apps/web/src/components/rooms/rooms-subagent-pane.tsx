@@ -8,12 +8,12 @@ import { RoomsChatQuestions } from '@/components/rooms/rooms-chat-questions';
 import { Message, MessageContent, MessageStack } from '@/components/ui/ai/message';
 import { Response } from '@/components/ui/ai/response';
 import { Clamp } from '@/components/ui/clamp';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Pane, PaneBody, PaneContent, PaneHeader, PaneTitle } from '@/components/ui/pane';
 import { rpc } from '@/services/rpc/rpc.client';
 import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
 import type { ToolBot } from '@repo/client/client';
 
-interface RoomsSubagentDialogProps {
+interface RoomsSubagentPaneProps {
   botId: string
   bot: ToolBot
   conversationId: number
@@ -22,7 +22,7 @@ interface RoomsSubagentDialogProps {
   onOpenChange: (open: boolean) => void
 }
 
-export function RoomsSubagentDialog({ botId, bot, conversationId, name, task, onOpenChange }: RoomsSubagentDialogProps) {
+export function RoomsSubagentPane({ botId, bot, conversationId, name, task, onOpenChange }: RoomsSubagentPaneProps) {
   const { data: bots } = useSuspenseQuery(rpc.bots.list.queryOptions());
   const { data: view } = useQuery(chatQueries.view(RPC_CONTEXT, { botId, conversationId }));
   const { data: pending = [] } = useQuery(rpc.tools.pending.queryOptions({ input: { botId } }));
@@ -43,17 +43,15 @@ export function RoomsSubagentDialog({ botId, bot, conversationId, name, task, on
   const replies = messages.filter((message) => message.role === 'assistant' && roomsMessageText(message));
 
   return (
-    <Dialog open onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[85svh] flex-col sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>{name}</DialogTitle>
-          <DialogDescription asChild>
-            <div>
-              <Clamp size="sm">{task}</Clamp>
-            </div>
-          </DialogDescription>
-        </DialogHeader>
-        <div className="-mx-6 scrollbar min-h-0 flex-1 overflow-y-auto px-6 [--scrollbar-thumb:color-mix(in_oklab,var(--muted-foreground)_20%,transparent)] [--scrollbar-track:transparent] scrollbar-h-1 scrollbar-thumb-rounded-full scrollbar-w-1">
+    <Pane open onOpenChange={onOpenChange}>
+      <PaneContent>
+        <PaneHeader>
+          <PaneTitle>{name}</PaneTitle>
+        </PaneHeader>
+        <PaneBody>
+          <div className="mb-4 text-xs text-muted-foreground">
+            <Clamp size="sm">{task}</Clamp>
+          </div>
           {replies.map((message) => (
             <Message from="assistant" key={message.id}>
               <MessageStack>
@@ -83,8 +81,8 @@ export function RoomsSubagentDialog({ botId, bot, conversationId, name, task, on
             />
           ))}
           {view && replies.length === 0 && approvals.length === 0 && questions.length === 0 ? <p className="py-6 text-center text-xs text-muted-foreground">{m.rooms_subagent_empty()}</p> : null}
-        </div>
-      </DialogContent>
-    </Dialog>
+        </PaneBody>
+      </PaneContent>
+    </Pane>
   );
 }

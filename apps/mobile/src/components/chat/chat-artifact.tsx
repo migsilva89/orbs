@@ -1,8 +1,8 @@
 import { artifactsStore } from '@repo/client/client';
+import { ARTIFACT } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { LayoutDashboard } from 'lucide-react-native';
 import { match, P } from 'ts-pattern';
 import { ArtifactView } from '@/components/artifacts/artifact-view';
 import { HtmlFrame } from '@/components/ui/html-frame';
@@ -40,7 +40,7 @@ export function ChatArtifact({ session, artifact }: ChatArtifactProps) {
   return (
     <PreviewCard
       content={html === undefined ? 'padded' : 'page'}
-      icon={LayoutDashboard}
+      emoji={saved?.emoji ?? ARTIFACT.emojiDefault}
       kind={html === undefined ? m.artifacts_kind() : m.ui_html_page()}
       label={m.artifacts_open()}
       title={title}

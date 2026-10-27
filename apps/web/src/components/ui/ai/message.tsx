@@ -10,8 +10,14 @@ const messageOutline = 'rounded-3xl border border-input';
 
 export const messageSurface = [messageOutline, 'bg-secondary text-foreground'];
 
+/** A card's inner list, such as a question's options or an artifact's rows: one rounded box, rows split by lines. */
+export const messageList = 'flex min-w-0 flex-col divide-y overflow-hidden rounded-xl border border-input bg-background';
+
+/** One row of a `messageList`. */
+export const messageRow = 'flex w-full min-w-0 items-center gap-3 px-3 py-2.5 text-left text-sm';
+
 /** The icon tile that leads a card's header or footer. */
-export const messageTile = 'flex size-8 shrink-0 items-center justify-center rounded-lg border border-input bg-background text-muted-foreground [&_svg]:size-4';
+export const messageTile = 'flex size-8 shrink-0 items-center justify-center rounded-lg border border-input bg-background text-base leading-none text-muted-foreground [&_svg]:size-4';
 
 export type MessageProps = HTMLAttributes<HTMLDivElement> & {
   from: UIMessage['role']

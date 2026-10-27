@@ -62,7 +62,8 @@ export function ArtifactChart({ chart }: ArtifactChartProps) {
                   dataKey={item.key}
                   fill={color}
                   key={item.key}
-                  radius={4}
+                  maxBarSize={40}
+                  radius={6}
                 />
               );
             }

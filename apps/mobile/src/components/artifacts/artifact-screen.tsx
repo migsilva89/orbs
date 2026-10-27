@@ -74,7 +74,7 @@ function ArtifactScreenView({ session, artifact }: ArtifactScreenViewProps) {
 
   return (
     <Screen padding="none" scroll={false}>
-      <Stack.Screen options={{ title: artifact.title }} />
+      <Stack.Screen options={{ title: `${artifact.emoji} ${artifact.title}` }} />
       <Stack.Toolbar placement="right">
         <Stack.Toolbar.Menu
           accessibilityLabel={m.artifacts_versions({ version: artifact.version })}

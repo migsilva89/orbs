@@ -22,3 +22,5 @@ export const CHAT_TYPING = {
   },
   dotDelayMs: 160,
 } as const;
+
+export const CHAT_PANE = { barHeight: 56 } as const;

@@ -8,6 +8,7 @@ import { BotLoadState } from '@/components/bots/bot-load-state';
 import { Empty } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 import { ItemButton, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
+import { Text } from '@/components/ui/text';
 import { useConnection } from '@/hooks/use-connection';
 import type { RpcSession } from '@/types/rpc.types';
 
@@ -79,7 +80,7 @@ function ArtifactListScreenContent({ session }: ArtifactListScreenContentProps) 
               })}
             >
               <ItemMedia variant="icon">
-                <Icon icon={LayoutDashboard} tone="muted" />
+                <Text variant="body">{artifact.emoji}</Text>
               </ItemMedia>
               <ItemContent>
                 <ItemTitle numberOfLines={1}>{artifact.title}</ItemTitle>

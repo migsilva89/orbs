@@ -7,7 +7,6 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/u
 import { Item, ItemActions, ItemContent, ItemDescription, ItemLink, ItemMedia, ItemTitle, ItemValue } from '@/components/ui/item';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconChevronRight from '~icons/lucide/chevron-right';
-import IconLayoutDashboard from '~icons/lucide/layout-dashboard';
 
 export function ArtifactList() {
   const { data: bots } = useSuspenseQuery(rpc.bots.list.queryOptions());
@@ -36,9 +35,7 @@ export function ArtifactList() {
             <ul className="grid gap-2 sm:grid-cols-2">
               {artifacts.map((artifact) => (
                 <Item key={artifact.id} variant="outline">
-                  <ItemMedia variant="icon">
-                    <IconLayoutDashboard />
-                  </ItemMedia>
+                  <ItemMedia variant="icon">{artifact.emoji}</ItemMedia>
                   <ItemContent className="min-w-0">
                     <ItemTitle className="w-full">
                       <ItemLink asChild>

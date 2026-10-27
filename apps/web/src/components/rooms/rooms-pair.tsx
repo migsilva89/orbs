@@ -8,6 +8,7 @@ import { RoomsChatTranscript } from '@/components/rooms/rooms-chat-transcript';
 import { RoomsPairPill } from '@/components/rooms/rooms-pair-pill';
 import { Button } from '@/components/ui/button';
 import { MessageScrollerProvider } from '@/components/ui/message-scroller';
+import { PaneFooter, PaneHeader } from '@/components/ui/pane';
 import { roomsLink } from '@/services/rooms/rooms.client';
 import { rpc } from '@/services/rpc/rpc.client';
 import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
@@ -30,9 +31,9 @@ function RoomsPairView({ sender, peer, bots, view }: RoomsPairViewProps) {
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center px-12 pt-3 *:pointer-events-auto">
+      <PaneHeader>
         <RoomsPairPill peer={peer} sender={sender} />
-      </div>
+      </PaneHeader>
       <RoomsChatTranscript
         isReadOnly
         bot={peer}
@@ -53,11 +54,11 @@ function RoomsPairView({ sender, peer, bots, view }: RoomsPairViewProps) {
         reactions={room.reactions}
         onReply={() => undefined}
       />
-      <div className="flex justify-center p-4">
+      <PaneFooter>
         <Button asChild variant="outline">
           <Link {...roomsLink(sender)}>{m.rooms_pair_close()}</Link>
         </Button>
-      </div>
+      </PaneFooter>
     </div>
   );
 }

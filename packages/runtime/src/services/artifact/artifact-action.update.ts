@@ -18,6 +18,8 @@ export async function artifactActionUpdate(
     };
 
     record.title = params.title ?? record.title;
+    record.emoji = params.emoji ?? record.emoji;
+
     await artifactAppendVersion(tx, params.conversationId, record, spec, Date.now());
 
     return artifactCopy(record, spec);

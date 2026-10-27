@@ -10,7 +10,10 @@ import { RoomsChatComposer } from '@/components/rooms/rooms-chat-composer';
 import { RoomsChatPill } from '@/components/rooms/rooms-chat-pill';
 import { RoomsChatQuote } from '@/components/rooms/rooms-chat-quote';
 import { RoomsChatRuns } from '@/components/rooms/rooms-chat-runs';
+import { RoomsChatStatus } from '@/components/rooms/rooms-chat-status';
 import { RoomsChatTranscript } from '@/components/rooms/rooms-chat-transcript';
+import { PaneHost, usePaneHost } from '@/components/ui/pane';
+import { cn } from '@/lib/cn';
 import { LAYOUT_SHORTCUT_OPTIONS, LAYOUT_SHORTCUT_OVERLAYS, LAYOUT_SHORTCUTS } from '@/services/layout/layout.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import { RPC_CONTEXT } from '@/services/rpc/rpc.constants';
@@ -34,6 +37,7 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
   const [outgoing, setOutgoing] = useState<ChatOutgoing[]>([]);
   const quote = useChatQuote();
   const [composerHeight, setComposerHeight] = useState(0);
+  const panes = usePaneHost();
   const { conversationId } = view;
 
   const room = useChatRoom({
@@ -45,7 +49,9 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
   });
 
   const { messages, activity, queued, isBusy } = room;
-  const unread = useChatRead(bot.id, chat.readThroughEntryId, view.latestEntryId);
+  const unread = useChatRead(bot.id, chat.readThroughEntryId, view.latestEntryId, panes.isOpen);
+  const draft = messages.find((message) => message.id === CHAT.liveMessageId);
+  const unreadReply = messages.filter((message) => message.role === 'assistant' && (message.metadata?.entryId ?? 0) > chat.readThroughEntryId).at(-1);
   const around = focusEntryId !== undefined && !messages.some((message) => message.metadata?.entryIds.includes(focusEntryId)) ? focusEntryId : undefined;
 
   useEffect(() => {
@@ -62,6 +68,14 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
     composer.current?.insert([mentionQuote({ text: quote.selection.text, entryId })]);
     document.getSelection()?.removeAllRanges();
     quote.dismiss();
+  }
+
+  function send() {
+    panes.closeAll();
+
+    if (focusEntryId) {
+      leaveFocus();
+    }
   }
 
   function leaveFocus() {
@@ -90,7 +104,11 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
   };
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+    <PaneHost
+      className="flex min-h-0 flex-1 flex-col overflow-hidden"
+      host={panes}
+      insetBottom={composerHeight}
+    >
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center px-12 pt-3 *:pointer-events-auto">
         <RoomsChatPill activity={activity} bot={bot} />
       </div>
@@ -117,7 +135,7 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
               approvals={room.approvals}
               bot={bot}
               bots={bots}
-              draft={messages.find((message) => message.id === CHAT.liveMessageId)}
+              draft={draft}
               failure={room.failure}
               questions={room.questions}
             />
@@ -136,7 +154,7 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
           onQuote={quoteSelection}
         />
       ) : null}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 *:pointer-events-auto" ref={measureComposer}>
+      <div className={cn('pointer-events-none absolute inset-x-0 bottom-0 *:pointer-events-auto', panes.isOpen ? 'z-30' : 'z-10')} ref={measureComposer}>
         <RoomsChatComposer
           bot={bot}
           bots={bots}
@@ -148,12 +166,21 @@ function RoomsChatView({ bot, bots, chat, view }: RoomsChatViewProps) {
           messages={messages}
           queued={queued}
           replyTo={replyTo}
+          status={panes.isOpen ? (
+            <RoomsChatStatus
+              activity={activity}
+              bot={bot}
+              draft={draft}
+              unread={unreadReply}
+              onOpen={panes.closeAll}
+            />
+          ) : undefined}
           onOutgoingChange={setOutgoing}
           onReplyChange={setReplyTo}
-          onSend={focusEntryId ? leaveFocus : undefined}
+          onSend={send}
         />
       </div>
-    </div>
+    </PaneHost>
   );
 }
 

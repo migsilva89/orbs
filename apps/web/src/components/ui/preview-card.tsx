@@ -40,7 +40,7 @@ export function PreviewCard({ icon, title, kind, label, content, children, onOpe
           <span className="text-xs text-muted-foreground">{kind}</span>
         </span>
       </div>
-      <button aria-label={label} className="absolute inset-0 cursor-pointer rounded-[inherit] outline-none hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset" type="button" onClick={onOpen} />
+      <button aria-label={label} className="absolute inset-0 cursor-pointer rounded-[inherit] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset" type="button" onClick={onOpen} />
     </div>
   );
 }

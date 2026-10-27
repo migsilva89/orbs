@@ -11,7 +11,7 @@ export const artifactToolCreate = artifactCreate.omit({ botId: true, conversatio
 export const artifactToolGet = artifactGet.omit({ botId: true, conversationId: true }).strict();
 
 export const artifactToolUpdate = artifactUpdateFields.omit({ botId: true, conversationId: true }).strict().refine((value) => (
-  value.title !== undefined || value.spec !== undefined || value.state !== undefined
+  value.title !== undefined || value.emoji !== undefined || value.spec !== undefined || value.state !== undefined
 ));
 
 export const artifactToolCreateParameters = Type.Unsafe<z.infer<typeof artifactToolCreate>>(z.toJSONSchema(artifactToolCreate, { io: 'input' }));

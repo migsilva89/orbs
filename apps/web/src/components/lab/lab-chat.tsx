@@ -3,8 +3,11 @@ import { useRef, useState } from 'react';
 import { RoomsChatComposer } from '@/components/rooms/rooms-chat-composer';
 import { RoomsChatPill } from '@/components/rooms/rooms-chat-pill';
 import { RoomsChatRuns } from '@/components/rooms/rooms-chat-runs';
+import { RoomsChatStatus } from '@/components/rooms/rooms-chat-status';
 import { RoomsChatTranscript } from '@/components/rooms/rooms-chat-transcript';
 import { MessageScrollerProvider } from '@/components/ui/message-scroller';
+import { PaneHost, usePaneHost } from '@/components/ui/pane';
+import { cn } from '@/lib/cn';
 import type { PromptInputEditorHandle } from '@/components/ui/ai/prompt-input-editor';
 import type { LabChatFixture } from '@/types/lab.types';
 import type { ChatMessage } from '@repo/client/client';
@@ -19,6 +22,7 @@ function LabChatView({ fixture }: LabChatViewProps) {
   const composer = useRef<PromptInputEditorHandle>(null);
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [composerHeight, setComposerHeight] = useState(0);
+  const panes = usePaneHost();
   const latestEntryId = messages.at(-1)?.metadata?.entryId ?? 0;
 
   const measureComposer = (node: HTMLDivElement | null) => {
@@ -33,7 +37,11 @@ function LabChatView({ fixture }: LabChatViewProps) {
   };
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+    <PaneHost
+      className="flex min-h-0 flex-1 flex-col overflow-hidden"
+      host={panes}
+      insetBottom={composerHeight}
+    >
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center px-12 pt-3 *:pointer-events-auto">
         <RoomsChatPill activity={activity} bot={bot} />
       </div>
@@ -58,7 +66,7 @@ function LabChatView({ fixture }: LabChatViewProps) {
         reactions={fixture.reactions}
         onReply={setReplyTo}
       />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 *:pointer-events-auto" ref={measureComposer}>
+      <div className={cn('pointer-events-none absolute inset-x-0 bottom-0 *:pointer-events-auto', panes.isOpen ? 'z-30' : 'z-10')} ref={measureComposer}>
         <RoomsChatComposer
           isBusy
           bot={bot}
@@ -70,11 +78,20 @@ function LabChatView({ fixture }: LabChatViewProps) {
           messages={messages}
           queued={fixture.queued}
           replyTo={replyTo}
+          status={panes.isOpen ? (
+            <RoomsChatStatus
+              activity={activity}
+              bot={bot}
+              draft={draft}
+              onOpen={panes.closeAll}
+            />
+          ) : undefined}
           onOutgoingChange={() => undefined}
           onReplyChange={setReplyTo}
+          onSend={panes.closeAll}
         />
       </div>
-    </div>
+    </PaneHost>
   );
 }
 

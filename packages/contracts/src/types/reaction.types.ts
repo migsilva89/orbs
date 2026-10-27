@@ -13,7 +13,7 @@ const reactionSymbol = '(?:\\p{Regional_Indicator}{2}|\\p{Emoji}\\uFE0F?\\u20E3|
 const reactionEmojiPattern = new RegExp(`^(?:${reactionSymbol})(?:\\u200D(?:${reactionSymbol}))*$`, 'u');
 
 export const reactionEmoji = z.string().min(1).max(REACTION.maxEmoji).refine((value) => {
-  const graphemes = [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(value)];
+  const isOneGrapheme = !Object.hasOwn(Intl, 'Segmenter') || [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(value)].length === 1;
 
-  return graphemes.length === 1 && reactionEmojiPattern.test(value);
+  return isOneGrapheme && reactionEmojiPattern.test(value);
 });

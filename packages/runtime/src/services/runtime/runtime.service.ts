@@ -47,6 +47,7 @@ import { runtimeQueryArtifactVersions } from './runtime-query.artifact-versions'
 import { runtimeQueryAttachment } from './runtime-query.attachment';
 import { runtimeQueryAttachmentTarget } from './runtime-query.attachment-target';
 import { runtimeQueryAttachments } from './runtime-query.attachments';
+import { runtimeQueryBotUsage } from './runtime-query.bot-usage';
 import { runtimeQueryCarry } from './runtime-query.carry';
 import { runtimeQueryCommands } from './runtime-query.commands';
 import { runtimeQueryContextUsage } from './runtime-query.context-usage';
@@ -210,6 +211,7 @@ export function makeRuntimeService({
       attachmentTarget: runtimeBotCall(directory, runtimeQueryAttachmentTarget),
       contextUsage: runtimeBotCall(directory, runtimeQueryContextUsage),
       usage: runtimeBotCall(directory, runtimeQueryUsage),
+      botUsage: runtimeBotCall(directory, runtimeQueryBotUsage),
       contexts: runtimeBotCall(directory, runtimeQueryContexts),
       hasEntry: runtimeBotCall(directory, runtimeQueryHasEntry),
       conversations: async (context: Context = BACKGROUND_CONTEXT): Promise<ConversationIndexSummary[]> => {

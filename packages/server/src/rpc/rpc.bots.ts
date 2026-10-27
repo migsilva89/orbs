@@ -8,4 +8,5 @@ export const bots = {
   update: authedRouter.bots.update.handler(async ({ context, input }) => context.bots.actions.update(input)),
   delete: authedRouter.bots.delete.handler(async ({ context, input }) => context.bots.actions.delete(input)),
   catalog: authedRouter.bots.catalog.handler(async ({ context, input }) => context.bots.queries.catalog(input)),
+  usage: authedRouter.bots.usage.handler(async ({ context, input }) => context.bots.queries.usage(input)),
 };

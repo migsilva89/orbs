@@ -292,6 +292,8 @@ export const contract = {
     delete: ocFind.input(botGet).output(botDeleteResult),
 
     catalog: ocFind.input(botGet).output(botCatalog),
+
+    usage: ocFind.input(botGet).output(conversationUsage),
   },
 
   pairing: {

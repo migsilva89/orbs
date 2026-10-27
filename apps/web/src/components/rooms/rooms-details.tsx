@@ -1,8 +1,10 @@
+import { botUsageLabel } from '@repo/client/client';
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useHydrated, useMatch, useMatchRoute } from '@tanstack/react-router';
-import { match } from 'ts-pattern';
+import { useEffect, useRef } from 'react';
+import { match, P } from 'ts-pattern';
 import { BotAvatar } from '@/components/bots/bot-avatar';
 import { RoomsDetailsBot } from '@/components/rooms/rooms-details-bot';
 import { RoomsDetailsMedia } from '@/components/rooms/rooms-details-media';
@@ -177,6 +179,7 @@ function RoomsDetailsContent({ bot, chat, page }: RoomsDetailsContentProps) {
           ))}
         </ItemGroup>
         <RoomsDetailsFacts bot={bot} chat={chat} />
+        <RoomsDetailsUsage bot={bot} chat={chat} />
       </>
     ))
     .exhaustive();
@@ -213,4 +216,69 @@ function RoomsDetailsFacts({ bot, chat }: RoomsDetailsFactsProps) {
       </ItemGroup>
     </RoomsDetailsSection>
   );
+}
+
+interface RoomsDetailsUsageProps {
+  bot: Bot
+  chat: RoomsChat
+}
+
+function RoomsDetailsUsage({ bot, chat }: RoomsDetailsUsageProps) {
+  const { data: usage, isError, refetch } = useQuery(rpc.bots.usage.queryOptions({ input: { botId: bot.id } }));
+  const lastEntryId = chat.lastMessage?.entryId;
+  const isMounted = useRef(false);
+
+  useEffect(() => {
+    if (isMounted.current) {
+      void refetch();
+    }
+
+    isMounted.current = true;
+  }, [refetch, lastEntryId, chat.isRunning]);
+
+  const models = Object.entries(usage?.models ?? {}).map(([key, bucket]) => ({
+    id: key,
+    label: key.slice(key.indexOf('/') + 1),
+    value: botUsageLabel(bucket),
+  }));
+
+  const total = [...Object.values(usage?.models ?? {}), ...Object.values(usage?.tools ?? {})].reduce((sum, bucket) => ({
+    input: sum.input + bucket.input,
+    output: sum.output + bucket.output,
+    cacheRead: sum.cacheRead + bucket.cacheRead,
+    cost: { total: sum.cost.total + bucket.cost.total },
+  }), {
+    input: 0,
+    output: 0,
+    cacheRead: 0,
+    cost: { total: 0 },
+  });
+
+  const rows = match({
+    usage,
+    isError,
+    count: models.length,
+  })
+    .with({ isError: true }, () => [{ id: 'error', label: m.rooms_details_usage_error(), value: '' }])
+    .with({ usage: P.nullish }, () => null)
+    .with({ count: 0 }, () => [{ id: 'none', label: m.rooms_details_usage_none(), value: '' }])
+    .with({ count: 1 }, () => models)
+    .otherwise(() => [...models, { id: 'total', label: m.rooms_details_usage_total(), value: botUsageLabel(total) }]);
+
+  return rows ? (
+    <RoomsDetailsSection title={m.rooms_details_usage()}>
+      <ItemGroup variant="outline">
+        {rows.map((row) => (
+          <Item key={row.id} size="sm">
+            <ItemContent className="min-w-0">
+              <ItemTitle>{row.label}</ItemTitle>
+            </ItemContent>
+            <ItemActions className="min-w-0">
+              <ItemValue>{row.value}</ItemValue>
+            </ItemActions>
+          </Item>
+        ))}
+      </ItemGroup>
+    </RoomsDetailsSection>
+  ) : null;
 }

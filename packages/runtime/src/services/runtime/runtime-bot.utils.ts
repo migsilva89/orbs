@@ -14,7 +14,7 @@ import { runtimeQueryNextDeadline } from './runtime-query.next-deadline';
 import { runtimeRoutineToolsExtension } from './runtime-routine-tools.extension';
 import { runtimeTodoToolsExtension } from './runtime-todo-tools.extension';
 import { runtimeToolsExtension } from './runtime-tools.extension';
-import { RUNTIME_ALARM_DEBOUNCE_MS } from './runtime.constants';
+import { RUNTIME_ALARM_DEBOUNCE_MS, RUNTIME_HARNESS } from './runtime.constants';
 import type * as RuntimeTypes from '../../types/runtime.types';
 import type { Context } from '@earendil-works/chord/context';
 
@@ -37,6 +37,16 @@ export async function runtimeBotOpen(shared: RuntimeTypes.RuntimeSharedDeps, bot
     registry,
     env: shared.env,
     telemetry: telemetry.telemetry,
+    ...RUNTIME_HARNESS,
+    onReport: (error, info) => match(info)
+      .with({ type: 'session_failed' }, () => undefined)
+      .otherwise(() => log.error({
+        tag: 'runtime-report',
+        message: 'Pi reported a failure.',
+        botId,
+        report: info,
+        error,
+      })),
   }, BACKGROUND_CONTEXT).catch(async (error: unknown) => {
     await telemetry.close();
     await storage.close(BACKGROUND_CONTEXT);

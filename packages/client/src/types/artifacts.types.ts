@@ -10,6 +10,14 @@ export interface ArtifactsStoreParams {
   onError: () => void;
 }
 
-export type ArtifactsChart =
+interface ArtifactsChartHeader {
+  title?: string;
+  value?: string;
+  change?: string;
+  caption?: string;
+}
+
+export type ArtifactsChart = ArtifactsChartHeader & (
   | { kind: 'line' | 'area' | 'bar'; data: Record<string, string | number | null>[]; x: string; series: { key: string; label: string }[] }
-  | { kind: 'pie'; data: { label: string; value: number }[] };
+  | { kind: 'pie'; data: { label: string; value: number }[] }
+);

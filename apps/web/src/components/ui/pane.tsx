@@ -239,4 +239,3 @@ function PaneFooter({ className, ...props }: ComponentProps<'div'>) {
 }
 
 export { Pane, PaneBody, PaneContent, PaneFooter, PaneHeader, PaneHost, PanePill, PaneTitle, usePaneHost };
-export type { PaneHostState };

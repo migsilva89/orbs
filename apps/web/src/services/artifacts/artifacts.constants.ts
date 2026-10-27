@@ -1,7 +1,3 @@
-import IconMinus from '~icons/lucide/minus';
-import IconTrendingDown from '~icons/lucide/trending-down';
-import IconTrendingUp from '~icons/lucide/trending-up';
-
 export const ARTIFACTS = {
   chartColors: [
     'var(--foreground)',
@@ -11,7 +7,6 @@ export const ARTIFACTS = {
     'color-mix(in srgb, var(--foreground) 20%, var(--background))',
     'color-mix(in srgb, var(--foreground) 12%, var(--background))',
   ],
-  trendIcons: { up: IconTrendingUp, down: IconTrendingDown, flat: IconMinus },
   badges: { secondary: 'outline-secondary', outline: 'outline', destructive: 'destructive' },
   gaps: { sm: 'gap-2', md: 'gap-4', lg: 'gap-6' },
   columns: { '1': 'grid-cols-1', '2': 'sm:grid-cols-2', '3': 'sm:grid-cols-2 lg:grid-cols-3', '4': 'sm:grid-cols-2 lg:grid-cols-4' },

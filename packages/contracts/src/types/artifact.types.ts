@@ -16,6 +16,14 @@ export const ARTIFACT = {
 
 const artifactLink = z.url({ protocol: /^https?$/ });
 const artifactCell = z.union([z.string(), z.number(), z.null()]);
+const artifactSeries = z.array(z.object({ key: z.string(), label: z.string() })).min(1).max(4);
+
+const artifactChartHeader = {
+  title: z.string().optional(),
+  value: z.string().optional(),
+  change: z.string().optional(),
+  caption: z.string().optional(),
+};
 
 export const artifactComponents = {
   Stack: {
@@ -105,7 +113,8 @@ export const artifactComponents = {
     props: z.object({
       data: z.array(z.record(z.string(), artifactCell)).max(500),
       x: z.string(),
-      series: z.array(z.object({ key: z.string(), label: z.string() })).min(1).max(4),
+      series: artifactSeries,
+      ...artifactChartHeader,
     }),
     description: 'ui_artifact_block_line_chart_description',
   },
@@ -113,7 +122,10 @@ export const artifactComponents = {
     props: z.object({
       data: z.array(z.record(z.string(), artifactCell)).max(500),
       x: z.string(),
-      series: z.array(z.object({ key: z.string(), label: z.string() })).min(1).max(4),
+      series: artifactSeries,
+      average: z.boolean().optional(),
+      unit: z.string().optional(),
+      ...artifactChartHeader,
     }),
     description: 'ui_artifact_block_bar_chart_description',
   },
@@ -188,13 +200,17 @@ export const artifactComponents = {
     props: z.object({
       data: z.array(z.record(z.string(), artifactCell)).max(500),
       x: z.string(),
-      series: z.array(z.object({ key: z.string(), label: z.string() })).min(1).max(4),
+      series: artifactSeries,
+      ...artifactChartHeader,
     }),
     description: 'ui_artifact_block_area_chart_description',
   },
   PieChart: {
     props: z.object({
       data: z.array(z.object({ label: z.string(), value: z.number().nonnegative() })).min(1).max(6),
+      title: z.string().optional(),
+      centerLabel: z.string().optional(),
+      caption: z.string().optional(),
     }),
     description: 'ui_artifact_block_pie_chart_description',
   },
@@ -213,6 +229,57 @@ export const artifactComponents = {
       value: z.string().max(5000),
     }),
     description: 'ui_artifact_block_notes_description',
+  },
+  Metric: {
+    props: z.object({
+      label: z.string(),
+      value: z.union([z.string(), z.number()]),
+      prefix: z.string().optional(),
+      suffix: z.string().optional(),
+      change: z.string().optional(),
+      context: z.string().optional(),
+    }),
+    description: 'ui_artifact_block_metric_description',
+  },
+  Sparkline: {
+    props: z.object({
+      data: z.array(z.number()).min(2).max(200),
+      label: z.string().optional(),
+      value: z.string().optional(),
+      change: z.string().optional(),
+    }),
+    description: 'ui_artifact_block_sparkline_description',
+  },
+  Gauge: {
+    props: z.object({
+      value: z.number(),
+      max: z.number().positive().optional(),
+      unit: z.string().optional(),
+      status: z.string().optional(),
+      label: z.string(),
+      description: z.string().optional(),
+      tone: z.enum(['default', 'success', 'destructive']).optional(),
+    }),
+    description: 'ui_artifact_block_gauge_description',
+  },
+  UsageMeter: {
+    props: z.object({
+      title: z.string(),
+      used: z.number().nonnegative(),
+      total: z.number().positive(),
+      unit: z.string().optional(),
+      parts: z.array(z.object({ label: z.string(), value: z.number().nonnegative() })).min(1).max(6),
+      caption: z.string().optional(),
+    }),
+    description: 'ui_artifact_block_usage_meter_description',
+  },
+  Heatmap: {
+    props: z.object({
+      days: z.array(z.object({ date: z.iso.date(), value: z.number().nonnegative() })).max(400),
+      title: z.string().optional(),
+      caption: z.string().optional(),
+    }),
+    description: 'ui_artifact_block_heatmap_description',
   },
 } as const;
 

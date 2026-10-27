@@ -13,5 +13,4 @@ export const htmlFrameFonts = queryOptions({
   staleTime: Number.POSITIVE_INFINITY,
   gcTime: Number.POSITIVE_INFINITY,
   retry: false,
-  enabled: true,
 });

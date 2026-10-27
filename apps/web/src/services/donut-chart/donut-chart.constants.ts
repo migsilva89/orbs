@@ -1,0 +1,23 @@
+export const DONUT_CHART = {
+  size: 208,
+  thickness: 24,
+  margin: 7,
+  gap: 3,
+  corner: 4,
+  lift: 4,
+  grow: 2,
+  reach: 6,
+  stagger: 0.035,
+  lead: 0.04,
+  drum: 0.45,
+  total: '__total',
+  tau: Math.PI * 2,
+  motion: {
+    reveal: { visualDuration: 0.72, bounce: 0 },
+    settle: { visualDuration: 0.5, bounce: 0 },
+    pop: { visualDuration: 0.26, bounce: 0 },
+    count: { visualDuration: 0.4, bounce: 0 },
+    enter: { duration: 0.24, ease: [0.16, 1, 0.3, 1] },
+    leave: { duration: 0.16, ease: [0.22, 1, 0.36, 1] },
+  },
+} as const;

@@ -18,6 +18,7 @@ import { botQueryMcp } from './bot-query.mcp';
 import { botQueryPlugins } from './bot-query.plugins';
 import { botQueryPreferences } from './bot-query.preferences';
 import { botQuerySkills } from './bot-query.skills';
+import { botQueryUsage } from './bot-query.usage';
 import type * as BotTypes from '../../types/bot.types';
 import type * as UniversalTypes from '@repo/contracts/universal';
 
@@ -58,6 +59,7 @@ export function makeBotService(deps: Omit<BotTypes.BotServiceDeps, 'queues' | 'c
       catalog: (params: UniversalTypes.BotGetInput) => botQueryCatalog(serviceDeps, params),
       skills: (params: UniversalTypes.BotGetInput) => botQuerySkills(serviceDeps, params),
       mcp: (params: UniversalTypes.BotGetInput) => botQueryMcp(serviceDeps, params),
+      usage: (params: UniversalTypes.BotGetInput) => botQueryUsage(serviceDeps, params),
       list: () => botQueryList(serviceDeps),
       preferences: () => botQueryPreferences(serviceDeps),
       get: (params: UniversalTypes.BotGetInput) => botQueryGet(serviceDeps, params),

@@ -2,6 +2,7 @@ import { defineCatalog } from '@json-render/core';
 import { defineRegistry, JSONUIProvider, Renderer, useBoundProp } from '@json-render/react-native';
 import { schema } from '@json-render/react-native/schema';
 import { artifactComponents } from '@repo/contracts/universal';
+import { m } from '@repo/i18n/client';
 import { Check, ChevronDown, ChevronsUpDown, ExternalLink, Info } from 'lucide-react-native';
 import { Children, useState } from 'react';
 import { Image, Linking, Pressable, ScrollView, Switch, View } from 'react-native';
@@ -24,6 +25,10 @@ import { cn } from '@/lib/cn';
 import { ARTIFACTS } from '@/services/artifacts/artifacts.constants';
 import type { StateStore } from '@json-render/core';
 import type { ArtifactSpec } from '@repo/contracts/universal';
+
+function ArtifactViewUnsupported() {
+  return <Text tone="muted" variant="small">{m.artifacts_block_unsupported()}</Text>;
+}
 
 const { registry } = defineRegistry(defineCatalog(schema, { components: artifactComponents, actions: {} }), {
   components: {
@@ -311,6 +316,18 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
         </View>
       );
     },
+    Metric: ({ props }) => (
+      <View className="min-w-0 gap-1">
+        <Text tone="muted" variant="small">{props.label}</Text>
+        <Text variant="title">{`${props.prefix ?? ''}${props.value}${props.suffix ?? ''}`}</Text>
+        {props.change ? <Text tone="muted" variant="small">{props.change}</Text> : null}
+        {props.context ? <Text tone="muted" variant="small">{props.context}</Text> : null}
+      </View>
+    ),
+    Sparkline: () => <ArtifactViewUnsupported />,
+    Gauge: () => <ArtifactViewUnsupported />,
+    UsageMeter: () => <ArtifactViewUnsupported />,
+    Heatmap: () => <ArtifactViewUnsupported />,
   },
 });
 

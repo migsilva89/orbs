@@ -6,6 +6,24 @@ import { Text } from '@/components/ui/text';
 import { ARTIFACTS } from '@/services/artifacts/artifacts.constants';
 import type { ArtifactsChart } from '@repo/client/client';
 
+interface ArtifactChartHeaderProps {
+  title?: string;
+  value?: string;
+  change?: string;
+  caption?: string;
+}
+
+function ArtifactChartHeader({ title, value, change, caption }: ArtifactChartHeaderProps) {
+  return title || value || change || caption ? (
+    <View className="gap-1">
+      {title ? <Text variant="label">{title}</Text> : null}
+      {caption ? <Text tone="muted" variant="small">{caption}</Text> : null}
+      {value ? <Text variant="title">{value}</Text> : null}
+      {change ? <Text tone="muted" variant="small">{change}</Text> : null}
+    </View>
+  ) : null;
+}
+
 interface ArtifactChartProps {
   chart: ArtifactsChart;
 }
@@ -17,6 +35,7 @@ export function ArtifactChart({ chart }: ArtifactChartProps) {
   if (chart.kind === 'pie') {
     return (
       <View className="gap-3">
+        <ArtifactChartHeader caption={chart.caption} title={chart.title} />
         <View className="items-center">
           <ArtifactChartPie data={chart.data} foreground={foreground} />
         </View>
@@ -37,6 +56,12 @@ export function ArtifactChart({ chart }: ArtifactChartProps) {
 
   return (
     <View className="gap-3">
+      <ArtifactChartHeader
+        caption={chart.caption}
+        change={chart.change}
+        title={chart.title}
+        value={chart.value}
+      />
       <View onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>
         <Svg height={height} width={width}>
           {[0.25, 0.5, 0.75].map((line) => (

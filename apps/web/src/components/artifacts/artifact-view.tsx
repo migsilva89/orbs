@@ -2,24 +2,31 @@ import { defineCatalog } from '@json-render/core';
 import { defineRegistry, JSONUIProvider, Renderer, useBoundProp } from '@json-render/react';
 import { schema } from '@json-render/react/schema';
 import { artifactComponents } from '@repo/contracts/universal';
-import { Children, lazy, Suspense, useId } from 'react';
+import { Children, useId } from 'react';
 import { match, P } from 'ts-pattern';
+import { ActivityHeatmap } from '@/components/ui/activity-heatmap';
 import { Event, EventLabel, EventTrigger } from '@/components/ui/ai/event';
 import { messageList, messageRow, messageSurface } from '@/components/ui/ai/message';
 import { Response } from '@/components/ui/ai/response';
 import { Badge } from '@/components/ui/badge';
+import { ArcBarChart } from '@/components/ui/bar-chart';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CollapsibleContent } from '@/components/ui/collapsible';
+import { DonutChart } from '@/components/ui/donut-chart';
+import { Gauge } from '@/components/ui/gauge';
 import { HtmlFrame } from '@/components/ui/html-frame';
+import { ArcLineChart } from '@/components/ui/line-chart';
+import { MetricCard } from '@/components/ui/metric-card';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Sparkline } from '@/components/ui/sparkline';
 import { StatusDot } from '@/components/ui/status-dot';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { UsageMeter } from '@/components/ui/usage-meter';
 import { cn } from '@/lib/cn';
 import { ARTIFACTS } from '@/services/artifacts/artifacts.constants';
 import IconExternalLink from '~icons/lucide/external-link';
@@ -27,8 +34,6 @@ import IconInfo from '~icons/lucide/info';
 import type { StateStore } from '@json-render/core';
 import type { ArtifactSpec } from '@repo/contracts/universal';
 import type { ReactNode } from 'react';
-
-const ArtifactChart = lazy(() => import('@/components/artifacts/artifact-chart').then((module) => ({ default: module.ArtifactChart })));
 
 interface ArtifactViewRowTextProps {
   description?: string
@@ -63,23 +68,15 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
     ),
     Heading: ({ props }) => <h2 className={ARTIFACTS.headings[props.level ?? '2']}>{props.text}</h2>,
     Text: ({ props }) => <p className={cn('text-sm leading-snug text-pretty', props.variant === 'muted' && 'text-muted-foreground')}>{props.text}</p>,
-    Stat: ({ props }) => {
-      const Trend = props.trend ? ARTIFACTS.trendIcons[props.trend] : null;
-
-      return (
-        <div className="flex min-w-0 flex-col gap-1">
-          <span className="text-xs text-muted-foreground">{props.label}</span>
-          <span className="text-2xl font-semibold tabular-nums">{props.value}</span>
-          {props.change ? (
-            <span className={cn('flex items-center gap-1 text-xs tabular-nums', props.trend === 'up' && 'text-success', props.trend === 'down' && 'text-destructive')}>
-              {Trend ? <Trend className="size-3" /> : null}
-              {props.change}
-            </span>
-          ) : null}
-          {props.hint ? <span className="text-xs text-muted-foreground">{props.hint}</span> : null}
-        </div>
-      );
-    },
+    Stat: ({ props }) => (
+      <MetricCard
+        change={props.change}
+        context={props.hint}
+        label={props.label}
+        trend={props.trend}
+        value={props.value}
+      />
+    ),
     Badge: ({ props }) => <Badge variant={ARTIFACTS.badges[props.variant ?? 'secondary']}>{props.text}</Badge>,
     List: ({ props }) => (
       <ul className={messageList}>
@@ -131,16 +128,8 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
       </div>
     ),
     Separator: () => <Separator />,
-    LineChart: ({ props }) => (
-      <Suspense fallback={<Skeleton className="h-56 w-full" />}>
-        <ArtifactChart chart={{ kind: 'line', ...props }} />
-      </Suspense>
-    ),
-    BarChart: ({ props }) => (
-      <Suspense fallback={<Skeleton className="h-56 w-full" />}>
-        <ArtifactChart chart={{ kind: 'bar', ...props }} />
-      </Suspense>
-    ),
+    LineChart: ({ props }) => <ArcLineChart {...props} />,
+    BarChart: ({ props }) => <ArcBarChart {...props} />,
     Checklist: ({ props, bindings }) => {
       const id = useId();
       const [items = [], setItems] = useBoundProp(props.items, bindings?.items);
@@ -263,16 +252,8 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
         {props.caption ? <figcaption className="text-xs text-muted-foreground">{props.caption}</figcaption> : null}
       </figure>
     ),
-    AreaChart: ({ props }) => (
-      <Suspense fallback={<Skeleton className="h-56 w-full" />}>
-        <ArtifactChart chart={{ kind: 'area', ...props }} />
-      </Suspense>
-    ),
-    PieChart: ({ props }) => (
-      <Suspense fallback={<Skeleton className="mx-auto size-56" />}>
-        <ArtifactChart chart={{ kind: 'pie', ...props }} />
-      </Suspense>
-    ),
+    AreaChart: ({ props }) => <ArcLineChart area {...props} />,
+    PieChart: ({ props }) => <DonutChart {...props} />,
     Select: ({ props, bindings }) => {
       const id = useId();
       const [value, setValue] = useBoundProp(props.value, bindings?.value);
@@ -309,6 +290,11 @@ const { registry } = defineRegistry(defineCatalog(schema, { components: artifact
         </div>
       );
     },
+    Metric: ({ props }) => <MetricCard {...props} />,
+    Sparkline: ({ props }) => <Sparkline {...props} />,
+    Gauge: ({ props }) => <Gauge {...props} />,
+    UsageMeter: ({ props }) => <UsageMeter {...props} />,
+    Heatmap: ({ props }) => <ActivityHeatmap {...props} />,
   },
 });
 

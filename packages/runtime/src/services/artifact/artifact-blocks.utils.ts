@@ -30,6 +30,11 @@ const descriptions = {
   ui_artifact_block_pie_chart_description: m.ui_artifact_block_pie_chart_description,
   ui_artifact_block_select_description: m.ui_artifact_block_select_description,
   ui_artifact_block_notes_description: m.ui_artifact_block_notes_description,
+  ui_artifact_block_metric_description: m.ui_artifact_block_metric_description,
+  ui_artifact_block_sparkline_description: m.ui_artifact_block_sparkline_description,
+  ui_artifact_block_gauge_description: m.ui_artifact_block_gauge_description,
+  ui_artifact_block_usage_meter_description: m.ui_artifact_block_usage_meter_description,
+  ui_artifact_block_heatmap_description: m.ui_artifact_block_heatmap_description,
 };
 
 export const artifactBlocksCatalog = artifactBlocks.parse(Object.fromEntries(Object.entries(artifactBlockSchemas).map(([name, block]) => [

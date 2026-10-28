@@ -1,3 +1,4 @@
+import { linkFaviconUrl } from '@repo/client/client';
 import { createContext, Fragment, use } from 'react';
 import { Linking, ScrollView, StyleSheet } from 'react-native';
 import { EnrichedMarkdownText } from 'react-native-enriched-markdown';
@@ -107,6 +108,27 @@ function markdownTable(text: string): MarkdownTableData {
   return { header: markdownTableCells(header), aligns, rows: rows.map(markdownTableCells) };
 }
 
+/**
+ * A markdown link that is not an image, an angle-bracket autolink, or a bare web address not already a link's
+ * target, such as a badge's outer link. Bare addresses drop trailing punctuation, as GitHub's autolinks do.
+ */
+const MARKDOWN_LINK = /(?<!!)\[([^[\]\n]*)\]\((https?:\/\/[^\s)]+)([^)\n]*)\)|<(https?:\/\/[^\s>]+)>|(?<!\]\(|[[<"'=\w])(https?:\/\/[^\s<>()[\]]*[^\s<>()[\].,;:!?'"*_~])/g;
+
+/** Puts each web link's favicon in front of it as an inline image, outside inline code, so the underline covers only the text. */
+function markdownFavicons(markdown: string) {
+  return markdown.split(/(`+[^`]*?`+)/).map((part, index) => index % 2 === 1 ? part : part.replaceAll(MARKDOWN_LINK, (whole, label: string | undefined, href: string | undefined, rest: string | undefined, angled: string | undefined, bare: string | undefined) => {
+    const url = href ?? angled ?? bare ?? '';
+    const favicon = linkFaviconUrl(url);
+
+    if (!favicon) {
+      return whole;
+    }
+
+    // The renderer draws an image that starts a line as a full-width block; a word joiner in front keeps it inline.
+    return `\u2060![](${favicon})\u00A0[${label ?? url}](${url}${rest ?? ''})`;
+  })).join('');
+}
+
 const MARKDOWN_TEXT = { fontFamily: 'Inter', fontSize: 16, lineHeight: 21, marginTop: 0, marginBottom: 8 };
 
 interface MarkdownProps {
@@ -126,14 +148,18 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
   const color = use(markdownColorContext);
   const { theme } = useUniwind();
 
-  const [foreground, muted, border, codeBackground, link, background] = useCSSVariable([
+  const [foreground, muted, border, codeBackground, primary, link, background] = useCSSVariable([
     '--color-foreground',
     '--color-muted-foreground',
     '--color-border',
     '--color-muted',
     '--color-primary',
+    '--color-link',
     '--color-background',
   ]).map(String);
+
+  // Secondary marks (bullets, quotes, table headers) read muted on the page but take the text colour inside a bubble.
+  const secondary = color ?? muted;
 
   const text = match(tone)
     .with('muted', () => ({ ...MARKDOWN_TEXT, fontSize: 14, lineHeight: 20, color: muted }))
@@ -162,13 +188,16 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
     strong: { fontWeight: 'bold' },
     em: { fontStyle: 'italic' },
     strikethrough: { color: text.color },
-    link: { color: color ?? link, underline: true },
+    // Soft blue on the page, like web; inside a coloured bubble a link keeps the bubble's colour and an underline.
+    link: { color: color ?? link, underline: color !== undefined },
+    // A favicon in front of a web link, sized to the body text.
+    inlineImage: { size: 16 },
     // Bot mentions and quotes read as clean tags, like the pills on web: medium weight, no underline or fill.
     linkVariants: { '^(bot|quote):': { color: text.color, fontFamily: 'Inter-Medium', underline: false } },
     code: { fontFamily: 'Menlo', fontSize: 14, color: text.color, backgroundColor: codeBackground, borderColor: 'transparent' },
-    blockquote: { ...text, color: muted, borderColor: border, borderWidth: 3, gapWidth: 12, backgroundColor: 'transparent' },
+    blockquote: { ...text, color: secondary, borderColor: border, borderWidth: 3, gapWidth: 12, backgroundColor: 'transparent' },
     // Web's list geometry: text 22pt in (a 14pt marker column and an 8pt gap), each nested level 20pt further, 4pt between items.
-    list: { ...text, bulletColor: muted, markerColor: muted, bulletSize: 5, markerMinWidth: 14, gapWidth: 8, marginLeft: 20, itemSpacing: 4 },
+    list: { ...text, bulletColor: secondary, markerColor: secondary, bulletSize: 5, markerMinWidth: 14, gapWidth: 8, marginLeft: 20, itemSpacing: 4 },
     thematicBreak: { color: border, height: 1, marginTop: 8, marginBottom: 8 },
     codeBlock: {
       ...text,
@@ -181,7 +210,7 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
       padding: 12,
       syntaxColors: theme === 'dark' ? MARKDOWN_SYNTAX.dark : MARKDOWN_SYNTAX.light,
     },
-    taskList: { checkedColor: link, borderColor: muted, checkmarkColor: background, checkedTextColor: muted, checkedStrikethrough: true },
+    taskList: { checkedColor: color ?? primary, borderColor: secondary, checkmarkColor: background, checkedTextColor: secondary, checkedStrikethrough: true },
     table: {
       ...text,
       ...block,
@@ -215,13 +244,13 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
   );
 
   if (segments.every((segment) => segment.kind === 'text')) {
-    return render(children, true);
+    return render(markdownFavicons(children), true);
   }
 
   const cell = (content: string, isHeader: boolean, align: MarkdownTableAlign) => {
-    const paragraph = { ...text, fontSize: 14, lineHeight: 20, marginBottom: 0, textAlign: align, fontFamily: isHeader ? 'Inter-Medium' : text.fontFamily, color: isHeader ? muted : text.color };
+    const paragraph = { ...text, fontSize: 14, lineHeight: 20, marginBottom: 0, textAlign: align, fontFamily: isHeader ? 'Inter-Medium' : text.fontFamily, color: isHeader ? secondary : text.color };
 
-    return render(content, false, { ...markdownStyle, paragraph });
+    return render(markdownFavicons(content), false, { ...markdownStyle, paragraph });
   };
 
   return segments.map((segment, index) => match(segment.kind)
@@ -238,6 +267,6 @@ export function Markdown({ children, isStreaming = false, tone = 'default', sele
         table={markdownTable(segment.text)}
       />
     ))
-    .with('text', () => <Fragment key={index}>{render(segment.text, index === segments.length - 1)}</Fragment>)
+    .with('text', () => <Fragment key={index}>{render(markdownFavicons(segment.text), index === segments.length - 1)}</Fragment>)
     .exhaustive());
 }

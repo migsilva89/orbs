@@ -65,6 +65,7 @@ import { credentialsList, credentialsSet, credentialsSetResult } from '../types/
 import { deviceList, deviceRevoke, deviceRevokeResult } from '../types/device.types';
 import { instructionCatalog, instructionConfigure, instructionDiscover, instructionSettings } from '../types/instruction.types';
 import { limitConfigure, limitSettings } from '../types/limit.types';
+import { linkPreview, linkPreviewInput } from '../types/link.types';
 import {
   mcpAuthCancelResult,
   mcpAuthComplete,
@@ -192,6 +193,9 @@ export const contract = {
   activity: {
     list: ocFind.input(activityListInput).output(activityPage),
     run: ocFind.input(activityRunGet).output(activityRun),
+  },
+  links: {
+    preview: ocAuth.input(linkPreviewInput).output(linkPreview.nullable()),
   },
   avatars: {
     upload: ocAuth.input(avatarUpload).output(botAvatarImage),

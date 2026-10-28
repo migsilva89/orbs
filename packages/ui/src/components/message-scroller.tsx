@@ -330,6 +330,7 @@ function MessageScrollerButton({
         'absolute inset-s-1/2 bottom-4 -translate-x-1/2 rounded-full bg-background shadow-sm transition-[translate,scale,opacity] duration-200 dark:bg-[color-mix(in_oklab,var(--input)_30%,var(--background))]',
         'data-[active=false]:pointer-events-none data-[active=false]:translate-y-full data-[active=false]:scale-95 data-[active=false]:opacity-0 data-[active=false]:duration-400 data-[active=false]:ease-[cubic-bezier(0.7,0,0.84,0)]',
         'data-[active=true]:translate-y-0 data-[active=true]:scale-100 data-[active=true]:opacity-100 data-[active=true]:ease-[cubic-bezier(0.23,1,0.32,1)] rtl:translate-x-1/2',
+        'group-has-[[data-pending-scroll]]/message-scroller:invisible group-has-[[data-pending-scroll]]/message-scroller:opacity-0! group-has-[[data-pending-scroll]]/message-scroller:transition-none!',
         className,
       )}
       data-active={end}

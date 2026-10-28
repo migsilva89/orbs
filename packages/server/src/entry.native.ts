@@ -8,3 +8,4 @@ export { workspacePathsNative, workspacePathsRootNative } from './services/works
 export { makeAttachmentStorageService } from './services/attachment/attachment-storage.service';
 export { makeAvatarImageService } from './services/avatar/avatar-image.service';
 export { makeServerNetworkService } from './services/server/server-network.service';
+export { makeLinkResolverService } from './services/link/link-resolver.service';

@@ -11,6 +11,7 @@ export * from './services/chat/chat.utils';
 export * from './services/connection/connection.constants';
 export * from './services/connection/connection.utils';
 export * from './services/html/html.utils';
+export * from './services/link/link.utils';
 export * from './services/mention/mention.utils';
 export * from './services/mention/mention.constants';
 export * from './services/rooms/rooms.constants';

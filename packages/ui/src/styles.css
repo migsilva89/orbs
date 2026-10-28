@@ -97,6 +97,7 @@ button {
   --warning: oklch(0.795 0.184 86.047);
   --warning-foreground: oklch(0.96 0.03 95);
   --blue: oklch(0.623 0.214 259.815);
+  --link: oklch(0.55 0.12 255);
   --border: oklch(0.92 0.004 286.32);
   --series-1: #1f7dcf;
   --series-2: #7128a5;
@@ -181,6 +182,7 @@ button {
   --warning: oklch(0.795 0.184 86.047);
   --warning-foreground: oklch(0.96 0.03 95);
   --blue: oklch(0.623 0.214 259.815);
+  --link: oklch(0.76 0.1 250);
   --border: oklch(1 0 0 / 10%);
   --series-1: #55adff;
   --series-2: #9c37be;
@@ -253,6 +255,7 @@ button {
   --color-warning-700: var(--color-yellow-700);
   --color-warning-800: var(--color-yellow-800);
   --color-blue: var(--blue);
+  --color-link: var(--link);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

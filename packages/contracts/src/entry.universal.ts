@@ -17,6 +17,7 @@ export * from './types/entry.types';
 export * from './types/html.types';
 export * from './types/instruction.types';
 export * from './types/limit.types';
+export * from './types/link.types';
 export * from './types/mcp-auth.types';
 export * from './types/mcp.types';
 export * from './types/model.types';

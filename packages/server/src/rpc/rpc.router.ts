@@ -9,6 +9,7 @@ import { credentials } from './rpc.credentials';
 import { devices } from './rpc.devices';
 import { instructions } from './rpc.instructions';
 import { limits } from './rpc.limits';
+import { links } from './rpc.links';
 import { mcp } from './rpc.mcp';
 import { mcpAuth } from './rpc.mcp-auth';
 import { models } from './rpc.models';
@@ -30,6 +31,7 @@ export const router = rpcRouter.router({
   server: rpcServer,
   onboarding,
   limits,
+  links,
   providers,
   mcpAuth,
   routines,

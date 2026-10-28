@@ -35,7 +35,7 @@ export async function conversationIndexActionRestore(
           const index = await tx.doc(conversationIndex);
           const current = conversationIndexFind(index, botId);
 
-          const latest = match((lastMessage?.entryId ?? 0) > (current.lastMessage?.entryId ?? 0))
+          const latest = match((lastMessage?.entryId ?? 0) >= (current.lastMessage?.entryId ?? 0) && lastMessage !== null)
             .with(true, () => lastMessage)
             .with(false, () => current.lastMessage ?? null)
             .exhaustive();

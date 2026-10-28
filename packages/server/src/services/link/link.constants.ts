@@ -1,0 +1,23 @@
+export const LINK = {
+  timeoutMs: 5000,
+  maxRedirects: 3,
+  maxBytes: 768 * 1024,
+  maxTitleLength: 200,
+  maxDescriptionLength: 300,
+  maxCodePoint: 0x10FFFF,
+  userAgent: 'Mozilla/5.0 (compatible; OrbsLinkPreview/1.0)',
+  privateSubnets: [
+    ['0.0.0.0', 8, 'ipv4'],
+    ['10.0.0.0', 8, 'ipv4'],
+    ['100.64.0.0', 10, 'ipv4'],
+    ['127.0.0.0', 8, 'ipv4'],
+    ['169.254.0.0', 16, 'ipv4'],
+    ['172.16.0.0', 12, 'ipv4'],
+    ['192.168.0.0', 16, 'ipv4'],
+    ['224.0.0.0', 3, 'ipv4'],
+    ['::', 127, 'ipv6'],
+    ['fc00::', 7, 'ipv6'],
+    ['fe80::', 10, 'ipv6'],
+    ['ff00::', 8, 'ipv6'],
+  ],
+} as const;

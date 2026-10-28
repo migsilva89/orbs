@@ -90,6 +90,18 @@ export function conversationIndexFind(index: ConversationIndexDocument, botId: s
     });
 }
 
+function conversationIndexMarkdownText(content: string) {
+  const lines = CONVERSATION_INDEX.markdownLines.reduce((text, line) => text.replace(line, ''), content.replace(CONVERSATION_INDEX.mentionLink, '$1'));
+
+  const rows = lines.replace(CONVERSATION_INDEX.markdownPrefix, '').replace(CONVERSATION_INDEX.tableRow, (_row, cells: string) => cells.replace(CONVERSATION_INDEX.tableCell, ' · '));
+
+  return CONVERSATION_INDEX.markdownInline.reduce((text, [pattern, replacement]) => text.replace(pattern, replacement), rows);
+}
+
 function conversationIndexText(content: string) {
-  return content.replace(CONVERSATION_INDEX.mentionLink, '$1').replace(/\s+/g, ' ').trim();
+  const text = match(CONVERSATION_INDEX.htmlPage.test(content))
+    .with(true, () => content.replace(CONVERSATION_INDEX.htmlHidden, ' ').replace(CONVERSATION_INDEX.htmlTag, ' '))
+    .otherwise(() => conversationIndexMarkdownText(content));
+
+  return CONVERSATION_INDEX.entities.reduce((plain, [entity, character]) => plain.replaceAll(entity, character), text).replace(/\s+/g, ' ').trim();
 }

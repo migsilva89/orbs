@@ -8,6 +8,7 @@ import type { ConversationService } from '../services/conversation/conversation.
 import type { CredentialsService } from '../services/credentials/credentials.service';
 import type { InstructionService } from '../services/instruction/instruction.service';
 import type { LimitService } from '../services/limit/limit.service';
+import type { LinkService } from '../services/link/link.service';
 import type { McpAuthService } from '../services/mcp/mcp-auth.service';
 import type { McpService } from '../services/mcp/mcp.service';
 import type { NotificationService } from '../services/notification/notification.service';
@@ -27,6 +28,7 @@ export interface RpcContext extends RequestHeadersPluginContext {
   server: ServerService;
   onboarding: OnboardingService;
   limits: LimitService;
+  links: LinkService;
   providers: ProviderService;
   mcpAuth: McpAuthService;
   routines: RoutineService;

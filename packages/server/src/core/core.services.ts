@@ -9,6 +9,7 @@ import { makeCollaborationService } from '../services/collaboration/collaboratio
 import { makeConversationService } from '../services/conversation/conversation.service';
 import { makeInstructionService } from '../services/instruction/instruction.service';
 import { makeLimitService } from '../services/limit/limit.service';
+import { makeLinkService } from '../services/link/link.service';
 import { makeMcpAuthService } from '../services/mcp/mcp-auth.service';
 import { makeNotificationService } from '../services/notification/notification.service';
 import { makeOnboardingService } from '../services/onboarding/onboarding.service';
@@ -35,6 +36,7 @@ export async function makeServices({
   mcp,
   mcpAuth,
   network,
+  linkResolver,
   appScheme,
   providers,
   runtime: runtimeOptions,
@@ -106,6 +108,7 @@ export async function makeServices({
       server,
       onboarding: makeOnboardingService({ settings }),
       limits,
+      links: makeLinkService({ resolver: linkResolver }),
       providers,
       mcpAuth: makeMcpAuthService({
         bots,

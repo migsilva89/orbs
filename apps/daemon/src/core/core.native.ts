@@ -41,6 +41,7 @@ import {
   makeAvatarImageService,
   makeBackupService,
   makeDatabaseService,
+  makeLinkResolverService,
   makeMcpService,
   makeServerNetworkService,
   makeWorkspaceService,
@@ -195,6 +196,7 @@ async function coreNativeServices(resources: AsyncDisposableStack): Promise<Core
     }),
     mcpAuth,
     network: makeServerNetworkService({ host: env.DAEMON_HOST, port: env.DAEMON_PORT }),
+    linkResolver: makeLinkResolverService(),
     appScheme: env.MOBILE_SCHEME,
     providers,
     runtime: {

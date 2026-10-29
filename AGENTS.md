@@ -23,7 +23,7 @@ A bot backend for one owner. A native daemon runs each bot as a persistent Pi Du
 - To pair a device with the running dev daemon, run `bun run dev:pair`. It prints a PIN and a connect link for `http://localhost:47190`; pass `--url <origin>` (for example the machine's Tailscale address on port 47190) to link another web origin.
 - A new native dependency on mobile needs a rebuild of the iOS dev app before its JavaScript can load; say so when you add one.
 - Add tests only when the user asks.
-- After a substantial set of code changes, run the `review` skill in full (simplify, code, blast), fix its findings within the task, and rerun the affected checks before reporting completion.
+- After a substantial set of code changes, run the `orbs-review` skill in full (simplify, code, blast), fix its findings within the task, and rerun the affected checks before reporting completion.
 
 ## Validation
 

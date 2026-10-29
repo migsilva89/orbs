@@ -1,12 +1,13 @@
 import { botSection } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { LayoutNotFound } from '@repo/ui/layout/layout-error';
-import { createFileRoute, useCanGoBack, useMatches, useParams, useRouter } from '@tanstack/react-router';
+import { createFileRoute, useMatches, useParams } from '@tanstack/react-router';
 import { match } from 'ts-pattern';
 import { BotDialog } from '@/components/bots/bot-dialog';
+import { useSectionDialogClose } from '@/hooks/use-section-dialog-close';
 import { rpc } from '@/services/rpc/rpc.client';
 import { seoHead } from '@/services/seo/seo.utils';
-import type { BotDialogView } from '@repo/ui/bot.types';
+import type { BotDialogView } from '@/types/bot.types';
 
 export const Route = createFileRoute('/_chat/bots')({
   head: () => seoHead({ title: m.bots_title() }),
@@ -26,8 +27,7 @@ export const Route = createFileRoute('/_chat/bots')({
 function BotsRoute() {
   const routeId = useMatches({ select: (matches) => matches.at(-1)?.routeId });
   const { botId = '', tab, routineId = '', todoId = '' } = useParams({ strict: false });
-  const router = useRouter();
-  const canGoBack = useCanGoBack();
+  const close = useSectionDialogClose();
 
   const view = match(routeId)
     .returnType<BotDialogView | null>()
@@ -47,5 +47,5 @@ function BotsRoute() {
     return null;
   }
 
-  return <BotDialog view={view} onClose={() => (canGoBack ? router.history.back() : void router.navigate({ to: '/rooms' }))} />;
+  return <BotDialog view={view} onClose={close} />;
 }

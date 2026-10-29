@@ -4,7 +4,7 @@ import { botForm } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { BotMcpPanel } from '@repo/ui/bots/bot-mcp-panel';
 import { Button } from '@repo/ui/button';
-import { Form } from '@repo/ui/forms/form';
+import { Form, FormErrors } from '@repo/ui/forms/form';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@repo/ui/panel';
 import { SectionDialogBody, SectionDialogSaveBar } from '@repo/ui/section-dialog';
 import { SettingsConfirm } from '@repo/ui/settings/settings-confirm';
@@ -26,8 +26,8 @@ import { BOT_FORM_SECTIONS, BOT_NAV } from '@/services/bot/bot.constants';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import IconTrash from '~icons/lucide/trash-2';
+import type { BotDialogView } from '@/types/bot.types';
 import type { Bot, BotForm, BotSection } from '@repo/contracts/universal';
-import type { BotDialogView } from '@repo/ui/bot.types';
 
 interface BotEditProps {
   bot: Bot
@@ -321,23 +321,26 @@ interface BotEditRoutineProps {
 }
 
 function BotEditRoutine({ bot, routineId, onBack }: BotEditRoutineProps) {
-  const { data: routines } = useQuery(rpc.routines.list.queryOptions({ input: { botId: bot.id } }));
-  const routine = routines?.find((item) => item.id === routineId);
+  const list = useQuery(rpc.routines.list.queryOptions({ input: { botId: bot.id } }));
+  const routine = list.data?.find((item) => item.id === routineId);
 
-  return routine ? (
-    <SettingsSubview
-      backLabel={m.rooms_routines()}
-      description={m.rooms_routines_edit_hint()}
-      title={m.rooms_routines_edit_title({ name: routine.name })}
-      onBack={onBack}
-    >
-      <RoutinesEdit
-        bot={bot}
-        routine={routine}
-        onDone={onBack}
-      />
-    </SettingsSubview>
-  ) : null;
+  return match({ routine, isError: list.isError })
+    .with({ routine: P.nonNullable }, ({ routine: found }) => (
+      <SettingsSubview
+        backLabel={m.rooms_routines()}
+        description={m.rooms_routines_edit_hint()}
+        title={m.rooms_routines_edit_title({ name: found.name })}
+        onBack={onBack}
+      >
+        <RoutinesEdit
+          bot={bot}
+          routine={found}
+          onDone={onBack}
+        />
+      </SettingsSubview>
+    ))
+    .with({ isError: true }, () => <FormErrors error={m.rooms_routines_error()} />)
+    .otherwise(() => null);
 }
 
 interface BotEditRoutineDeleteProps {
@@ -348,8 +351,8 @@ interface BotEditRoutineDeleteProps {
 
 function BotEditRoutineDelete({ bot, routineId, onBack }: BotEditRoutineDeleteProps) {
   const queryClient = useQueryClient();
-  const { data: routines } = useQuery(rpc.routines.list.queryOptions({ input: { botId: bot.id } }));
-  const routine = routines?.find((item) => item.id === routineId);
+  const list = useQuery(rpc.routines.list.queryOptions({ input: { botId: bot.id } }));
+  const routine = list.data?.find((item) => item.id === routineId);
 
   const remove = useMutation(rpc.routines.remove.mutationOptions({
     onSuccess: async () => {
@@ -358,25 +361,28 @@ function BotEditRoutineDelete({ bot, routineId, onBack }: BotEditRoutineDeletePr
     },
   }));
 
-  return routine ? (
-    <SettingsSubview
-      backLabel={m.rooms_routines()}
-      description={m.rooms_routines_delete_description({ bot: bot.name })}
-      isBackDisabled={remove.isPending}
-      title={m.rooms_routines_delete_title({ name: routine.name })}
-      onBack={onBack}
-    >
-      <SettingsGroup title={m.rooms_routines_delete()}>
-        <SettingsConfirm
-          confirmLabel={m.rooms_routines_delete()}
-          error={remove.isError ? m.rooms_routines_action_failed() : null}
-          pending={remove.isPending}
-          onCancel={onBack}
-          onConfirm={() => remove.mutate({ botId: bot.id, routineId: routine.id })}
-        />
-      </SettingsGroup>
-    </SettingsSubview>
-  ) : null;
+  return match({ routine, isError: list.isError })
+    .with({ routine: P.nonNullable }, ({ routine: found }) => (
+      <SettingsSubview
+        backLabel={m.rooms_routines()}
+        description={m.rooms_routines_delete_description({ bot: bot.name })}
+        isBackDisabled={remove.isPending}
+        title={m.rooms_routines_delete_title({ name: found.name })}
+        onBack={onBack}
+      >
+        <SettingsGroup title={m.rooms_routines_delete()}>
+          <SettingsConfirm
+            confirmLabel={m.rooms_routines_delete()}
+            error={remove.isError ? m.rooms_routines_action_failed() : null}
+            pending={remove.isPending}
+            onCancel={onBack}
+            onConfirm={() => remove.mutate({ botId: bot.id, routineId: found.id })}
+          />
+        </SettingsGroup>
+      </SettingsSubview>
+    ))
+    .with({ isError: true }, () => <FormErrors error={m.rooms_routines_error()} />)
+    .otherwise(() => null);
 }
 
 interface BotEditTodoDeleteProps {
@@ -387,8 +393,8 @@ interface BotEditTodoDeleteProps {
 
 function BotEditTodoDelete({ bot, todoId, onBack }: BotEditTodoDeleteProps) {
   const queryClient = useQueryClient();
-  const { data: todos } = useQuery(rpc.todos.list.queryOptions({ input: { botId: bot.id } }));
-  const todo = todos?.find((item) => String(item.id) === todoId);
+  const list = useQuery(rpc.todos.list.queryOptions({ input: { botId: bot.id } }));
+  const todo = list.data?.find((item) => String(item.id) === todoId);
 
   const remove = useMutation(rpc.todos.remove.mutationOptions({
     onSuccess: async () => {
@@ -397,23 +403,26 @@ function BotEditTodoDelete({ bot, todoId, onBack }: BotEditTodoDeleteProps) {
     },
   }));
 
-  return todo ? (
-    <SettingsSubview
-      backLabel={m.rooms_todos()}
-      description={m.rooms_todos_delete_description({ bot: bot.name })}
-      isBackDisabled={remove.isPending}
-      title={m.rooms_todos_delete_title({ title: todo.title })}
-      onBack={onBack}
-    >
-      <SettingsGroup title={m.rooms_todos_delete()}>
-        <SettingsConfirm
-          confirmLabel={m.rooms_todos_delete()}
-          error={remove.isError ? m.rooms_todos_action_failed() : null}
-          pending={remove.isPending}
-          onCancel={onBack}
-          onConfirm={() => remove.mutate({ botId: bot.id, todoId: todo.id })}
-        />
-      </SettingsGroup>
-    </SettingsSubview>
-  ) : null;
+  return match({ todo, isError: list.isError })
+    .with({ todo: P.nonNullable }, ({ todo: found }) => (
+      <SettingsSubview
+        backLabel={m.rooms_todos()}
+        description={m.rooms_todos_delete_description({ bot: bot.name })}
+        isBackDisabled={remove.isPending}
+        title={m.rooms_todos_delete_title({ title: found.title })}
+        onBack={onBack}
+      >
+        <SettingsGroup title={m.rooms_todos_delete()}>
+          <SettingsConfirm
+            confirmLabel={m.rooms_todos_delete()}
+            error={remove.isError ? m.rooms_todos_action_failed() : null}
+            pending={remove.isPending}
+            onCancel={onBack}
+            onConfirm={() => remove.mutate({ botId: bot.id, todoId: found.id })}
+          />
+        </SettingsGroup>
+      </SettingsSubview>
+    ))
+    .with({ isError: true }, () => <FormErrors error={m.rooms_todos_error()} />)
+    .otherwise(() => null);
 }

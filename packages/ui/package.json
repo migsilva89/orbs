@@ -32,7 +32,6 @@
     "./bar-chart": "./src/components/bar-chart.tsx",
     "./bar-chart-tip": "./src/components/bar-chart-tip.tsx",
     "./bot.client": "./src/services/bot/bot.client.ts",
-    "./bot.types": "./src/types/bot.types.ts",
     "./bots/bot-avatar": "./src/components/bots/bot-avatar.tsx",
     "./bots/bot-avatar-emoji": "./src/components/bots/bot-avatar-emoji.tsx",
     "./bots/bot-avatar-picker": "./src/components/bots/bot-avatar-picker.tsx",

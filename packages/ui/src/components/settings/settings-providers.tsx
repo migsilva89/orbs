@@ -1,5 +1,6 @@
 import { useSettingsProviderLogout, useSettingsProviders } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
+import { useNavigate } from '@tanstack/react-router';
 import { Fragment, useState } from 'react';
 import { Combobox } from '../combobox';
 import { FormErrors } from '../forms/form';
@@ -10,13 +11,18 @@ import { SettingsProviderLogo } from './settings-provider-logo';
 import { SettingsProviderRow } from './settings-provider-row';
 import { SettingsProviderSession } from './settings-provider-session';
 
-export function SettingsProviders() {
+interface SettingsProvidersProps {
+  signOutId: string | undefined
+  onSignOutClose: () => void
+}
+
+export function SettingsProviders({ signOutId, onSignOutClose }: SettingsProvidersProps) {
+  const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState('');
   const { session, status, connected, available, isBusy, problem, login, dismiss } = useSettingsProviders();
   const selected = available.find((provider) => provider.id === selectedId);
   const visible = selected ? [...connected, selected] : connected;
-  const [signingOut, setSigningOut] = useState<string | null>(null);
-  const logout = useSettingsProviderLogout({ onDone: () => setSigningOut(null) });
+  const logout = useSettingsProviderLogout({ onDone: onSignOutClose });
 
   return (
     <SettingsGroup isTitleVisible title={m.settings_providers()}>
@@ -58,17 +64,22 @@ export function SettingsProviders() {
             onLogin={login}
             onSignOut={provider.isConfigured && provider.source === 'stored' ? () => {
               logout.reset();
-              setSigningOut(provider.id);
+              void navigate({
+                to: '/settings/providers/$providerId/logout',
+                params: { providerId: provider.id },
+                replace: true,
+                resetScroll: false,
+              });
             } : undefined}
           />
-          {signingOut === provider.id ? (
+          {signOutId === provider.id ? (
             <SettingsConfirm
               confirmLabel={m.settings_providers_sign_out()}
               description={m.settings_providers_sign_out_description({ provider: provider.name })}
               error={logout.problem}
               pending={logout.isPending}
               title={m.settings_providers_sign_out_title({ provider: provider.name })}
-              onCancel={() => setSigningOut(null)}
+              onCancel={onSignOutClose}
               onConfirm={() => logout.logout(provider.id)}
             />
           ) : null}

@@ -1,7 +1,8 @@
 import { m } from '@repo/i18n/client';
 import { LayoutNotFound } from '@repo/ui/layout/layout-error';
-import { createFileRoute, useCanGoBack, useMatch, useRouter } from '@tanstack/react-router';
+import { createFileRoute, useMatch } from '@tanstack/react-router';
 import { ArtifactList } from '@/components/artifacts/artifact-list';
+import { useSectionDialogClose } from '@/hooks/use-section-dialog-close';
 import { rpc } from '@/services/rpc/rpc.client';
 import { seoHead } from '@/services/seo/seo.utils';
 
@@ -19,13 +20,12 @@ export const Route = createFileRoute('/_chat/artifacts')({
 
 function ArtifactsRoute() {
   const detail = useMatch({ from: '/_chat/artifacts/$botId/$conversationId/$artifactId', shouldThrow: false });
-  const router = useRouter();
-  const canGoBack = useCanGoBack();
+  const close = useSectionDialogClose();
 
   return (
     <ArtifactList
       selected={detail?.params}
-      onClose={() => (canGoBack ? router.history.back() : void router.navigate({ to: '/rooms' }))}
+      onClose={close}
     />
   );
 }

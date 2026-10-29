@@ -8,8 +8,8 @@ import IconSparkles from '~icons/lucide/sparkles';
 import IconTriangleAlert from '~icons/lucide/triangle-alert';
 import IconUserRound from '~icons/lucide/user-round';
 import IconWrench from '~icons/lucide/wrench';
+import type { BotNavItem } from '@/types/bot.types';
 import type { BotForm, BotSection } from '@repo/contracts/universal';
-import type { BotNavItem } from '@repo/ui/bot.types';
 
 export const BOT_NAV: BotNavItem[] = [
   { id: 'profile', label: m.bots_profile, description: m.bots_profile_hint, icon: IconUserRound },

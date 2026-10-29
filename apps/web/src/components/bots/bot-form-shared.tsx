@@ -7,6 +7,7 @@ import { Panel, PanelRow } from '@repo/ui/panel';
 import { Skeleton } from '@repo/ui/skeleton';
 import { useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import type { BotFormSharedItem, BotFormSharedMessages } from '@/types/bot.types';
 import type { BotForm } from '@repo/contracts/universal';
 
@@ -43,11 +44,10 @@ export function BotFormShared({ resource, field, items, isError, messages, busy 
   function toggle(name: string, isChecked: boolean) {
     const next = new Set(selected);
 
-    if (isChecked) {
-      next.add(name);
-    } else {
-      next.delete(name);
-    }
+    match(isChecked)
+      .with(true, () => next.add(name))
+      .with(false, () => next.delete(name))
+      .exhaustive();
     choose(next);
   }
 

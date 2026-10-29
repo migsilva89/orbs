@@ -76,7 +76,7 @@ function SettingsAppearanceControls() {
           >
             <Link
               replace
-              to="/settings/general/theme"
+              to="/settings/themes/create"
             >
               <IconPlus className="size-4" />
             </Link>

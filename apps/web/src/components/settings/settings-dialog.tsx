@@ -20,6 +20,7 @@ import { SettingsGeneral } from '@/components/settings/settings-general';
 import { SettingsModelSwap } from '@/components/settings/settings-model-swap';
 import { SettingsModels } from '@/components/settings/settings-models';
 import { SettingsTools } from '@/components/settings/settings-tools';
+import { useMutationPending } from '@/hooks/use-mutation-pending';
 import { rpc } from '@/services/rpc/rpc.client';
 import { SETTINGS_NAV } from '@/services/settings/settings.constants';
 import type { ConnectionInfo } from '@repo/client/client';
@@ -30,17 +31,26 @@ interface SettingsDialogProps {
   section: SettingsSection
   view: 'theme' | 'swap' | undefined
   modelKey: string | undefined
+  deviceId: string | undefined
+  providerId: string | undefined
   onClose: () => void
 }
 
-export function SettingsDialog({ connection, section, view, modelKey, onClose }: SettingsDialogProps) {
+export function SettingsDialog({ connection, section, view, modelKey, deviceId, providerId, onClose }: SettingsDialogProps) {
   const navigate = useNavigate();
 
   const current = SETTINGS_NAV.find((item) => item.id === section) ?? SETTINGS_NAV[0];
 
+  const isBusy = useMutationPending([
+    rpc.devices.revoke.mutationKey(),
+    rpc.providers.logout.mutationKey(),
+    rpc.bots.swapModels.mutationKey(),
+  ]);
+
   return (
     <SectionDialog
       description={m.settings_description()}
+      isBusy={isBusy}
       title={m.settings_title()}
       onClose={onClose}
     >
@@ -53,7 +63,9 @@ export function SettingsDialog({ connection, section, view, modelKey, onClose }:
         <Suspense fallback={<Skeleton className="h-48 w-full" />}>
           <SettingsDialogSection
             connection={connection}
+            deviceId={deviceId}
             modelKey={modelKey}
+            providerId={providerId}
             section={section}
             view={view}
             onBack={() => void navigate({
@@ -140,10 +152,12 @@ interface SettingsDialogSectionProps {
   section: SettingsSection
   view: 'theme' | 'swap' | undefined
   modelKey: string | undefined
+  deviceId: string | undefined
+  providerId: string | undefined
   onBack: () => void
 }
 
-function SettingsDialogSection({ connection, section, view, modelKey, onBack }: SettingsDialogSectionProps) {
+function SettingsDialogSection({ connection, section, view, modelKey, deviceId, providerId, onBack }: SettingsDialogSectionProps) {
   return match(section)
     .with('general', () => (view === 'theme' ? <ClientOnly><SettingsThemeCreate onBack={onBack} /></ClientOnly> : (
       <>
@@ -154,7 +168,7 @@ function SettingsDialogSection({ connection, section, view, modelKey, onBack }: 
     .with('chat', () => <SettingsChat />)
     .with('models', () => (view === 'swap' ? <SettingsDialogSwap modelKey={modelKey} onBack={onBack} /> : (
       <>
-        <SettingsProviders />
+        <SettingsProviders signOutId={providerId} onSignOutClose={onBack} />
         <SettingsModels />
       </>
     )))
@@ -162,7 +176,13 @@ function SettingsDialogSection({ connection, section, view, modelKey, onBack }: 
     .with('secrets', () => <SettingsSecrets />)
     .with('sources', () => <SettingsSources />)
     .with('server', () => <SettingsServer />)
-    .with('devices', () => <SettingsDevices connection={connection} />)
+    .with('devices', () => (
+      <SettingsDevices
+        connection={connection}
+        revokeId={deviceId}
+        onRevokeClose={onBack}
+      />
+    ))
     .with('desktop', () => <ClientOnly><SettingsDesktop /></ClientOnly>)
     .exhaustive();
 }

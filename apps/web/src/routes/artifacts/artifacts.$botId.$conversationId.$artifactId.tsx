@@ -10,7 +10,7 @@ export const Route = createFileRoute('/_chat/artifacts/$botId/$conversationId/$a
   loader: async ({ context, params }) => {
     const artifact = await context.queryClient.ensureQueryData(rpc.artifacts.get.queryOptions({ input: params }));
 
-    return { breadcrumb: `${artifact.emoji} ${artifact.title}` };
+    return { breadcrumb: artifact.title };
   },
   head: ({ loaderData }) => seoHead({ title: loaderData?.breadcrumb }),
 });

@@ -13,6 +13,8 @@ interface SectionDialogProps {
   description: string
   /** Fills the screen, for content that needs room. */
   isExpanded?: boolean
+  /** Keeps the dialog open while an action it started is still running. */
+  isBusy?: boolean
   onClose: () => void
   children: ReactNode
 }
@@ -21,9 +23,9 @@ interface SectionDialogProps {
  * A dialog with its sections listed on the left, or as tabs on top below 720px.
  * Escape inside an element marked `data-escape="local"` stays with that element.
  */
-export function SectionDialog({ title, description, isExpanded = false, onClose, children }: SectionDialogProps) {
+export function SectionDialog({ title, description, isExpanded = false, isBusy = false, onClose, children }: SectionDialogProps) {
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
+    <Dialog open onOpenChange={(open) => !open && !isBusy && onClose()}>
       <DialogContent
         flush
         close={false}
@@ -47,6 +49,7 @@ export function SectionDialog({ title, description, isExpanded = false, onClose,
         <DialogClose asChild>
           <Button
             aria-label={m.ui_close()}
+            disabled={isBusy}
             className="absolute top-3 right-3 @min-[720px]/section-dialog:top-6 @min-[720px]/section-dialog:right-6"
             size="icon-sm"
             title={m.ui_close()}

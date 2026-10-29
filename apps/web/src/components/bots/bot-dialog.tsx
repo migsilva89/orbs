@@ -16,10 +16,11 @@ import { useEffect } from 'react';
 import { useForm, useFormContext, useWatch } from 'react-hook-form';
 import { BotEdit } from '@/components/bots/bot-edit';
 import { BotFormModel } from '@/components/bots/bot-form-model';
+import { useMutationPending } from '@/hooks/use-mutation-pending';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconChevronLeft from '~icons/lucide/chevron-left';
+import type { BotDialogView } from '@/types/bot.types';
 import type { BotForm } from '@repo/contracts/universal';
-import type { BotDialogView } from '@repo/ui/bot.types';
 
 interface BotDialogProps {
   view: BotDialogView
@@ -31,9 +32,19 @@ export function BotDialog({ view, onClose }: BotDialogProps) {
 
   const bot = view.kind === 'create' ? undefined : bots.find((item) => item.id === view.botId);
 
+  const isBusy = useMutationPending([
+    rpc.bots.create.mutationKey(),
+    rpc.bots.delete.mutationKey(),
+    rpc.commands.execute.mutationKey(),
+    rpc.routines.update.mutationKey(),
+    rpc.routines.remove.mutationKey(),
+    rpc.todos.remove.mutationKey(),
+  ]);
+
   return (
     <SectionDialog
       description={m.bots_description()}
+      isBusy={isBusy}
       title={m.bots_title()}
       onClose={onClose}
     >

@@ -40,7 +40,9 @@ export const routes = rootRoute('root.tsx', [
     ]),
     route('/settings', 'settings/settings.tsx', [
       index('settings/settings.index.tsx'),
-      route('/general/theme', 'settings/settings.general.theme.tsx'),
+      route('/themes/create', 'settings/settings.themes.create.tsx'),
+      route('/devices/$deviceId/revoke', 'settings/settings.devices.$deviceId.revoke.tsx'),
+      route('/providers/$providerId/logout', 'settings/settings.providers.$providerId.logout.tsx'),
       route('/models/$model', 'settings/settings.models.$model.tsx'),
       route('/$tab', 'settings/settings.$tab.tsx'),
     ]),

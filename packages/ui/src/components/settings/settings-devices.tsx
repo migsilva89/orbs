@@ -2,8 +2,8 @@ import { useSettingsDeviceRevoke, useSettingsDevices } from '@repo/client/react'
 import { useClipboardCopy } from '@repo/client/web';
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
-import { useHydrated } from '@tanstack/react-router';
-import { Fragment, useState } from 'react';
+import { Link, useHydrated } from '@tanstack/react-router';
+import { Fragment } from 'react';
 import IconCopy from '~icons/lucide/copy';
 import { Button } from '../button';
 import { ButtonLoading } from '../button-loading';
@@ -16,16 +16,17 @@ import type { ConnectionInfo } from '@repo/client/client';
 
 interface SettingsDevicesProps {
   connection: ConnectionInfo
+  revokeId: string | undefined
+  onRevokeClose: () => void
 }
 
-export function SettingsDevices({ connection }: SettingsDevicesProps) {
+export function SettingsDevices({ connection, revokeId, onRevokeClose }: SettingsDevicesProps) {
   const settings = useSettingsDevices();
   const clipboard = useClipboardCopy();
   const devices = settings.devices.data ?? [];
   const hydrated = useHydrated();
   const date = new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium' });
-  const [revoking, setRevoking] = useState<string | null>(null);
-  const revoke = useSettingsDeviceRevoke({ onDone: () => setRevoking(null) });
+  const revoke = useSettingsDeviceRevoke({ onDone: onRevokeClose });
 
   return (
     <SettingsGroup title={m.settings_devices()}>
@@ -40,26 +41,30 @@ export function SettingsDevices({ connection }: SettingsDevicesProps) {
             </PanelContent>
             {device.id === connection.deviceId ? null : (
               <Button
-                disabled={revoking === device.id}
+                asChild
                 size="sm"
                 variant="outline"
-                onClick={() => {
-                  revoke.reset();
-                  setRevoking(device.id);
-                }}
               >
-                {m.settings_devices_revoke()}
+                <Link
+                  replace
+                  params={{ deviceId: device.id }}
+                  resetScroll={false}
+                  to="/settings/devices/$deviceId/revoke"
+                  onClick={revoke.reset}
+                >
+                  {m.settings_devices_revoke()}
+                </Link>
               </Button>
             )}
           </PanelRow>
-          {revoking === device.id ? (
+          {revokeId === device.id ? (
             <SettingsConfirm
               confirmLabel={m.settings_devices_revoke()}
               description={m.settings_devices_revoke_description()}
               error={revoke.problem}
               pending={revoke.isPending}
               title={m.settings_devices_revoke_title({ name: device.name })}
-              onCancel={() => setRevoking(null)}
+              onCancel={onRevokeClose}
               onConfirm={() => revoke.revoke(device.id)}
             />
           ) : null}

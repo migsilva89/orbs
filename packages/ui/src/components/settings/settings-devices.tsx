@@ -1,64 +1,76 @@
-import { useSettingsDevices } from '@repo/client/react';
+import { useSettingsDeviceRevoke, useSettingsDevices } from '@repo/client/react';
 import { useClipboardCopy } from '@repo/client/web';
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
 import { Link, useHydrated } from '@tanstack/react-router';
+import { Fragment } from 'react';
 import IconCopy from '~icons/lucide/copy';
-import IconLaptop from '~icons/lucide/laptop';
-import IconQrCode from '~icons/lucide/qr-code';
 import { Button } from '../button';
 import { ButtonLoading } from '../button-loading';
 import { FormErrors } from '../forms/form';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '../panel';
 import { toasty } from '../sonner';
-import { SettingsPanel } from './settings-panel';
+import { SettingsConfirm } from './settings-confirm';
+import { SettingsGroup } from './settings-group';
 import type { ConnectionInfo } from '@repo/client/client';
 
 interface SettingsDevicesProps {
   connection: ConnectionInfo
+  revokeId: string | undefined
+  onRevokeClose: () => void
 }
 
-export function SettingsDevices({ connection }: SettingsDevicesProps) {
+export function SettingsDevices({ connection, revokeId, onRevokeClose }: SettingsDevicesProps) {
   const settings = useSettingsDevices();
   const clipboard = useClipboardCopy();
   const devices = settings.devices.data ?? [];
   const hydrated = useHydrated();
   const date = new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium' });
+  const revoke = useSettingsDeviceRevoke({ onDone: onRevokeClose });
 
   return (
-    <SettingsPanel
-      icon={IconLaptop}
-      id="devices"
-      title={m.settings_devices()}
-    >
+    <SettingsGroup title={m.settings_devices()}>
       {devices.map((device) => (
-        <PanelRow key={device.id}>
-          <IconLaptop />
-          <PanelContent>
-            <PanelTitle className="truncate">{device.name}</PanelTitle>
-            <PanelDescription>
-              {device.id === connection.deviceId ? m.settings_devices_current() : m.settings_devices_added({ date: hydrated ? date.format(new Date(device.createdAt)) : '' })}
-            </PanelDescription>
-          </PanelContent>
-          {device.id === connection.deviceId ? null : (
-            <Button
-              asChild
-              size="sm"
-              variant="outline"
-            >
-              <Link
-                params={{ deviceId: device.id }}
-                resetScroll={false}
-                to="/settings/devices/$deviceId/revoke"
+        <Fragment key={device.id}>
+          <PanelRow>
+            <PanelContent>
+              <PanelTitle className="truncate">{device.name}</PanelTitle>
+              <PanelDescription>
+                {device.id === connection.deviceId ? m.settings_devices_current() : m.settings_devices_added({ date: hydrated ? date.format(new Date(device.createdAt)) : '' })}
+              </PanelDescription>
+            </PanelContent>
+            {device.id === connection.deviceId ? null : (
+              <Button
+                asChild
+                size="sm"
+                variant="outline"
               >
-                {m.settings_devices_revoke()}
-              </Link>
-            </Button>
-          )}
-        </PanelRow>
+                <Link
+                  replace
+                  params={{ deviceId: device.id }}
+                  resetScroll={false}
+                  to="/settings/devices/$deviceId/revoke"
+                  onClick={revoke.reset}
+                >
+                  {m.settings_devices_revoke()}
+                </Link>
+              </Button>
+            )}
+          </PanelRow>
+          {revokeId === device.id ? (
+            <SettingsConfirm
+              confirmLabel={m.settings_devices_revoke()}
+              description={m.settings_devices_revoke_description()}
+              error={revoke.problem}
+              pending={revoke.isPending}
+              title={m.settings_devices_revoke_title({ name: device.name })}
+              onCancel={onRevokeClose}
+              onConfirm={() => revoke.revoke(device.id)}
+            />
+          ) : null}
+        </Fragment>
       ))}
       <PanelRow className="items-start">
-        <IconQrCode />
         <div className="flex min-w-0 flex-1 flex-col gap-3">
           <PanelContent>
             <PanelTitle>{m.settings_devices_pair()}</PanelTitle>
@@ -96,6 +108,6 @@ export function SettingsDevices({ connection }: SettingsDevicesProps) {
           </ButtonLoading>
         </div>
       </PanelRow>
-    </SettingsPanel>
+    </SettingsGroup>
   );
 }

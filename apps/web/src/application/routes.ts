@@ -21,24 +21,30 @@ export const routes = rootRoute('root.tsx', [
         ]),
       ]),
     ]),
-    route('/bots', 'bots/bots.layout.tsx', [
+    route('/bots', 'bots/bots.tsx', [
       index('bots/bots.index.tsx'),
       route('/create', 'bots/bots.create.tsx'),
       route('/$botId', 'bots/bots.$botId.tsx', [
+        index('bots/bots.$botId.index.tsx'),
         route('/delete', 'bots/bots.$botId.delete.tsx'),
+        route('/reset', 'bots/bots.$botId.reset.tsx'),
         route('/routines/$routineId/edit', 'bots/bots.$botId.routines.$routineId.edit.tsx'),
         route('/routines/$routineId/delete', 'bots/bots.$botId.routines.$routineId.delete.tsx'),
         route('/todos/$todoId/delete', 'bots/bots.$botId.todos.$todoId.delete.tsx'),
+        route('/$tab', 'bots/bots.$botId.$tab.tsx'),
       ]),
     ]),
-    route('/artifacts', 'artifacts/artifacts.layout.tsx', [
+    route('/artifacts', 'artifacts/artifacts.tsx', [
       index('artifacts/artifacts.index.tsx'),
       route('/$botId/$conversationId/$artifactId', 'artifacts/artifacts.$botId.$conversationId.$artifactId.tsx'),
     ]),
-    route('/settings', 'settings/settings.layout.tsx', [
+    route('/settings', 'settings/settings.tsx', [
+      index('settings/settings.index.tsx'),
       route('/themes/create', 'settings/settings.themes.create.tsx'),
       route('/devices/$deviceId/revoke', 'settings/settings.devices.$deviceId.revoke.tsx'),
       route('/providers/$providerId/logout', 'settings/settings.providers.$providerId.logout.tsx'),
+      route('/models/$model', 'settings/settings.models.$model.tsx'),
+      route('/$tab', 'settings/settings.$tab.tsx'),
     ]),
   ]),
   route('/lab/avatars', 'lab/lab.avatars.tsx'),

@@ -1,75 +1,37 @@
 import { useSettingsSources } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
-import IconBox from '~icons/lucide/box';
-import IconFileText from '~icons/lucide/file-text';
-import IconFolderTree from '~icons/lucide/folder-tree';
-import IconPlug from '~icons/lucide/plug';
-import IconPuzzle from '~icons/lucide/puzzle';
 import { PanelRow } from '../panel';
-import { SettingsPanel } from './settings-panel';
+import { SettingsGroup } from './settings-group';
 import { SettingsPathList } from './settings-path-list';
 
 export function SettingsSources() {
   const sources = useSettingsSources();
 
+  const lists = [
+    { key: 'skills', source: sources.skills, title: m.settings_sources_skills(), placeholder: m.settings_sources_skills_placeholder() },
+    { key: 'instructions', source: sources.instructions, title: m.settings_sources_instructions(), placeholder: m.settings_sources_instructions_placeholder() },
+    { key: 'plugins', source: sources.plugins, title: m.settings_sources_plugins(), placeholder: m.settings_sources_plugins_placeholder() },
+    { key: 'mcp', source: sources.mcp, title: m.settings_sources_mcp(), placeholder: m.settings_sources_mcp_placeholder() },
+  ];
+
   return (
-    <SettingsPanel
-      icon={IconFolderTree}
-      id="sources"
-      title={m.settings_sources()}
-    >
-      <PanelRow className="items-start">
-        <IconBox />
-        <div className="min-w-0 flex-1">
-          <SettingsPathList
-            isFailed={sources.skills.isFailed}
-            isPending={sources.skills.isPending}
-            paths={sources.skills.paths}
-            placeholder={m.settings_sources_skills_placeholder()}
-            title={m.settings_sources_skills()}
-            onChange={sources.skills.save}
-          />
-        </div>
-      </PanelRow>
-      <PanelRow className="items-start">
-        <IconFileText />
-        <div className="min-w-0 flex-1">
-          <SettingsPathList
-            isFailed={sources.instructions.isFailed}
-            isPending={sources.instructions.isPending}
-            paths={sources.instructions.paths}
-            placeholder={m.settings_sources_instructions_placeholder()}
-            title={m.settings_sources_instructions()}
-            onChange={sources.instructions.save}
-          />
-        </div>
-      </PanelRow>
-      <PanelRow className="items-start">
-        <IconPuzzle />
-        <div className="min-w-0 flex-1">
-          <SettingsPathList
-            isFailed={sources.plugins.isFailed}
-            isPending={sources.plugins.isPending}
-            paths={sources.plugins.paths}
-            placeholder={m.settings_sources_plugins_placeholder()}
-            title={m.settings_sources_plugins()}
-            onChange={sources.plugins.save}
-          />
-        </div>
-      </PanelRow>
-      <PanelRow className="items-start">
-        <IconPlug />
-        <div className="min-w-0 flex-1">
-          <SettingsPathList
-            isFailed={sources.mcp.isFailed}
-            isPending={sources.mcp.isPending}
-            paths={sources.mcp.paths}
-            placeholder={m.settings_sources_mcp_placeholder()}
-            title={m.settings_sources_mcp()}
-            onChange={sources.mcp.save}
-          />
-        </div>
-      </PanelRow>
-    </SettingsPanel>
+    <div className="flex flex-col gap-4">
+      {lists.map((list) => (
+        <SettingsGroup key={list.key} title={list.title}>
+          <PanelRow className="items-start">
+            <div className="min-w-0 flex-1">
+              <SettingsPathList
+                isFailed={list.source.isFailed}
+                isPending={list.source.isPending}
+                paths={list.source.paths}
+                placeholder={list.placeholder}
+                title={list.title}
+                onChange={list.source.save}
+              />
+            </div>
+          </PanelRow>
+        </SettingsGroup>
+      ))}
+    </div>
   );
 }

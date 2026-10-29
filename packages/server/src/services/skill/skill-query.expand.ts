@@ -7,6 +7,7 @@ export async function skillQueryExpand(deps: SkillServiceDeps, { bot, names }: S
     botId: bot.id,
     directories: settings.directories,
     isInherited: bot.inherit.includes('skills'),
+    sharedSkills: bot.sharedSkills,
     names,
   });
 }

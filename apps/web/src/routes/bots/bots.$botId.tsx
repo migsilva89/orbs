@@ -1,5 +1,4 @@
 import { createFileRoute, notFound } from '@tanstack/react-router';
-import { BotPage } from '@/components/bots/bot-page';
 import { rpc } from '@/services/rpc/rpc.client';
 import { seoHead } from '@/services/seo/seo.utils';
 
@@ -15,9 +14,4 @@ export const Route = createFileRoute('/_chat/bots/$botId')({
     return { breadcrumb: bot.name };
   },
   head: ({ loaderData }) => seoHead({ title: loaderData?.breadcrumb }),
-  component: BotRoute,
 });
-
-function BotRoute() {
-  return <BotPage botId={Route.useParams().botId} />;
-}

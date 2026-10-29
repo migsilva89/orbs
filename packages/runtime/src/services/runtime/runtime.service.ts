@@ -3,12 +3,12 @@ import { createToolSearchExtension } from '@earendil-works/pi-durable/tool-searc
 import { log } from '@repo/logger/server';
 import { match, P } from 'ts-pattern';
 import { artifactBlocksCatalog } from '../artifact/artifact-blocks.utils';
-import { collaborationExtension } from '../collaboration/collaboration.extension';
+import { makeCollaborationExtensionService } from '../collaboration/collaboration-extension.service';
 import { notificationItemKey, notificationRecentAppend } from '../notification/notification.utils';
-import { questionExtension } from '../question/question.extension';
-import { routineExtension } from '../routine/routine.extension';
-import { subagentExtension } from '../subagent/subagent.extension';
-import { todoExtension } from '../todo/todo.extension';
+import { makeQuestionExtensionService } from '../question/question-extension.service';
+import { makeRoutineExtensionService } from '../routine/routine-extension.service';
+import { makeSubagentExtensionService } from '../subagent/subagent-extension.service';
+import { makeTodoExtensionService } from '../todo/todo-extension.service';
 import { runtimeActionAddAttachment } from './runtime-action.add-attachment';
 import { runtimeActionAnswerQuestion } from './runtime-action.answer-question';
 import { runtimeActionApprove } from './runtime-action.approve';
@@ -94,11 +94,13 @@ export function makeRuntimeService({
   const codingTools = runtimeCodingToolsExtension({ images, secrets });
   const readOnlyTools = codingTools.tools?.filter((tool) => tool.name === 'read') ?? [];
   const directory = runtimeDirectory({ open: (botId) => runtimeBotOpen(shared, botId) });
-  const collaboration = collaborationExtension({ policy, directory });
-  const questions = questionExtension();
+  const collaboration = makeCollaborationExtensionService({ policy, directory });
+  const questions = makeQuestionExtensionService();
   const chatTools = runtimeChatToolsExtension();
   const toolSearch = createToolSearchExtension();
-  const subagents = subagentExtension();
+  const subagents = makeSubagentExtensionService();
+  const routines = makeRoutineExtensionService();
+  const todos = makeTodoExtensionService();
 
   const shared: RuntimeTypes.RuntimeSharedDeps = {
     appName,
@@ -114,10 +116,10 @@ export function makeRuntimeService({
       collaboration.extension,
       questions.extension,
       chatTools.extension,
-      subagents,
-      routineExtension,
+      subagents.extension,
+      routines.extension,
       runtimeReactionExtension,
-      todoExtension,
+      todos.extension,
       toolSearch,
       ...(secrets ? [runtimeSecretsExtension({ secrets })] : []),
       ...toolExtensions,
@@ -129,7 +131,7 @@ export function makeRuntimeService({
       ...chatTools.readOnlyTools,
       ...(toolSearch.tools ?? []),
     ],
-    ownTools: [collaboration.extension, questions.extension, chatTools.extension, subagents].flatMap((extension) => extension.tools ?? []),
+    ownTools: [collaboration.extension, questions.extension, chatTools.extension, subagents.extension].flatMap((extension) => extension.tools ?? []),
   };
 
   const unlisten = alarm.listen(({ botId }) => {

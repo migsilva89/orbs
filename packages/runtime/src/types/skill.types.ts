@@ -12,6 +12,7 @@ export interface SkillLoaderServiceDeps {
 
 export interface SkillResolved extends Skill {
   argumentHint: string | null;
+  isShared: boolean;
 }
 
 export interface SkillResolvedResult extends LoadSkillsResult {
@@ -28,6 +29,7 @@ export interface SkillLoadParams {
   botId: string;
   directories: string[];
   isInherited: boolean;
+  sharedSkills: string[] | null;
 }
 
 export interface SkillLoadResult {

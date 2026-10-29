@@ -15,6 +15,8 @@ function labBot(bot: Pick<UniversalTypes.Bot, 'id' | 'name' | 'handle' | 'avatar
     fallbackModel: null,
     permission: 'ask',
     inherit: ['skills', 'mcp', 'plugins'],
+    sharedSkills: null,
+    sharedMcp: null,
     createdAt: now,
     updatedAt: now,
   };

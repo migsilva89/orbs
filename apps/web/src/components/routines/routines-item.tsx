@@ -13,7 +13,7 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@rep
 import { toasty } from '@repo/ui/sonner';
 import { Switch } from '@repo/ui/switch';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link, useHydrated } from '@tanstack/react-router';
+import { Link, useHydrated, useMatch } from '@tanstack/react-router';
 import { rpc } from '@/services/rpc/rpc.client';
 import IconEllipsisVertical from '~icons/lucide/ellipsis-vertical';
 import IconPencil from '~icons/lucide/pencil';
@@ -31,6 +31,7 @@ export function RoutinesItem({ bot, routine }: RoutinesItemProps) {
   const queryClient = useQueryClient();
 
   const params = { botId: bot.id, routineId: routine.id };
+  const isInBotDialog = Boolean(useMatch({ from: '/_chat/bots', shouldThrow: false }));
 
   const settled = {
     onError: () => toasty(m.rooms_routines_action_failed(), '⚠️'),
@@ -86,6 +87,7 @@ export function RoutinesItem({ bot, routine }: RoutinesItemProps) {
             <DropdownMenuItem asChild>
               <Link
                 params={params}
+                replace={isInBotDialog}
                 resetScroll={false}
                 to="/bots/$botId/routines/$routineId/edit"
               >
@@ -97,6 +99,7 @@ export function RoutinesItem({ bot, routine }: RoutinesItemProps) {
             <DropdownMenuItem asChild variant="destructive">
               <Link
                 params={params}
+                replace={isInBotDialog}
                 resetScroll={false}
                 to="/bots/$botId/routines/$routineId/delete"
               >

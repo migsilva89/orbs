@@ -3,14 +3,12 @@ import { m } from '@repo/i18n/client';
 import { useState } from 'react';
 import IconLogIn from '~icons/lucide/log-in';
 import IconLogOut from '~icons/lucide/log-out';
-import IconPlug from '~icons/lucide/plug';
-import IconServer from '~icons/lucide/server';
 import IconX from '~icons/lucide/x';
 import { Button } from '../button';
 import { FormErrors } from '../forms/form';
 import { Input } from '../input';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '../panel';
-import { SettingsPanel } from '../settings/settings-panel';
+import { SettingsGroup } from '../settings/settings-group';
 import { StatusDot } from '../status-dot';
 import type { Bot } from '@repo/contracts/universal';
 
@@ -35,17 +33,12 @@ export function BotMcpPanel({ bot }: BotMcpPanelProps) {
   const [callbackUrl, setCallbackUrl] = useState('');
 
   return (
-    <SettingsPanel
-      icon={IconPlug}
-      id="mcp"
-      title={m.bots_mcp()}
-    >
+    <SettingsGroup isTitleVisible title={m.bots_mcp_servers()}>
       {mcp.isEmpty ? (
         <PanelRow><PanelDescription>{m.bots_mcp_empty()}</PanelDescription></PanelRow>
       ) : null}
       {mcp.servers.map((server) => (
         <PanelRow className="flex-wrap" key={server.name}>
-          <IconServer />
           <PanelContent>
             <PanelTitle className="truncate">{server.name}</PanelTitle>
             <div className="flex items-center gap-1.5">
@@ -122,7 +115,7 @@ export function BotMcpPanel({ bot }: BotMcpPanelProps) {
           </form>
         </PanelRow>
       ) : null}
-      <FormErrors error={mcp.problem} />
-    </SettingsPanel>
+      {mcp.problem ? <PanelRow><FormErrors error={mcp.problem} /></PanelRow> : null}
+    </SettingsGroup>
   );
 }

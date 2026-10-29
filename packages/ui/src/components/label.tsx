@@ -20,7 +20,7 @@ function Label({ className, required, showRequired, disabled, children, ...props
       {...props}
     >
       <span className="contents">{children}</span>
-      {required && showRequired !== false ? <span className="text-xs text-destructive/40">*</span> : null}
+      {required && showRequired !== false ? <span className="text-xs leading-none text-destructive/40">*</span> : null}
     </LabelPrimitive.Root>
   );
 }

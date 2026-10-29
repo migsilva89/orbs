@@ -37,6 +37,8 @@ export const botFields = z.object({
   fallbackModel: modelSelection.nullable(),
   permission: z.enum(['read-only', 'ask', 'auto', 'full']),
   inherit: botInherit,
+  sharedSkills: z.array(z.string().trim().min(1).max(128)).max(500).nullable(),
+  sharedMcp: z.array(z.string().trim().min(1).max(128)).max(200).nullable(),
 });
 
 export const bot = botFields.extend({
@@ -55,6 +57,8 @@ export const botCreate = botFields.extend({
   thinkingLevel: modelThinkingLevel.default('off'),
   permission: botFields.shape.permission.default('ask'),
   inherit: botInherit.default(['skills', 'mcp', 'plugins']),
+  sharedSkills: botFields.shape.sharedSkills.default(null),
+  sharedMcp: botFields.shape.sharedMcp.default(null),
 });
 
 export const botUpdate = botFields.partial().extend(botGet.shape);
@@ -82,6 +86,10 @@ export const botSwapModelsResult = z.object({
 
 export const botForm = botCreate.extend({ handle: botFields.shape.handle.or(z.literal('')) });
 
+export const botSection = z.enum(['profile', 'instructions', 'model', 'tools', 'skills', 'mcp', 'todos', 'routines', 'danger']);
+
+export const botFormSection = botSection.extract(['profile', 'instructions', 'model', 'tools']);
+
 export type Bot = z.infer<typeof bot>;
 export type BotAvatarImage = z.infer<typeof botAvatarImage>;
 export type BotCreateInput = z.infer<typeof botCreate>;
@@ -91,3 +99,5 @@ export type BotCatalog = z.infer<typeof botCatalog>;
 export type BotSwapModelsInput = z.infer<typeof botSwapModels>;
 export type BotSwapModelsResult = z.infer<typeof botSwapModelsResult>;
 export type BotForm = z.infer<typeof botForm>;
+export type BotSection = z.infer<typeof botSection>;
+export type BotFormSection = z.infer<typeof botFormSection>;

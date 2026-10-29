@@ -2,8 +2,19 @@ import { Slot as SlotPrimitive } from 'radix-ui';
 import { cn } from '../lib/cn';
 import type { ComponentProps } from 'react';
 
-function Panel({ className, ...props }: ComponentProps<'section'>) {
-  return <section className={cn('@container/panel flex flex-col divide-y divide-border/40 overflow-hidden rounded-lg border bg-card text-card-foreground', className)} data-slot="panel" {...props} />;
+function Panel({ className, variant = 'card', ...props }: ComponentProps<'section'> & { variant?: 'card' | 'soft' }) {
+  return (
+    <section
+      className={cn(
+        '@container/panel flex flex-col divide-y divide-border/40 overflow-hidden',
+        variant === 'card' && 'rounded-lg border bg-card text-card-foreground',
+        variant === 'soft' && 'divide-transparent rounded-xl bg-muted/40',
+        className,
+      )}
+      data-slot="panel"
+      {...props}
+    />
+  );
 }
 
 function PanelHeader({ className, ...props }: ComponentProps<'div'>) {

@@ -94,6 +94,8 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
       thinkingLevel: bot.thinkingLevel,
       permission: bot.permission,
       inherit: bot.inherit,
+      sharedSkills: bot.sharedSkills,
+      sharedMcp: bot.sharedMcp,
     },
   });
 

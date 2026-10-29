@@ -12,6 +12,7 @@ export async function mcpQueryDiscover(deps: McpServiceDeps, { bot }: McpBotPara
     botId: bot.id,
     paths: settings.paths,
     isInherited: bot.inherit.includes('mcp'),
+    sharedMcp: bot.sharedMcp,
   });
 
   const diagnostics = await Promise.all(config.servers.map(mcpDiscoverCredentials));

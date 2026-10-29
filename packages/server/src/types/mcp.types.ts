@@ -11,7 +11,7 @@ export interface McpServiceDeps {
 }
 
 export interface McpBotParams {
-  bot: Pick<Bot, 'id' | 'inherit'>;
+  bot: Pick<Bot, 'id' | 'inherit' | 'sharedMcp'>;
 }
 
 export interface McpPrepareParams extends McpBotParams {
@@ -26,4 +26,5 @@ export interface McpConfigParams {
   botId: string;
   paths: string[];
   isInherited: boolean;
+  sharedMcp: string[] | null;
 }

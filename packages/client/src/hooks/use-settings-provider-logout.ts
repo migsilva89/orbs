@@ -11,5 +11,6 @@ export function useSettingsProviderLogout({ onDone }: SettingsDoneParams) {
     isPending: logout.isPending,
     problem: logout.isError ? m.settings_providers_error() : null,
     logout: (providerId: string) => logout.mutate({ providerId }),
+    reset: logout.reset,
   };
 }

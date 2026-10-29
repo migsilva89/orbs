@@ -3,14 +3,13 @@ import { serverOrigin } from '@repo/contracts/universal';
 import { m } from '@repo/i18n/client';
 import { useState } from 'react';
 import { match } from 'ts-pattern';
-import IconServer from '~icons/lucide/server';
 import IconTrash2 from '~icons/lucide/trash-2';
 import { Button } from '../button';
 import { FormErrors } from '../forms/form';
 import { Input } from '../input';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from '../item';
 import { PanelDescription, PanelRow } from '../panel';
-import { SettingsPanel } from './settings-panel';
+import { SettingsGroup } from './settings-group';
 import type { ServerAddressKind } from '@repo/contracts/universal';
 
 export function SettingsServer() {
@@ -36,11 +35,7 @@ export function SettingsServer() {
   }
 
   return (
-    <SettingsPanel
-      icon={IconServer}
-      id="server"
-      title={m.settings_server()}
-    >
+    <SettingsGroup title={m.settings_server()}>
       <PanelRow className="items-start">
         <div className="flex min-w-0 flex-1 flex-col gap-3">
           <PanelDescription>{m.settings_server_description()}</PanelDescription>
@@ -88,6 +83,6 @@ export function SettingsServer() {
           <FormErrors error={settings.problem ?? undefined} />
         </div>
       </PanelRow>
-    </SettingsPanel>
+    </SettingsGroup>
   );
 }

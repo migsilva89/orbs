@@ -10,6 +10,7 @@ export function useSettingsSources() {
   const mcp = useQuery(rpc.mcp.settings.queryOptions());
 
   const saveSkills = useMutation(rpc.skills.configure.mutationOptions({
+    meta: { invalidates: [rpc.skills.shared.key(), rpc.skills.discover.key()] },
     onSuccess: (saved) => queryClient.setQueryData(rpc.skills.settings.queryKey(), saved),
   }));
 
@@ -22,6 +23,7 @@ export function useSettingsSources() {
   }));
 
   const saveMcp = useMutation(rpc.mcp.configure.mutationOptions({
+    meta: { invalidates: [rpc.mcp.shared.key(), rpc.mcp.discover.key()] },
     onSuccess: (saved) => queryClient.setQueryData(rpc.mcp.settings.queryKey(), saved),
   }));
 

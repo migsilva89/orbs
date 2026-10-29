@@ -5,5 +5,6 @@ export function skillQueryLoad(deps: SkillServiceDeps, { bot, settings }: SkillL
     botId: bot.id,
     directories: settings.directories,
     isInherited: bot.inherit.includes('skills'),
+    sharedSkills: bot.sharedSkills,
   });
 }

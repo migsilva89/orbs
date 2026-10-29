@@ -17,6 +17,8 @@ import { botQueryList } from './bot-query.list';
 import { botQueryMcp } from './bot-query.mcp';
 import { botQueryPlugins } from './bot-query.plugins';
 import { botQueryPreferences } from './bot-query.preferences';
+import { botQuerySharedMcp } from './bot-query.shared-mcp';
+import { botQuerySharedSkills } from './bot-query.shared-skills';
 import { botQuerySkills } from './bot-query.skills';
 import { botQueryUsage } from './bot-query.usage';
 import type * as BotTypes from '../../types/bot.types';
@@ -58,6 +60,8 @@ export function makeBotService(deps: Omit<BotTypes.BotServiceDeps, 'queues' | 'c
       instructions: (params: UniversalTypes.BotGetInput) => botQueryInstructions(serviceDeps, params),
       catalog: (params: UniversalTypes.BotGetInput) => botQueryCatalog(serviceDeps, params),
       skills: (params: UniversalTypes.BotGetInput) => botQuerySkills(serviceDeps, params),
+      sharedSkills: (params: UniversalTypes.BotGetInput) => botQuerySharedSkills(serviceDeps, params),
+      sharedMcp: (params: UniversalTypes.BotGetInput) => botQuerySharedMcp(serviceDeps, params),
       mcp: (params: UniversalTypes.BotGetInput) => botQueryMcp(serviceDeps, params),
       usage: (params: UniversalTypes.BotGetInput) => botQueryUsage(serviceDeps, params),
       list: () => botQueryList(serviceDeps),

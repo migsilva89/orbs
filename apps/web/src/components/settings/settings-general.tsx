@@ -5,14 +5,10 @@ import { Button } from '@repo/ui/button';
 import { Label } from '@repo/ui/label';
 import { PanelContent, PanelDescription, PanelRow, PanelTitle } from '@repo/ui/panel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/select';
-import { SettingsPanel } from '@repo/ui/settings/settings-panel';
+import { SettingsGroup } from '@repo/ui/settings/settings-group';
 import { Switch } from '@repo/ui/switch';
 import { ClientOnly } from '@tanstack/react-router';
 import { useId, useState } from 'react';
-import IconBellRing from '~icons/lucide/bell-ring';
-import IconSettings from '~icons/lucide/settings';
-import IconSmartphone from '~icons/lucide/smartphone';
-import IconWrench from '~icons/lucide/wrench';
 import type { NotificationPlatform } from '@repo/contracts/universal';
 
 const SETTINGS_NOTIFY_PREFER = {
@@ -29,7 +25,6 @@ function SettingsGeneralNotifications() {
 
   return (
     <PanelRow>
-      <IconBellRing />
       <PanelContent>
         <Label htmlFor={id}>{m.settings_general_notifications()}</Label>
         {permission === 'denied' ? <PanelDescription>{m.settings_general_notifications_blocked()}</PanelDescription> : null}
@@ -53,13 +48,8 @@ export function SettingsGeneral() {
   const verboseId = useId();
 
   return (
-    <SettingsPanel
-      icon={IconSettings}
-      id="general"
-      title={m.settings_general()}
-    >
+    <SettingsGroup title={m.settings_general()}>
       <PanelRow>
-        <IconWrench />
         <PanelContent>
           <Label htmlFor={verboseId}>{m.settings_general_verbose()}</Label>
         </PanelContent>
@@ -74,7 +64,6 @@ export function SettingsGeneral() {
         <SettingsGeneralNotifications />
       </ClientOnly>
       <PanelRow>
-        <IconSmartphone />
         <PanelContent>
           <PanelTitle>{m.settings_notify_prefer()}</PanelTitle>
         </PanelContent>
@@ -91,6 +80,6 @@ export function SettingsGeneral() {
           </SelectContent>
         </Select>
       </PanelRow>
-    </SettingsPanel>
+    </SettingsGroup>
   );
 }

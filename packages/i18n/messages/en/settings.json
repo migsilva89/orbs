@@ -1,8 +1,9 @@
 {
   "settings_title": "Settings",
+  "settings_description": "Change how Orbs looks, connects and runs your bots.",
+  "settings_sections": "Settings sections",
   "settings_saved": "Settings saved",
   "settings_save_failed": "Couldn't save the setting.",
-  "settings_more": "More",
   "settings_desktop": "Desktop app",
   "settings_general": "General",
   "settings_general_verbose": "Hide tool calls and thinking",
@@ -150,5 +151,17 @@
   "settings_mcp_callback_connected_body": "You can close this window. The MCP server is ready for your bot.",
   "settings_mcp_callback_failed_title": "Login did not finish",
   "settings_mcp_callback_failed_body": "Something went wrong while signing in. Close this window and try again from the app.",
-  "settings_mcp_callback_expired_body": "This login link expired or was already used. Start the login again from the app."
+  "settings_mcp_callback_expired_body": "This login link expired or was already used. Start the login again from the app.",
+  "settings_general_hint": "Notifications, what the chat shows, and how Orbs looks.",
+  "settings_models_hint": "Sign in to model providers, and change the models your bots use.",
+  "settings_models_in_use": "Used by your bots",
+  "settings_tools_hint": "What bots may run on their own, and when they ask you first.",
+  "settings_secrets_hint": "Keys and passwords bots can use without seeing them.",
+  "settings_sources_hint": "Where bots load skills, instructions, plugins and MCP servers from.",
+  "settings_server_hint": "The addresses your devices use to reach this server.",
+  "settings_devices_hint": "Phones and computers that can use this server.",
+  "settings_desktop_hint": "How the Mac app shares this server on your network.",
+  "settings_chat_hint": "What the Enter key does, and what happens when you write while a bot works.",
+  "settings_providers_actions": "Actions for {provider}",
+  "settings_models_actions": "Actions for {model}"
 }

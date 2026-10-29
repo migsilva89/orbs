@@ -26,6 +26,11 @@ export const mcpCatalogServer = z.object({
   tools: z.array(mcpCatalogTool),
 });
 
+export const mcpShared = z.array(z.object({
+  name: z.string(),
+  source: z.string(),
+}));
+
 export const mcpCatalog = z.object({
   servers: z.array(mcpCatalogServer),
   diagnostics: z.array(z.object({
@@ -38,3 +43,4 @@ export const mcpCatalog = z.object({
 export type McpSettings = z.infer<typeof mcpSettings>;
 export type McpConfigureInput = z.infer<typeof mcpConfigure>;
 export type McpCatalog = z.infer<typeof mcpCatalog>;
+export type McpShared = z.infer<typeof mcpShared>;

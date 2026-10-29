@@ -2,8 +2,6 @@ import { useTheme } from '@repo/client/web';
 import { m } from '@repo/i18n/client';
 import { ClientOnly, Link } from '@tanstack/react-router';
 import { useId, useState } from 'react';
-import IconMonitor from '~icons/lucide/monitor';
-import IconPalette from '~icons/lucide/palette';
 import IconPlus from '~icons/lucide/plus';
 import { Button } from '../button';
 import { ButtonGroup } from '../button-group';
@@ -13,7 +11,7 @@ import { Label } from '../label';
 import { PanelContent, PanelRow } from '../panel';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
 import { Skeleton } from '../skeleton';
-import { SettingsPanel } from './settings-panel';
+import { SettingsGroup } from './settings-group';
 
 function SettingsAppearanceControls() {
   const theme = useTheme();
@@ -24,7 +22,6 @@ function SettingsAppearanceControls() {
   return (
     <>
       <PanelRow>
-        <IconMonitor />
         <PanelContent>
           <Label htmlFor={modeId}>{m.settings_appearance_mode()}</Label>
         </PanelContent>
@@ -46,12 +43,11 @@ function SettingsAppearanceControls() {
           </SelectContent>
         </Select>
       </PanelRow>
-      <PanelRow className="grid grid-cols-[auto_minmax(0,1fr)] @lg/panel:grid-cols-[auto_minmax(0,1fr)_auto]">
-        <IconPalette />
+      <PanelRow>
         <PanelContent>
           <Label htmlFor={paletteId}>{m.settings_appearance_theme()}</Label>
         </PanelContent>
-        <ButtonGroup aria-label={m.settings_appearance_theme()} className="col-start-2 max-w-full @lg/panel:col-start-auto">
+        <ButtonGroup aria-label={m.settings_appearance_theme()} className="max-w-full">
           <Select value={theme.selected} onValueChange={(id) => setFailed(!theme.select(id))}>
             <SelectTrigger className="w-48 min-w-0" id={paletteId}>
               <SelectValue />
@@ -78,7 +74,10 @@ function SettingsAppearanceControls() {
             title={m.settings_theme_add()}
             variant="outline"
           >
-            <Link to="/settings/themes/create">
+            <Link
+              replace
+              to="/settings/themes/create"
+            >
               <IconPlus className="size-4" />
             </Link>
           </Button>
@@ -95,11 +94,7 @@ function SettingsAppearanceControls() {
 
 export function SettingsAppearance() {
   return (
-    <SettingsPanel
-      icon={IconPalette}
-      id="appearance"
-      title={m.settings_appearance()}
-    >
+    <SettingsGroup isTitleVisible title={m.settings_appearance()}>
       <ClientOnly
         fallback={(
           <PanelRow>
@@ -109,6 +104,6 @@ export function SettingsAppearance() {
       >
         <SettingsAppearanceControls />
       </ClientOnly>
-    </SettingsPanel>
+    </SettingsGroup>
   );
 }

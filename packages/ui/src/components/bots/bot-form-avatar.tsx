@@ -5,14 +5,16 @@ import type { BotForm } from '@repo/contracts/universal';
 
 interface BotFormAvatarProps {
   busy: boolean
+  density?: 'default' | 'compact'
 }
 
-export function BotFormAvatar({ busy }: BotFormAvatarProps) {
+export function BotFormAvatar({ busy, density }: BotFormAvatarProps) {
   const form = useFormContext<BotForm>();
   const [name, avatar] = useWatch({ control: form.control, name: ['name', 'avatar'] });
 
   return (
     <BotAvatarPicker
+      density={density}
       disabled={busy}
       name={name || m.rooms_bot_default_name()}
       value={avatar ?? null}

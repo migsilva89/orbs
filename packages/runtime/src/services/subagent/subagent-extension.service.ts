@@ -25,8 +25,8 @@ const subagentMessage = Type.String({
   description: 'Message for the subagent.',
 });
 
-export function subagentExtension() {
-  return defineExtension({
+export function makeSubagentExtensionService() {
+  const extension = defineExtension({
     name: SUBAGENT.extension,
     tasks: [subagentAnchorTask, subagentReporterTask],
     tools: [
@@ -101,5 +101,8 @@ export function subagentExtension() {
       }),
     ],
   });
+
+  return { extension };
 }
 
+export type SubagentExtensionService = ReturnType<typeof makeSubagentExtensionService>;

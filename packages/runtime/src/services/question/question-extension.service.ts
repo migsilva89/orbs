@@ -46,7 +46,7 @@ const askSecret = defineTool({
   }),
 });
 
-export function questionExtension() {
+export function makeQuestionExtensionService() {
   return {
     extension: defineExtension({
       name: QUESTION.extension,
@@ -55,3 +55,5 @@ export function questionExtension() {
     readOnlyTools: [ask, askSecret],
   };
 }
+
+export type QuestionExtensionService = ReturnType<typeof makeQuestionExtensionService>;

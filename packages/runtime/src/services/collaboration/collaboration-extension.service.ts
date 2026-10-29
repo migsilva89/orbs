@@ -8,7 +8,7 @@ import { COLLABORATION } from './collaboration.constants';
 import { collaborationBotId } from './collaboration.utils';
 import type { CollaborationDeps } from '../../types/collaboration.types';
 
-export function collaborationExtension({ policy, directory }: CollaborationDeps) {
+export function makeCollaborationExtensionService({ policy, directory }: CollaborationDeps) {
   const delivery = collaborationDeliveryTask({ directory });
   const deps = { policy, directory, delivery };
 
@@ -75,3 +75,5 @@ export function collaborationExtension({ policy, directory }: CollaborationDeps)
     readOnlyTools: [listBots],
   };
 }
+
+export type CollaborationExtensionService = ReturnType<typeof makeCollaborationExtensionService>;

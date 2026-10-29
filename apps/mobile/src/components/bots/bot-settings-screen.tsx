@@ -26,6 +26,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Icon } from '@/components/ui/icon';
 import { useChatReturn } from '@/hooks/use-chat-return';
 import { useConnection } from '@/hooks/use-connection';
+import { BOT_SHARED_RESOURCES } from '@/services/bot/bot-shared.constants';
 import type { BotAvatarRouteParams } from '@/types/bot-avatar.types';
 import type { RpcSession } from '@/types/rpc.types';
 import type { Bot, BotForm } from '@repo/contracts/universal';
@@ -133,8 +134,12 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
   const isBusy = save.isPending;
   const prefill = (text: string) => returnToChat({ botId: bot.id, prefill: text });
 
-  const submit = form.handleSubmit((input: BotForm) => save.mutate({
+  const submit = form.handleSubmit(({ sharedSkills: _skills, sharedMcp: _mcp, ...input }: BotForm) => save.mutate({
     ...input,
+    inherit: [
+      ...input.inherit.filter((resource) => !BOT_SHARED_RESOURCES.includes(resource)),
+      ...bot.inherit.filter((resource) => BOT_SHARED_RESOURCES.includes(resource)),
+    ],
     handle: input.handle === '' ? bot.handle : input.handle,
     botId: bot.id,
   }, {
@@ -185,7 +190,11 @@ function BotSettingsScreenForm({ session, bot, isDeletable }: BotSettingsScreenF
             </Card>
           </BotDetailsSection>
           <BotSettingsModel isDisabled={isBusy} session={session} />
-          <BotSettingsAccess isDisabled={isBusy} />
+          <BotSettingsAccess
+            bot={bot}
+            isDisabled={isBusy}
+            session={session}
+          />
           <BotSettingsMcp bot={bot} session={session} />
           <BotDetailsSection
             icon={ListTodo}

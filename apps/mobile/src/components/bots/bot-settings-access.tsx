@@ -5,25 +5,27 @@ import { useController, useFormContext } from 'react-hook-form';
 import { Switch } from 'react-native';
 import { BotDetailsSection } from '@/components/bots/bot-details-section';
 import { BotSettingsMenuRow } from '@/components/bots/bot-settings-menu-row';
+import { BotSettingsSharedRow } from '@/components/bots/bot-settings-shared-row';
 import { Icon } from '@/components/ui/icon';
 import { Item, ItemContent, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { botMenuPermissions } from '@/services/bot/bot-menu.utils';
+import type { RpcSession } from '@/types/rpc.types';
 import type { BotInherit } from '@repo/client/client';
-import type { BotForm } from '@repo/contracts/universal';
+import type { Bot, BotForm } from '@repo/contracts/universal';
 import type { LucideIcon } from 'lucide-react-native';
 
 const BOT_SETTINGS_INHERIT = [
-  { resource: 'skills', icon: Sparkles, label: m.rooms_bot_global_skills },
   { resource: 'agentsFile', icon: FileText, label: m.rooms_bot_global_agents_md },
-  { resource: 'mcp', icon: Plug, label: m.rooms_bot_global_mcp },
   { resource: 'plugins', icon: Blocks, label: m.rooms_bot_global_plugins },
 ] satisfies { resource: BotInherit; icon: LucideIcon; label: () => string }[];
 
 interface BotSettingsAccessProps {
+  bot: Bot;
+  session: RpcSession;
   isDisabled: boolean;
 }
 
-export function BotSettingsAccess({ isDisabled }: BotSettingsAccessProps) {
+export function BotSettingsAccess({ bot, session, isDisabled }: BotSettingsAccessProps) {
   const form = useFormContext<BotForm>();
   const permission = useController({ control: form.control, name: 'permission' });
   const inherit = useController({ control: form.control, name: 'inherit' });
@@ -60,6 +62,22 @@ export function BotSettingsAccess({ isDisabled }: BotSettingsAccessProps) {
             />
           </Item>
         ))}
+        <BotSettingsSharedRow
+          bot={bot}
+          icon={Sparkles}
+          isDisabled={isDisabled}
+          resource="skills"
+          session={session}
+          title={m.bots_skills()}
+        />
+        <BotSettingsSharedRow
+          bot={bot}
+          icon={Plug}
+          isDisabled={isDisabled}
+          resource="mcp"
+          session={session}
+          title={m.bots_mcp()}
+        />
       </ItemGroup>
     </BotDetailsSection>
   );

@@ -18,6 +18,7 @@ export const textBaseVariants = cva({
       'on-primary': 'text-primary-foreground',
       'on-secondary': 'text-secondary-foreground',
       success: 'text-success',
+      warning: 'text-warning',
       destructive: 'text-destructive',
       'destructive-subtle': 'text-destructive/40',
       'on-destructive': 'text-destructive-foreground',

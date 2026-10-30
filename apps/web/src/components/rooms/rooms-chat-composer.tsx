@@ -13,6 +13,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { match, P } from 'ts-pattern';
+import { RoomsChatContext } from '@/components/rooms/rooms-chat-context';
 import { RoomsMention } from '@/components/rooms/rooms-mention';
 import { RoomsMentionOption } from '@/components/rooms/rooms-mention-option';
 import { rpc } from '@/services/rpc/rpc.client';
@@ -299,6 +300,13 @@ export function RoomsChatComposer({
           />
         </Suspense>
         <InputGroupAddon align="inline-end">
+          <RoomsChatContext
+            bot={bot}
+            conversationId={conversationId}
+            isBusy={isBusy}
+            isCompacting={isCompacting}
+            latestEntryId={latestEntryId}
+          />
           <PromptInputSubmit
             aria-label={isStopping ? m.rooms_chat_stop() : m.rooms_chat_send()}
             disabled={isCompacting || files.uploading || isSendingFiles || (!isBusy && !text.trim() && files.readyIds.length === 0)}

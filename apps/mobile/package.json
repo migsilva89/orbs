@@ -18,6 +18,7 @@
     "eas:dev": "eas build --profile development",
     "eas:preview": "eas build --profile preview",
     "eas:prod": "eas build --profile production",
+    "eas:testflight": "eas build --platform ios --profile production --auto-submit",
     "codegen": "uniwind generate-artifacts --css ./src/application/styles.css --dts ./src/uniwind-types.d.ts",
     "check": "bun run codegen && tsrs --noEmit",
     "lint": "bun run codegen && oxlint src/ app.config.ts -c ../../oxlint.config.ts --tsconfig tsconfig.json --disable-nested-config",

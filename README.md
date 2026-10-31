@@ -103,7 +103,7 @@ This releases from a clean `main` that matches `origin/main`. It runs `check` an
 - `Orbs-<version>-macos-arm64.zip`: the macOS app, signed with your Developer ID and notarized by Apple.
 - `Orbs-<version>-server.tar.gz`: the daemon and web app for a Mac without the desktop app. Run `bun server/daemon/entry.native.js start` and `bun server/web/src/application/server.bun.js`.
 
-The iOS app ships through EAS and TestFlight, not GitHub: `bun run release:ios` builds it on EAS and submits it to TestFlight. `bun run release:desktop` builds only the macOS app, without tagging.
+The iOS app ships through EAS and TestFlight, not GitHub: `bun run release:ios` builds it on this Mac and submits it to TestFlight; `bun run release:ios-expo` builds it on EAS instead. `bun run release:desktop` builds only the macOS app, without tagging.
 
 Signing reads `DESKTOP_SIGNING_KEYCHAIN` (a dedicated keychain holding the Developer ID certificate) and `DESKTOP_SIGNING_IDENTITY` (its SHA-1) from `.env`. The keychain password and notary key come from `.env` or from a `credentials.json` next to the keychain; see `.env.example`.
 

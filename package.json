@@ -191,6 +191,7 @@
     "dev:desktop": "turbo run dev:macos --filter=@repo/desktop --log-prefix=none --env-mode=loose",
     "release:desktop": "bun --env-file=.env scripts/desktop.ts release",
     "release:ios": "bun run --cwd apps/mobile eas:testflight",
+    "release:ios-expo": "bun run --cwd apps/mobile eas:testflight:cloud",
     "release": "bun --env-file=.env scripts/release.ts",
     "screenshots:web": "bun scripts/web.ts screenshots",
     "build:web": "turbo run build --filter=@repo/web",

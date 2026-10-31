@@ -9,6 +9,7 @@ import { BotDetailsFacts } from '@/components/bots/bot-details-facts';
 import { BotDetailsMedia } from '@/components/bots/bot-details-media';
 import { BotDetailsSettings } from '@/components/bots/bot-details-settings';
 import { BotLoadState } from '@/components/bots/bot-load-state';
+import { ChatContextRow } from '@/components/chat/chat-context-row';
 import { RoutinesList } from '@/components/routines/routines-list';
 import { TodosList } from '@/components/todos/todos-list';
 import { Avatar } from '@/components/ui/avatar';
@@ -128,7 +129,7 @@ function BotDetailsScreenContent({ session, bot, chat, page }: BotDetailsScreenC
               chat={chat}
               session={session}
             />
-            <BotDetailsScreenPages botId={bot.id} />
+            <BotDetailsScreenPages chat={chat} />
             <BotDetailsFacts bot={bot} chat={chat} />
           </>
         ))
@@ -138,10 +139,10 @@ function BotDetailsScreenContent({ session, bot, chat, page }: BotDetailsScreenC
 }
 
 interface BotDetailsScreenPagesProps {
-  botId: string;
+  chat: ConversationListItem;
 }
 
-function BotDetailsScreenPages({ botId }: BotDetailsScreenPagesProps) {
+function BotDetailsScreenPages({ chat }: BotDetailsScreenPagesProps) {
   const router = useRouter();
 
   const pages = [
@@ -152,12 +153,13 @@ function BotDetailsScreenPages({ botId }: BotDetailsScreenPagesProps) {
 
   return (
     <ItemGroup>
+      <ChatContextRow chat={chat} />
       {pages.map((item) => (
         <ItemButton
           accessibilityLabel={item.title}
           key={item.pathname}
           size="sm"
-          onPress={() => router.push({ pathname: item.pathname, params: { botId } })}
+          onPress={() => router.push({ pathname: item.pathname, params: { botId: chat.botId } })}
         >
           <ItemMedia>
             <Icon icon={item.icon} tone="muted" />

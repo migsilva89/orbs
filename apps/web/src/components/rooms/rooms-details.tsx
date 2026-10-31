@@ -1,4 +1,5 @@
 import { botUsageLabel } from '@repo/client/client';
+import { useIsMobile } from '@repo/client/web';
 import { m } from '@repo/i18n/client';
 import { getLocale } from '@repo/i18n/runtime';
 import { BotAvatar } from '@repo/ui/bots/bot-avatar';
@@ -11,6 +12,7 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useHydrated, useMatch, useMatchRoute } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
 import { match, P } from 'ts-pattern';
+import { RoomsChatContextItem } from '@/components/rooms/rooms-chat-context';
 import { RoomsDetailsBot } from '@/components/rooms/rooms-details-bot';
 import { RoomsDetailsMedia } from '@/components/rooms/rooms-details-media';
 import { RoutinesList } from '@/components/routines/routines-list';
@@ -134,6 +136,7 @@ interface RoomsDetailsContentProps {
 
 function RoomsDetailsContent({ bot, chat, page }: RoomsDetailsContentProps) {
   const handle = bot.handle;
+  const isMobile = useIsMobile();
 
   const pages = [
     { to: '/rooms/direct/$handle/todos', title: m.rooms_todos(), icon: <IconListTodo /> },
@@ -162,6 +165,7 @@ function RoomsDetailsContent({ bot, chat, page }: RoomsDetailsContentProps) {
       <>
         <RoomsDetailsBot bot={bot} chat={chat} />
         <ItemGroup variant="outline">
+          {isMobile ? <RoomsChatContextItem bot={bot} chat={chat} /> : null}
           {pages.map((item) => (
             <Item key={item.to} size="sm">
               <ItemMedia>{item.icon}</ItemMedia>

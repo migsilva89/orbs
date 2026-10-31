@@ -37,6 +37,11 @@ export interface ChatActionsRouteParams extends ChatReactionRouteParams {
   details?: string;
 }
 
+export interface ChatContextRouteParams extends ChatSearchParams {
+  botId: string;
+  conversationId: string;
+}
+
 export interface ChatResetRouteParams extends ChatSearchParams {
   botId: string;
   handoff?: string;

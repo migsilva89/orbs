@@ -101,6 +101,21 @@ export interface ChatHistoryParams {
   cursor: UniversalTypes.ConversationView['historyCursor'];
 }
 
+export interface ChatContextUsageParams {
+  botId: string;
+  conversationId: number;
+  revision?: number;
+}
+
+export interface ChatContextView {
+  percent: number | null;
+  shown: string | null;
+  used: string;
+  label: string;
+  tokens: string;
+  isNearFull: boolean;
+}
+
 export interface ChatReactionsParams {
   botId: string;
   conversationId: number;

@@ -136,7 +136,6 @@ interface RoomsDetailsContentProps {
 
 function RoomsDetailsContent({ bot, chat, page }: RoomsDetailsContentProps) {
   const handle = bot.handle;
-  const isMobile = useIsMobile();
 
   const pages = [
     { to: '/rooms/direct/$handle/todos', title: m.rooms_todos(), icon: <IconListTodo /> },
@@ -165,7 +164,6 @@ function RoomsDetailsContent({ bot, chat, page }: RoomsDetailsContentProps) {
       <>
         <RoomsDetailsBot bot={bot} chat={chat} />
         <ItemGroup variant="outline">
-          {isMobile ? <RoomsChatContextItem bot={bot} chat={chat} /> : null}
           {pages.map((item) => (
             <Item key={item.to} size="sm">
               <ItemMedia>{item.icon}</ItemMedia>
@@ -196,6 +194,7 @@ interface RoomsDetailsFactsProps {
 
 function RoomsDetailsFacts({ bot, chat }: RoomsDetailsFactsProps) {
   const hydrated = useHydrated();
+  const isMobile = useIsMobile();
   const date = new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium', timeStyle: 'short' });
   const lastActivity = chat.lastMessage && hydrated ? date.format(new Date(chat.lastMessage.createdAt)) : '';
 
@@ -207,6 +206,7 @@ function RoomsDetailsFacts({ bot, chat }: RoomsDetailsFactsProps) {
   return (
     <RoomsDetailsSection title={m.rooms_details_general()}>
       <ItemGroup variant="outline">
+        {isMobile ? <RoomsChatContextItem bot={bot} chat={chat} /> : null}
         {facts.map((fact) => (
           <Item key={fact.label} size="sm">
             <ItemContent>

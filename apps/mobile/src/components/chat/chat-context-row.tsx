@@ -1,11 +1,11 @@
 import { useChatContextUsage } from '@repo/client/react';
 import { m } from '@repo/i18n/client';
 import { useRouter } from 'expo-router';
-import { ChevronRight, Gauge } from 'lucide-react-native';
+import { ChevronRight } from 'lucide-react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { useCSSVariable } from 'uniwind';
 import { Icon } from '@/components/ui/icon';
-import { ItemButton, ItemContent, ItemMedia, ItemTitle } from '@/components/ui/item';
+import { ItemButton, ItemContent, ItemTitle } from '@/components/ui/item';
 import { Text } from '@/components/ui/text';
 import type { ConversationListItem } from '@repo/contracts/universal';
 
@@ -15,7 +15,7 @@ interface ChatContextRowProps {
 
 export function ChatContextRow({ chat }: ChatContextRowProps) {
   const router = useRouter();
-  const [muted, warning] = useCSSVariable(['--color-muted-foreground', '--color-warning']).map(String);
+  const [muted, warning, destructive] = useCSSVariable(['--color-muted-foreground', '--color-warning', '--color-destructive']).map(String);
 
   const usage = useChatContextUsage({
     botId: chat.botId,
@@ -24,7 +24,7 @@ export function ChatContextRow({ chat }: ChatContextRowProps) {
   });
 
   const context = usage.context;
-  const color = context?.isNearFull ? warning : muted;
+  const color = { muted, warning, destructive }[context?.tone ?? 'muted'];
   const circumference = 2 * Math.PI * 6;
 
   return (
@@ -33,9 +33,6 @@ export function ChatContextRow({ chat }: ChatContextRowProps) {
       size="sm"
       onPress={() => router.push({ pathname: '/chat/[botId]/context', params: { botId: chat.botId, conversationId: String(chat.conversationId) } })}
     >
-      <ItemMedia>
-        <Icon icon={Gauge} tone="muted" />
-      </ItemMedia>
       <ItemContent>
         <ItemTitle>{m.rooms_context_title()}</ItemTitle>
       </ItemContent>
@@ -68,7 +65,7 @@ export function ChatContextRow({ chat }: ChatContextRowProps) {
         </Svg>
       )}
       {context ? (
-        <Text tone={context.isNearFull ? 'warning' : 'muted'} variant="item-description">{context.shown ?? `~${context.used}`}</Text>
+        <Text tone={context.tone} variant="item-description">{context.shown ?? `~${context.used}`}</Text>
       ) : null}
       <Icon
         icon={ChevronRight}

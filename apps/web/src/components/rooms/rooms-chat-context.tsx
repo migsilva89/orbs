@@ -3,19 +3,24 @@ import { m } from '@repo/i18n/client';
 import { PromptInputButton } from '@repo/ui/ai/prompt-input';
 import { Button } from '@repo/ui/button';
 import { cn } from '@repo/ui/cn';
-import { Item, ItemActions, ItemContent, ItemLink, ItemMedia, ItemTitle, ItemValue } from '@repo/ui/item';
+import { Item, ItemActions, ItemContent, ItemLink, ItemTitle, ItemValue } from '@repo/ui/item';
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@repo/ui/popover';
 import { Progress } from '@repo/ui/progress';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import IconChevronRight from '~icons/lucide/chevron-right';
 import IconFoldVertical from '~icons/lucide/fold-vertical';
-import IconGauge from '~icons/lucide/gauge';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import IconTriangleAlert from '~icons/lucide/triangle-alert';
-import type { RoomsChat } from '@repo/client/client';
+import type { ChatContextView, RoomsChat } from '@repo/client/client';
 import type { Bot } from '@repo/contracts/universal';
 import type { ComponentProps } from 'react';
+
+const ROOMS_CHAT_CONTEXT_TONES = {
+  muted: 'text-muted-foreground',
+  warning: 'text-warning',
+  destructive: 'text-destructive',
+} satisfies Record<ChatContextView['tone'], string>;
 
 interface RoomsChatContextProps {
   bot: Bot
@@ -38,21 +43,21 @@ export function RoomsChatContext({ bot, conversationId, latestEntryId, isBusy, i
     return null;
   }
 
-  const { percent, shown, used, label, isNearFull } = usage.context;
+  const { percent, shown, used, label, tone } = usage.context;
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <PromptInputButton
           aria-label={label}
-          size={percent === null || isNearFull ? 'sm' : 'icon-sm'}
+          size={percent === null || tone !== 'muted' ? 'sm' : 'icon-sm'}
           title={label}
         >
-          <span className={cn('flex items-center gap-1.5 text-xs text-muted-foreground tabular-nums', isNearFull && 'text-warning')}>
+          <span className={cn('flex items-center gap-1.5 text-xs tabular-nums', ROOMS_CHAT_CONTEXT_TONES[tone])}>
             {percent === null ? `~${used}` : (
               <>
                 <RoomsChatContextRing percent={percent} />
-                {isNearFull ? shown : null}
+                {tone === 'muted' ? null : shown}
               </>
             )}
           </span>
@@ -90,7 +95,6 @@ export function RoomsChatContextItem({ bot, chat }: RoomsChatContextItemProps) {
     <Popover open={context ? isOpen : false} onOpenChange={setIsOpen}>
       <PopoverAnchor asChild>
         <Item size="sm">
-          <ItemMedia><IconGauge /></ItemMedia>
           <ItemContent className="min-w-0">
             <ItemTitle>
               <PopoverTrigger asChild>
@@ -102,7 +106,7 @@ export function RoomsChatContextItem({ bot, chat }: RoomsChatContextItemProps) {
           </ItemContent>
           <ItemActions>
             {context ? (
-              <span className={cn('flex items-center gap-1.5 text-sm text-muted-foreground tabular-nums', context.isNearFull && 'text-warning')}>
+              <span className={cn('flex items-center gap-1.5 text-sm tabular-nums', ROOMS_CHAT_CONTEXT_TONES[context.tone])}>
                 {context.percent === null ? null : <RoomsChatContextRing percent={context.percent} />}
                 {context.shown ?? `~${context.used}`}
               </span>
@@ -169,7 +173,7 @@ function RoomsChatContextPanel({ bot, usage, isCompacting, onClose, align, side 
     return null;
   }
 
-  const { percent, shown, tokens, isNearFull } = usage.context;
+  const { percent, shown, tokens, tone } = usage.context;
 
   return (
     <PopoverContent align={align} side={side}>
@@ -177,8 +181,8 @@ function RoomsChatContextPanel({ bot, usage, isCompacting, onClose, align, side 
         <div className="flex items-center justify-between gap-2 text-sm">
           <span className="font-medium">{m.rooms_context_title()}</span>
           {shown ? (
-            <span className={cn('flex items-center gap-1 text-muted-foreground tabular-nums', isNearFull && 'text-warning')}>
-              {isNearFull ? <IconTriangleAlert aria-hidden className="size-3.5" /> : null}
+            <span className={cn('flex items-center gap-1 tabular-nums', ROOMS_CHAT_CONTEXT_TONES[tone])}>
+              {tone === 'muted' ? null : <IconTriangleAlert aria-hidden className="size-3.5" />}
               {shown}
             </span>
           ) : null}
@@ -187,7 +191,7 @@ function RoomsChatContextPanel({ bot, usage, isCompacting, onClose, align, side 
           <Progress
             className="h-1"
             value={percent}
-            variant={isNearFull ? 'warning' : 'default'}
+            variant={tone === 'muted' ? 'default' : tone}
           />
         )}
         <p className="text-xs text-muted-foreground tabular-nums">
@@ -198,7 +202,7 @@ function RoomsChatContextPanel({ bot, usage, isCompacting, onClose, align, side 
           <Button
             disabled={isCompacting || usage.isCompacting}
             size="xs"
-            variant={isNearFull ? 'primary' : 'outline'}
+            variant={tone === 'destructive' ? 'primary' : 'outline'}
             onClick={() => {
               onClose();
               usage.compact();
